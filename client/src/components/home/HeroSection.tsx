@@ -3,28 +3,34 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
-// Animations améliorées avec effet de rebond
+// Animations améliorées avec effet de rebond plus accentué
 const fadeInWithBounce = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.175, 0.885, 0.32, 1.275], // Effet de rebond
-    }
-  }
-};
-
-const slideUpWithBounce = {
   hidden: { opacity: 0, y: 30 },
   visible: { 
     opacity: 1, 
     y: 0,
     transition: {
       duration: 0.7,
-      delay: 0.2,
-      ease: [0.175, 0.885, 0.32, 1.275], // Effet de rebond
+      ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond plus accentué
+      bounce: 0.4,
+      type: "spring",
+      stiffness: 120
+    }
+  }
+};
+
+const slideUpWithBounce = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.8,
+      delay: 0.3,
+      ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond plus accentué
+      bounce: 0.5,
+      type: "spring",
+      stiffness: 100
     }
   }
 };
@@ -34,11 +40,11 @@ const HeroSection: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   
   return (
-    <section className="relative text-white overflow-hidden h-[70vh] md:h-auto mb-8 md:mb-16">
+    <section className="relative text-white overflow-hidden h-[70vh] md:h-screen mb-8 md:mb-4">
       {/* Image de fond avec effet parallaxe */}
       <div className="absolute inset-0 z-0">
         {/* Dégradé amélioré, plus dynamique */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10 backdrop-blur-[1px] z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10 backdrop-blur-[0px] z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 z-10"></div>
         <div
           className={`absolute inset-0 ${isMobile ? '' : 'bg-fixed'}`}
@@ -47,13 +53,14 @@ const HeroSection: React.FC = () => {
               "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
             backgroundPosition: isMobile ? "center top" : "center center",
             backgroundSize: "cover",
-            backgroundAttachment: isMobile ? "scroll" : "fixed", 
+            backgroundAttachment: isMobile ? "scroll" : "fixed",
+            filter: "contrast(1.05) brightness(0.95)",
           }}
         ></div>
       </div>
 
       {/* Contenu */}
-      <div className="container mx-auto px-4 py-40 md:py-72 lg:py-96 relative z-10">
+      <div className="container mx-auto px-4 py-40 md:py-[calc(50vh-10rem)] lg:py-[calc(50vh-8rem)] relative z-10">
         <div className={`max-w-4xl ${isMobile ? 'text-left mx-0 pt-16' : 'mx-auto text-center md:text-left md:mx-0'}`}>
           <motion.h1
             variants={fadeInWithBounce}
