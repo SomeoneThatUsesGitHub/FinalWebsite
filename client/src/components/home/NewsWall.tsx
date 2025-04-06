@@ -285,17 +285,7 @@ const NewsWall: React.FC = () => {
               ))}
         </div>
 
-        {/* "Voir tout" button for mobile */}
-        {isReallyMobile && !showAllMobile && recent && recent.length > 4 && (
-          <ScrollAnimation className="flex justify-center mt-8" threshold={0.1} delay={0.3}>
-            <Button 
-              onClick={() => setShowAllMobile(true)}
-              className="rounded-full bg-blue-600 hover:bg-blue-700"
-            >
-              Voir tous les articles
-            </Button>
-          </ScrollAnimation>
-        )}
+        {/* Le bouton a été supprimé à la demande du client */}
 
       </div>
     </section>

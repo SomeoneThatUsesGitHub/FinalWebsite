@@ -143,3 +143,24 @@ export type InsertElection = z.infer<typeof insertElectionSchema>;
 
 export type EducationalContent = typeof educationalContent.$inferSelect;
 export type InsertEducationalContent = z.infer<typeof insertEducationalContentSchema>;
+
+// Video model (YouTube shorts)
+export const videos = pgTable("videos", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  videoId: text("video_id").notNull(), // YouTube video ID
+  views: integer("views").default(0),
+  publishedAt: timestamp("published_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertVideoSchema = createInsertSchema(videos).pick({
+  title: true,
+  videoId: true,
+  views: true,
+  publishedAt: true,
+});
+
+export type Video = typeof videos.$inferSelect;
+export type InsertVideo = z.infer<typeof insertVideoSchema>;

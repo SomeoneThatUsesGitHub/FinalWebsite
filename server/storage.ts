@@ -4,7 +4,8 @@ import {
   articles, type Article, type InsertArticle,
   newsUpdates, type NewsUpdate, type InsertNewsUpdate,
   elections, type Election, type InsertElection,
-  educationalContent, type EducationalContent, type InsertEducationalContent
+  educationalContent, type EducationalContent, type InsertEducationalContent,
+  videos, type Video, type InsertVideo
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not } from "drizzle-orm";
@@ -44,6 +45,12 @@ export interface IStorage {
   getAllEducationalContent(categoryId?: number): Promise<EducationalContent[]>;
   getEducationalContentById(id: number): Promise<EducationalContent | undefined>;
   createEducationalContent(content: InsertEducationalContent): Promise<EducationalContent>;
+  
+  // Videos operations
+  getAllVideos(limit?: number): Promise<Video[]>;
+  getVideoById(id: number): Promise<Video | undefined>;
+  createVideo(video: InsertVideo): Promise<Video>;
+  updateVideoViews(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -303,6 +310,48 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return content;
   }
+  
+  // Videos operations
+  async getAllVideos(limit: number = 8): Promise<Video[]> {
+    return db
+      .select()
+      .from(videos)
+      .orderBy(desc(videos.publishedAt))
+      .limit(limit);
+  }
+  
+  async getVideoById(id: number): Promise<Video | undefined> {
+    const [video] = await db
+      .select()
+      .from(videos)
+      .where(eq(videos.id, id));
+    return video;
+  }
+  
+  async createVideo(insertVideo: InsertVideo): Promise<Video> {
+    const [video] = await db
+      .insert(videos)
+      .values({
+        ...insertVideo,
+        views: insertVideo.views || 0
+      })
+      .returning();
+    return video;
+  }
+  
+  async updateVideoViews(id: number): Promise<void> {
+    const [video] = await db
+      .select()
+      .from(videos)
+      .where(eq(videos.id, id));
+    
+    if (video) {
+      await db
+        .update(videos)
+        .set({ views: video.views + 1 })
+        .where(eq(videos.id, id));
+    }
+  }
 }
 
 // Initialize sample database data
@@ -500,6 +549,48 @@ async function initializeDb() {
     
     // Insert all articles
     await db.insert(articles).values(articlesList);
+    
+    // Add some sample videos (YouTube shorts)
+    const videosList = [
+      {
+        title: "Pourquoi les jeunes ne votent plus ?",
+        videoId: "Emm3XznHJkM",
+        views: 24500,
+        publishedAt: new Date("2023-05-15")
+      },
+      {
+        title: "Comment fonctionne l'Assemblée Nationale en 2 minutes",
+        videoId: "nYAVMU5YYzw",
+        views: 18300,
+        publishedAt: new Date("2023-06-22")
+      },
+      {
+        title: "L'Union Européenne expliquée simplement",
+        videoId: "O37yJBFRrfg",
+        views: 32100,
+        publishedAt: new Date("2023-04-10")
+      },
+      {
+        title: "La Constitution française en bref",
+        videoId: "9MleNgLdQGE",
+        views: 12700,
+        publishedAt: new Date("2023-07-05")
+      },
+      {
+        title: "Comment se prépare une élection présidentielle",
+        videoId: "PwoQJP4e8Rk",
+        views: 28900,
+        publishedAt: new Date("2023-03-18")
+      },
+      {
+        title: "Les institutions européennes expliquées",
+        videoId: "_ZXeKXvUcx8",
+        views: 19600,
+        publishedAt: new Date("2023-06-03")
+      }
+    ];
+    
+    await db.insert(videos).values(videosList);
   }
 }
 

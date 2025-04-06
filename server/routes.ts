@@ -165,6 +165,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     res.json(content);
   });
+  
+  // Videos
+  app.get("/api/videos", async (req: Request, res: Response) => {
+    try {
+      const { limit } = req.query;
+      const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 8;
+      
+      const videos = await storage.getAllVideos(limitNum);
+      res.json(videos);
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      res.status(500).json({ error: "Error fetching videos" });
+    }
+  });
+  
+  app.get("/api/videos/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid video ID" });
+      }
+      
+      const video = await storage.getVideoById(Number(id));
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+      
+      // Increment view count asynchronously
+      storage.updateVideoViews(video.id).catch(console.error);
+      
+      res.json(video);
+    } catch (error) {
+      console.error("Error fetching video by ID:", error);
+      res.status(500).json({ error: "Error fetching video" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
