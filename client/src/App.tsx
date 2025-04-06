@@ -10,7 +10,6 @@ function App() {
       <main className="flex-grow">
         <Home />
       </main>
-      <Footer />
       <Toaster />
     </div>
   );

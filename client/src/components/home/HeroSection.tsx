@@ -6,7 +6,7 @@ const HeroSection: React.FC = () => {
   return (
     <section className="relative bg-gradient-to-br from-blue-900 to-blue-600 text-white overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-blue-950 opacity-40"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-950/70 via-blue-950/50 to-black/80"></div>
         <img 
           src="https://www.touteleurope.eu/wp-content/uploads/2021/10/20191217_EP-097972A_GEN_103_RESIZED_M.jpg" 
           alt="European Parliament" 
