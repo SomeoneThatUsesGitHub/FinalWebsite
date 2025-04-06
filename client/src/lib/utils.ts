@@ -8,7 +8,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(date: string | Date, formatString: string = "d MMMM yyyy"): string {
-  return format(new Date(date), formatString, { locale: fr });
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return format(dateObj, formatString, { locale: fr });
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return String(date);
+  }
 }
 
 export function truncateText(text: string, maxLength: number): string {

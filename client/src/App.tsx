@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Route, Switch, useLocation } from "wouter";
 import Home from "@/pages/Home";
 import ArticlesList from "@/pages/ArticlesList";
+import Article from "@/pages/Article";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import NotFound from "@/pages/not-found";
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" component={() => <Redirector to="/home" />} />
           <Route path="/home" component={Home} />
           <Route path="/articles" component={ArticlesList} />
+          <Route path="/articles/:slug" component={Article} />
           <Route path="/:rest*" component={NotFound} />
         </Switch>
       </main>
