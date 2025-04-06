@@ -2,17 +2,24 @@ import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { mobileMenu } from "@/lib/animations";
-import { Menu, X } from "lucide-react";
+import { Menu, X, MessageCircle } from "lucide-react";
 
-const NavItem: React.FC<{ href: string; label: string; active: boolean }> = ({ href, label, active }) => (
+const NavItem: React.FC<{ href: string; label: string; active: boolean; highlighted?: boolean }> = ({ 
+  href, 
+  label, 
+  active, 
+  highlighted = false 
+}) => (
   <Link href={href}>
     <div className={`relative px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-      active 
-        ? "text-blue-600 bg-blue-50" 
-        : "text-gray-700 hover:text-blue-600 hover:bg-gray-100"
+      highlighted 
+        ? "text-white bg-blue-600 hover:bg-blue-700" 
+        : active 
+          ? "text-blue-600 bg-blue-50" 
+          : "text-gray-700 hover:text-blue-600 hover:bg-gray-100"
     }`}>
       {label}
-      {active && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></span>}
+      {active && !highlighted && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></span>}
     </div>
   </Link>
 );
@@ -53,6 +60,13 @@ const Header: React.FC = () => {
                 active={item.active}
               />
             ))}
+            
+            <NavItem 
+              href="/contact"
+              label="Contactez-nous"
+              active={location === "/contact"}
+              highlighted={true}
+            />
           </nav>
           
           {/* Mobile Menu Button */}
@@ -87,6 +101,16 @@ const Header: React.FC = () => {
                   </div>
                 </Link>
               ))}
+              
+              <Link href="/contact">
+                <div 
+                  className="py-2 px-4 rounded-md cursor-pointer bg-blue-600 text-white flex items-center justify-center space-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <MessageCircle size={16} />
+                  <span>Contactez-nous</span>
+                </div>
+              </Link>
             </nav>
           </motion.div>
         )}
