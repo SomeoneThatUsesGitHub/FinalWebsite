@@ -140,7 +140,55 @@ const NewsWall: React.FC = () => {
           </div>
         </div>
 
-        {/* Articles Grid */}
+        {/* Featured Article & Articles Grid */}
+        {isLoading ? (
+          <div className="mb-10">
+            <Skeleton className="h-96 w-full rounded-xl" />
+          </div>
+        ) : recent && recent.length > 0 ? (
+          <div className="mb-10">
+            <motion.div 
+              className="news-card group rounded-xl overflow-hidden shadow-lg relative h-96"
+              variants={staggerItem}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
+              <div className="overflow-hidden h-full">
+                {recent[0].imageUrl ? (
+                  <img
+                    src={recent[0].imageUrl}
+                    alt={recent[0].title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-lg">Aucune image</span>
+                  </div>
+                )}
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+                <span
+                  className="inline-block px-3 py-1 text-white text-xs font-semibold rounded-full mb-3"
+                  style={{ backgroundColor: getCategoryColor(recent[0].categoryId) }}
+                >
+                  {getCategoryName(recent[0].categoryId)}
+                </span>
+                <Link href="#">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2 hover:underline cursor-pointer line-clamp-2 min-h-[4rem]">
+                    {recent[0].title}
+                  </h3>
+                </Link>
+                <p className="text-white/80 text-sm md:text-base mb-4 line-clamp-2 min-h-[3rem]">
+                  {recent[0].excerpt}
+                </p>
+                <div className="flex items-center text-white/70 text-sm">
+                  <span>{getTimeAgo(recent[0].createdAt)}</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        ) : null}
 
         {/* Recent News Grid */}
         <motion.div 
@@ -156,7 +204,7 @@ const NewsWall: React.FC = () => {
                   <Skeleton key={i} className="h-80 w-full rounded-xl" />
                 ))
             : recent &&
-              recent.map((article, index) => (
+              recent.slice(1).map((article, index) => (
                 <motion.div
                   key={article.id}
                   className="news-card rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow duration-300"
@@ -188,23 +236,15 @@ const NewsWall: React.FC = () => {
                       {getCategoryName(article.categoryId)}
                     </span>
                     <Link href="#">
-                      <h3 className="text-lg font-bold text-dark mb-2 hover:text-primary transition-colors cursor-pointer">
+                      <h3 className="text-lg font-bold text-dark mb-2 hover:text-primary transition-colors cursor-pointer line-clamp-2 min-h-[3.5rem]">
                         {article.title}
                       </h3>
                     </Link>
-                    <p className="text-dark/70 text-sm mb-4 line-clamp-2">
+                    <p className="text-dark/70 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
                       {article.excerpt}
                     </p>
-                    <div className="flex items-center justify-between text-dark/60 text-xs">
+                    <div className="flex items-center text-dark/60 text-xs">
                       <span>{getTimeAgo(article.createdAt)}</span>
-                      <div className="flex items-center">
-                        <span className="flex items-center mr-3">
-                          <Eye className="h-3 w-3 mr-1" /> {article.viewCount}
-                        </span>
-                        <span className="flex items-center">
-                          <MessageSquare className="h-3 w-3 mr-1" /> {article.commentCount}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </motion.div>
