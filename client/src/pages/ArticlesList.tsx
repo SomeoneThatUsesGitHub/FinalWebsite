@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import ArticlesSection from "@/components/articles/ArticlesSection";
-import SubscriptionBanner from "@/components/shared/SubscriptionBanner";
 import { Helmet } from "react-helmet";
 
 // Animation avec effet de rebond
@@ -34,14 +33,14 @@ const ArticlesList: React.FC = () => {
         <meta name="description" content="Découvrez tous nos articles sur l'actualité politique, économique et historique pour les jeunes de 16 à 30 ans." />
       </Helmet>
       
-      <div className="bg-background py-6 md:py-10">
+      <div className="bg-blue-50 py-8 md:py-12 shadow-sm mb-4">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-3xl mx-auto mb-8 text-center">
+          <div className="max-w-3xl mx-auto text-center">
             <motion.h1 
               variants={fadeInWithBounce}
               initial="hidden"
               animate="visible"
-              className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark mb-2"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-primary mb-2 relative"
             >
               Articles et Analyses
             </motion.h1>
@@ -50,7 +49,6 @@ const ArticlesList: React.FC = () => {
       </div>
       
       <ArticlesSection />
-      <SubscriptionBanner />
     </motion.div>
   );
 };

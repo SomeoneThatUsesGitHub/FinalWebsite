@@ -38,7 +38,7 @@ type Article = {
 };
 
 // Liste des années pour la barre de navigation temporelle
-const years = [2025, 2024, 2023, 2022, 2021, 2020];
+const years = [2025, 2024];
 
 // Composant pour les badges de catégories
 const CategoryBadge: React.FC<{ categoryId: number; categories: Category[] | undefined }> = ({ categoryId, categories }) => {
@@ -120,8 +120,25 @@ const GridArticleCard: React.FC<{
 }> = ({ article, categories, onCategoryClick }) => {
   return (
     <motion.article 
-      variants={staggerItem}
-      className="rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col bg-white"
+      variants={{
+        hidden: { opacity: 0, y: 50, scale: 0.9 },
+        visible: { 
+          opacity: 1, 
+          y: 0, 
+          scale: 1,
+          transition: { 
+            type: "spring", 
+            stiffness: 260, 
+            damping: 20,
+            duration: 0.5
+          } 
+        }
+      }}
+      whileHover={{ 
+        y: -8,
+        transition: { duration: 0.3 }
+      }}
+      className="rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col bg-white"
     >
       <div className="relative overflow-hidden h-48">
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
@@ -340,12 +357,27 @@ const ArticlesSection: React.FC = () => {
     <section id="articles" className="py-8 md:py-12 bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark mb-2">Tous nos articles</h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0,
+              transition: {
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                duration: 0.7,
+              }
+            }}
+          >
+            <h2 className="inline-block text-2xl md:text-3xl font-bold relative mb-4 pb-2 text-primary">
+              Tous nos articles
+              <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-blue-500 rounded-full"></span>
+            </h2>
             <p className="text-dark/70">
               Explorez notre collection complète d'articles politiques, économiques et historiques.
             </p>
-          </div>
+          </motion.div>
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
@@ -421,31 +453,51 @@ const ArticlesSection: React.FC = () => {
         
         {/* Navigation par année - affichée seulement si les filtres sont cachés */}
         {!showFilters && (
-          <div className="mb-8">
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0,
+              transition: {
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                delay: 0.3
+              }
+            }}
+          >
             <ScrollArea className="w-full whitespace-nowrap">
               <div className="flex space-x-1 py-1">
-                <Button
-                  variant={selectedYear === 'all' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleYearChange('all')}
-                  className={selectedYear === 'all' ? 'bg-blue-600' : ''}
-                >
-                  Toutes les années
-                </Button>
-                {years.map(year => (
+                <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
                   <Button
-                    key={year}
-                    variant={selectedYear === year.toString() ? 'default' : 'outline'}
+                    variant={selectedYear === 'all' ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => handleYearChange(year.toString())}
-                    className={selectedYear === year.toString() ? 'bg-blue-600' : ''}
+                    onClick={() => handleYearChange('all')}
+                    className={selectedYear === 'all' ? 'bg-blue-600' : ''}
                   >
-                    {year}
+                    Toutes les années
                   </Button>
+                </motion.div>
+                {years.map(year => (
+                  <motion.div 
+                    key={year} 
+                    whileHover={{ scale: 1.05 }} 
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
+                    <Button
+                      variant={selectedYear === year.toString() ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handleYearChange(year.toString())}
+                      className={selectedYear === year.toString() ? 'bg-blue-600' : ''}
+                    >
+                      {year}
+                    </Button>
+                  </motion.div>
                 ))}
               </div>
             </ScrollArea>
-          </div>
+          </motion.div>
         )}
         
         {/* Affichage du contenu en mode grille uniquement */}
