@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { pageTransition, staggerChildren, staggerItem } from "@/lib/animations";
 import { Button } from "@/components/ui/button";
-import SubscriptionBanner from "@/components/shared/SubscriptionBanner";
 import { Helmet } from "react-helmet";
 import { Twitter, Instagram, ExternalLink } from "lucide-react";
 
@@ -231,8 +230,6 @@ const TeamPage: React.FC = () => {
           </div>
         </div>
       </section>
-      
-      <SubscriptionBanner />
     </motion.div>
   );
 };

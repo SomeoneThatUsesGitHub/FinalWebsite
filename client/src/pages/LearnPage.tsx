@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import LearnSection from "@/components/learn/LearnSection";
-import SubscriptionBanner from "@/components/shared/SubscriptionBanner";
 import { Helmet } from "react-helmet";
 
 const LearnPage: React.FC = () => {
@@ -33,7 +32,6 @@ const LearnPage: React.FC = () => {
       </div>
       
       <LearnSection />
-      <SubscriptionBanner />
     </motion.div>
   );
 };

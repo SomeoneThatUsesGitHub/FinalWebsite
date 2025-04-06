@@ -35,6 +35,28 @@
   @apply pl-4 border-l-4 border-gray-300 italic my-4 text-gray-700;
 }
 
+.article-content img {
+  @apply rounded-lg mx-auto my-6 shadow-md max-w-full;
+}
+
+.article-content figure {
+  @apply my-6;
+}
+
+.article-content figcaption {
+  @apply text-sm text-center text-gray-600 mt-2;
+}
+
+/* Breakpoints responsifs supplémentaires */
+@media (min-width: 480px) {
+  .xs\:block {
+    display: block;
+  }
+  .xs\:hidden {
+    display: none;
+  }
+}
+
 @layer utilities {
   .animate-spin-slow {
     animation: spin 12s linear infinite;

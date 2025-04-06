@@ -7,10 +7,9 @@ import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Heart, MessageSquare, Share2, Eye, Calendar, Clock, Bookmark, Facebook, Twitter } from "lucide-react";
+import { ChevronLeft, Share2, Calendar, Clock, Bookmark, Facebook, Twitter } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
-import SubscriptionBanner from "@/components/shared/SubscriptionBanner";
 
 interface Article {
   id: number;
@@ -82,24 +81,27 @@ const Article: React.FC = () => {
       )}
       
       {/* Navigation top bar */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div className="container mx-auto px-4 md:px-6 py-3">
+      <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-700 to-blue-500 backdrop-blur-md shadow-md">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3">
           <div className="flex justify-between items-center">
             <Link href="/articles">
-              <Button variant="ghost" size="sm" className="flex items-center text-primary">
-                <ChevronLeft className="mr-1 h-4 w-4" />
+              <Button variant="ghost" size="sm" className="flex items-center text-white hover:bg-blue-600 min-w-0 p-1 sm:p-2">
+                <ChevronLeft className="h-4 w-4 sm:mr-1" />
                 <span className="hidden sm:inline-block">Retour aux articles</span>
-                <span className="sm:hidden">Retour</span>
+                <span className="sm:hidden ml-1 text-xs">Retour</span>
               </Button>
             </Link>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="flex items-center text-primary">
+            <h2 className="text-white text-sm font-semibold truncate max-w-[180px] sm:max-w-[250px] md:max-w-none hidden xs:block">
+              {article?.title || "Article"}
+            </h2>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" className="flex items-center text-white hover:bg-blue-600 min-w-0 p-1 sm:p-2">
                 <Bookmark className="h-4 w-4" />
-                <span className="hidden md:ml-1 md:inline-block">Sauvegarder</span>
+                <span className="hidden lg:ml-1 lg:inline-block">Sauvegarder</span>
               </Button>
-              <Button variant="ghost" size="sm" className="flex items-center text-primary">
+              <Button variant="ghost" size="sm" className="flex items-center text-white hover:bg-blue-600 min-w-0 p-1 sm:p-2">
                 <Share2 className="h-4 w-4" />
-                <span className="hidden md:ml-1 md:inline-block">Partager</span>
+                <span className="hidden lg:ml-1 lg:inline-block">Partager</span>
               </Button>
             </div>
           </div>
@@ -201,10 +203,6 @@ const Article: React.FC = () => {
                     <div className="flex items-center">
                       <Clock className="w-4 h-4 mr-1" />
                       <span>8 min de lecture</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Eye className="w-4 h-4 mr-1" />
-                      <span>{article.viewCount} vues</span>
                     </div>
                   </motion.div>
                 </motion.div>
@@ -315,8 +313,6 @@ const Article: React.FC = () => {
           </div>
         )}
       </div>
-      
-      <SubscriptionBanner />
     </motion.div>
   );
 };

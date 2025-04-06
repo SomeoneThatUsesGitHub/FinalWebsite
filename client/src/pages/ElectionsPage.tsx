@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import ElectionsPortal from "@/components/elections/ElectionsPortal";
-import SubscriptionBanner from "@/components/shared/SubscriptionBanner";
 import { Helmet } from "react-helmet";
 
 const ElectionsPage: React.FC = () => {
@@ -33,7 +32,6 @@ const ElectionsPage: React.FC = () => {
       </div>
       
       <ElectionsPortal />
-      <SubscriptionBanner />
     </motion.div>
   );
 };
