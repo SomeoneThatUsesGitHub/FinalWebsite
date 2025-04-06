@@ -8,7 +8,7 @@ const HeroSection: React.FC = () => {
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-blue-950 opacity-60"></div>
         <img 
-          src="https://images.unsplash.com/photo-1537004184641-152e5b7079af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+          src="https://www.touteleurope.eu/wp-content/uploads/2021/10/20191217_EP-097972A_GEN_103_RESIZED_M.jpg" 
           alt="European Parliament" 
           className="object-cover w-full h-full opacity-40"
         />
