@@ -530,7 +530,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
               </CardHeader>
               <CardContent>
                 <Select
-                  value={form.watch("categoryId")?.toString() || article.categoryId.toString()}
+                  value={form.watch("categoryId")?.toString() || (article.categoryId?.toString() || "1")}
                   onValueChange={(value) => form.setValue("categoryId", parseInt(value))}
                 >
                   <SelectTrigger>
