@@ -121,27 +121,27 @@ const GridArticleCard: React.FC<{
   return (
     <motion.article 
       variants={{
-        hidden: { opacity: 0, y: 50, scale: 0.9 },
+        hidden: { opacity: 0, y: 20, scale: 0.98 },
         visible: { 
           opacity: 1, 
           y: 0, 
           scale: 1,
           transition: { 
             type: "spring", 
-            stiffness: 260, 
-            damping: 20,
-            duration: 0.5
+            stiffness: 100, 
+            damping: 25,
+            duration: 0.4
           } 
         }
       }}
       whileHover={{ 
-        y: -8,
-        transition: { duration: 0.3 }
+        y: -5,
+        transition: { duration: 0.2 }
       }}
       className="rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col bg-white"
     >
       <div className="relative overflow-hidden h-48">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
         {article.imageUrl ? (
           <img
             src={article.imageUrl}
@@ -170,14 +170,14 @@ const GridArticleCard: React.FC<{
           className="text-lg font-bold text-dark mb-3 transition-colors duration-300 hover:text-blue-600 line-clamp-2 min-h-[3.5rem]"
           whileHover={{ scale: 1.01 }}
           variants={{
-            hidden: { opacity: 0, y: 10 },
+            hidden: { opacity: 0, y: 5 },
             visible: { 
               opacity: 1, 
               y: 0,
               transition: { 
                 type: "spring",
-                stiffness: 300,
-                damping: 15
+                stiffness: 120,
+                damping: 20
               }
             }
           }}

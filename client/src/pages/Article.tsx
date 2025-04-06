@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "wouter";
 import { motion } from "framer-motion";
 import { pageTransition, staggerChildren, staggerItem, fadeIn } from "@/lib/animations";
@@ -37,6 +37,11 @@ interface Category {
 
 const Article: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  
+  // Effet pour scroller vers le haut lorsqu'un nouvel article est chargé
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
   
   const { data: article, isLoading: articleLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${slug}`],
@@ -126,7 +131,7 @@ const Article: React.FC = () => {
             {/* Article hero */}
             {article.imageUrl && (
               <div className="relative w-full h-[50vh] bg-gray-900">
-                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/30 z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/40 z-10"></div>
                 <img 
                   src={article.imageUrl} 
                   alt={article.title} 
