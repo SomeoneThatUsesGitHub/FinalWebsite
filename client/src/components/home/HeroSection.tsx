@@ -5,71 +5,56 @@ import { ArrowRight } from "lucide-react";
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white overflow-hidden">
-      <div className="container mx-auto px-4 py-12 lg:py-16 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
-          <div className="max-w-xl">
-            <motion.h1 
-              variants={fadeIn}
-              initial="hidden"
-              animate="visible"
-              className="text-3xl md:text-4xl font-bold leading-tight mb-4"
-            >
-              L'actualité politique, 
-              <span className="text-white/90 block mt-1">simplifiée et accessible</span>
-            </motion.h1>
-            
-            <motion.p 
-              variants={slideUp}
-              initial="hidden"
-              animate="visible"
-              className="text-lg mb-6 text-white/80 max-w-2xl"
-            >
-              Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="hidden md:flex"
-            >
-              <a 
-                href="/articles" 
-                className="inline-flex items-center px-5 py-3 rounded-full bg-white text-blue-700 font-medium hover:bg-blue-50 transition-colors"
-              >
-                Découvrir nos articles
-                <ArrowRight size={16} className="ml-2" />
-              </a>
-            </motion.div>
-          </div>
-          
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="lg:w-2/5 flex justify-center"
-          >
-            <div className="relative w-full max-w-md aspect-square rounded-full bg-white/10 flex items-center justify-center p-5">
-              <div className="absolute inset-3 rounded-full border-4 border-white/20 border-dashed animate-spin-slow"></div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-full p-8 w-4/5 h-4/5 flex items-center justify-center">
-                <span className="text-3xl md:text-5xl font-bold">P</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+    <section className="relative text-white overflow-hidden">
+      {/* Image de fond avec effet parallaxe */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-blue-700/70 z-10"></div>
+        <div 
+          className="absolute inset-0 bg-fixed"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1608322368235-b1ff33955952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80')",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        ></div>
       </div>
-
-      {/* Mobile CTA */}
-      <div className="md:hidden bg-blue-700 py-4">
-        <div className="container mx-auto px-4">
-          <a 
-            href="/articles" 
-            className="flex items-center justify-center gap-2 text-white font-medium"
+      
+      {/* Contenu */}
+      <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
+        <div className="max-w-4xl mx-auto text-center md:text-left md:mx-0">
+          <motion.h1 
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+            className="text-3xl md:text-5xl font-bold leading-tight mb-4"
           >
-            Découvrir nos articles
-            <ArrowRight size={16} />
-          </a>
+            L'actualité politique,
+            <span className="block mt-2">simplifiée et accessible</span>
+          </motion.h1>
+          
+          <motion.p 
+            variants={slideUp}
+            initial="hidden"
+            animate="visible"
+            className="text-lg md:text-xl mb-8 text-white/90 max-w-2xl mx-auto md:mx-0"
+          >
+            Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex justify-center md:justify-start"
+          >
+            <a 
+              href="/articles" 
+              className="inline-flex items-center px-6 py-3 rounded-full bg-white text-blue-700 font-medium hover:bg-blue-50 transition-colors shadow-lg"
+            >
+              Découvrir nos articles
+              <ArrowRight size={18} className="ml-2" />
+            </a>
+          </motion.div>
         </div>
       </div>
     </section>
