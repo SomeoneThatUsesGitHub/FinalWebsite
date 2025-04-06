@@ -16,7 +16,7 @@ const Home: React.FC = () => {
       exit="exit"
     >
       <Helmet>
-        <title>Politique Jeune - L'actualité politique pour les 16-30 ans</title>
+        <title>Politiquensemble - L'actualité politique pour les 16-30 ans</title>
         <meta name="description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans." />
       </Helmet>
       
