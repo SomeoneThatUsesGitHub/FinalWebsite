@@ -244,7 +244,7 @@ const NewsWall: React.FC = () => {
                           Événement en direct
                         </span>
                         <span className="text-gray-500 text-xs">
-                          {(featuredContent.data as LiveEvent).scheduledFor ? getTimeAgo((featuredContent.data as LiveEvent).scheduledFor) : "En cours"}
+                          {(featuredContent.data as LiveEvent).scheduledFor ? getTimeAgo((featuredContent.data as LiveEvent).scheduledFor || '') : "En cours"}
                         </span>
                       </div>
                       <h2 className="text-xl md:text-2xl font-bold text-dark mb-4 transition-colors duration-300 group-hover:text-blue-600">
@@ -260,7 +260,7 @@ const NewsWall: React.FC = () => {
                         <ul className="space-y-2 text-dark/70 text-sm">
                           <li className="flex items-start">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            <span>En direct depuis le plateau de Politiquensemble</span>
+                            <span>Diffusé simultanément sur notre chaîne YouTube</span>
                           </li>
                           <li className="flex items-start">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -274,7 +274,7 @@ const NewsWall: React.FC = () => {
                         <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
                           <div className="flex items-center">
                             <div className="mr-2 w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                            Regarder maintenant
+                            Suivre le direct
                           </div>
                         </Button>
                       )}
@@ -341,40 +341,46 @@ const NewsWall: React.FC = () => {
           </ScrollAnimation>
         )}
 
-        {/* Flash Info (Breaking News) Card */}
-        {!isLoading && flashInfos && flashInfos.length > 0 && (
-          <ScrollAnimation className="mb-8" threshold={0.1} delay={0.2}>
-            <div className="md:max-w-md lg:max-w-lg mx-auto md:mx-0 bg-white overflow-hidden rounded-xl shadow-xl border border-red-200 relative">
-              <div className="absolute inset-y-0 left-0 w-2 bg-red-600"></div>
-              <div className="p-5 pl-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold animate-pulse">
-                    Flash info
-                  </span>
-                  <span className="text-gray-500 text-xs">
-                    {getTimeAgo(flashInfos[0].createdAt)}
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold text-dark mb-2">
-                  {flashInfos[0].title}
-                </h3>
-                <p className="text-dark/70 text-sm">
-                  {flashInfos[0].content}
-                </p>
-                {flashInfos[0].imageUrl && (
-                  <img 
-                    src={flashInfos[0].imageUrl}
-                    alt={flashInfos[0].title}
-                    className="mt-4 rounded-lg w-full max-h-[200px] object-cover"
-                  />
-                )}
-              </div>
-            </div>
-          </ScrollAnimation>
-        )}
-
         {/* Recent News Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+          {/* Flash Info Card (en premier dans la grille) */}
+          {!isLoading && flashInfos && flashInfos.length > 0 && (
+            <ScrollAnimation threshold={0.1} delay={0.1}>
+              <div className="bg-white overflow-hidden rounded-xl shadow-xl border border-red-200 relative hover:shadow-2xl transition-all duration-300 h-full">
+                <div className="absolute inset-y-0 left-0 w-2 bg-red-600"></div>
+                <div className="p-5 pl-6 flex flex-col h-full">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold animate-pulse">
+                      Flash info
+                    </span>
+                    <span className="text-gray-500 text-xs">
+                      {getTimeAgo(flashInfos[0].createdAt)}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-dark mb-2 line-clamp-2 min-h-[3.5rem]">
+                    {flashInfos[0].title}
+                  </h3>
+                  <p className="text-dark/70 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
+                    {flashInfos[0].content}
+                  </p>
+                  {flashInfos[0].imageUrl && (
+                    <div className="overflow-hidden h-32 mb-4 rounded-lg">
+                      <img 
+                        src={flashInfos[0].imageUrl}
+                        alt={flashInfos[0].title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="mt-auto flex justify-end">
+                    <span className="text-red-600 text-xs font-medium hover:underline cursor-pointer">En savoir plus</span>
+                  </div>
+                </div>
+              </div>
+            </ScrollAnimation>
+          )}
+          
+          {/* Articles récents */}
           {isLoading
             ? Array(3)
                 .fill(0)
