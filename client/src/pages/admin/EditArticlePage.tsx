@@ -54,37 +54,59 @@ export default function EditArticlePage() {
     enabled: !isNewArticle,
   });
 
+  // Valeurs par défaut initiales
+  const defaultValues: ArticleFormValues = {
+    title: "",
+    slug: "",
+    excerpt: "",
+    content: "",
+    imageUrl: "",
+    categoryId: 0,
+    published: false,
+    featured: false,
+  };
+
   // Formulaire avec react-hook-form et zod
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
-    defaultValues: {
-      title: "",
-      slug: "",
-      excerpt: "",
-      content: "",
-      imageUrl: "",
-      categoryId: 0,
-      published: false,
-      featured: false,
-    },
+    defaultValues
   });
 
   // Mettre à jour les valeurs du formulaire quand l'article est chargé
   useEffect(() => {
     if (article && !articleLoading) {
-      form.reset({
-        title: article.title,
-        slug: article.slug,
-        excerpt: article.excerpt,
-        content: article.content,
-        imageUrl: article.imageUrl || "",
-        categoryId: article.categoryId,
-        published: article.published,
-        featured: article.featured,
-      });
+      console.log("Article chargé pour édition:", article);
       
-      // Mettre à jour le prévisualisateur
-      setPreviewHtml(article.content);
+      // Délai court pour s'assurer que le formulaire est prêt
+      setTimeout(() => {
+        form.reset({
+          title: article.title,
+          slug: article.slug,
+          excerpt: article.excerpt || "",
+          content: article.content,
+          imageUrl: article.imageUrl || "",
+          categoryId: article.categoryId,
+          published: Boolean(article.published),
+          featured: Boolean(article.featured),
+        });
+        
+        // Forcer la mise à jour des valeurs si reset ne fonctionne pas
+        Object.entries({
+          title: article.title,
+          slug: article.slug,
+          excerpt: article.excerpt || "",
+          content: article.content,
+          imageUrl: article.imageUrl || "",
+          categoryId: article.categoryId,
+          published: Boolean(article.published),
+          featured: Boolean(article.featured),
+        }).forEach(([field, value]) => {
+          form.setValue(field as any, value);
+        });
+        
+        // Mettre à jour le prévisualisateur
+        setPreviewHtml(article.content);
+      }, 100);
     }
   }, [article, articleLoading, form]);
 
