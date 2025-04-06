@@ -239,19 +239,37 @@ const NewsWall: React.FC = () => {
                   </div>
                   <div className="p-6 md:p-8 flex flex-col justify-between h-full">
                     <div>
-                      <span
-                        className="inline-block px-2 py-1 text-xs font-semibold rounded-full mb-4 bg-red-600 text-white"
-                      >
-                        Événement en direct
-                      </span>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-red-600 text-white">
+                          Événement en direct
+                        </span>
+                        <span className="text-gray-500 text-xs">
+                          {(featuredContent.data as LiveEvent).scheduledFor ? getTimeAgo((featuredContent.data as LiveEvent).scheduledFor) : "En cours"}
+                        </span>
+                      </div>
                       <h2 className="text-xl md:text-2xl font-bold text-dark mb-4 transition-colors duration-300 group-hover:text-blue-600">
                         {(featuredContent.data as LiveEvent).title}
                       </h2>
-                      <p className="text-dark/70 text-base mb-6">
+                      <p className="text-dark/70 text-base mb-4">
                         {(featuredContent.data as LiveEvent).description}
                       </p>
+                      
+                      {/* Informations supplémentaires */}
+                      <div className="border-t border-gray-100 pt-4 mb-4">
+                        <h3 className="font-semibold text-dark mb-2">À propos de cet événement</h3>
+                        <ul className="space-y-2 text-dark/70 text-sm">
+                          <li className="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span>En direct depuis le plateau de Politiquensemble</span>
+                          </li>
+                          <li className="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <span>Animé par Marc Dupont, journaliste politique</span>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                    <div className="mt-4">
+                    <div className="mt-2">
                       {(featuredContent.data as LiveEvent).liveUrl && (
                         <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
                           <div className="flex items-center">
@@ -323,10 +341,10 @@ const NewsWall: React.FC = () => {
           </ScrollAnimation>
         )}
 
-        {/* Flash Info (Breaking News) Banner */}
+        {/* Flash Info (Breaking News) Card */}
         {!isLoading && flashInfos && flashInfos.length > 0 && (
           <ScrollAnimation className="mb-8" threshold={0.1} delay={0.2}>
-            <div className="bg-white overflow-hidden rounded-xl shadow-xl border border-red-200 relative">
+            <div className="md:max-w-md lg:max-w-lg mx-auto md:mx-0 bg-white overflow-hidden rounded-xl shadow-xl border border-red-200 relative">
               <div className="absolute inset-y-0 left-0 w-2 bg-red-600"></div>
               <div className="p-5 pl-6">
                 <div className="flex items-center gap-3 mb-3">
