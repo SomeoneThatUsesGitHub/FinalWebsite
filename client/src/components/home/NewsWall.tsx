@@ -285,7 +285,18 @@ const NewsWall: React.FC = () => {
               ))}
         </div>
 
-        {/* Le bouton a été supprimé à la demande du client */}
+        {/* Bouton "Voir tous nos articles" - uniquement sur mobile */}
+        {isMobile && recent && recent.length > displayedArticles.length && (
+          <div className="mt-8 flex justify-center">
+            <Button
+              onClick={() => setShowAllMobile(!showAllMobile)}
+              variant="outline"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
+            >
+              {showAllMobile ? "Voir moins d'articles" : "Voir tous nos articles"}
+            </Button>
+          </div>
+        )}
 
       </div>
     </section>

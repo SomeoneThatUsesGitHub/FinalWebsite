@@ -53,23 +53,7 @@ const HeroSection: React.FC = () => {
             </span>
           </motion.p>
 
-          {/* Bouton visible uniquement sur desktop */}
-          {!isMobile && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="flex justify-center md:justify-start"
-            >
-              <a
-                href="/articles"
-                className="inline-flex items-center px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-white text-blue-700 font-medium hover:bg-blue-50 transition-colors shadow-lg"
-              >
-                Découvrir nos articles
-                <ArrowRight size={16} className="ml-1.5 sm:ml-2 sm:size-[18px]" />
-              </a>
-            </motion.div>
-          )}
+          {/* Le bouton "Découvrir nos articles" a été supprimé à la demande du client */}
         </div>
       </div>
     </section>
