@@ -10,7 +10,7 @@ const HeroSection: React.FC = () => {
         <img 
           src="https://www.radiofrance.fr/s3/cruiser-production/2022/02/af860b5c-da54-49b0-ba42-6f7106eb17b1/1200x680_0parlement-europeen00-98t4np.jpg" 
           alt="European Parliament" 
-          className="object-cover object-center w-full h-full"
+          className="object-cover object-center w-full h-full filter blur-[2px]"
         />
       </div>
       

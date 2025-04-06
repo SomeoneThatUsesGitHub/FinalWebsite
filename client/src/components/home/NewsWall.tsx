@@ -122,7 +122,7 @@ const NewsWall: React.FC = () => {
   };
 
   return (
-    <section id="actualites" className="py-16 md:py-24 bg-white">
+    <section id="actualites" className="pt-0 pb-16 md:pt-0 md:pb-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-10">
           <div className="mb-4">
@@ -171,7 +171,7 @@ const NewsWall: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="group bg-white overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="group bg-white overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
               <Link href="#" className="block">
                 <div className="flex flex-col md:grid md:grid-cols-2 h-auto md:h-[360px]">
                   <div className="relative h-64 md:h-full overflow-hidden">
@@ -208,10 +208,12 @@ const NewsWall: React.FC = () => {
                         {featuredArticle.title}
                       </h2>
                       <p className="text-dark/70 text-base mb-6">
-                        {featuredArticle.excerpt} 
-                        Cette analyse approfondie explore les implications politiques, économiques et sociales de cet enjeu majeur.
-                        Découvrez comment les différents acteurs politiques se positionnent et quelles pourraient être les conséquences 
-                        à moyen et long terme pour notre société. Un regard éclairé sur les enjeux qui façonnent notre avenir collectif.
+                        {featuredArticle.excerpt}
+                        <span className="hidden md:inline"> 
+                          Cette analyse approfondie explore les implications politiques, économiques et sociales de cet enjeu majeur.
+                          Découvrez comment les différents acteurs politiques se positionnent et quelles pourraient être les conséquences 
+                          à moyen et long terme pour notre société. Un regard éclairé sur les enjeux qui façonnent notre avenir collectif.
+                        </span>
                       </p>
                     </div>
                     <div className="flex items-center justify-between">
@@ -241,7 +243,7 @@ const NewsWall: React.FC = () => {
             : displayedArticles.map((article, index) => (
                 <motion.div
                   key={article.id}
-                  className="news-card group rounded-xl overflow-hidden shadow-md bg-white hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  className="news-card group rounded-xl overflow-hidden shadow-lg bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                   variants={staggerItem}
                   custom={index}
                 >
