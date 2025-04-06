@@ -112,7 +112,8 @@ export class MemStorage implements IStorage {
         imageUrl: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80",
         authorId: 1,
         categoryId: 1,
-        featured: true
+        featured: true,
+        published: true
       },
       {
         title: "Manifestation historique pour le climat à Paris",
@@ -122,7 +123,8 @@ export class MemStorage implements IStorage {
         imageUrl: "https://images.unsplash.com/photo-1503428593586-e225b39bddfe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 1,
         categoryId: 4,
-        featured: true
+        featured: true,
+        published: true
       },
       {
         title: "L'UE adopte une réforme majeure sur l'immigration",
@@ -132,7 +134,8 @@ export class MemStorage implements IStorage {
         imageUrl: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 1,
         categoryId: 2,
-        featured: true
+        featured: true,
+        published: true
       }
     ];
     
@@ -151,7 +154,8 @@ export class MemStorage implements IStorage {
         authorId: 1,
         categoryId: 5,
         viewCount: 1200,
-        commentCount: 18
+        commentCount: 18,
+        published: true
       },
       {
         title: "Les jeunes entrepreneurs au service d'une économie durable",
@@ -162,7 +166,8 @@ export class MemStorage implements IStorage {
         authorId: 1,
         categoryId: 3,
         viewCount: 945,
-        commentCount: 7
+        commentCount: 7,
+        published: true
       },
       {
         title: "Comprendre les tensions internationales en 20 minutes",
@@ -173,7 +178,8 @@ export class MemStorage implements IStorage {
         authorId: 1,
         categoryId: 2,
         viewCount: 763,
-        commentCount: 12
+        commentCount: 12,
+        published: true
       },
       {
         title: "Les réformes éducatives du nouveau gouvernement : ce qui va changer",
@@ -182,7 +188,8 @@ export class MemStorage implements IStorage {
         excerpt: "Analyse détaillée des nouvelles mesures pour l'éducation nationale et leurs impacts pour les étudiants et professeurs.",
         imageUrl: "https://images.unsplash.com/photo-1494172961521-33799ddd43a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
         authorId: 1,
-        categoryId: 1
+        categoryId: 1,
+        published: true
       },
       {
         title: "Abstention des jeunes : comment inverser la tendance ?",
@@ -191,7 +198,8 @@ export class MemStorage implements IStorage {
         excerpt: "Les chiffres de l'abstention chez les 18-25 ans sont alarmants. Décryptage des solutions proposées pour remobiliser la jeunesse.",
         imageUrl: "https://images.unsplash.com/photo-1600693606196-86c2a0c9293c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 1,
-        categoryId: 5
+        categoryId: 5,
+        published: true
       },
       {
         title: "Rapport du GIEC : ce que les politiques doivent faire maintenant",
@@ -200,7 +208,8 @@ export class MemStorage implements IStorage {
         excerpt: "Les scientifiques sont formels : il reste peu de temps pour agir. Quelles sont les mesures urgentes que nos dirigeants devraient prendre ?",
         imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 1,
-        categoryId: 4
+        categoryId: 4,
+        published: true
       },
       {
         title: "Les défis de la transition énergétique en Europe",
@@ -209,7 +218,8 @@ export class MemStorage implements IStorage {
         excerpt: "Analyse des différentes stratégies adoptées par les pays européens pour atteindre la neutralité carbone.",
         imageUrl: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 2,
-        categoryId: 2
+        categoryId: 2,
+        published: true
       },
       {
         title: "La crise des réfugiés : nouveaux développements",
@@ -218,7 +228,8 @@ export class MemStorage implements IStorage {
         excerpt: "Point sur la situation des réfugiés en Europe et les politiques d'accueil des différents pays membres.",
         imageUrl: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 3,
-        categoryId: 2
+        categoryId: 2,
+        published: true
       },
       {
         title: "Nouvelles tensions diplomatiques au Moyen-Orient",
@@ -227,7 +238,8 @@ export class MemStorage implements IStorage {
         excerpt: "Analyse des récentes tensions entre grandes puissances et leur impact sur la stabilité régionale.",
         imageUrl: "https://images.unsplash.com/photo-1589262804704-c5aa9e6def89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
         authorId: 2,
-        categoryId: 4
+        categoryId: 4,
+        published: true
       },
       {
         title: "La réforme fiscale : gagnants et perdants",
@@ -236,7 +248,8 @@ export class MemStorage implements IStorage {
         excerpt: "Décryptage des nouvelles mesures fiscales et leurs impacts sur les différentes catégories de contribuables.",
         imageUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 1,
-        categoryId: 3
+        categoryId: 3,
+        published: true
       },
       {
         title: "L'avenir des médias traditionnels face au numérique",
@@ -245,7 +258,8 @@ export class MemStorage implements IStorage {
         excerpt: "Comment les journaux et chaînes de télévision s'adaptent-ils face à la montée en puissance des plateformes numériques ?",
         imageUrl: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 3,
-        categoryId: 5
+        categoryId: 5,
+        published: true
       }
     ];
     
@@ -517,7 +531,7 @@ export class MemStorage implements IStorage {
     return limit ? articles.slice(0, limit) : articles;
   }
   
-  async getRecentArticles(limit: number = 6): Promise<Article[]> {
+  async getRecentArticles(limit: number = 9): Promise<Article[]> {
     const articles = Array.from(this.articles.values())
       .filter(article => article.published)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
