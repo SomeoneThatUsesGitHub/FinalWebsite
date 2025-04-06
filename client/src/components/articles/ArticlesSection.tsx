@@ -356,39 +356,16 @@ const ArticlesSection: React.FC = () => {
   return (
     <section id="articles" className="py-8 md:py-12 bg-background">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0,
-              transition: {
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-                duration: 0.7,
-              }
-            }}
+        <div className="flex justify-end mb-8">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className={`flex items-center ${showFilters ? 'bg-blue-50 text-blue-600' : ''}`}
+            onClick={toggleFilters}
           >
-            <h2 className="inline-block text-2xl md:text-3xl font-bold relative mb-4 pb-2 text-primary">
-              Tous nos articles
-              <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-blue-500 rounded-full"></span>
-            </h2>
-            <p className="text-dark/70">
-              Explorez notre collection complète d'articles politiques, économiques et historiques.
-            </p>
-          </motion.div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className={`flex items-center ${showFilters ? 'bg-blue-50 text-blue-600' : ''}`}
-              onClick={toggleFilters}
-            >
-              <Sliders className="h-4 w-4 mr-1" />
-              Filtres
-            </Button>
-          </div>
+            <Sliders className="h-4 w-4 mr-1" />
+            Filtres
+          </Button>
         </div>
         
         {/* Filtres de recherche */}

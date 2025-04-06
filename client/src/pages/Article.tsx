@@ -1,15 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useParams } from "wouter";
 import { motion } from "framer-motion";
-import { pageTransition } from "@/lib/animations";
+import { pageTransition, staggerChildren, staggerItem, fadeIn } from "@/lib/animations";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import SubscriptionBanner from "@/components/shared/SubscriptionBanner";
-import { ChevronLeft, Heart, MessageSquare, Share2, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ChevronLeft, Heart, MessageSquare, Share2, Eye, Calendar, Clock, Bookmark, Facebook, Twitter } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
+import SubscriptionBanner from "@/components/shared/SubscriptionBanner";
 
 interface Article {
   id: number;
@@ -80,142 +81,239 @@ const Article: React.FC = () => {
         </Helmet>
       )}
       
-      <div className="bg-background min-h-screen pb-12">
-        {/* Back button */}
-        <div className="container mx-auto px-4 md:px-6 pt-6">
-          <Link href="/articles">
-            <Button variant="ghost" className="mb-6">
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Retour aux articles
-            </Button>
-          </Link>
-          
-          {articleLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-10 w-3/4 max-w-lg" />
-              <Skeleton className="h-6 w-1/4" />
-              <Skeleton className="h-[400px] w-full rounded-xl mt-8" />
-              <div className="space-y-2 mt-8">
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-3/4" />
-              </div>
-            </div>
-          ) : article ? (
-            <div className="max-w-4xl mx-auto">
-              {/* Article header */}
-              <div className="mb-8">
-                {category && (
-                  <span 
-                    className="inline-block px-3 py-1 text-white text-sm font-semibold rounded-full mb-4"
-                    style={{ backgroundColor: category.color }}
-                  >
-                    {category.name}
-                  </span>
-                )}
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark mb-4">
-                  {article.title}
-                </h1>
-                <div className="flex flex-wrap items-center text-dark/60 text-sm gap-4">
-                  <div className="flex items-center">
-                    <img 
-                      src="https://randomuser.me/api/portraits/men/32.jpg" 
-                      alt="Author" 
-                      className="w-8 h-8 rounded-full mr-2" 
-                    />
-                    <span>Jean Dupont</span>
-                  </div>
-                  <span>|</span>
-                  <span>{formatDate(article.createdAt, "d MMMM yyyy")}</span>
-                  <span>|</span>
-                  <div className="flex items-center space-x-4">
-                    <span className="flex items-center">
-                      <Eye className="w-4 h-4 mr-1" /> {article.viewCount}
-                    </span>
-                    <span className="flex items-center">
-                      <MessageSquare className="w-4 h-4 mr-1" /> {article.commentCount}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Article featured image */}
-              {article.imageUrl && (
-                <div className="mb-8">
-                  <img 
-                    src={article.imageUrl} 
-                    alt={article.title} 
-                    className="w-full h-auto max-h-[500px] object-cover rounded-xl"
-                  />
-                </div>
-              )}
-              
-              {/* Article content */}
-              <div className="prose prose-lg max-w-none mb-8">
-                <p className="text-xl font-medium text-dark/80 mb-6">{article.excerpt}</p>
-                <div dangerouslySetInnerHTML={{ __html: article.content }} />
-              </div>
-              
-              {/* Article footer */}
-              <div className="flex justify-between items-center py-4 border-t border-b border-gray-200 mb-8">
-                <div className="flex space-x-4">
-                  <Button variant="outline" size="sm" className="flex items-center">
-                    <Heart className="mr-2 h-4 w-4" /> J'aime
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center">
-                    <Share2 className="mr-2 h-4 w-4" /> Partager
-                  </Button>
-                </div>
-                <div className="flex items-center">
-                  <span className="text-sm text-dark/60">Mis à jour le {formatDate(article.updatedAt, "d MMMM yyyy")}</span>
-                </div>
-              </div>
-              
-              {/* Related articles */}
-              {relatedArticles && relatedArticles.length > 0 && (
-                <div className="mt-12">
-                  <h3 className="text-2xl font-bold mb-6">Articles similaires</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {relatedArticles
-                      .filter(a => a.id !== article.id)
-                      .slice(0, 3)
-                      .map(relatedArticle => (
-                        <div key={relatedArticle.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                          {relatedArticle.imageUrl && (
-                            <div className="h-40 overflow-hidden">
-                              <img 
-                                src={relatedArticle.imageUrl} 
-                                alt={relatedArticle.title} 
-                                className="w-full h-full object-cover transition-transform hover:scale-105 duration-300" 
-                              />
-                            </div>
-                          )}
-                          <div className="p-4">
-                            <div 
-                              className="text-lg font-bold text-dark hover:text-primary transition-colors cursor-pointer"
-                              onClick={() => window.location.href = `/articles/${relatedArticle.slug}`}
-                            >
-                              {relatedArticle.title}
-                            </div>
-                            <p className="text-dark/70 text-sm mt-2 line-clamp-2">{relatedArticle.excerpt}</p>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <h2 className="text-2xl font-bold text-dark mb-2">Article non trouvé</h2>
-              <p className="text-dark/70 mb-6">L'article que vous recherchez n'existe pas ou a été supprimé.</p>
-              <Button onClick={() => window.location.href = '/articles'}>
-                Voir tous les articles
+      {/* Navigation top bar */}
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+        <div className="container mx-auto px-4 md:px-6 py-3">
+          <div className="flex justify-between items-center">
+            <Link href="/articles">
+              <Button variant="ghost" size="sm" className="flex items-center text-primary">
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                <span className="hidden sm:inline-block">Retour aux articles</span>
+                <span className="sm:hidden">Retour</span>
+              </Button>
+            </Link>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="flex items-center text-primary">
+                <Bookmark className="h-4 w-4" />
+                <span className="hidden md:ml-1 md:inline-block">Sauvegarder</span>
+              </Button>
+              <Button variant="ghost" size="sm" className="flex items-center text-primary">
+                <Share2 className="h-4 w-4" />
+                <span className="hidden md:ml-1 md:inline-block">Partager</span>
               </Button>
             </div>
-          )}
+          </div>
         </div>
+      </div>
+
+      <div className="bg-background min-h-screen pb-12">
+        {articleLoading ? (
+          <div className="container mx-auto px-4 md:px-6 pt-6 space-y-4">
+            <Skeleton className="h-10 w-3/4 max-w-lg mx-auto" />
+            <Skeleton className="h-6 w-1/4 mx-auto" />
+            <Skeleton className="h-[400px] w-full rounded-xl mt-8" />
+            <div className="space-y-2 mt-8 max-w-3xl mx-auto">
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-3/4" />
+            </div>
+          </div>
+        ) : article ? (
+          <>
+            {/* Article hero */}
+            {article.imageUrl && (
+              <div className="relative w-full h-[50vh] bg-gray-900">
+                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/30 z-10"></div>
+                <img 
+                  src={article.imageUrl} 
+                  alt={article.title} 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-6 z-20 container mx-auto">
+                  <motion.div 
+                    className="max-w-4xl mx-auto"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    {category && (
+                      <Badge
+                        className="mb-4 text-white px-3 py-1"
+                        style={{ backgroundColor: category.color }}
+                      >
+                        {category.name}
+                      </Badge>
+                    )}
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-md">
+                      {article.title}
+                    </h1>
+                  </motion.div>
+                </div>
+              </div>
+            )}
+
+            <div className="container mx-auto px-4 md:px-6 pt-8">
+              <div className="max-w-3xl mx-auto">
+                {/* Article header - only shown if no image */}
+                {!article.imageUrl && (
+                  <div className="mb-8">
+                    {category && (
+                      <Badge
+                        className="mb-4 text-white px-3 py-1"
+                        style={{ backgroundColor: category.color }}
+                      >
+                        {category.name}
+                      </Badge>
+                    )}
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-dark mb-4">
+                      {article.title}
+                    </h1>
+                  </div>
+                )}
+
+                {/* Author and meta */}
+                <motion.div 
+                  className="flex flex-wrap items-center justify-between py-4 mb-8 border-b border-gray-200"
+                  variants={staggerChildren}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <motion.div variants={staggerItem} className="flex items-center mb-4 md:mb-0">
+                    <div className="flex-shrink-0 mr-4">
+                      <img 
+                        src="https://randomuser.me/api/portraits/men/32.jpg" 
+                        alt="Author" 
+                        className="w-12 h-12 rounded-full border-2 border-primary/20" 
+                      />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-dark">Jean Dupont</div>
+                      <div className="text-sm text-dark/60">Journaliste politique</div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-4 text-sm text-dark/60">
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      <span>{formatDate(article.createdAt, "d MMMM yyyy")}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-1" />
+                      <span>8 min de lecture</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Eye className="w-4 h-4 mr-1" />
+                      <span>{article.viewCount} vues</span>
+                    </div>
+                  </motion.div>
+                </motion.div>
+                
+                {/* Article content */}
+                <motion.div 
+                  className="prose prose-lg max-w-none mb-12"
+                  variants={fadeIn}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <p className="text-xl font-medium text-dark/80 mb-8 leading-relaxed">{article.excerpt}</p>
+                  <div 
+                    className="article-content"
+                    dangerouslySetInnerHTML={{ __html: article.content }} 
+                  />
+                </motion.div>
+                
+                {/* Social sharing */}
+                <motion.div 
+                  className="flex flex-col md:flex-row justify-between items-center py-6 px-6 md:px-8 bg-blue-50 rounded-xl mb-12"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="mb-4 md:mb-0">
+                    <h4 className="font-semibold text-dark mb-1">Vous avez aimé cet article ?</h4>
+                    <p className="text-sm text-dark/70">Partagez-le avec vos amis</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button variant="outline" size="sm" className="bg-white">
+                      <Facebook className="h-4 w-4 mr-2" />
+                      Facebook
+                    </Button>
+                    <Button variant="outline" size="sm" className="bg-white">
+                      <Twitter className="h-4 w-4 mr-2" />
+                      Twitter
+                    </Button>
+                    <Button variant="outline" size="sm" className="bg-white">
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Partager
+                    </Button>
+                  </div>
+                </motion.div>
+                
+                {/* Related articles */}
+                {relatedArticles && relatedArticles.length > 0 && (
+                  <motion.div 
+                    className="mt-16"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <h3 className="text-2xl font-bold mb-6 relative inline-block">
+                      Articles similaires
+                      <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-blue-500 rounded-full"></span>
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                      {relatedArticles
+                        .filter(a => a.id !== article.id)
+                        .slice(0, 3)
+                        .map(relatedArticle => (
+                          <motion.div 
+                            key={relatedArticle.id} 
+                            className="bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                            whileHover={{ scale: 1.02 }}
+                          >
+                            {relatedArticle.imageUrl && (
+                              <div className="h-40 overflow-hidden">
+                                <img 
+                                  src={relatedArticle.imageUrl} 
+                                  alt={relatedArticle.title} 
+                                  className="w-full h-full object-cover transition-transform hover:scale-105 duration-300" 
+                                />
+                              </div>
+                            )}
+                            <div className="p-4">
+                              <Link href={`/articles/${relatedArticle.slug}`}>
+                                <h4 className="text-lg font-bold text-dark hover:text-primary transition-colors">
+                                  {relatedArticle.title}
+                                </h4>
+                              </Link>
+                              <p className="text-dark/70 text-sm mt-2 line-clamp-2">{relatedArticle.excerpt}</p>
+                              <div className="flex items-center mt-4 text-xs text-dark/60">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                <span>{formatDate(relatedArticle.createdAt, "d MMMM yyyy")}</span>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="container mx-auto px-4 md:px-6 pt-16">
+            <div className="text-center py-16 max-w-md mx-auto">
+              <h2 className="text-2xl font-bold text-dark mb-2">Article non trouvé</h2>
+              <p className="text-dark/70 mb-6">L'article que vous recherchez n'existe pas ou a été supprimé.</p>
+              <Link href="/articles">
+                <Button>
+                  Voir tous les articles
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
       
       <SubscriptionBanner />

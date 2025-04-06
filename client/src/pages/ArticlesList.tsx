@@ -33,17 +33,26 @@ const ArticlesList: React.FC = () => {
         <meta name="description" content="Découvrez tous nos articles sur l'actualité politique, économique et historique pour les jeunes de 16 à 30 ans." />
       </Helmet>
       
-      <div className="bg-blue-50 py-8 md:py-12 shadow-sm mb-4">
+      <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <motion.h1 
               variants={fadeInWithBounce}
               initial="hidden"
               animate="visible"
-              className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-primary mb-2 relative"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative"
             >
               Articles et Analyses
             </motion.h1>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1,
+                transition: { delay: 0.3, duration: 0.5 } 
+              }}
+              className="h-1 w-20 bg-blue-500 mx-auto rounded-full"
+            ></motion.div>
           </div>
         </div>
       </div>
