@@ -25,10 +25,12 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.location.href = '/'}>
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold font-heading">PJ</div>
-            <span className="text-xl font-bold text-dark font-heading hidden sm:inline-block">Politique Jeune</span>
-          </div>
+          <Link href="/">
+            <div className="flex items-center space-x-2 cursor-pointer">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold font-heading">PJ</div>
+              <span className="text-xl font-bold text-dark font-heading hidden sm:inline-block">Politique Jeune</span>
+            </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
@@ -40,12 +42,13 @@ const Header: React.FC = () => {
                 animate="visible"
                 custom={index}
               >
-                <div 
-                  className={`text-dark hover:text-primary font-medium transition-colors cursor-pointer ${location === link.path ? 'text-primary' : ''}`}
-                  onClick={() => window.location.href = link.path}
-                >
-                  {link.name}
-                </div>
+                <Link href={link.path}>
+                  <div 
+                    className={`text-dark hover:text-primary font-medium transition-colors cursor-pointer ${location === link.path ? 'text-primary' : ''}`}
+                  >
+                    {link.name}
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </nav>
@@ -103,16 +106,14 @@ const Header: React.FC = () => {
             <div className="container mx-auto px-4 py-3">
               <nav className="flex flex-col space-y-3 pb-3">
                 {navLinks.map(link => (
-                  <div 
-                    key={link.path}
-                    className={`text-dark hover:text-primary font-medium py-2 px-3 rounded-md hover:bg-light transition-colors cursor-pointer ${location === link.path ? 'text-primary bg-light' : ''}`}
-                    onClick={() => {
-                      window.location.href = link.path;
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    {link.name}
-                  </div>
+                  <Link key={link.path} href={link.path}>
+                    <div 
+                      className={`text-dark hover:text-primary font-medium py-2 px-3 rounded-md hover:bg-light transition-colors cursor-pointer ${location === link.path ? 'text-primary bg-light' : ''}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {link.name}
+                    </div>
+                  </Link>
                 ))}
               </nav>
             </div>
