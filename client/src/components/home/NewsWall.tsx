@@ -78,6 +78,7 @@ const NewsWall: React.FC = () => {
 
   const [showAllMobile, setShowAllMobile] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const isReallyMobile = typeof window !== 'undefined' ? window.innerWidth <= 768 : false;
   
   // Prepare featured article and recent articles lists
   const featuredArticle = useMemo(() => {
@@ -285,7 +286,7 @@ const NewsWall: React.FC = () => {
         </div>
 
         {/* "Voir tout" button for mobile */}
-        {isMobile && !showAllMobile && recent && recent.length > 4 && (
+        {isReallyMobile && !showAllMobile && recent && recent.length > 4 && (
           <ScrollAnimation className="flex justify-center mt-8" threshold={0.1} delay={0.3}>
             <Button 
               onClick={() => setShowAllMobile(true)}

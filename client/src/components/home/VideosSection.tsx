@@ -47,10 +47,11 @@ const formatViews = (views: number): string => {
 
 const VideosSection: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
+  // Afficher seulement 2 vidéos sur mobile, 4 sur desktop
   const showCount = isMobile ? 2 : 4;
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="pt-12 pb-20 bg-gray-50">
       <div className="container mx-auto px-4 md:px-6">
         <ScrollAnimation className="mb-10" threshold={0.1}>
           <div className="mb-4">
