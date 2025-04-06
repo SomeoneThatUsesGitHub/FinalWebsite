@@ -78,12 +78,30 @@ const NewsWall: React.FC = () => {
   const [showAllMobile, setShowAllMobile] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
   
+  // Prepare featured article and recent articles lists
+  const featuredArticle = useMemo(() => {
+    if (!featured || featured.length === 0) {
+      return recent && recent.length > 0 ? recent[0] : null;
+    }
+    return featured[0];
+  }, [featured, recent]);
+  
   // Determine articles to display based on mobile or desktop
   const displayedArticles = useMemo(() => {
     if (!recent) return [];
-    if (!isMobile || showAllMobile) return recent;
-    return recent.slice(0, 6); // Show only 6 articles on mobile
-  }, [recent, isMobile, showAllMobile]);
+    
+    // Skip the featured article if it comes from recent (to avoid duplication)
+    const articlesToDisplay = featuredArticle && !featured?.length && recent.length > 0
+      ? recent.filter(a => a.id !== featuredArticle.id)
+      : recent;
+    
+    if (isMobile && !showAllMobile) {
+      return articlesToDisplay.slice(0, 6); // Show only 6 articles on mobile
+    }
+    
+    // For desktop, limit to 6 articles
+    return showAllMobile ? articlesToDisplay : articlesToDisplay.slice(0, 6);
+  }, [recent, featured, featuredArticle, isMobile, showAllMobile]);
 
   const isLoading = categoriesLoading || featuredLoading || recentLoading;
 
@@ -109,7 +127,7 @@ const NewsWall: React.FC = () => {
         <div className="mb-10">
           <div className="flex justify-between items-center mb-4">
             <div className="relative">
-              <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Actualités récentes</h2>
+              <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Notre sélection</h2>
               <div className="absolute -bottom-2 left-0 w-24 h-1 bg-blue-600 rounded-full"></div>
             </div>
             <div className="flex space-x-2">
@@ -161,7 +179,64 @@ const NewsWall: React.FC = () => {
           </div>
         </div>
 
-        {/* Articles Grid */}
+        {/* Featured Article */}
+        {isLoading ? (
+          <Skeleton className="h-96 w-full rounded-xl mb-10" />
+        ) : featuredArticle && (
+          <motion.div 
+            className="mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="group bg-white overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <Link href="#" className="block">
+                <div className="grid md:grid-cols-2 h-auto md:h-[360px]">
+                  <div className="relative h-64 md:h-full overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
+                    {featuredArticle.imageUrl ? (
+                      <img
+                        src={featuredArticle.imageUrl}
+                        alt={featuredArticle.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="bg-secondary/10 h-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="text-9xl text-secondary/30" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                      </div>
+                    )}
+                    <div className="absolute top-4 left-4 z-20">
+                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+                        En vedette
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6 md:p-8 flex flex-col justify-center">
+                    <span
+                      className="inline-block px-2 py-1 text-xs font-semibold rounded-full mb-4"
+                      style={{
+                        backgroundColor: getCategoryColor(featuredArticle.categoryId),
+                        color: "#FFFFFF"
+                      }}
+                    >
+                      {getCategoryName(featuredArticle.categoryId)}
+                    </span>
+                    <h2 className="text-xl md:text-2xl font-bold text-dark mb-4 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 h-[4rem] flex items-center">
+                      {featuredArticle.title}
+                    </h2>
+                    <p className="text-dark/70 text-base mb-6 line-clamp-3 h-[4.5rem] flex items-center">
+                      {featuredArticle.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-dark/60 text-sm">{getTimeAgo(featuredArticle.createdAt)}</span>
+                      <span className="text-blue-600 text-sm font-medium group-hover:underline">Lire l'article complet</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </motion.div>
+        )}
 
         {/* Recent News Grid */}
         <motion.div 
@@ -210,10 +285,10 @@ const NewsWall: React.FC = () => {
                       </div>
                     </div>
                     <div className="p-5">
-                      <h3 className="text-lg font-bold text-dark mb-3 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 min-h-[3.5rem]">
+                      <h3 className="text-lg font-bold text-dark mb-3 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 h-[3.5rem] flex items-center">
                         {article.title}
                       </h3>
-                      <p className="text-dark/70 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
+                      <p className="text-dark/70 text-sm mb-4 line-clamp-2 h-[2.5rem] flex items-center">
                         {article.excerpt}
                       </p>
                       <div className="flex items-center justify-between">
@@ -233,7 +308,7 @@ const NewsWall: React.FC = () => {
               onClick={() => setShowAllMobile(true)}
               className="rounded-full bg-blue-600 hover:bg-blue-700"
             >
-              Voir tous les articles ({recent.length})
+              Voir tous les articles
             </Button>
           </div>
         )}

@@ -8,7 +8,7 @@ const HeroSection: React.FC = () => {
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-blue-950/50 to-black/80 z-10"></div>
         <img 
-          src="https://www.europarl.europa.eu/resources/library/images/20180409PHT01211/20180409PHT01211_original.jpg" 
+          src="https://www.radiofrance.fr/s3/cruiser-production/2022/02/af860b5c-da54-49b0-ba42-6f7106eb17b1/1200x680_0parlement-europeen00-98t4np.jpg" 
           alt="European Parliament" 
           className="object-cover object-center w-full h-full"
         />
