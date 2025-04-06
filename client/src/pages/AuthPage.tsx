@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { z } from "zod";
@@ -32,13 +32,27 @@ type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [location, setLocation] = useLocation();
-  const { user, loginMutation, registerMutation } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>("login");
+  const { user, loginMutation } = useAuth();
+  // N'utilisons plus d'onglets, uniquement la connexion
   
-  // Si l'utilisateur est déjà connecté, rediriger vers le tableau de bord
+  // Utiliser useEffect pour la redirection pour éviter les erreurs de hook
+  useEffect(() => {
+    if (user) {
+      setLocation("/admin");
+    }
+  }, [user, setLocation]);
+  
+  // Si l'utilisateur est déjà connecté, afficher un message de chargement
+  // mais ne pas retourner null pour éviter l'erreur de hook
   if (user) {
-    setLocation("/admin");
-    return null;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4">Redirection vers le tableau de bord...</p>
+        </div>
+      </div>
+    );
   }
   
   // Formulaire de connexion
@@ -50,27 +64,9 @@ export default function AuthPage() {
     },
   });
   
-  // Formulaire d'inscription
-  const registerForm = useForm<RegisterValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-      confirmPassword: "",
-      displayName: "",
-    },
-  });
-  
   // Soumission du formulaire de connexion
   const onLoginSubmit = (data: LoginValues) => {
     loginMutation.mutate(data);
-  };
-  
-  // Soumission du formulaire d'inscription
-  const onRegisterSubmit = (values: RegisterValues) => {
-    // Supprimer le champ confirmPassword avant d'envoyer au serveur
-    const { confirmPassword, ...data } = values;
-    registerMutation.mutate(data);
   };
   
   return (
@@ -85,173 +81,71 @@ export default function AuthPage() {
             </p>
           </div>
           
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Connexion</TabsTrigger>
-              <TabsTrigger value="register">Inscription</TabsTrigger>
-            </TabsList>
-            
-            {/* Onglet de connexion */}
-            <TabsContent value="login">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Connexion</CardTitle>
-                  <CardDescription>
-                    Connectez-vous à votre compte pour accéder à l'administration
-                  </CardDescription>
-                </CardHeader>
-                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)}>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-1">
-                      <Label htmlFor="login-username">Nom d'utilisateur</Label>
-                      <Input
-                        id="login-username"
-                        type="text"
-                        {...loginForm.register("username")}
-                      />
-                      {loginForm.formState.errors.username && (
-                        <p className="text-sm text-red-500">
-                          {loginForm.formState.errors.username.message}
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <Label htmlFor="login-password">Mot de passe</Label>
-                      <Input
-                        id="login-password"
-                        type="password"
-                        {...loginForm.register("password")}
-                      />
-                      {loginForm.formState.errors.password && (
-                        <p className="text-sm text-red-500">
-                          {loginForm.formState.errors.password.message}
-                        </p>
-                      )}
-                    </div>
-                    
-                    {loginMutation.isError && (
-                      <div className="text-sm text-red-500 text-center">
-                        Nom d'utilisateur ou mot de passe incorrect
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter>
-                    <Button 
-                      type="submit" 
-                      className="w-full" 
-                      disabled={loginMutation.isPending}
-                    >
-                      {loginMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connexion...
-                        </>
-                      ) : (
-                        <>
-                          <LogIn className="mr-2 h-4 w-4" /> Se connecter
-                        </>
-                      )}
-                    </Button>
-                  </CardFooter>
-                </form>
-              </Card>
-            </TabsContent>
-            
-            {/* Onglet d'inscription */}
-            <TabsContent value="register">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Inscription</CardTitle>
-                  <CardDescription>
-                    Créez un nouveau compte pour accéder à l'administration
-                  </CardDescription>
-                </CardHeader>
-                <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)}>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-1">
-                      <Label htmlFor="register-username">Nom d'utilisateur</Label>
-                      <Input
-                        id="register-username"
-                        type="text"
-                        {...registerForm.register("username")}
-                      />
-                      {registerForm.formState.errors.username && (
-                        <p className="text-sm text-red-500">
-                          {registerForm.formState.errors.username.message}
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <Label htmlFor="register-displayName">Nom d'affichage</Label>
-                      <Input
-                        id="register-displayName"
-                        type="text"
-                        {...registerForm.register("displayName")}
-                      />
-                      {registerForm.formState.errors.displayName && (
-                        <p className="text-sm text-red-500">
-                          {registerForm.formState.errors.displayName.message}
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <Label htmlFor="register-password">Mot de passe</Label>
-                      <Input
-                        id="register-password"
-                        type="password"
-                        {...registerForm.register("password")}
-                      />
-                      {registerForm.formState.errors.password && (
-                        <p className="text-sm text-red-500">
-                          {registerForm.formState.errors.password.message}
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <Label htmlFor="register-confirmPassword">Confirmer le mot de passe</Label>
-                      <Input
-                        id="register-confirmPassword"
-                        type="password"
-                        {...registerForm.register("confirmPassword")}
-                      />
-                      {registerForm.formState.errors.confirmPassword && (
-                        <p className="text-sm text-red-500">
-                          {registerForm.formState.errors.confirmPassword.message}
-                        </p>
-                      )}
-                    </div>
-                    
-                    {registerMutation.isError && (
-                      <div className="text-sm text-red-500 text-center">
-                        Une erreur est survenue lors de l'inscription. Ce nom d'utilisateur est peut-être déjà pris.
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter>
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      disabled={registerMutation.isPending}
-                    >
-                      {registerMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription...
-                        </>
-                      ) : (
-                        "S'inscrire"
-                      )}
-                    </Button>
-                  </CardFooter>
-                </form>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          <Card>
+            <CardHeader>
+              <CardTitle>Connexion</CardTitle>
+              <CardDescription>
+                Connectez-vous à votre compte pour accéder à l'administration
+              </CardDescription>
+            </CardHeader>
+            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)}>
+              <CardContent className="space-y-4">
+                <div className="space-y-1">
+                  <Label htmlFor="login-username">Nom d'utilisateur</Label>
+                  <Input
+                    id="login-username"
+                    type="text"
+                    {...loginForm.register("username")}
+                  />
+                  {loginForm.formState.errors.username && (
+                    <p className="text-sm text-red-500">
+                      {loginForm.formState.errors.username.message}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-1">
+                  <Label htmlFor="login-password">Mot de passe</Label>
+                  <Input
+                    id="login-password"
+                    type="password"
+                    {...loginForm.register("password")}
+                  />
+                  {loginForm.formState.errors.password && (
+                    <p className="text-sm text-red-500">
+                      {loginForm.formState.errors.password.message}
+                    </p>
+                  )}
+                </div>
+                
+                {loginMutation.isError && (
+                  <div className="text-sm text-red-500 text-center">
+                    Nom d'utilisateur ou mot de passe incorrect
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={loginMutation.isPending}
+                >
+                  {loginMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connexion...
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-4 w-4" /> Se connecter
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
           
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            <a href="/home" className="underline underline-offset-4 hover:text-primary">
+            <a href="/" className="underline underline-offset-4 hover:text-primary">
               Retourner au site
             </a>
           </p>
