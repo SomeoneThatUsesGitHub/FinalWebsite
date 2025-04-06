@@ -10,7 +10,7 @@ import {
   videos, type Video, type InsertVideo
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, like, and, or, isNull, not } from "drizzle-orm";
+import { eq, desc, like, and, or, isNull, not, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -24,7 +24,7 @@ export interface IStorage {
   createCategory(category: InsertCategory): Promise<Category>;
   
   // Article operations
-  getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string}): Promise<Article[]>;
+  getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number}): Promise<Article[]>;
   getFeaturedArticles(limit?: number): Promise<Article[]>;
   getRecentArticles(limit?: number): Promise<Article[]>;
   getArticlesByCategory(categoryId: number, limit?: number): Promise<Article[]>;
@@ -105,7 +105,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Article operations
-  async getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string}): Promise<Article[]> {
+  async getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number}): Promise<Article[]> {
     let query = db.select().from(articles);
     
     if (filters) {
@@ -122,6 +122,19 @@ export class DatabaseStorage implements IStorage {
             like(articles.title, searchTerm),
             like(articles.excerpt, searchTerm),
             like(articles.content, searchTerm)
+          )
+        );
+      }
+      
+      // Filter by year
+      if (filters.year) {
+        const startOfYear = new Date(filters.year, 0, 1).toISOString();
+        const endOfYear = new Date(filters.year, 11, 31, 23, 59, 59).toISOString();
+        
+        query = query.where(
+          and(
+            gte(articles.createdAt, startOfYear),
+            lte(articles.createdAt, endOfYear)
           )
         );
       }

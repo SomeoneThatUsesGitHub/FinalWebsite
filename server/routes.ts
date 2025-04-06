@@ -25,12 +25,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Articles
   app.get("/api/articles", async (req: Request, res: Response) => {
-    const { categoryId, search, sort } = req.query;
+    const { categoryId, search, sort, year } = req.query;
     
     const filters: {
       categoryId?: number;
       search?: string;
       sort?: string;
+      year?: number;
     } = {};
     
     if (categoryId && !isNaN(Number(categoryId))) {
@@ -43,6 +44,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     if (sort && typeof sort === 'string') {
       filters.sort = sort;
+    }
+    
+    if (year && !isNaN(Number(year))) {
+      filters.year = Number(year);
     }
     
     const articles = await storage.getAllArticles(filters);
