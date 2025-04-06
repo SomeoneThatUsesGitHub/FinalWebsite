@@ -37,11 +37,7 @@ export default function EditArticlePage() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const [previewHtml, setPreviewHtml] = useState("");
-
-  const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
-    queryKey: ["/api/categories"],
-    queryFn: getQueryFn({ on401: "throw" }),
-  });
+  const [isFormReady, setIsFormReady] = useState(false);
 
   // Récupérer l'article si on est en mode édition
   const {
@@ -54,61 +50,55 @@ export default function EditArticlePage() {
     enabled: !isNewArticle,
   });
 
-  // Valeurs par défaut initiales
-  const defaultValues: ArticleFormValues = {
-    title: "",
-    slug: "",
-    excerpt: "",
-    content: "",
-    imageUrl: "",
-    categoryId: 0,
-    published: false,
-    featured: false,
+  const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+    queryFn: getQueryFn({ on401: "throw" }),
+  });
+
+  // Préparer les valeurs par défaut avec l'article chargé s'il existe
+  const getDefaultValues = (): ArticleFormValues => {
+    if (article) {
+      console.log("Initialisation avec article existant:", article);
+      return {
+        title: article.title || "",
+        slug: article.slug || "",
+        excerpt: article.excerpt || "",
+        content: article.content || "",
+        imageUrl: article.imageUrl || "",
+        categoryId: article.categoryId || 1,
+        published: Boolean(article.published),
+        featured: Boolean(article.featured),
+      };
+    }
+
+    return {
+      title: "",
+      slug: "",
+      excerpt: "",
+      content: "",
+      imageUrl: "",
+      categoryId: 1,
+      published: false,
+      featured: false,
+    };
   };
+
+  // Initialiser le formulaire après avoir reçu les données de l'article
+  useEffect(() => {
+    if (!isNewArticle && article) {
+      setIsFormReady(true);
+      setPreviewHtml(article.content || "");
+    } else if (isNewArticle) {
+      setIsFormReady(true);
+    }
+  }, [article, isNewArticle]);
 
   // Formulaire avec react-hook-form et zod
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
-    defaultValues
+    values: getDefaultValues(), // Utiliser les données actuelles à chaque render
+    mode: "onChange",
   });
-
-  // Mettre à jour les valeurs du formulaire quand l'article est chargé
-  useEffect(() => {
-    if (article && !articleLoading) {
-      console.log("Article chargé pour édition:", article);
-      
-      // Délai court pour s'assurer que le formulaire est prêt
-      setTimeout(() => {
-        form.reset({
-          title: article.title,
-          slug: article.slug,
-          excerpt: article.excerpt || "",
-          content: article.content,
-          imageUrl: article.imageUrl || "",
-          categoryId: article.categoryId,
-          published: Boolean(article.published),
-          featured: Boolean(article.featured),
-        });
-        
-        // Forcer la mise à jour des valeurs si reset ne fonctionne pas
-        Object.entries({
-          title: article.title,
-          slug: article.slug,
-          excerpt: article.excerpt || "",
-          content: article.content,
-          imageUrl: article.imageUrl || "",
-          categoryId: article.categoryId,
-          published: Boolean(article.published),
-          featured: Boolean(article.featured),
-        }).forEach(([field, value]) => {
-          form.setValue(field as any, value);
-        });
-        
-        // Mettre à jour le prévisualisateur
-        setPreviewHtml(article.content);
-      }, 100);
-    }
-  }, [article, articleLoading, form]);
 
   // Générer automatiquement le slug à partir du titre
   useEffect(() => {
