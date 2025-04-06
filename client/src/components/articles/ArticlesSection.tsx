@@ -121,28 +121,52 @@ const GridArticleCard: React.FC<{
   return (
     <motion.article 
       variants={staggerItem}
-      className="rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col bg-white"
+      className="rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col bg-white"
     >
       <div className="relative overflow-hidden h-48">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
         {article.imageUrl ? (
           <img
             src={article.imageUrl}
             alt={article.title}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full bg-gray-100 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
           </div>
         )}
-        <div className="absolute top-3 left-3" onClick={() => onCategoryClick(article.categoryId)}>
-          <CategoryBadge categoryId={article.categoryId} categories={categories} />
+        <div className="absolute top-2 right-2 z-20" onClick={() => onCategoryClick(article.categoryId)}>
+          <span
+            className="inline-block px-2 py-1 text-xs font-semibold rounded-full transition-transform duration-300 hover:scale-110"
+            style={{
+              backgroundColor: categories?.find(c => c.id === article.categoryId)?.color || "#3b82f6",
+              color: "#FFFFFF"
+            }}
+          >
+            {categories?.find(c => c.id === article.categoryId)?.name || "Catégorie"}
+          </span>
         </div>
       </div>
-      <div className="p-4 flex-1 flex flex-col">
-        <h3 className="text-lg font-bold text-dark mb-2 line-clamp-2 hover:text-blue-600 transition-colors">
+      <div className="p-5 flex-1 flex flex-col">
+        <motion.h3 
+          className="text-lg font-bold text-dark mb-3 transition-colors duration-300 hover:text-blue-600 line-clamp-2 min-h-[3.5rem]"
+          whileHover={{ scale: 1.01 }}
+          variants={{
+            hidden: { opacity: 0, y: 10 },
+            visible: { 
+              opacity: 1, 
+              y: 0,
+              transition: { 
+                type: "spring",
+                stiffness: 300,
+                damping: 15
+              }
+            }
+          }}
+        >
           <Link href={`/articles/${article.slug}`}>{article.title}</Link>
-        </h3>
+        </motion.h3>
         <p className="text-dark/70 text-sm mb-4 line-clamp-2 flex-1">{article.excerpt}</p>
         <div className="flex items-center justify-between text-dark/60 text-xs pt-3 border-t border-gray-100">
           <div className="flex items-center">
@@ -242,7 +266,6 @@ const ArticlesSection: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOrder, setSortOrder] = useState("recent");
-  const [viewMode, setViewMode] = useState("grid");
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
   
@@ -324,33 +347,6 @@ const ArticlesSection: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className={`flex items-center ${viewMode === 'compact' ? 'bg-blue-50 text-blue-600' : ''}`}
-              onClick={() => setViewMode('compact')}
-            >
-              <List className="h-4 w-4 mr-1" />
-              Compact
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className={`flex items-center ${viewMode === 'grid' ? 'bg-blue-50 text-blue-600' : ''}`}
-              onClick={() => setViewMode('grid')}
-            >
-              <Grid3X3 className="h-4 w-4 mr-1" />
-              Grille
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className={`flex items-center ${viewMode === 'list' ? 'bg-blue-50 text-blue-600' : ''}`}
-              onClick={() => setViewMode('list')}
-            >
-              <List className="h-4 w-4 mr-1" />
-              Liste
-            </Button>
             <Button 
               variant="outline" 
               size="sm" 
@@ -452,129 +448,29 @@ const ArticlesSection: React.FC = () => {
           </div>
         )}
         
-        {/* Affichage du contenu selon le mode de vue */}
+        {/* Affichage du contenu en mode grille uniquement */}
         {isLoading ? (
-          viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array(9).fill(0).map((_, i) => (
-                <Skeleton key={i} className="h-[400px] w-full rounded-xl" />
-              ))}
-            </div>
-          ) : viewMode === 'list' ? (
-            <div className="space-y-6">
-              {Array(5).fill(0).map((_, i) => (
-                <Skeleton key={i} className="h-[180px] w-full rounded-xl" />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {Array(10).fill(0).map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full rounded-md" />
-              ))}
-            </div>
-          )
-        ) : articles && articles.length > 0 ? (
-          <div>
-            {viewMode === 'grid' && (
-              <motion.div 
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                variants={staggerChildren}
-                initial="hidden"
-                animate="visible"
-              >
-                {articles.map((article, index) => (
-                  <GridArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    categories={categories}
-                    onCategoryClick={handleCategoryClick}
-                  />
-                ))}
-              </motion.div>
-            )}
-            
-            {viewMode === 'list' && (
-              <motion.div 
-                className="bg-white rounded-xl overflow-hidden shadow-md"
-                variants={staggerChildren}
-                initial="hidden"
-                animate="visible"
-              >
-                {articles.map((article, index) => (
-                  <ListArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    categories={categories}
-                    onCategoryClick={handleCategoryClick}
-                  />
-                ))}
-              </motion.div>
-            )}
-            
-            {viewMode === 'compact' && (
-              <div className="bg-white rounded-xl overflow-hidden shadow-md">
-                <Tabs defaultValue="chronological" className="w-full">
-                  <div className="border-b border-gray-100 p-4">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="chronological">Par date</TabsTrigger>
-                      <TabsTrigger value="all">Tous les articles</TabsTrigger>
-                    </TabsList>
-                  </div>
-                  
-                  <TabsContent value="chronological" className="p-0">
-                    {Object.keys(articlesByDate).length > 0 ? (
-                      Object.entries(articlesByDate)
-                        .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
-                        .map(([date, dateArticles]) => (
-                          <div key={date} className="mb-6">
-                            <h3 className="px-4 pt-4 pb-2 text-lg font-semibold text-dark capitalize border-b border-gray-100">
-                              {date}
-                            </h3>
-                            <motion.div
-                              variants={staggerChildren}
-                              initial="hidden"
-                              animate="visible"
-                              className="divide-y divide-gray-50"
-                            >
-                              {dateArticles.map(article => (
-                                <CompactArticleCard 
-                                  key={article.id} 
-                                  article={article} 
-                                  categories={categories}
-                                  onCategoryClick={handleCategoryClick}
-                                />
-                              ))}
-                            </motion.div>
-                          </div>
-                        ))
-                    ) : (
-                      <div className="p-8 text-center text-gray-500">
-                        Aucun article trouvé pour cette période
-                      </div>
-                    )}
-                  </TabsContent>
-                  
-                  <TabsContent value="all" className="p-0">
-                    <motion.div
-                      variants={staggerChildren}
-                      initial="hidden"
-                      animate="visible"
-                      className="divide-y divide-gray-50"
-                    >
-                      {articles.map(article => (
-                        <CompactArticleCard 
-                          key={article.id} 
-                          article={article} 
-                          categories={categories}
-                          onCategoryClick={handleCategoryClick}
-                        />
-                      ))}
-                    </motion.div>
-                  </TabsContent>
-                </Tabs>
-              </div>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array(9).fill(0).map((_, i) => (
+              <Skeleton key={i} className="h-[400px] w-full rounded-xl" />
+            ))}
           </div>
+        ) : articles && articles.length > 0 ? (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            variants={staggerChildren}
+            initial="hidden"
+            animate="visible"
+          >
+            {articles.map((article, index) => (
+              <GridArticleCard 
+                key={article.id} 
+                article={article} 
+                categories={categories}
+                onCategoryClick={handleCategoryClick}
+              />
+            ))}
+          </motion.div>
         ) : (
           <div className="py-16 text-center bg-white rounded-xl shadow-md">
             <h3 className="text-xl font-medium mb-2">Aucun article trouvé</h3>
