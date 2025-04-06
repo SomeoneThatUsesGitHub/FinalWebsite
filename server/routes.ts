@@ -1,0 +1,171 @@
+import type { Express, Request, Response } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { z } from "zod";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // API Routes - prefix all with /api
+  
+  // Categories
+  app.get("/api/categories", async (req: Request, res: Response) => {
+    const categories = await storage.getAllCategories();
+    res.json(categories);
+  });
+  
+  app.get("/api/categories/:slug", async (req: Request, res: Response) => {
+    const { slug } = req.params;
+    const category = await storage.getCategoryBySlug(slug);
+    
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    
+    res.json(category);
+  });
+  
+  // Articles
+  app.get("/api/articles", async (req: Request, res: Response) => {
+    const { categoryId, search, sort } = req.query;
+    
+    const filters: {
+      categoryId?: number;
+      search?: string;
+      sort?: string;
+    } = {};
+    
+    if (categoryId && !isNaN(Number(categoryId))) {
+      filters.categoryId = Number(categoryId);
+    }
+    
+    if (search && typeof search === 'string') {
+      filters.search = search;
+    }
+    
+    if (sort && typeof sort === 'string') {
+      filters.sort = sort;
+    }
+    
+    const articles = await storage.getAllArticles(filters);
+    res.json(articles);
+  });
+  
+  app.get("/api/articles/featured", async (req: Request, res: Response) => {
+    const { limit } = req.query;
+    const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 3;
+    
+    const articles = await storage.getFeaturedArticles(limitNum);
+    res.json(articles);
+  });
+  
+  app.get("/api/articles/recent", async (req: Request, res: Response) => {
+    const { limit } = req.query;
+    const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 6;
+    
+    const articles = await storage.getRecentArticles(limitNum);
+    res.json(articles);
+  });
+  
+  app.get("/api/articles/by-category/:categoryId", async (req: Request, res: Response) => {
+    const { categoryId } = req.params;
+    const { limit } = req.query;
+    
+    if (isNaN(Number(categoryId))) {
+      return res.status(400).json({ message: "Invalid category ID" });
+    }
+    
+    const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 6;
+    
+    const articles = await storage.getArticlesByCategory(Number(categoryId), limitNum);
+    res.json(articles);
+  });
+  
+  app.get("/api/articles/:slug", async (req: Request, res: Response) => {
+    const { slug } = req.params;
+    const article = await storage.getArticleBySlug(slug);
+    
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+    
+    // Increment view count asynchronously
+    storage.updateArticleViews(article.id).catch(console.error);
+    
+    res.json(article);
+  });
+  
+  // News Updates for ticker
+  app.get("/api/news-updates", async (req: Request, res: Response) => {
+    const newsUpdates = await storage.getActiveNewsUpdates();
+    res.json(newsUpdates);
+  });
+  
+  // Elections
+  app.get("/api/elections", async (req: Request, res: Response) => {
+    const elections = await storage.getAllElections();
+    res.json(elections);
+  });
+  
+  app.get("/api/elections/upcoming", async (req: Request, res: Response) => {
+    const { limit } = req.query;
+    const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 4;
+    
+    const elections = await storage.getUpcomingElections(limitNum);
+    res.json(elections);
+  });
+  
+  app.get("/api/elections/recent", async (req: Request, res: Response) => {
+    const { limit } = req.query;
+    const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 2;
+    
+    const elections = await storage.getRecentElections(limitNum);
+    res.json(elections);
+  });
+  
+  app.get("/api/elections/:id", async (req: Request, res: Response) => {
+    const { id } = req.params;
+    
+    if (isNaN(Number(id))) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
+    
+    const election = await storage.getElectionById(Number(id));
+    
+    if (!election) {
+      return res.status(404).json({ message: "Election not found" });
+    }
+    
+    res.json(election);
+  });
+  
+  // Educational Content
+  app.get("/api/educational-content", async (req: Request, res: Response) => {
+    const { categoryId } = req.query;
+    
+    let categoryIdNum: number | undefined = undefined;
+    if (categoryId && !isNaN(Number(categoryId))) {
+      categoryIdNum = Number(categoryId);
+    }
+    
+    const content = await storage.getAllEducationalContent(categoryIdNum);
+    res.json(content);
+  });
+  
+  app.get("/api/educational-content/:id", async (req: Request, res: Response) => {
+    const { id } = req.params;
+    
+    if (isNaN(Number(id))) {
+      return res.status(400).json({ message: "Invalid content ID" });
+    }
+    
+    const content = await storage.getEducationalContentById(Number(id));
+    
+    if (!content) {
+      return res.status(404).json({ message: "Content not found" });
+    }
+    
+    res.json(content);
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
