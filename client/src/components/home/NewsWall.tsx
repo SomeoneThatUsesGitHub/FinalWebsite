@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { staggerChildren, staggerItem } from "@/lib/animations";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { getTimeAgo, truncateText } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, Eye, MessageSquare } from "lucide-react";
+import { getTimeAgo } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 type Category = {
   id: number;
@@ -73,6 +74,16 @@ const NewsWall: React.FC = () => {
       return res.json();
     }
   });
+
+  const [showAllMobile, setShowAllMobile] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  
+  // Determine articles to display based on mobile or desktop
+  const displayedArticles = useMemo(() => {
+    if (!recent) return [];
+    if (!isMobile || showAllMobile) return recent;
+    return recent.slice(0, 6); // Show only 6 articles on mobile
+  }, [recent, isMobile, showAllMobile]);
 
   const isLoading = categoriesLoading || featuredLoading || recentLoading;
 
@@ -165,8 +176,7 @@ const NewsWall: React.FC = () => {
                 .map((_, i) => (
                   <Skeleton key={i} className="h-80 w-full rounded-xl" />
                 ))
-            : recent &&
-              recent.map((article, index) => (
+            : displayedArticles.map((article, index) => (
                 <motion.div
                   key={article.id}
                   className="news-card group rounded-xl overflow-hidden shadow-md bg-white hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
@@ -216,6 +226,17 @@ const NewsWall: React.FC = () => {
               ))}
         </motion.div>
 
+        {/* "Voir tout" button for mobile */}
+        {isMobile && !showAllMobile && recent && recent.length > 6 && (
+          <div className="flex justify-center mt-8">
+            <Button 
+              onClick={() => setShowAllMobile(true)}
+              className="rounded-full bg-blue-600 hover:bg-blue-700"
+            >
+              Voir tous les articles ({recent.length})
+            </Button>
+          </div>
+        )}
 
       </div>
     </section>
