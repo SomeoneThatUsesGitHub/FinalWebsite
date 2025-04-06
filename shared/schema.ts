@@ -81,6 +81,52 @@ export const insertNewsUpdateSchema = createInsertSchema(newsUpdates).pick({
   active: true,
 });
 
+// Flash Info schema - for breaking news alerts
+export const flashInfos = pgTable("flash_infos", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  imageUrl: text("image_url"),
+  active: boolean("active").notNull().default(true),
+  priority: integer("priority").notNull().default(1), // Higher value = higher priority
+  categoryId: integer("category_id").references(() => categories.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertFlashInfoSchema = createInsertSchema(flashInfos).pick({
+  title: true,
+  content: true,
+  imageUrl: true,
+  active: true,
+  priority: true,
+  categoryId: true,
+});
+
+// Live Broadcasts schema - for live announcements
+export const liveEvents = pgTable("live_events", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  imageUrl: text("image_url"),
+  liveUrl: text("live_url"), // URL for the live stream or embed
+  active: boolean("active").notNull().default(false),
+  scheduledFor: timestamp("scheduled_for"),
+  categoryId: integer("category_id").references(() => categories.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertLiveEventSchema = createInsertSchema(liveEvents).pick({
+  title: true,
+  description: true,
+  imageUrl: true,
+  liveUrl: true,
+  active: true,
+  scheduledFor: true,
+  categoryId: true,
+});
+
 // Elections schema - for election data
 export const elections = pgTable("elections", {
   id: serial("id").primaryKey(),
@@ -137,6 +183,12 @@ export type InsertArticle = z.infer<typeof insertArticleSchema>;
 
 export type NewsUpdate = typeof newsUpdates.$inferSelect;
 export type InsertNewsUpdate = z.infer<typeof insertNewsUpdateSchema>;
+
+export type FlashInfo = typeof flashInfos.$inferSelect;
+export type InsertFlashInfo = z.infer<typeof insertFlashInfoSchema>;
+
+export type LiveEvent = typeof liveEvents.$inferSelect;
+export type InsertLiveEvent = z.infer<typeof insertLiveEventSchema>;
 
 export type Election = typeof elections.$inferSelect;
 export type InsertElection = z.infer<typeof insertElectionSchema>;

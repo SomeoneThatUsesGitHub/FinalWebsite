@@ -30,6 +30,31 @@ type Article = {
   createdAt: string;
 };
 
+type FlashInfo = {
+  id: number;
+  title: string;
+  content: string;
+  imageUrl: string | null;
+  active: boolean;
+  priority: number;
+  categoryId: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type LiveEvent = {
+  id: number;
+  title: string;
+  description: string;
+  imageUrl: string | null;
+  liveUrl: string | null;
+  active: boolean;
+  scheduledFor: string | null;
+  categoryId: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 const CategoryPill: React.FC<{
   category: Category;
   isActive: boolean;
@@ -63,6 +88,15 @@ const NewsWall: React.FC = () => {
     queryKey: ['/api/articles/featured'],
   });
 
+  const { data: flashInfos, isLoading: flashInfosLoading } = useQuery<FlashInfo[]>({
+    queryKey: ['/api/flash-infos'],
+  });
+
+  const { data: liveEvent, isLoading: liveEventLoading } = useQuery<LiveEvent>({
+    queryKey: ['/api/live-event'],
+    throwOnError: false,
+  });
+
   const { data: recent, isLoading: recentLoading } = useQuery<Article[]>({
     queryKey: ['/api/articles/recent', selectedCategoryId],
     queryFn: async ({ queryKey }) => {
@@ -80,22 +114,32 @@ const NewsWall: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isReallyMobile = typeof window !== 'undefined' ? window.innerWidth <= 768 : false;
   
-  // Prepare featured article and recent articles lists
-  const featuredArticle = useMemo(() => {
-    if (!featured || featured.length === 0) {
-      return recent && recent.length > 0 ? recent[0] : null;
+  // Check if we have an active live event
+  const hasLiveEvent = !!liveEvent;
+  
+  // Prepare featured content - Live Event takes precedence, then featured article
+  const featuredContent = useMemo(() => {
+    if (hasLiveEvent) {
+      return { type: 'liveEvent', data: liveEvent };
+    } else if (featured && featured.length > 0) {
+      return { type: 'article', data: featured[0] };
+    } else if (recent && recent.length > 0) {
+      return { type: 'article', data: recent[0] };
     }
-    return featured[0];
-  }, [featured, recent]);
+    return null;
+  }, [featured, recent, liveEvent, hasLiveEvent]);
   
   // Determine articles to display based on mobile or desktop
   const displayedArticles = useMemo(() => {
     if (!recent) return [];
     
     // Skip the featured article if it comes from recent (to avoid duplication)
-    const articlesToDisplay = featuredArticle && !featured?.length && recent.length > 0
-      ? recent.filter(a => a.id !== featuredArticle.id)
-      : recent;
+    const articlesToDisplay = 
+      featuredContent?.type === 'article' && 
+      !featured?.length && 
+      recent.length > 0
+        ? recent.filter(a => a.id !== (featuredContent.data as Article).id)
+        : recent;
     
     if (isMobile && !showAllMobile) {
       return articlesToDisplay.slice(0, 4); // Show only 4 articles on mobile
@@ -103,9 +147,9 @@ const NewsWall: React.FC = () => {
     
     // For desktop, limit to 6 articles
     return showAllMobile ? articlesToDisplay : articlesToDisplay.slice(0, 6);
-  }, [recent, featured, featuredArticle, isMobile, showAllMobile]);
+  }, [recent, featured, featuredContent, isMobile, showAllMobile]);
 
-  const isLoading = categoriesLoading || featuredLoading || recentLoading;
+  const isLoading = categoriesLoading || featuredLoading || recentLoading || flashInfosLoading || liveEventLoading;
 
   const handleCategoryClick = (categoryId: number | null) => {
     setSelectedCategoryId(categoryId);
@@ -165,20 +209,21 @@ const NewsWall: React.FC = () => {
           </div>
         </ScrollAnimation>
 
-        {/* Featured Article */}
+        {/* Featured Content - Live Event or Featured Article */}
         {isLoading ? (
           <Skeleton className="h-96 w-full rounded-xl mb-10" />
-        ) : featuredArticle && (
+        ) : featuredContent && (
           <ScrollAnimation className="mb-10" threshold={0.1} delay={0.2}>
-            <div className="group bg-white overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200">
-              <Link href="#" className="block">
+            {featuredContent.type === 'liveEvent' ? (
+              // Live Event Card
+              <div className="group bg-white overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200">
                 <div className="flex flex-col md:grid md:grid-cols-2 h-auto md:h-[360px]">
                   <div className="relative h-64 md:h-full overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
-                    {featuredArticle.imageUrl ? (
+                    {(featuredContent.data as LiveEvent).imageUrl ? (
                       <img
-                        src={featuredArticle.imageUrl}
-                        alt={featuredArticle.title}
+                        src={(featuredContent.data as LiveEvent).imageUrl || ''}
+                        alt={(featuredContent.data as LiveEvent).title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
@@ -187,41 +232,125 @@ const NewsWall: React.FC = () => {
                       </div>
                     )}
                     <div className="absolute top-4 left-4 z-20">
-                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-                        En vedette
+                      <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md animate-pulse">
+                        DIRECT
                       </span>
                     </div>
                   </div>
                   <div className="p-6 md:p-8 flex flex-col justify-between h-full">
                     <div>
                       <span
-                        className="inline-block px-2 py-1 text-xs font-semibold rounded-full mb-4"
-                        style={{
-                          backgroundColor: getCategoryColor(featuredArticle.categoryId),
-                          color: "#FFFFFF"
-                        }}
+                        className="inline-block px-2 py-1 text-xs font-semibold rounded-full mb-4 bg-red-600 text-white"
                       >
-                        {getCategoryName(featuredArticle.categoryId)}
+                        Événement en direct
                       </span>
                       <h2 className="text-xl md:text-2xl font-bold text-dark mb-4 transition-colors duration-300 group-hover:text-blue-600">
-                        {featuredArticle.title}
+                        {(featuredContent.data as LiveEvent).title}
                       </h2>
                       <p className="text-dark/70 text-base mb-6">
-                        {featuredArticle.excerpt}
-                        <span className="hidden xl:inline"> 
-                          Cette analyse approfondie explore les implications politiques, économiques et sociales de cet enjeu majeur.
-                          Découvrez comment les différents acteurs politiques se positionnent et quelles pourraient être les conséquences 
-                          à moyen et long terme pour notre société.
-                        </span>
+                        {(featuredContent.data as LiveEvent).description}
                       </p>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-dark/60 text-sm">{getTimeAgo(featuredArticle.createdAt)}</span>
-                      <span className="text-blue-600 text-sm font-medium group-hover:underline">Lire l'article complet</span>
+                    <div className="mt-4">
+                      {(featuredContent.data as LiveEvent).liveUrl && (
+                        <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
+                          <div className="flex items-center">
+                            <div className="mr-2 w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                            Regarder maintenant
+                          </div>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
+            ) : (
+              // Featured Article Card
+              <div className="group bg-white overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200">
+                <Link href="#" className="block">
+                  <div className="flex flex-col md:grid md:grid-cols-2 h-auto md:h-[360px]">
+                    <div className="relative h-64 md:h-full overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
+                      {(featuredContent.data as Article).imageUrl ? (
+                        <img
+                          src={(featuredContent.data as Article).imageUrl}
+                          alt={(featuredContent.data as Article).title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="bg-secondary/10 h-full flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="text-9xl text-secondary/30" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                        </div>
+                      )}
+                      <div className="absolute top-4 left-4 z-20">
+                        <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+                          En vedette
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-6 md:p-8 flex flex-col justify-between h-full">
+                      <div>
+                        <span
+                          className="inline-block px-2 py-1 text-xs font-semibold rounded-full mb-4"
+                          style={{
+                            backgroundColor: getCategoryColor((featuredContent.data as Article).categoryId),
+                            color: "#FFFFFF"
+                          }}
+                        >
+                          {getCategoryName((featuredContent.data as Article).categoryId)}
+                        </span>
+                        <h2 className="text-xl md:text-2xl font-bold text-dark mb-4 transition-colors duration-300 group-hover:text-blue-600">
+                          {(featuredContent.data as Article).title}
+                        </h2>
+                        <p className="text-dark/70 text-base mb-6">
+                          {(featuredContent.data as Article).excerpt}
+                          <span className="hidden xl:inline"> 
+                            Cette analyse approfondie explore les implications politiques, économiques et sociales de cet enjeu majeur.
+                            Découvrez comment les différents acteurs politiques se positionnent et quelles pourraient être les conséquences 
+                            à moyen et long terme pour notre société.
+                          </span>
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-dark/60 text-sm">{getTimeAgo((featuredContent.data as Article).createdAt)}</span>
+                        <span className="text-blue-600 text-sm font-medium group-hover:underline">Lire l'article complet</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            )}
+          </ScrollAnimation>
+        )}
+
+        {/* Flash Info (Breaking News) Banner */}
+        {!isLoading && flashInfos && flashInfos.length > 0 && (
+          <ScrollAnimation className="mb-8" threshold={0.1} delay={0.2}>
+            <div className="bg-white overflow-hidden rounded-xl shadow-xl border border-red-200 relative">
+              <div className="absolute inset-y-0 left-0 w-2 bg-red-600"></div>
+              <div className="p-5 pl-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold animate-pulse">
+                    Flash info
+                  </span>
+                  <span className="text-gray-500 text-xs">
+                    {getTimeAgo(flashInfos[0].createdAt)}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-dark mb-2">
+                  {flashInfos[0].title}
+                </h3>
+                <p className="text-dark/70 text-sm">
+                  {flashInfos[0].content}
+                </p>
+                {flashInfos[0].imageUrl && (
+                  <img 
+                    src={flashInfos[0].imageUrl}
+                    alt={flashInfos[0].title}
+                    className="mt-4 rounded-lg w-full max-h-[200px] object-cover"
+                  />
+                )}
+              </div>
             </div>
           </ScrollAnimation>
         )}

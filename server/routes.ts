@@ -204,6 +204,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Flash Info (Breaking News) routes
+  app.get("/api/flash-infos", async (req: Request, res: Response) => {
+    try {
+      const flashInfos = await storage.getActiveFlashInfos();
+      res.json(flashInfos);
+    } catch (error) {
+      console.error("Error fetching flash infos:", error);
+      res.status(500).json({ error: "Error fetching flash infos" });
+    }
+  });
+
+  app.get("/api/flash-infos/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid flash info ID" });
+      }
+      
+      const flashInfo = await storage.getFlashInfoById(Number(id));
+      
+      if (!flashInfo) {
+        return res.status(404).json({ message: "Flash info not found" });
+      }
+      
+      res.json(flashInfo);
+    } catch (error) {
+      console.error("Error fetching flash info:", error);
+      res.status(500).json({ error: "Error fetching flash info" });
+    }
+  });
+
+  // Live Event routes
+  app.get("/api/live-event", async (req: Request, res: Response) => {
+    try {
+      const liveEvent = await storage.getActiveLiveEvent();
+      
+      if (!liveEvent) {
+        return res.status(404).json({ message: "No active live event" });
+      }
+      
+      res.json(liveEvent);
+    } catch (error) {
+      console.error("Error fetching live event:", error);
+      res.status(500).json({ error: "Error fetching live event" });
+    }
+  });
+
+  app.get("/api/live-events/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid live event ID" });
+      }
+      
+      const liveEvent = await storage.getLiveEventById(Number(id));
+      
+      if (!liveEvent) {
+        return res.status(404).json({ message: "Live event not found" });
+      }
+      
+      res.json(liveEvent);
+    } catch (error) {
+      console.error("Error fetching live event:", error);
+      res.status(500).json({ error: "Error fetching live event" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

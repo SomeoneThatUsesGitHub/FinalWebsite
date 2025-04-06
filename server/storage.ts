@@ -3,6 +3,8 @@ import {
   categories, type Category, type InsertCategory,
   articles, type Article, type InsertArticle,
   newsUpdates, type NewsUpdate, type InsertNewsUpdate,
+  flashInfos, type FlashInfo, type InsertFlashInfo,
+  liveEvents, type LiveEvent, type InsertLiveEvent,
   elections, type Election, type InsertElection,
   educationalContent, type EducationalContent, type InsertEducationalContent,
   videos, type Video, type InsertVideo
@@ -33,6 +35,16 @@ export interface IStorage {
   // News Updates operations
   getActiveNewsUpdates(): Promise<NewsUpdate[]>;
   createNewsUpdate(newsUpdate: InsertNewsUpdate): Promise<NewsUpdate>;
+  
+  // Flash Info operations
+  getActiveFlashInfos(): Promise<FlashInfo[]>;
+  getFlashInfoById(id: number): Promise<FlashInfo | undefined>;
+  createFlashInfo(flashInfo: InsertFlashInfo): Promise<FlashInfo>;
+  
+  // Live Events operations
+  getActiveLiveEvent(): Promise<LiveEvent | undefined>;
+  getLiveEventById(id: number): Promise<LiveEvent | undefined>;
+  createLiveEvent(liveEvent: InsertLiveEvent): Promise<LiveEvent>;
   
   // Election operations
   getAllElections(): Promise<Election[]>;
@@ -222,6 +234,70 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return newsUpdate;
+  }
+  
+  // Flash Info operations
+  async getActiveFlashInfos(): Promise<FlashInfo[]> {
+    return db
+      .select()
+      .from(flashInfos)
+      .where(eq(flashInfos.active, true))
+      .orderBy(desc(flashInfos.priority), desc(flashInfos.createdAt));
+  }
+  
+  async getFlashInfoById(id: number): Promise<FlashInfo | undefined> {
+    const [flashInfo] = await db
+      .select()
+      .from(flashInfos)
+      .where(eq(flashInfos.id, id));
+    return flashInfo;
+  }
+  
+  async createFlashInfo(insertFlashInfo: InsertFlashInfo): Promise<FlashInfo> {
+    const [flashInfo] = await db
+      .insert(flashInfos)
+      .values({
+        ...insertFlashInfo,
+        imageUrl: insertFlashInfo.imageUrl || null,
+        active: insertFlashInfo.active ?? true,
+        priority: insertFlashInfo.priority ?? 1,
+        categoryId: insertFlashInfo.categoryId || null
+      })
+      .returning();
+    return flashInfo;
+  }
+  
+  // Live Events operations
+  async getActiveLiveEvent(): Promise<LiveEvent | undefined> {
+    const [liveEvent] = await db
+      .select()
+      .from(liveEvents)
+      .where(eq(liveEvents.active, true))
+      .orderBy(desc(liveEvents.scheduledFor));
+    return liveEvent;
+  }
+  
+  async getLiveEventById(id: number): Promise<LiveEvent | undefined> {
+    const [liveEvent] = await db
+      .select()
+      .from(liveEvents)
+      .where(eq(liveEvents.id, id));
+    return liveEvent;
+  }
+  
+  async createLiveEvent(insertLiveEvent: InsertLiveEvent): Promise<LiveEvent> {
+    const [liveEvent] = await db
+      .insert(liveEvents)
+      .values({
+        ...insertLiveEvent,
+        imageUrl: insertLiveEvent.imageUrl || null,
+        liveUrl: insertLiveEvent.liveUrl || null,
+        active: insertLiveEvent.active ?? false,
+        scheduledFor: insertLiveEvent.scheduledFor || null,
+        categoryId: insertLiveEvent.categoryId || null
+      })
+      .returning();
+    return liveEvent;
   }
   
   // Election operations
