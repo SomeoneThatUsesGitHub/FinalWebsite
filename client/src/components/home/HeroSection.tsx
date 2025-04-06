@@ -52,17 +52,17 @@ const HeroSection: React.FC = () => {
             animate="visible"
             className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4"
           >
-            <Link href="/articles">
+            <Link href="#">
               <div className="btn px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-colors inline-flex items-center justify-center cursor-pointer">
                 <Newspaper className="mr-2 h-5 w-5" /> Découvrir nos articles
               </div>
             </Link>
-            <Link href="/elections">
+            <Link href="#">
               <div className="btn px-6 py-3 bg-white hover:bg-gray-100 text-blue-800 rounded-lg font-medium transition-colors inline-flex items-center justify-center cursor-pointer">
                 <TrendingUp className="mr-2 h-5 w-5" /> Suivi des élections
               </div>
             </Link>
-            <Link href="/apprendre">
+            <Link href="#">
               <div className="btn px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg font-medium transition-colors inline-flex items-center justify-center cursor-pointer">
                 <GraduationCap className="mr-2 h-5 w-5" /> Apprendre
               </div>

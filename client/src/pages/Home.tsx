@@ -39,7 +39,7 @@ const Home: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-2">Articles</h3>
               <p className="text-gray-600 mb-4">Découvrez nos analyses approfondies sur les sujets d'actualité</p>
-              <Link href="/articles">
+              <Link href="#">
                 <div className="inline-block px-4 py-2 bg-primary text-white rounded-md cursor-pointer">
                   Voir les articles
                 </div>
@@ -54,7 +54,7 @@ const Home: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-2">Élections</h3>
               <p className="text-gray-600 mb-4">Suivez les élections en cours et les résultats des scrutins récents</p>
-              <Link href="/elections">
+              <Link href="#">
                 <div className="inline-block px-4 py-2 bg-primary text-white rounded-md cursor-pointer">
                   Voir les élections
                 </div>
@@ -69,7 +69,7 @@ const Home: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-2">Apprendre</h3>
               <p className="text-gray-600 mb-4">Explorez nos contenus éducatifs pour mieux comprendre la politique</p>
-              <Link href="/apprendre">
+              <Link href="#">
                 <div className="inline-block px-4 py-2 bg-primary text-white rounded-md cursor-pointer">
                   Découvrir
                 </div>

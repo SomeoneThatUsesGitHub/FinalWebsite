@@ -183,7 +183,7 @@ const NewsWall: React.FC = () => {
                     >
                       {getCategoryName(featured[0].categoryId)}
                     </span>
-                    <Link href={`/articles/${featured[0].slug}`}>
+                    <Link href="#">
                       <h3 className="text-xl md:text-2xl font-bold text-white mb-2 hover:underline cursor-pointer">
                         {featured[0].title}
                       </h3>
@@ -234,7 +234,7 @@ const NewsWall: React.FC = () => {
                       >
                         {getCategoryName(article.categoryId)}
                       </span>
-                      <Link href={`/articles/${article.slug}`}>
+                      <Link href="#">
                         <h3 className="text-base md:text-lg font-bold text-white hover:underline cursor-pointer">
                           {article.title}
                         </h3>
@@ -290,7 +290,7 @@ const NewsWall: React.FC = () => {
                     >
                       {getCategoryName(article.categoryId)}
                     </span>
-                    <Link href={`/articles/${article.slug}`}>
+                    <Link href="#">
                       <h3 className="text-lg font-bold text-dark mb-2 hover:text-primary transition-colors cursor-pointer">
                         {article.title}
                       </h3>
@@ -315,7 +315,7 @@ const NewsWall: React.FC = () => {
         </motion.div>
 
         <div className="mt-8 text-center">
-          <Link href="/articles">
+          <Link href="#">
             <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
               Voir tous les articles <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
