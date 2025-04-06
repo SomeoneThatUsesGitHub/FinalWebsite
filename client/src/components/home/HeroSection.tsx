@@ -9,7 +9,7 @@ const HeroSection: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   
   return (
-    <section className="relative text-white overflow-hidden h-[85vh] md:h-auto">
+    <section className="relative text-white overflow-hidden h-[70vh] md:h-auto">
       {/* Image de fond avec effet parallaxe */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30 backdrop-blur-[1px] z-10"></div>
@@ -17,8 +17,8 @@ const HeroSection: React.FC = () => {
           className={`absolute inset-0 ${isMobile ? '' : 'bg-fixed'}`}
           style={{
             backgroundImage:
-              "url('https://www.touteleurope.eu/wp-content/uploads/2021/10/20191217_EP-097972A_GEN_103_RESIZED_M.jpg')",
-            backgroundPosition: "center center",
+              "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
+            backgroundPosition: isMobile ? "center top" : "center center",
             backgroundSize: "cover",
             backgroundAttachment: isMobile ? "scroll" : "fixed", 
           }}
@@ -26,16 +26,16 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Contenu */}
-      <div className="container mx-auto px-4 py-32 md:py-48 lg:py-64 relative z-10">
-        <div className="max-w-4xl mx-auto text-center md:text-left md:mx-0">
+      <div className="container mx-auto px-4 py-24 md:py-40 lg:py-56 relative z-10">
+        <div className={`max-w-4xl ${isMobile ? 'text-left mx-0' : 'mx-auto text-center md:text-left md:mx-0'}`}>
           <motion.h1
             variants={fadeIn}
             initial="hidden"
             animate="visible"
-            className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4 md:mb-6"
+            className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-3 md:mb-5"
           >
             <span className="block text-white/90">L'actualité politique</span>
-            <span className="block mt-1 sm:mt-3 text-white">
+            <span className="block mt-1 sm:mt-2 text-white">
               simplifiée et accessible
             </span>
           </motion.h1>
@@ -44,29 +44,32 @@ const HeroSection: React.FC = () => {
             variants={slideUp}
             initial="hidden"
             animate="visible"
-            className="text-base sm:text-lg md:text-xl mb-8 md:mb-10 text-white/90 max-w-2xl mx-auto md:mx-0"
+            className="text-sm sm:text-base md:text-lg mb-6 md:mb-8 text-white/90 max-w-xl"
           >
             Comprendre les enjeux politiques d'aujourd'hui pour construire le
             monde de demain.
-            <span className="block mt-1 sm:mt-2">
+            <span className="block mt-1">
               Pour tous les citoyens de 16 à 30 ans.
             </span>
           </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex justify-center md:justify-start"
-          >
-            <a
-              href="/articles"
-              className="inline-flex items-center px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-white text-blue-700 font-medium hover:bg-blue-50 transition-colors shadow-lg"
+          {/* Bouton visible uniquement sur desktop */}
+          {!isMobile && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex justify-center md:justify-start"
             >
-              Découvrir nos articles
-              <ArrowRight size={16} className="ml-1.5 sm:ml-2 sm:size-[18px]" />
-            </a>
-          </motion.div>
+              <a
+                href="/articles"
+                className="inline-flex items-center px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-white text-blue-700 font-medium hover:bg-blue-50 transition-colors shadow-lg"
+              >
+                Découvrir nos articles
+                <ArrowRight size={16} className="ml-1.5 sm:ml-2 sm:size-[18px]" />
+              </a>
+            </motion.div>
+          )}
         </div>
       </div>
     </section>
