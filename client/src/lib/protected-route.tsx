@@ -40,8 +40,9 @@ function ProtectedContent({
         // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
         setRedirecting(true);
         setLocation("/auth");
-      } else if (adminOnly && user.role !== "admin") {
+      } else if (adminOnly && !user.isAdmin) {
         // Rediriger vers la page d'accueil si l'utilisateur n'est pas admin
+        console.log("L'utilisateur n'est pas admin, redirection vers l'accueil", user);
         setRedirecting(true);
         setLocation("/");
       }

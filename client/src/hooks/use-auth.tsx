@@ -4,9 +4,12 @@ import {
   useMutation,
   UseMutationResult,
 } from "@tanstack/react-query";
-import { User, InsertUser } from "@shared/schema";
+import { User as BaseUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+
+// Étendre le type User pour inclure isAdmin
+type User = BaseUser & { isAdmin?: boolean };
 
 type AuthContextType = {
   user: User | null;

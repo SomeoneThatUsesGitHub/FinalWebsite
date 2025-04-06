@@ -77,7 +77,7 @@ export function isAuthenticated(req: any, res: any, next: any) {
 
 // Middleware pour vérifier si l'utilisateur est un admin
 export function isAdmin(req: any, res: any, next: any) {
-  if (req.isAuthenticated() && req.user.role === "admin") {
+  if (req.isAuthenticated() && (req.user.role === "admin" || req.user.isAdmin)) {
     return next();
   }
   res.status(403).json({ message: "Accès refusé" });
