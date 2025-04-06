@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import HeroSection from "@/components/home/HeroSection";
 import NewsWall from "@/components/home/NewsWall";
+import VideosSection from "@/components/home/VideosSection";
 
 import { Helmet } from "react-helmet";
 import { Link } from "wouter";
@@ -22,6 +23,7 @@ const Home: React.FC = () => {
       
       <HeroSection />
       <NewsWall />
+      <VideosSection />
     </motion.div>
   );
 };

@@ -128,14 +128,10 @@ const NewsWall: React.FC = () => {
 
 
         <ScrollAnimation className="mb-10" threshold={0.1}>
-          <div className="mb-4 flex justify-between items-center">
+          <div className="mb-4">
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Notre sélection</h2>
               <div className="absolute -bottom-2 left-0 w-24 h-1 bg-blue-600 rounded-full"></div>
-            </div>
-            <div className="flex items-center space-x-1 text-blue-600 cursor-pointer hover:text-blue-800 transition-colors">
-              <span className="text-sm font-medium hidden sm:inline">Toutes les actualités</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
             </div>
           </div>
           <p className="text-gray-500 mb-6">Restez informé des dernières informations politiques en France et à l'international</p>
