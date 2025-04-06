@@ -267,7 +267,8 @@ const NewsWall: React.FC = () => {
                   variants={staggerItem}
                   custom={index}
                 >
-                  <div className="overflow-hidden h-48">
+                  <div className="overflow-hidden h-48 relative">
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark/40 via-dark/20 to-transparent z-10"></div>
                     {article.imageUrl ? (
                       <img
                         src={article.imageUrl}

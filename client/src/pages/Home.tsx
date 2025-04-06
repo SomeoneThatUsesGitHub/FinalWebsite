@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import HeroSection from "@/components/home/HeroSection";
-import NewsTicker from "@/components/home/NewsTicker";
 import NewsWall from "@/components/home/NewsWall";
 
 import { Helmet } from "react-helmet";
@@ -22,7 +21,6 @@ const Home: React.FC = () => {
       </Helmet>
       
       <HeroSection />
-      <NewsTicker />
       <NewsWall />
       
       {/* Quick Access Sections */}

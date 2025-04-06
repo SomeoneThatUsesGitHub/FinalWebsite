@@ -59,7 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get("/api/articles/recent", async (req: Request, res: Response) => {
     const { limit } = req.query;
-    const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 6;
+    const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 9;
     
     const articles = await storage.getRecentArticles(limitNum);
     res.json(articles);
