@@ -136,8 +136,8 @@ export class DatabaseStorage implements IStorage {
       
       // Filter by year
       if (filters.year) {
-        const startOfYear = new Date(filters.year, 0, 1).toISOString();
-        const endOfYear = new Date(filters.year, 11, 31, 23, 59, 59).toISOString();
+        const startOfYear = new Date(filters.year, 0, 1);
+        const endOfYear = new Date(filters.year, 11, 31, 23, 59, 59);
         
         query = query.where(
           and(
