@@ -124,29 +124,17 @@ const NewsWall: React.FC = () => {
   return (
     <section id="actualites" className="pt-8 pb-16 md:pt-12 md:pb-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
-        {/* Mobile buttons for Learn and Elections */}
-        <div className="md:hidden flex justify-center w-full px-2 mb-8 mt-2">
-          <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-            <Link href="/apprendre" className="w-full">
-              <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors duration-300 flex items-center justify-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                <span>Apprendre</span>
-              </button>
-            </Link>
-            <Link href="/elections" className="w-full">
-              <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors duration-300 flex items-center justify-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"></path><path d="M2 20h20"></path><path d="M14 12v.01"></path></svg>
-                <span>Élections</span>
-              </button>
-            </Link>
-          </div>
-        </div>
+
 
         <div className="mb-10">
-          <div className="mb-4">
+          <div className="mb-4 flex justify-between items-center">
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Notre sélection</h2>
               <div className="absolute -bottom-2 left-0 w-24 h-1 bg-blue-600 rounded-full"></div>
+            </div>
+            <div className="flex items-center space-x-1 text-blue-600 cursor-pointer hover:text-blue-800 transition-colors">
+              <span className="text-sm font-medium hidden sm:inline">Toutes les actualités</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
             </div>
           </div>
           <p className="text-gray-500 mb-6">Restez informé des dernières informations politiques en France et à l'international</p>
@@ -189,7 +177,7 @@ const NewsWall: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="group bg-white overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300">
+            <div className="group bg-white overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200">
               <Link href="#" className="block">
                 <div className="flex flex-col md:grid md:grid-cols-2 h-auto md:h-[360px]">
                   <div className="relative h-64 md:h-full overflow-hidden">
@@ -227,10 +215,10 @@ const NewsWall: React.FC = () => {
                       </h2>
                       <p className="text-dark/70 text-base mb-6">
                         {featuredArticle.excerpt}
-                        <span className="hidden md:inline"> 
+                        <span className="hidden lg:inline"> 
                           Cette analyse approfondie explore les implications politiques, économiques et sociales de cet enjeu majeur.
                           Découvrez comment les différents acteurs politiques se positionnent et quelles pourraient être les conséquences 
-                          à moyen et long terme pour notre société. Un regard éclairé sur les enjeux qui façonnent notre avenir collectif.
+                          à moyen et long terme pour notre société.
                         </span>
                       </p>
                     </div>

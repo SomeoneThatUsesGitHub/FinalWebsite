@@ -63,7 +63,7 @@ const Header: React.FC = () => {
             
             <NavItem 
               href="/contact"
-              label="Contactez-nous"
+              label="Contact"
               active={location === "/contact"}
               highlighted={true}
             />
@@ -108,7 +108,7 @@ const Header: React.FC = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <MessageCircle size={16} />
-                  <span>Contactez-nous</span>
+                  <span>Contact</span>
                 </div>
               </Link>
             </nav>
