@@ -110,7 +110,6 @@ const NewsWall: React.FC = () => {
     }
   });
 
-  const [showAllMobile, setShowAllMobile] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isReallyMobile = typeof window !== 'undefined' ? window.innerWidth <= 768 : false;
   
@@ -141,13 +140,16 @@ const NewsWall: React.FC = () => {
         ? recent.filter(a => a.id !== (featuredContent.data as Article).id)
         : recent;
     
-    if (isMobile && !showAllMobile) {
-      return articlesToDisplay.slice(0, 4); // Show only 4 articles on mobile
+    if (isMobile) {
+      // Show only 4 articles on mobile
+      return articlesToDisplay.slice(0, 4); 
     }
     
-    // For desktop, limit to 6 articles
-    return showAllMobile ? articlesToDisplay : articlesToDisplay.slice(0, 6);
-  }, [recent, featured, featuredContent, isMobile, showAllMobile]);
+    // For desktop, we need to consider if Flash Info is present
+    // If Flash Info exists, show 5 articles (total of 6 cards), otherwise show 6 articles
+    const maxArticles = (flashInfos && flashInfos.length > 0) ? 5 : 6;
+    return articlesToDisplay.slice(0, maxArticles);
+  }, [recent, featured, featuredContent, isMobile, flashInfos]);
 
   const isLoading = categoriesLoading || featuredLoading || recentLoading || flashInfosLoading || liveEventLoading;
 
@@ -439,15 +441,16 @@ const NewsWall: React.FC = () => {
         </div>
 
         {/* Bouton "Voir tous nos articles" - uniquement sur mobile */}
-        {isMobile && recent && recent.length > displayedArticles.length && (
+        {isMobile && recent && recent.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <Button
-              onClick={() => setShowAllMobile(!showAllMobile)}
-              variant="outline"
-              className="border-blue-600 text-blue-600 hover:bg-blue-50"
-            >
-              {showAllMobile ? "Voir moins d'articles" : "Voir tous nos articles"}
-            </Button>
+            <Link href="/articles">
+              <Button
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                Voir tous nos articles
+              </Button>
+            </Link>
           </div>
         )}
 
