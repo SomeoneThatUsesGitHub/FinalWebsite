@@ -170,18 +170,18 @@ const NewsWall: React.FC = () => {
   };
 
   return (
-    <section id="actualites" className="pt-8 pb-16 md:pt-12 md:pb-24 bg-white">
+    <section id="actualites" className="pt-16 pb-16 md:pt-24 md:pb-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
 
 
-        <ScrollAnimation className="mb-10" threshold={0.1}>
-          <div className="mb-4">
+        <ScrollAnimation className="mb-12" threshold={0.1}>
+          <div className="mb-5">
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Notre sélection</h2>
               <div className="absolute -bottom-2 left-0 w-24 h-1 bg-blue-600 rounded-full"></div>
             </div>
           </div>
-          <p className="text-gray-500 mb-6">Restez informé des dernières informations politiques en France et à l'international</p>
+          <p className="text-gray-500 mb-8">Restez informé des dernières informations politiques en France et à l'international</p>
         </ScrollAnimation>
 
         {/* Removed Category Tabs as requested by client */}
