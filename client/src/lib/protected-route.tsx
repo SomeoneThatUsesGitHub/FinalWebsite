@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Route, useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface ProtectedRouteProps {
   path: string;
@@ -31,43 +31,33 @@ function ProtectedContent({
 }) {
   const { user, isLoading } = useAuth();
   const [_, setLocation] = useLocation();
+  const [redirecting, setRedirecting] = useState(false);
+  
+  // Hook unifié pour les redirections
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user) {
+        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+        setRedirecting(true);
+        setLocation("/auth");
+      } else if (adminOnly && user.role !== "admin") {
+        // Rediriger vers la page d'accueil si l'utilisateur n'est pas admin
+        setRedirecting(true);
+        setLocation("/");
+      }
+    }
+  }, [user, isLoading, adminOnly, setLocation]);
 
-  // Gérer le chargement
-  if (isLoading) {
+  // Afficher un écran de chargement pendant le chargement ou la redirection
+  if (isLoading || redirecting) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
-  if (!user) {
-    // Utiliser useEffect pour la redirection au lieu de Redirect composant
-    // pour éviter l'erreur de hooks
-    useEffect(() => {
-      setLocation("/auth");
-    }, [setLocation]);
-
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">Redirection vers la page de connexion...</span>
-      </div>
-    );
-  }
-
-  // Si la route est réservée aux admins et que l'utilisateur n'est pas admin, rediriger vers la page d'accueil
-  if (adminOnly && user.role !== "admin") {
-    // Utiliser useEffect pour la redirection
-    useEffect(() => {
-      setLocation("/");
-    }, [setLocation]);
-
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">Redirection vers la page d'accueil...</span>
+        <div className="flex flex-col items-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+          <span className="text-sm text-muted-foreground">
+            {isLoading ? "Chargement..." : "Redirection..."}
+          </span>
+        </div>
       </div>
     );
   }
