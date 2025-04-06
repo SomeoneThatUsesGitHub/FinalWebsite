@@ -327,6 +327,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
+    try {
+      const userData = req.body;
+      
+      // Vérifier si l'utilisateur existe déjà
+      const existingUser = await storage.getUserByUsername(userData.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Ce nom d'utilisateur est déjà pris" });
+      }
+      
+      // Hacher le mot de passe
+      const hashedPassword = await hashPassword(userData.password);
+      
+      // Créer le nouvel utilisateur
+      const newUser = await storage.createUser({
+        username: userData.username,
+        password: hashedPassword,
+        displayName: userData.displayName,
+        role: "editor", // Par défaut, les nouveaux utilisateurs sont des éditeurs
+        avatarUrl: null
+      });
+      
+      // Connecter l'utilisateur automatiquement
+      req.login(newUser, (err) => {
+        if (err) {
+          console.error("Error logging in after registration:", err);
+          return res.status(500).json({ message: "Erreur lors de la connexion après inscription" });
+        }
+        
+        // Création d'un objet utilisateur sans le mot de passe
+        const safeUser = {
+          id: newUser.id,
+          username: newUser.username,
+          displayName: newUser.displayName,
+          role: newUser.role,
+          avatarUrl: newUser.avatarUrl,
+          isAdmin: newUser.role === "admin"
+        };
+        
+        return res.status(201).json({ user: safeUser });
+      });
+    } catch (err) {
+      console.error("Registration error:", err);
+      res.status(400).json({ message: "Erreur lors de l'inscription" });
+    }
+  });
+  
   app.post("/api/auth/logout", (req: Request, res: Response) => {
     req.logout((err) => {
       if (err) {

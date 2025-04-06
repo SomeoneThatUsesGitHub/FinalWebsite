@@ -157,7 +157,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 <div className="ml-3">
                   <p className="text-sm font-medium">{user?.username}</p>
                   <p className="text-xs text-muted-foreground">
-                    {user?.isAdmin ? "Administrateur" : "Éditeur"}
+                    {user?.role === "admin" ? "Administrateur" : "Éditeur"}
                   </p>
                 </div>
               </div>
@@ -236,7 +236,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <div className="ml-3">
                 <p className="text-sm font-medium">{user?.username}</p>
                 <p className="text-xs text-muted-foreground">
-                  {user?.isAdmin ? "Administrateur" : "Éditeur"}
+                  {user?.role === "admin" ? "Administrateur" : "Éditeur"}
                 </p>
               </div>
             </div>

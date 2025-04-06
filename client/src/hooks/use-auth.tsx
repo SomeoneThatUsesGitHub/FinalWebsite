@@ -14,9 +14,11 @@ type AuthContextType = {
   error: Error | null;
   loginMutation: UseMutationResult<any, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
+  registerMutation: UseMutationResult<any, Error, RegisterData>;
 };
 
 type LoginData = Pick<InsertUser, "username" | "password">;
+type RegisterData = Omit<InsertUser, "confirmPassword"> & { displayName: string };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -51,6 +53,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     },
   });
+  
+  const registerMutation = useMutation({
+    mutationFn: async (userData: RegisterData) => {
+      const res = await apiRequest("POST", "/api/auth/register", userData);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["/api/auth/me"], data.user);
+      toast({
+        title: "Inscription réussie",
+        description: `Bienvenue, ${data.user.displayName || data.user.username}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Échec de l'inscription",
+        description: error.message || "Impossible de créer le compte",
+        variant: "destructive",
+      });
+    },
+  });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -80,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error,
         loginMutation,
         logoutMutation,
+        registerMutation,
       }}
     >
       {children}
