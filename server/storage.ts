@@ -594,10 +594,70 @@ async function initializeDb() {
   }
 }
 
+// Fonction pour initialiser seulement les vidéos
+async function initializeVideosOnly() {
+  // Vérifier si les vidéos existent déjà
+  const existingVideos = await db.select().from(videos);
+  
+  if (existingVideos.length === 0) {
+    console.log("Initializing videos table with sample data...");
+    
+    // Ajouter des exemples de vidéos
+    const videosList = [
+      {
+        title: "Pourquoi les jeunes ne votent plus ?",
+        videoId: "Emm3XznHJkM",
+        views: 24500,
+        publishedAt: new Date("2023-05-15")
+      },
+      {
+        title: "Comment fonctionne l'Assemblée Nationale en 2 minutes",
+        videoId: "nYAVMU5YYzw",
+        views: 18300,
+        publishedAt: new Date("2023-06-22")
+      },
+      {
+        title: "L'Union Européenne expliquée simplement",
+        videoId: "O37yJBFRrfg",
+        views: 32100,
+        publishedAt: new Date("2023-04-10")
+      },
+      {
+        title: "La Constitution française en bref",
+        videoId: "9MleNgLdQGE",
+        views: 12700,
+        publishedAt: new Date("2023-07-05")
+      },
+      {
+        title: "Comment se prépare une élection présidentielle",
+        videoId: "PwoQJP4e8Rk",
+        views: 28900,
+        publishedAt: new Date("2023-03-18")
+      },
+      {
+        title: "Les institutions européennes expliquées",
+        videoId: "_ZXeKXvUcx8",
+        views: 19600,
+        publishedAt: new Date("2023-06-03")
+      }
+    ];
+    
+    await db.insert(videos).values(videosList);
+    console.log("Videos table initialization complete");
+  } else {
+    console.log("Videos table already contains data, skipping initialization");
+  }
+}
+
 // Initialize database with sample data
 initializeDb()
   .then(() => console.log("Database initialization complete or not needed"))
   .catch(err => console.error("Error initializing database:", err));
+
+// Initialiser spécifiquement les vidéos
+initializeVideosOnly()
+  .then(() => console.log("Videos initialization complete or not needed"))
+  .catch(err => console.error("Error initializing videos:", err));
 
 // Export the storage instance
 export const storage = new DatabaseStorage();
