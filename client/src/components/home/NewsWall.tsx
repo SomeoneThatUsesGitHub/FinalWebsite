@@ -96,7 +96,7 @@ const NewsWall: React.FC = () => {
       : recent;
     
     if (isMobile && !showAllMobile) {
-      return articlesToDisplay.slice(0, 6); // Show only 6 articles on mobile
+      return articlesToDisplay.slice(0, 4); // Show only 4 articles on mobile
     }
     
     // For desktop, limit to 6 articles
@@ -122,7 +122,7 @@ const NewsWall: React.FC = () => {
   };
 
   return (
-    <section id="actualites" className="py-12 md:py-16 bg-white">
+    <section id="actualites" className="py-16 md:py-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-10">
           <div className="mb-4">
@@ -208,7 +208,10 @@ const NewsWall: React.FC = () => {
                         {featuredArticle.title}
                       </h2>
                       <p className="text-dark/70 text-base mb-6">
-                        {featuredArticle.excerpt}
+                        {featuredArticle.excerpt} 
+                        Cette analyse approfondie explore les implications politiques, économiques et sociales de cet enjeu majeur.
+                        Découvrez comment les différents acteurs politiques se positionnent et quelles pourraient être les conséquences 
+                        à moyen et long terme pour notre société. Un regard éclairé sur les enjeux qui façonnent notre avenir collectif.
                       </p>
                     </div>
                     <div className="flex items-center justify-between">
@@ -269,10 +272,10 @@ const NewsWall: React.FC = () => {
                       </div>
                     </div>
                     <div className="p-5">
-                      <h3 className="text-lg font-bold text-dark mb-3 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 h-[3.5rem] flex items-center">
+                      <h3 className="text-lg font-bold text-dark mb-3 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 min-h-[3.5rem]">
                         {article.title}
                       </h3>
-                      <p className="text-dark/70 text-sm mb-4 line-clamp-2 h-[2.5rem] flex items-center">
+                      <p className="text-dark/70 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
                         {article.excerpt}
                       </p>
                       <div className="flex items-center justify-between">
@@ -286,7 +289,7 @@ const NewsWall: React.FC = () => {
         </motion.div>
 
         {/* "Voir tout" button for mobile */}
-        {isMobile && !showAllMobile && recent && recent.length > 6 && (
+        {isMobile && !showAllMobile && recent && recent.length > 4 && (
           <div className="flex justify-center mt-8">
             <Button 
               onClick={() => setShowAllMobile(true)}

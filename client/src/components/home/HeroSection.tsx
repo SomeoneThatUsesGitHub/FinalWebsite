@@ -14,7 +14,7 @@ const HeroSection: React.FC = () => {
         />
       </div>
       
-      <div className="container mx-auto px-4 md:px-6 py-20 md:py-36 relative z-10">
+      <div className="container mx-auto px-4 md:px-6 py-28 md:py-48 relative z-10">
         <div className="max-w-3xl mx-auto md:mx-0">
 
           
