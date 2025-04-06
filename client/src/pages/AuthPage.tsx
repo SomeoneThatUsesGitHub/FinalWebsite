@@ -33,27 +33,20 @@ type RegisterValues = z.infer<typeof registerSchema>;
 export default function AuthPage() {
   const [location, setLocation] = useLocation();
   const { user, loginMutation } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   // N'utilisons plus d'onglets, uniquement la connexion
   
   // Utiliser useEffect pour la redirection pour éviter les erreurs de hook
   useEffect(() => {
-    if (user) {
+    if (user && !isRedirecting) {
+      setIsRedirecting(true);
       setLocation("/admin");
     }
-  }, [user, setLocation]);
+  }, [user, setLocation, isRedirecting]);
   
-  // Si l'utilisateur est déjà connecté, afficher un message de chargement
-  // mais ne pas retourner null pour éviter l'erreur de hook
-  if (user) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4">Redirection vers le tableau de bord...</p>
-        </div>
-      </div>
-    );
-  }
+  // Note: Nous ne retournons PAS prématurément ici comme avant
+  // Au lieu de cela, nous utilisons isRedirecting pour afficher un message de chargement
+  // tout en continuant à rendre le reste du composant (important pour les hooks)
   
   // Formulaire de connexion
   const loginForm = useForm<LoginValues>({
@@ -71,6 +64,16 @@ export default function AuthPage() {
   
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Afficher l'indicateur de redirection si nécessaire */}
+      {isRedirecting && (
+        <div className="fixed inset-0 flex items-center justify-center bg-background/80 z-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4">Redirection vers le tableau de bord...</p>
+          </div>
+        </div>
+      )}
+      
       {/* Section de gauche: Formulaire */}
       <div className="flex flex-col justify-center w-full px-4 py-12 sm:px-6 lg:flex-none lg:w-[500px] xl:px-12">
         <div className="mx-auto w-full max-w-sm">
