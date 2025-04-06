@@ -201,6 +201,51 @@ export class MemStorage implements IStorage {
         imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
         authorId: 1,
         categoryId: 4
+      },
+      {
+        title: "Les défis de la transition énergétique en Europe",
+        slug: "defis-transition-energetique-europe",
+        content: "Analyse des différentes stratégies adoptées par les pays européens pour atteindre la neutralité carbone.",
+        excerpt: "Analyse des différentes stratégies adoptées par les pays européens pour atteindre la neutralité carbone.",
+        imageUrl: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+        authorId: 2,
+        categoryId: 2
+      },
+      {
+        title: "La crise des réfugiés : nouveaux développements",
+        slug: "crise-refugies-nouveaux-developpements",
+        content: "Point sur la situation des réfugiés en Europe et les politiques d'accueil des différents pays membres.",
+        excerpt: "Point sur la situation des réfugiés en Europe et les politiques d'accueil des différents pays membres.",
+        imageUrl: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+        authorId: 3,
+        categoryId: 2
+      },
+      {
+        title: "Nouvelles tensions diplomatiques au Moyen-Orient",
+        slug: "tensions-diplomatiques-moyen-orient",
+        content: "Analyse des récentes tensions entre grandes puissances et leur impact sur la stabilité régionale.",
+        excerpt: "Analyse des récentes tensions entre grandes puissances et leur impact sur la stabilité régionale.",
+        imageUrl: "https://images.unsplash.com/photo-1589262804704-c5aa9e6def89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
+        authorId: 2,
+        categoryId: 4
+      },
+      {
+        title: "La réforme fiscale : gagnants et perdants",
+        slug: "reforme-fiscale-gagnants-perdants",
+        content: "Décryptage des nouvelles mesures fiscales et leurs impacts sur les différentes catégories de contribuables.",
+        excerpt: "Décryptage des nouvelles mesures fiscales et leurs impacts sur les différentes catégories de contribuables.",
+        imageUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+        authorId: 1,
+        categoryId: 3
+      },
+      {
+        title: "L'avenir des médias traditionnels face au numérique",
+        slug: "avenir-medias-traditionnels-numerique",
+        content: "Comment les journaux et chaînes de télévision s'adaptent-ils face à la montée en puissance des plateformes numériques ?",
+        excerpt: "Comment les journaux et chaînes de télévision s'adaptent-ils face à la montée en puissance des plateformes numériques ?",
+        imageUrl: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+        authorId: 3,
+        categoryId: 5
       }
     ];
     

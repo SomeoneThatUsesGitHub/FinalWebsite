@@ -268,7 +268,7 @@ const NewsWall: React.FC = () => {
                   custom={index}
                 >
                   <div className="overflow-hidden h-48 relative">
-                    <div className="absolute inset-0 bg-gradient-to-t from-dark/40 via-dark/20 to-transparent z-10"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
                     {article.imageUrl ? (
                       <img
                         src={article.imageUrl}
