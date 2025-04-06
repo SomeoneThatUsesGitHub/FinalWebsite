@@ -8,6 +8,7 @@ import { getTimeAgo } from "@/lib/utils";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { ScrollAnimation } from "@/hooks/use-scroll-animation";
 
 type Category = {
   id: number;
@@ -126,7 +127,7 @@ const NewsWall: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
 
 
-        <div className="mb-10">
+        <ScrollAnimation className="mb-10" threshold={0.1}>
           <div className="mb-4 flex justify-between items-center">
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Notre sélection</h2>
@@ -138,10 +139,10 @@ const NewsWall: React.FC = () => {
             </div>
           </div>
           <p className="text-gray-500 mb-6">Restez informé des dernières informations politiques en France et à l'international</p>
-        </div>
+        </ScrollAnimation>
 
         {/* Category Tabs */}
-        <div className="mb-8 relative">
+        <ScrollAnimation className="mb-8 relative" threshold={0.1} delay={0.1}>
           <div className="flex space-x-2 md:space-x-4 overflow-x-auto pb-2 scrollbar-hide">
             <CategoryPill
               category={{ id: 0, name: "Tout", slug: "all", color: "#FF4D4D" }}
@@ -165,18 +166,13 @@ const NewsWall: React.FC = () => {
               ))
             )}
           </div>
-        </div>
+        </ScrollAnimation>
 
         {/* Featured Article */}
         {isLoading ? (
           <Skeleton className="h-96 w-full rounded-xl mb-10" />
         ) : featuredArticle && (
-          <motion.div 
-            className="mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <ScrollAnimation className="mb-10" threshold={0.1} delay={0.2}>
             <div className="group bg-white overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200">
               <Link href="#" className="block">
                 <div className="flex flex-col md:grid md:grid-cols-2 h-auto md:h-[360px]">
@@ -230,16 +226,11 @@ const NewsWall: React.FC = () => {
                 </div>
               </Link>
             </div>
-          </motion.div>
+          </ScrollAnimation>
         )}
 
         {/* Recent News Grid */}
-        <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6"
-          variants={staggerChildren}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {isLoading
             ? Array(3)
                 .fill(0)
@@ -247,65 +238,66 @@ const NewsWall: React.FC = () => {
                   <Skeleton key={i} className="h-80 w-full rounded-xl" />
                 ))
             : displayedArticles.map((article, index) => (
-                <motion.div
-                  key={article.id}
-                  className="news-card group rounded-xl overflow-hidden shadow-xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-                  variants={staggerItem}
-                  custom={index}
+                <ScrollAnimation 
+                  key={article.id} 
+                  threshold={0.1} 
+                  delay={0.1 * index}
                 >
-                  <Link href="#" className="block">
-                    <div className="overflow-hidden h-48 relative">
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
-                      {article.imageUrl ? (
-                        <img
-                          src={article.imageUrl}
-                          alt={article.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="bg-secondary/10 h-full flex items-center justify-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="text-6xl text-secondary/30" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                  <div className="news-card group rounded-xl overflow-hidden shadow-xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+                    <Link href="#" className="block">
+                      <div className="overflow-hidden h-48 relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
+                        {article.imageUrl ? (
+                          <img
+                            src={article.imageUrl}
+                            alt={article.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="bg-secondary/10 h-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="text-6xl text-secondary/30" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2 z-20">
+                          <span
+                            className="inline-block px-2 py-1 text-xs font-semibold rounded-full transition-transform duration-300 group-hover:scale-110"
+                            style={{
+                              backgroundColor: getCategoryColor(article.categoryId),
+                              color: "#FFFFFF"
+                            }}
+                          >
+                            {getCategoryName(article.categoryId)}
+                          </span>
                         </div>
-                      )}
-                      <div className="absolute top-2 right-2 z-20">
-                        <span
-                          className="inline-block px-2 py-1 text-xs font-semibold rounded-full transition-transform duration-300 group-hover:scale-110"
-                          style={{
-                            backgroundColor: getCategoryColor(article.categoryId),
-                            color: "#FFFFFF"
-                          }}
-                        >
-                          {getCategoryName(article.categoryId)}
-                        </span>
                       </div>
-                    </div>
-                    <div className="p-5">
-                      <h3 className="text-lg font-bold text-dark mb-3 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 min-h-[3.5rem]">
-                        {article.title}
-                      </h3>
-                      <p className="text-dark/70 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
-                        {article.excerpt}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-dark/60 text-xs">{getTimeAgo(article.createdAt)}</span>
-                        <span className="text-blue-600 text-xs font-medium group-hover:underline">Lire l'article</span>
+                      <div className="p-5">
+                        <h3 className="text-lg font-bold text-dark mb-3 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 min-h-[3.5rem]">
+                          {article.title}
+                        </h3>
+                        <p className="text-dark/70 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
+                          {article.excerpt}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-dark/60 text-xs">{getTimeAgo(article.createdAt)}</span>
+                          <span className="text-blue-600 text-xs font-medium group-hover:underline">Lire l'article</span>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                </motion.div>
+                    </Link>
+                  </div>
+                </ScrollAnimation>
               ))}
-        </motion.div>
+        </div>
 
         {/* "Voir tout" button for mobile */}
         {isMobile && !showAllMobile && recent && recent.length > 4 && (
-          <div className="flex justify-center mt-8">
+          <ScrollAnimation className="flex justify-center mt-8" threshold={0.1} delay={0.3}>
             <Button 
               onClick={() => setShowAllMobile(true)}
               className="rounded-full bg-blue-600 hover:bg-blue-700"
             >
               Voir tous les articles
             </Button>
-          </div>
+          </ScrollAnimation>
         )}
 
       </div>
