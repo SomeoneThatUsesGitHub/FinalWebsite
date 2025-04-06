@@ -356,18 +356,6 @@ const ArticlesSection: React.FC = () => {
   return (
     <section id="articles" className="py-8 md:py-12 bg-background">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex justify-end mb-8">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className={`flex items-center ${showFilters ? 'bg-blue-50 text-blue-600' : ''}`}
-            onClick={toggleFilters}
-          >
-            <Sliders className="h-4 w-4 mr-1" />
-            Filtres
-          </Button>
-        </div>
-        
         {/* Filtres de recherche */}
         {showFilters && (
           <div className="mb-8 bg-white p-4 md:p-6 rounded-xl shadow-md border border-gray-100">
@@ -428,23 +416,23 @@ const ArticlesSection: React.FC = () => {
           </div>
         )}
         
-        {/* Navigation par année - affichée seulement si les filtres sont cachés */}
-        {!showFilters && (
-          <motion.div 
-            className="mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0,
-              transition: {
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-                delay: 0.3
-              }
-            }}
-          >
-            <ScrollArea className="w-full whitespace-nowrap">
+        {/* Navigation par année et bouton filtres sur la même ligne */}
+        <motion.div 
+          className="mb-6 flex justify-between items-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            y: 0,
+            transition: {
+              type: "spring",
+              stiffness: 260,
+              damping: 20,
+              delay: 0.3
+            }
+          }}
+        >
+          {!showFilters && (
+            <ScrollArea className="w-full whitespace-nowrap mr-4">
               <div className="flex space-x-1 py-1">
                 <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
                   <Button
@@ -474,8 +462,20 @@ const ArticlesSection: React.FC = () => {
                 ))}
               </div>
             </ScrollArea>
-          </motion.div>
-        )}
+          )}
+
+          <div className="flex-shrink-0">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className={`flex items-center ${showFilters ? 'bg-blue-50 text-blue-600' : ''}`}
+              onClick={toggleFilters}
+            >
+              <Sliders className="h-4 w-4 mr-1" />
+              Filtres
+            </Button>
+          </div>
+        </motion.div>
         
         {/* Affichage du contenu en mode grille uniquement */}
         {isLoading ? (
