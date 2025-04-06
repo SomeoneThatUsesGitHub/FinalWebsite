@@ -457,13 +457,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "ID d'article invalide" });
       }
       
+      console.log("Données reçues pour mise à jour d'article:", req.body);
+      
+      // S'assurer que les champs requis sont présents
+      if (!req.body.title || !req.body.slug || !req.body.content || !req.body.categoryId) {
+        return res.status(400).json({ 
+          message: "Données incomplètes",
+          details: "Les champs titre, slug, contenu et catégorie sont obligatoires" 
+        });
+      }
+      
       // Validation partielle des données d'article
       const validation = insertArticleSchema.partial().safeParse(req.body);
       if (!validation.success) {
-        return res.status(400).json({ errors: validation.error.errors });
+        console.error("Erreur de validation:", validation.error.errors);
+        return res.status(400).json({ 
+          message: "Données invalides", 
+          errors: validation.error.errors 
+        });
       }
       
-      const updatedArticle = await storage.updateArticle(Number(id), validation.data);
+      // Conversion explicite de categoryId en nombre
+      const updateData = {
+        ...validation.data,
+        categoryId: Number(req.body.categoryId)
+      };
+      
+      console.log("Données validées pour mise à jour:", updateData);
+      
+      const updatedArticle = await storage.updateArticle(Number(id), updateData);
       
       if (!updatedArticle) {
         return res.status(404).json({ message: "Article non trouvé" });

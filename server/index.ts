@@ -15,10 +15,12 @@ const MemoryStoreSession = MemoryStore(session);
 app.use(session({
   secret: process.env.SESSION_SECRET || "politiquensemble-super-secret",
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true, // Permettre les sessions non initialisées
   cookie: { 
-    maxAge: 24 * 60 * 60 * 1000, // 24 heures
-    secure: app.get("env") === "production"
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 jours
+    secure: app.get("env") === "production",
+    httpOnly: true,
+    sameSite: 'lax'
   },
   store: new MemoryStoreSession({
     checkPeriod: 86400000 // 24 heures

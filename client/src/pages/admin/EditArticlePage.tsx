@@ -22,9 +22,12 @@ import { useToast } from "@/hooks/use-toast";
 const articleFormSchema = insertArticleSchema
   .extend({
     content: z.string().min(20, "Le contenu doit contenir au moins 20 caractères"),
-    imageUrl: z.string().url("Veuillez fournir une URL d'image valide").optional().or(z.literal("")),
+    imageUrl: z.string().url("Veuillez fournir une URL d'image valide").nullable().optional(),
+    categoryId: z.number().or(z.string().transform(val => parseInt(val, 10))),
+    published: z.boolean().default(false),
+    featured: z.boolean().default(false),
   })
-  .omit({ createdAt: true, updatedAt: true });
+  .omit({ createdAt: true, updatedAt: true, viewCount: true, commentCount: true });
 
 type ArticleFormValues = z.infer<typeof articleFormSchema>;
 
@@ -110,6 +113,11 @@ export default function EditArticlePage() {
   // Mutation pour créer ou mettre à jour un article
   const saveArticleMutation = useMutation({
     mutationFn: async (data: ArticleFormValues) => {
+      // S'assurer qu'on a des données minimales valides
+      if (!data.title || !data.content || !data.slug || !data.categoryId) {
+        throw new Error("Veuillez remplir tous les champs obligatoires: titre, slug, contenu et catégorie");
+      }
+      
       // Convertir categoryId en nombre
       const formattedData = {
         ...data,
@@ -117,6 +125,8 @@ export default function EditArticlePage() {
         // Supprimer les champs vides
         imageUrl: data.imageUrl || null,
       };
+      
+      console.log("Données envoyées pour sauvegarde:", formattedData);
       
       // Créer ou mettre à jour l'article
       if (isNewArticle) {
