@@ -4,9 +4,9 @@ import { fadeIn, slideUp } from "@/lib/animations";
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative bg-gradient-to-br from-blue-900 to-blue-600 text-white overflow-hidden">
+    <section className="relative bg-black text-white overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-blue-950/50 to-black/80 z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 z-10"></div>
         <img 
           src="https://www.radiofrance.fr/s3/cruiser-production/2022/02/af860b5c-da54-49b0-ba42-6f7106eb17b1/1200x680_0parlement-europeen00-98t4np.jpg" 
           alt="European Parliament" 
@@ -25,14 +25,14 @@ const HeroSection: React.FC = () => {
             className="text-3xl md:text-5xl font-bold leading-tight mb-4"
           >
             L'actualité politique, <br/>
-            <span className="text-blue-200">simplifiée et accessible</span>
+            <span className="text-blue-400">simplifiée et accessible</span>
           </motion.h1>
           
           <motion.p 
             variants={slideUp}
             initial="hidden"
             animate="visible"
-            className="text-lg md:text-xl mb-8 text-blue-100 max-w-2xl"
+            className="text-lg md:text-xl mb-8 text-gray-300 max-w-2xl"
           >
             Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans.
           </motion.p>

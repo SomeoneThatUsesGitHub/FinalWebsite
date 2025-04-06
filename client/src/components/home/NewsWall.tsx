@@ -5,7 +5,7 @@ import { staggerChildren, staggerItem } from "@/lib/animations";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { getTimeAgo } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
@@ -125,28 +125,10 @@ const NewsWall: React.FC = () => {
     <section id="actualites" className="py-12 md:py-16 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-10">
-          <div className="flex justify-between items-center mb-4">
+          <div className="mb-4">
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Notre sélection</h2>
               <div className="absolute -bottom-2 left-0 w-24 h-1 bg-blue-600 rounded-full"></div>
-            </div>
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full hover:bg-blue-50"
-                aria-label="Précédent"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full hover:bg-blue-50"
-                aria-label="Suivant"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
             </div>
           </div>
           <p className="text-gray-500 mb-6">Restez informé des dernières informations politiques en France et à l'international</p>
@@ -191,7 +173,7 @@ const NewsWall: React.FC = () => {
           >
             <div className="group bg-white overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
               <Link href="#" className="block">
-                <div className="grid md:grid-cols-2 h-auto md:h-[360px]">
+                <div className="flex flex-col md:grid md:grid-cols-2 h-auto md:h-[360px]">
                   <div className="relative h-64 md:h-full overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
                     {featuredArticle.imageUrl ? (
@@ -211,22 +193,24 @@ const NewsWall: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="p-6 md:p-8 flex flex-col justify-center">
-                    <span
-                      className="inline-block px-2 py-1 text-xs font-semibold rounded-full mb-4"
-                      style={{
-                        backgroundColor: getCategoryColor(featuredArticle.categoryId),
-                        color: "#FFFFFF"
-                      }}
-                    >
-                      {getCategoryName(featuredArticle.categoryId)}
-                    </span>
-                    <h2 className="text-xl md:text-2xl font-bold text-dark mb-4 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 h-[4rem] flex items-center">
-                      {featuredArticle.title}
-                    </h2>
-                    <p className="text-dark/70 text-base mb-6 line-clamp-3 h-[4.5rem] flex items-center">
-                      {featuredArticle.excerpt}
-                    </p>
+                  <div className="p-6 md:p-8 flex flex-col justify-between h-full">
+                    <div>
+                      <span
+                        className="inline-block px-2 py-1 text-xs font-semibold rounded-full mb-4"
+                        style={{
+                          backgroundColor: getCategoryColor(featuredArticle.categoryId),
+                          color: "#FFFFFF"
+                        }}
+                      >
+                        {getCategoryName(featuredArticle.categoryId)}
+                      </span>
+                      <h2 className="text-xl md:text-2xl font-bold text-dark mb-4 transition-colors duration-300 group-hover:text-blue-600">
+                        {featuredArticle.title}
+                      </h2>
+                      <p className="text-dark/70 text-base mb-6">
+                        {featuredArticle.excerpt}
+                      </p>
+                    </div>
                     <div className="flex items-center justify-between">
                       <span className="text-dark/60 text-sm">{getTimeAgo(featuredArticle.createdAt)}</span>
                       <span className="text-blue-600 text-sm font-medium group-hover:underline">Lire l'article complet</span>
