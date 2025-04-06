@@ -31,6 +31,7 @@ const Header: React.FC = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   
   const navItems = [
+    { href: "/home", label: "Accueil", active: location === "/home" || location === "/" },
     { href: "/a-propos", label: "A propos", active: location === "/a-propos" },
     { href: "/equipe", label: "Equipe", active: location === "/equipe" },
     { href: "/elections", label: "Elections", active: location === "/elections" },
@@ -43,7 +44,7 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
-          <Link href="/">
+          <Link href="/home">
             <div className="flex items-center space-x-2 cursor-pointer">
               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold font-heading">P</div>
               <span className="text-xl font-bold text-dark font-heading hidden sm:inline-block">Politiquensemble</span>
