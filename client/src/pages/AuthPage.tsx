@@ -39,8 +39,16 @@ export default function AuthPage() {
   // Utiliser useEffect pour la redirection pour éviter les erreurs de hook
   useEffect(() => {
     if (user && !isRedirecting) {
-      setIsRedirecting(true);
-      setLocation("/admin");
+      // Vérifier si l'utilisateur est admin avant de rediriger
+      if (user.isAdmin) {
+        console.log("Utilisateur admin connecté:", user);
+        setIsRedirecting(true);
+        setLocation("/admin");
+      } else {
+        console.log("Utilisateur non-admin connecté:", user);
+        setIsRedirecting(true);
+        setLocation("/"); // Rediriger vers l'accueil pour les non-admins
+      }
     }
   }, [user, setLocation, isRedirecting]);
   
@@ -69,7 +77,8 @@ export default function AuthPage() {
         <div className="fixed inset-0 flex items-center justify-center bg-background/80 z-50">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4">Redirection vers le tableau de bord...</p>
+            <p className="mt-4">
+              {user?.isAdmin ? "Redirection vers le tableau de bord..." : "Redirection vers l'accueil..."}</p>
           </div>
         </div>
       )}
