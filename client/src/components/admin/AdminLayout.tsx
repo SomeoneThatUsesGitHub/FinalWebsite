@@ -152,10 +152,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                  {user?.username.charAt(0).toUpperCase()}
+                  {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium">{user?.username}</p>
+                  <p className="text-sm font-medium">{user?.username || "Utilisateur"}</p>
                   <p className="text-xs text-muted-foreground">
                     {user?.role === "admin" ? "Administrateur" : "Éditeur"}
                   </p>
@@ -231,10 +231,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <div className="p-4 border-t border-border mt-auto">
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                {user?.username.charAt(0).toUpperCase()}
+                {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium">{user?.username}</p>
+                <p className="text-sm font-medium">{user?.username || "Utilisateur"}</p>
                 <p className="text-xs text-muted-foreground">
                   {user?.role === "admin" ? "Administrateur" : "Éditeur"}
                 </p>
@@ -260,11 +260,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-card border-b border-border md:hidden">
           <div className="flex-1 flex justify-between items-center px-4">
             <div className="flex items-center">
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setSidebarOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               <span className="ml-2 font-semibold">Admin</span>
             </div>
             <div className="flex items-center">
@@ -272,10 +274,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2">
                     <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                      {user?.username.charAt(0).toUpperCase()}
+                      {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
                     </div>
                     <span className="sr-only md:not-sr-only text-sm">
-                      {user?.username}
+                      {user?.username || "Utilisateur"}
                     </span>
                     <ChevronDown className="h-4 w-4 hidden md:block" />
                   </Button>
