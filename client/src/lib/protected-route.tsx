@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
-import { Redirect, Route } from "wouter";
+import { Route, useLocation } from "wouter";
+import { useEffect } from "react";
 
 interface ProtectedRouteProps {
   path: string;
@@ -13,40 +14,64 @@ export function ProtectedRoute({
   component: Component,
   adminOnly = false,
 }: ProtectedRouteProps) {
-  const { user, isLoading } = useAuth();
+  return (
+    <Route path={path}>
+      <ProtectedContent Component={Component} adminOnly={adminOnly} />
+    </Route>
+  );
+}
 
+// Composant interne qui gère la logique de protection
+function ProtectedContent({
+  Component,
+  adminOnly = false,
+}: {
+  Component: React.ComponentType;
+  adminOnly?: boolean;
+}) {
+  const { user, isLoading } = useAuth();
+  const [_, setLocation] = useLocation();
+
+  // Gérer le chargement
   if (isLoading) {
     return (
-      <Route path={path}>
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </Route>
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
   }
 
   // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
   if (!user) {
+    // Utiliser useEffect pour la redirection au lieu de Redirect composant
+    // pour éviter l'erreur de hooks
+    useEffect(() => {
+      setLocation("/auth");
+    }, [setLocation]);
+
     return (
-      <Route path={path}>
-        <Redirect to="/auth" />
-      </Route>
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2">Redirection vers la page de connexion...</span>
+      </div>
     );
   }
 
   // Si la route est réservée aux admins et que l'utilisateur n'est pas admin, rediriger vers la page d'accueil
   if (adminOnly && user.role !== "admin") {
+    // Utiliser useEffect pour la redirection
+    useEffect(() => {
+      setLocation("/");
+    }, [setLocation]);
+
     return (
-      <Route path={path}>
-        <Redirect to="/" />
-      </Route>
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2">Redirection vers la page d'accueil...</span>
+      </div>
     );
   }
 
   // L'utilisateur est connecté et a les droits nécessaires
-  return (
-    <Route path={path}>
-      <Component />
-    </Route>
-  );
+  return <Component />;
 }
