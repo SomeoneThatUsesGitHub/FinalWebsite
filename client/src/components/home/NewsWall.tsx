@@ -184,11 +184,9 @@ const NewsWall: React.FC = () => {
                       {getCategoryName(featured[0].categoryId)}
                     </span>
                     <Link href={`/articles/${featured[0].slug}`}>
-                      <a>
-                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 hover:underline">
-                          {featured[0].title}
-                        </h3>
-                      </a>
+                      <h3 className="text-xl md:text-2xl font-bold text-white mb-2 hover:underline cursor-pointer">
+                        {featured[0].title}
+                      </h3>
                     </Link>
                     <p className="text-white/80 text-sm md:text-base mb-4">
                       {featured[0].excerpt}
@@ -237,11 +235,9 @@ const NewsWall: React.FC = () => {
                         {getCategoryName(article.categoryId)}
                       </span>
                       <Link href={`/articles/${article.slug}`}>
-                        <a>
-                          <h3 className="text-base md:text-lg font-bold text-white hover:underline">
-                            {article.title}
-                          </h3>
-                        </a>
+                        <h3 className="text-base md:text-lg font-bold text-white hover:underline cursor-pointer">
+                          {article.title}
+                        </h3>
                       </Link>
                     </div>
                   </motion.div>
@@ -295,11 +291,9 @@ const NewsWall: React.FC = () => {
                       {getCategoryName(article.categoryId)}
                     </span>
                     <Link href={`/articles/${article.slug}`}>
-                      <a>
-                        <h3 className="text-lg font-bold text-dark mb-2 hover:text-primary transition-colors">
-                          {article.title}
-                        </h3>
-                      </a>
+                      <h3 className="text-lg font-bold text-dark mb-2 hover:text-primary transition-colors cursor-pointer">
+                        {article.title}
+                      </h3>
                     </Link>
                     <p className="text-dark/70 text-sm mb-4 line-clamp-2">
                       {article.excerpt}

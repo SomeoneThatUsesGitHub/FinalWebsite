@@ -4,7 +4,7 @@ import { pageTransition } from "@/lib/animations";
 import HeroSection from "@/components/home/HeroSection";
 import NewsTicker from "@/components/home/NewsTicker";
 import NewsWall from "@/components/home/NewsWall";
-import SubscriptionBanner from "@/components/shared/SubscriptionBanner";
+
 import { Helmet } from "react-helmet";
 import { Link } from "wouter";
 
@@ -78,8 +78,6 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-      
-      <SubscriptionBanner />
     </motion.div>
   );
 };

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { staggerChildren, staggerItem, barChart } from "@/lib/animations";
+import { fadeIn, staggerChildren, staggerItem } from "@/lib/animations";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Globe, ChartBar, Book, ChevronRight } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDate } from "@/lib/utils";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
 type Election = {
   id: number;
@@ -18,6 +19,7 @@ type Election = {
     party: string;
     percentage: number;
     color: string;
+    seats?: number;
   }>;
   description: string;
   upcoming: boolean;
@@ -25,291 +27,212 @@ type Election = {
 };
 
 const ElectionsPortal: React.FC = () => {
-  const [electionType, setElectionType] = useState<string>("legislative");
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   
-  const { data: upcomingElections, isLoading: upcomingLoading } = useQuery<Election[]>({
-    queryKey: ['/api/elections/upcoming'],
-  });
-  
-  const { data: recentElections, isLoading: recentLoading } = useQuery<Election[]>({
+  const { data: elections, isLoading } = useQuery<Election[]>({
     queryKey: ['/api/elections/recent'],
   });
   
-  const isLoading = upcomingLoading || recentLoading;
+  // Get unique list of countries from elections data
+  const countries = elections ? 
+    Array.from(new Set(elections.map(election => election.country)))
+      .map(country => {
+        const election = elections.find(e => e.country === country);
+        return {
+          name: country,
+          code: election?.countryCode || ''
+        };
+      }) : [];
   
-  const handleElectionTypeChange = (type: string) => {
-    setElectionType(type);
+  // Find the selected election based on country
+  const selectedElection = selectedCountry ? 
+    elections?.find(election => election.country === selectedCountry) : 
+    (elections && elections.length > 0 ? elections[0] : null);
+    
+  // Function to calculate total seats
+  const calculateTotalSeats = () => {
+    if (!selectedElection?.results) return 0;
+    return selectedElection.results.reduce((sum, party) => sum + (party.seats || 0), 0);
+  };
+  
+  const totalSeats = calculateTotalSeats();
+  
+  // Format data for pie chart (parliament visualization)
+  const getChartData = () => {
+    if (!selectedElection?.results) return [];
+    return selectedElection.results.map(result => ({
+      name: result.party,
+      value: result.seats || Math.round(result.percentage),
+      color: result.color,
+      percentage: result.percentage
+    }));
   };
   
   return (
     <section id="elections" className="py-12 md:py-16 bg-white">
       <div className="container mx-auto px-4 md:px-6">
-        <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark mb-2">Portail des élections</h2>
-        <p className="text-dark/70 mb-8">Suivez les résultats des élections dans le monde et leurs analyses</p>
-        
-        {/* Map and Featured Elections */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-          {/* Interactive Map */}
-          <motion.div 
-            className="lg:col-span-2 bg-white rounded-xl shadow-md p-4 h-96"
-            variants={staggerItem}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <h3 className="text-lg font-bold mb-4">Carte des élections récentes et à venir</h3>
-            <div className="h-72 bg-light rounded-lg flex items-center justify-center relative overflow-hidden">
-              {/* This would be replaced with an actual interactive map */}
-              <div className="absolute inset-0">
-                <img 
-                  src="https://images.unsplash.com/photo-1589519160732-576f165b9aaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
-                  alt="World elections map" 
-                  className="w-full h-full object-cover opacity-20"
-                />
-              </div>
-              <div className="relative z-10 text-center p-6">
-                <Globe className="h-16 w-16 text-secondary/40 mb-4" />
-                <p className="text-dark font-medium">Carte interactive des élections mondiales</p>
-                <p className="text-dark/60 text-sm">Cliquez sur un pays pour voir les détails des élections</p>
-              </div>
-            </div>
-          </motion.div>
-          
-          {/* Upcoming Elections */}
-          <motion.div 
-            className="lg:col-span-1 bg-white rounded-xl shadow-md p-4"
-            variants={staggerItem}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <h3 className="text-lg font-bold mb-4">Prochaines élections</h3>
-            {isLoading ? (
-              <div className="space-y-3">
-                {Array(4).fill(0).map((_, i) => (
-                  <Skeleton key={i} className="h-[72px] w-full" />
-                ))}
-              </div>
-            ) : (
-              <motion.ul 
-                className="space-y-3"
-                variants={staggerChildren}
-              >
-                {upcomingElections?.map((election, index) => (
-                  <motion.li 
-                    key={election.id}
-                    className="border-l-4 pl-3 py-2"
-                    style={{ borderColor: getElectionTypeColor(election.type) }}
-                    variants={staggerItem}
-                    custom={index}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium">{election.country}</h4>
-                        <p className="text-sm text-dark/70">{election.title}</p>
-                      </div>
-                      <span 
-                        className="text-sm px-2 py-1 rounded-full"
-                        style={{ 
-                          backgroundColor: `${getElectionTypeColor(election.type)}10`,
-                          color: getElectionTypeColor(election.type)
-                        }}
-                      >
-                        {formatDate(election.date, "MMMM yyyy")}
-                      </span>
-                    </div>
-                  </motion.li>
-                ))}
-              </motion.ul>
-            )}
-            <div className="mt-4 text-center">
-              <Button variant="link" className="text-secondary">
-                Voir toutes les élections à venir →
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-        
-        {/* Recent Election Results */}
-        <motion.div 
-          className="bg-white rounded-xl shadow-md p-6 mb-10"
-          variants={staggerItem}
+        <motion.div
+          variants={fadeIn}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
+          className="text-center mb-12"
         >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold">Résultats des dernières élections</h3>
-            <div className="flex space-x-2">
-              <Button 
-                variant={electionType === "presidential" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => handleElectionTypeChange("presidential")}
+          <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Résultats des élections</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Consultez les résultats détaillés des dernières élections dans différents pays et découvrez la composition des parlements.
+          </p>
+        </motion.div>
+        
+        {/* Country Selector */}
+        <motion.div
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+          className="max-w-md mx-auto mb-10"
+        >
+          <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+            <h3 className="text-xl font-medium mb-4 text-center">Sélectionner un pays</h3>
+            
+            {isLoading ? (
+              <Skeleton className="h-10 w-full" />
+            ) : (
+              <Select
+                value={selectedCountry || (elections && elections.length > 0 ? elections[0].country : '')}
+                onValueChange={(value) => setSelectedCountry(value)}
               >
-                Présidentielles
-              </Button>
-              <Button 
-                variant={electionType === "legislative" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => handleElectionTypeChange("legislative")}
-              >
-                Législatives
-              </Button>
-              <Button 
-                variant={electionType === "local" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => handleElectionTypeChange("local")}
-              >
-                Locales
-              </Button>
-            </div>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Choisir un pays" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries.map((country) => (
+                    <SelectItem key={country.code} value={country.name}>
+                      <div className="flex items-center">
+                        <img 
+                          src={`https://flagicons.lipis.dev/flags/4x3/${country.code.toLowerCase()}.svg`} 
+                          alt={country.name} 
+                          className="w-5 h-4 mr-2" 
+                        />
+                        {country.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
-          
+        </motion.div>
+        
+        {/* Election Results */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Skeleton className="h-[300px] w-full" />
-              <Skeleton className="h-[300px] w-full" />
+            <div className="p-8">
+              <Skeleton className="h-8 w-1/3 mb-4" />
+              <Skeleton className="h-6 w-1/2 mb-8" />
+              <Skeleton className="h-[400px] w-full" />
+            </div>
+          ) : selectedElection ? (
+            <div>
+              {/* Header with flag and title */}
+              <div className="bg-gray-50 p-6 border-b">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <img 
+                      src={`https://flagicons.lipis.dev/flags/4x3/${selectedElection.countryCode.toLowerCase()}.svg`} 
+                      alt={selectedElection.country} 
+                      className="w-10 h-7 mr-3" 
+                    />
+                    <div>
+                      <h3 className="text-xl font-bold">{selectedElection.country}</h3>
+                      <p className="text-gray-600">{selectedElection.title} - {formatDate(selectedElection.date, "MMMM yyyy")}</p>
+                    </div>
+                  </div>
+                  <span className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                    {selectedElection.type}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Parliament Visualization */}
+              <div className="p-6">
+                <h4 className="text-lg font-medium mb-6 text-center">Répartition des sièges au parlement</h4>
+                
+                <div className="flex flex-col lg:flex-row">
+                  {/* Pie Chart */}
+                  <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
+                    <ResponsiveContainer width="100%" height={400}>
+                      <PieChart>
+                        <Pie
+                          data={getChartData()}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={140}
+                          fill="#8884d8"
+                          paddingAngle={1}
+                          dataKey="value"
+                          label={({ name, percentage }) => `${name} (${percentage.toFixed(1)}%)`}
+                        >
+                          {getChartData().map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          formatter={(value, name, props) => {
+                            return [`${value} sièges (${props.payload.percentage.toFixed(1)}%)`, name];
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  {/* Parties Legend */}
+                  <div className="w-full lg:w-1/2 lg:pl-8">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h5 className="font-medium mb-4">Partis politiques</h5>
+                      <div className="space-y-4">
+                        {selectedElection.results.map((result, index) => (
+                          <div key={index} className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <div 
+                                className="w-4 h-4 rounded-full mr-3" 
+                                style={{ backgroundColor: result.color }}
+                              ></div>
+                              <span className="font-medium">{result.party}</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="font-bold">{result.seats || Math.round((result.percentage / 100) * totalSeats)}</span>
+                              <span className="text-gray-500 text-sm ml-1">sièges</span>
+                              <span className="block text-sm text-gray-500">{result.percentage.toFixed(1)}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-6 pt-4 border-t">
+                        <div className="flex justify-between">
+                          <span className="font-medium">Total</span>
+                          <span className="font-bold">{totalSeats} sièges</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Election Description */}
+                    <div className="mt-6 bg-blue-50 p-4 rounded-lg">
+                      <h5 className="font-medium mb-2">À propos de cette élection</h5>
+                      <p className="text-sm text-gray-700">{selectedElection.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {recentElections?.map(election => (
-                <div key={election.id} className="border border-light rounded-lg p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center">
-                      <img 
-                        src={`https://flagicons.lipis.dev/flags/4x3/${election.countryCode.toLowerCase()}.svg`} 
-                        alt={election.country} 
-                        className="w-8 h-6 object-cover mr-2"
-                      />
-                      <h4 className="font-bold">{`${election.country} - ${election.title}`}</h4>
-                    </div>
-                    <span className="text-xs text-dark/60">Mise à jour: {formatDate(election.createdAt, "dd/MM/yyyy")}</span>
-                  </div>
-                  
-                  {/* Election Graph */}
-                  <div className="mb-4 h-48 relative">
-                    <div className="absolute bottom-0 left-0 right-0 flex items-end justify-around h-40">
-                      {election.results.map((result, index) => (
-                        <div key={index} className="flex flex-col items-center w-1/5">
-                          <motion.div 
-                            className="graph-bar w-12 rounded-t-md"
-                            style={{ backgroundColor: result.color }}
-                            variants={barChart}
-                            custom={result.percentage}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                          ></motion.div>
-                          <span className="mt-2 text-xs font-medium">{result.party}</span>
-                          <span className="text-xs text-dark/60">{result.percentage}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <Button variant="link" className="text-secondary">
-                      Voir l'analyse complète →
-                    </Button>
-                  </div>
-                </div>
-              ))}
+            <div className="p-8 text-center">
+              <p className="text-gray-500">Aucun résultat d'élection disponible</p>
             </div>
           )}
-        </motion.div>
-        
-        {/* Election Analysis */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          variants={staggerChildren}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <motion.div 
-            className="bg-white rounded-xl shadow-md p-6"
-            variants={staggerItem}
-          >
-            <h3 className="text-xl font-bold mb-4">Analyses d'experts</h3>
-            <ul className="space-y-4">
-              <li className="flex space-x-4">
-                <div className="flex-shrink-0 w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center">
-                  <ChartBar className="text-secondary text-2xl" />
-                </div>
-                <div>
-                  <h4 className="font-medium mb-1">Les tendances de vote chez les jeunes</h4>
-                  <p className="text-sm text-dark/70 mb-2">Comment les 18-30 ans influencent les résultats électoraux et pourquoi leur mobilisation est cruciale.</p>
-                  <Button variant="link" className="text-secondary p-0 h-auto text-xs">
-                    Lire l'analyse →
-                  </Button>
-                </div>
-              </li>
-              <li className="flex space-x-4">
-                <div className="flex-shrink-0 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><rect x="2" y="8" width="20" height="12" rx="2"/><path d="M20 15a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2"/><path d="M4 15a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/><path d="M12 8a2 2 0 0 0 2-2V4a2 2 0 0 0-4 0v2a2 2 0 0 0 2 2Z"/></svg>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-1">L'impact des réseaux sociaux sur les élections</h4>
-                  <p className="text-sm text-dark/70 mb-2">Comment les plateformes numériques transforment les campagnes électorales et influencent l'opinion publique.</p>
-                  <Button variant="link" className="text-secondary p-0 h-auto text-xs">
-                    Lire l'analyse →
-                  </Button>
-                </div>
-              </li>
-            </ul>
-          </motion.div>
-          
-          <motion.div 
-            className="bg-white rounded-xl shadow-md p-6"
-            variants={staggerItem}
-          >
-            <h3 className="text-xl font-bold mb-4">Comprendre les systèmes électoraux</h3>
-            <ul className="space-y-3">
-              <li className="flex items-center p-2 bg-light/50 rounded-lg hover:bg-light transition-colors">
-                <Book className="text-dark/40 mr-3 h-5 w-5" />
-                <span>Le système électoral français expliqué simplement</span>
-              </li>
-              <li className="flex items-center p-2 bg-light/50 rounded-lg hover:bg-light transition-colors">
-                <Book className="text-dark/40 mr-3 h-5 w-5" />
-                <span>Présidentielle vs législatives : quelles différences ?</span>
-              </li>
-              <li className="flex items-center p-2 bg-light/50 rounded-lg hover:bg-light transition-colors">
-                <Book className="text-dark/40 mr-3 h-5 w-5" />
-                <span>Les systèmes électoraux dans le monde : tour d'horizon</span>
-              </li>
-              <li className="flex items-center p-2 bg-light/50 rounded-lg hover:bg-light transition-colors">
-                <Book className="text-dark/40 mr-3 h-5 w-5" />
-                <span>Le rôle des institutions européennes dans les élections</span>
-              </li>
-            </ul>
-            <div className="mt-4 text-center">
-              <Button className="bg-secondary hover:bg-secondary/90">
-                Explorer tous les guides <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 };
-
-// Helper function to get color based on election type
-function getElectionTypeColor(type: string): string {
-  switch (type) {
-    case "presidential":
-      return "#FF4D4D";
-    case "legislative":
-      return "#3B82F6";
-    case "parliament":
-      return "#8B5CF6";
-    case "federal":
-      return "#10B981";
-    case "general":
-      return "#F59E0B";
-    default:
-      return "#6B7280";
-  }
-}
 
 export default ElectionsPortal;
