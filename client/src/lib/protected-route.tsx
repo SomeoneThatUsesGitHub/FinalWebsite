@@ -38,13 +38,16 @@ function ProtectedContent({
     if (!isLoading) {
       if (!user) {
         // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+        console.log("Utilisateur non connecté, redirection vers /auth");
         setRedirecting(true);
         setLocation("/auth");
-      } else if (adminOnly && !user.isAdmin) {
+      } else if (adminOnly && !(user.isAdmin || user.role === "admin")) {
         // Rediriger vers la page d'accueil si l'utilisateur n'est pas admin
         console.log("L'utilisateur n'est pas admin, redirection vers l'accueil", user);
         setRedirecting(true);
         setLocation("/");
+      } else {
+        console.log("Utilisateur authentifié:", user);
       }
     }
   }, [user, isLoading, adminOnly, setLocation]);

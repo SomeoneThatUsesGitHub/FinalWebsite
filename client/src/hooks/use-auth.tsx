@@ -8,8 +8,8 @@ import { User as BaseUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-// Étendre le type User pour inclure isAdmin
-type User = BaseUser & { isAdmin?: boolean };
+// Étendre le type User pour inclure isAdmin et role
+type User = BaseUser & { isAdmin?: boolean; role?: "user" | "admin" };
 
 type AuthContextType = {
   user: User | null;

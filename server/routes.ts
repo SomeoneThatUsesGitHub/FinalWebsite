@@ -402,7 +402,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Routes admin pour les articles
-  app.get("/api/admin/articles", isAuthenticated, async (req: Request, res: Response) => {
+  app.get("/api/admin/articles", isAdmin, async (req: Request, res: Response) => {
     try {
       const articles = await storage.getAllArticles();
       res.json(articles);
@@ -412,7 +412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/admin/articles/:id", isAuthenticated, async (req: Request, res: Response) => {
+  app.get("/api/admin/articles/:id", isAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       
@@ -433,7 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/admin/articles", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/admin/articles", isAdmin, async (req: Request, res: Response) => {
     try {
       // Validation du schéma d'article
       const validation = insertArticleSchema.safeParse(req.body);
@@ -449,7 +449,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.put("/api/admin/articles/:id", isAuthenticated, async (req: Request, res: Response) => {
+  app.put("/api/admin/articles/:id", isAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       
