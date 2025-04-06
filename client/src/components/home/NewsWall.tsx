@@ -125,17 +125,21 @@ const NewsWall: React.FC = () => {
     <section id="actualites" className="pt-8 pb-16 md:pt-12 md:pb-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         {/* Mobile buttons for Learn and Elections */}
-        <div className="md:hidden flex space-x-3 mb-6">
-          <Link href="/apprendre">
-            <button className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors duration-300 flex items-center justify-center space-x-1">
-              <span>Apprendre</span>
-            </button>
-          </Link>
-          <Link href="/elections">
-            <button className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors duration-300 flex items-center justify-center space-x-1">
-              <span>Élections</span>
-            </button>
-          </Link>
+        <div className="md:hidden flex justify-center w-full px-2 mb-8 mt-2">
+          <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+            <Link href="/apprendre" className="w-full">
+              <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors duration-300 flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>Apprendre</span>
+              </button>
+            </Link>
+            <Link href="/elections" className="w-full">
+              <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors duration-300 flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"></path><path d="M2 20h20"></path><path d="M14 12v.01"></path></svg>
+                <span>Élections</span>
+              </button>
+            </Link>
+          </div>
         </div>
 
         <div className="mb-10">
@@ -185,7 +189,7 @@ const NewsWall: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="group bg-white overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
+            <div className="group bg-white overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300">
               <Link href="#" className="block">
                 <div className="flex flex-col md:grid md:grid-cols-2 h-auto md:h-[360px]">
                   <div className="relative h-64 md:h-full overflow-hidden">
@@ -243,7 +247,7 @@ const NewsWall: React.FC = () => {
 
         {/* Recent News Grid */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6"
           variants={staggerChildren}
           initial="hidden"
           animate="visible"
@@ -257,7 +261,7 @@ const NewsWall: React.FC = () => {
             : displayedArticles.map((article, index) => (
                 <motion.div
                   key={article.id}
-                  className="news-card group rounded-xl overflow-hidden shadow-lg bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  className="news-card group rounded-xl overflow-hidden shadow-xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                   variants={staggerItem}
                   custom={index}
                 >
