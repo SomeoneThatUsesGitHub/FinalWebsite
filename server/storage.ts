@@ -11,6 +11,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte } from "drizzle-orm";
+import { hashPassword } from "./auth";
 
 export interface IStorage {
   // User operations
@@ -29,7 +30,10 @@ export interface IStorage {
   getRecentArticles(limit?: number): Promise<Article[]>;
   getArticlesByCategory(categoryId: number, limit?: number): Promise<Article[]>;
   getArticleBySlug(slug: string): Promise<Article | undefined>;
+  getArticleById(id: number): Promise<Article | undefined>;
   createArticle(article: InsertArticle): Promise<Article>;
+  updateArticle(id: number, articleData: Partial<InsertArticle>): Promise<Article | undefined>;
+  deleteArticle(id: number): Promise<boolean>;
   updateArticleViews(id: number): Promise<void>;
   
   // News Updates operations
@@ -78,8 +82,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Hash the password before storing it
+    const hashedPassword = await hashPassword(insertUser.password);
+    
     const [user] = await db.insert(users).values({
       ...insertUser,
+      password: hashedPassword,
       role: insertUser.role || "user",
       avatarUrl: insertUser.avatarUrl || null
     }).returning();
@@ -198,6 +206,14 @@ export class DatabaseStorage implements IStorage {
     return article;
   }
   
+  async getArticleById(id: number): Promise<Article | undefined> {
+    const [article] = await db
+      .select()
+      .from(articles)
+      .where(eq(articles.id, id));
+    return article;
+  }
+  
   async createArticle(insertArticle: InsertArticle): Promise<Article> {
     const [article] = await db
       .insert(articles)
@@ -211,6 +227,34 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return article;
+  }
+  
+  async updateArticle(id: number, articleData: Partial<InsertArticle>): Promise<Article | undefined> {
+    const [article] = await db
+      .select()
+      .from(articles)
+      .where(eq(articles.id, id));
+    
+    if (!article) {
+      return undefined;
+    }
+    
+    const [updatedArticle] = await db
+      .update(articles)
+      .set(articleData)
+      .where(eq(articles.id, id))
+      .returning();
+    
+    return updatedArticle;
+  }
+  
+  async deleteArticle(id: number): Promise<boolean> {
+    const result = await db
+      .delete(articles)
+      .where(eq(articles.id, id))
+      .returning({ id: articles.id });
+    
+    return result.length > 0;
   }
   
   async updateArticleViews(id: number): Promise<void> {
@@ -489,27 +533,31 @@ async function initializeDb() {
     // Insert all categories
     await db.insert(categories).values(categoriesList);
     
-    // Add admin user
+    // Add admin user with hashed password
+    const adminPassword = await hashPassword("admin123");
     await db.insert(users).values({
       username: "admin",
-      password: "admin123",
+      password: adminPassword,
       displayName: "Administrator",
       role: "admin",
       avatarUrl: null
     });
     
-    // Add editors
+    // Add editors with hashed passwords
+    const editorPassword1 = await hashPassword("editor123");
+    const editorPassword2 = await hashPassword("editor456");
+    
     await db.insert(users).values([
       {
         username: "editor1",
-        password: "editor123",
+        password: editorPassword1,
         displayName: "Sarah Martin",
         role: "editor",
         avatarUrl: "https://randomuser.me/api/portraits/women/44.jpg"
       },
       {
         username: "editor2",
-        password: "editor456",
+        password: editorPassword2,
         displayName: "Thomas Legrand",
         role: "editor",
         avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg"

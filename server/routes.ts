@@ -2,6 +2,9 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
+import passport from "passport";
+import { isAuthenticated, isAdmin, loginSchema, hashPassword } from "./auth";
+import { insertArticleSchema, insertCategorySchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes - prefix all with /api
@@ -275,6 +278,192 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching live event:", error);
       res.status(500).json({ error: "Error fetching live event" });
+    }
+  });
+
+  // Routes d'authentification pour l'admin portal
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    try {
+      // Validation des données d'entrée
+      const validation = loginSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Authentification via Passport
+      passport.authenticate("local", (err: any, user: any, info: any) => {
+        if (err) {
+          console.error("Auth error:", err);
+          return res.status(500).json({ message: "Erreur d'authentification" });
+        }
+        
+        if (!user) {
+          return res.status(401).json({ message: info.message || "Identifiants incorrects" });
+        }
+        
+        // Connexion de l'utilisateur
+        req.logIn(user, (err) => {
+          if (err) {
+            console.error("Login error:", err);
+            return res.status(500).json({ message: "Erreur de connexion" });
+          }
+          
+          // Création d'un objet utilisateur sans le mot de passe
+          const safeUser = {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            role: user.role,
+            avatarUrl: user.avatarUrl,
+            isAdmin: user.role === "admin"
+          };
+          
+          return res.json({ user: safeUser });
+        });
+      })(req, res);
+    } catch (error) {
+      console.error("Login route error:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+  
+  app.post("/api/auth/logout", (req: Request, res: Response) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Erreur lors de la déconnexion" });
+      }
+      res.json({ message: "Déconnecté avec succès" });
+    });
+  });
+  
+  app.get("/api/auth/me", (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Non authentifié" });
+    }
+    
+    const user = req.user as any;
+    const safeUser = {
+      id: user.id,
+      username: user.username,
+      displayName: user.displayName,
+      role: user.role,
+      avatarUrl: user.avatarUrl,
+      isAdmin: user.role === "admin"
+    };
+    
+    res.json({ user: safeUser });
+  });
+  
+  // Routes admin pour les articles
+  app.get("/api/admin/articles", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const articles = await storage.getAllArticles();
+      res.json(articles);
+    } catch (error) {
+      console.error("Error fetching articles for admin:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des articles" });
+    }
+  });
+  
+  app.get("/api/admin/articles/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'article invalide" });
+      }
+      
+      const article = await storage.getArticleById(Number(id));
+      
+      if (!article) {
+        return res.status(404).json({ message: "Article non trouvé" });
+      }
+      
+      res.json(article);
+    } catch (error) {
+      console.error("Error fetching article for admin:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération de l'article" });
+    }
+  });
+  
+  app.post("/api/admin/articles", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Validation du schéma d'article
+      const validation = insertArticleSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const article = await storage.createArticle(validation.data);
+      res.status(201).json(article);
+    } catch (error) {
+      console.error("Error creating article:", error);
+      res.status(500).json({ message: "Erreur lors de la création de l'article" });
+    }
+  });
+  
+  app.put("/api/admin/articles/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'article invalide" });
+      }
+      
+      // Validation partielle des données d'article
+      const validation = insertArticleSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const updatedArticle = await storage.updateArticle(Number(id), validation.data);
+      
+      if (!updatedArticle) {
+        return res.status(404).json({ message: "Article non trouvé" });
+      }
+      
+      res.json(updatedArticle);
+    } catch (error) {
+      console.error("Error updating article:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour de l'article" });
+    }
+  });
+  
+  app.delete("/api/admin/articles/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'article invalide" });
+      }
+      
+      const result = await storage.deleteArticle(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Article non trouvé" });
+      }
+      
+      res.json({ message: "Article supprimé avec succès" });
+    } catch (error) {
+      console.error("Error deleting article:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression de l'article" });
+    }
+  });
+  
+  // Routes admin pour les catégories
+  app.post("/api/admin/categories", isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Validation du schéma de catégorie
+      const validation = insertCategorySchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const category = await storage.createCategory(validation.data);
+      res.status(201).json(category);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      res.status(500).json({ message: "Erreur lors de la création de la catégorie" });
     }
   });
 
