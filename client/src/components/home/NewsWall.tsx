@@ -3,9 +3,7 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { staggerChildren, staggerItem } from "@/lib/animations";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { getTimeAgo, truncateText } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, Eye, MessageSquare } from "lucide-react";
+import { getTimeAgo } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Category = {
@@ -53,10 +51,6 @@ const NewsWall: React.FC = () => {
     queryKey: ['/api/categories'],
   });
 
-  const { data: featured, isLoading: featuredLoading } = useQuery<Article[]>({
-    queryKey: ['/api/articles/featured'],
-  });
-
   const { data: recent, isLoading: recentLoading } = useQuery<Article[]>({
     queryKey: ['/api/articles/recent', selectedCategoryId],
     queryFn: async ({ queryKey }) => {
@@ -70,16 +64,16 @@ const NewsWall: React.FC = () => {
     }
   });
 
-  const isLoading = categoriesLoading || featuredLoading || recentLoading;
+  const isLoading = categoriesLoading || recentLoading;
 
   const handleCategoryClick = (categoryId: number | null) => {
     setSelectedCategoryId(categoryId);
   };
 
   const getCategoryColor = (categoryId: number): string => {
-    if (!categories) return "#FF4D4D";
+    if (!categories) return "#0D47A1";
     const category = categories.find(c => c.id === categoryId);
-    return category ? category.color : "#FF4D4D";
+    return category ? category.color : "#0D47A1";
   };
 
   const getCategoryName = (categoryId: number): string => {
@@ -93,31 +87,13 @@ const NewsWall: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark">Actualités récentes</h2>
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              aria-label="Précédent"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              aria-label="Suivant"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
 
         {/* Category Tabs */}
         <div className="mb-8 relative">
           <div className="flex space-x-2 md:space-x-4 overflow-x-auto pb-2 scrollbar-hide">
             <CategoryPill
-              category={{ id: 0, name: "Tout", slug: "all", color: "#FF4D4D" }}
+              category={{ id: 0, name: "Tout", slug: "all", color: "#0D47A1" }}
               isActive={selectedCategoryId === null}
               onClick={() => handleCategoryClick(null)}
             />
@@ -140,23 +116,62 @@ const NewsWall: React.FC = () => {
           </div>
         </div>
 
-        {/* Articles Grid */}
-
-        {/* Recent News Grid */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          variants={staggerChildren}
-          initial="hidden"
-          animate="visible"
-        >
-          {isLoading
-            ? Array(3)
-                .fill(0)
-                .map((_, i) => (
-                  <Skeleton key={i} className="h-80 w-full rounded-xl" />
-                ))
-            : recent &&
-              recent.map((article, index) => (
+        {/* News Content */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array(9).fill(0).map((_, i) => (
+              <Skeleton key={i} className="h-80 w-full rounded-xl" />
+            ))}
+          </div>
+        ) : recent && recent.length > 0 ? (
+          <>
+            {/* Featured Article */}
+            <div className="mb-12">
+              <div className="rounded-xl overflow-hidden shadow-lg bg-white hover:shadow-xl transition-shadow duration-300 h-full relative">
+                <div className="overflow-hidden h-72 md:h-96 relative">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
+                  {recent[0].imageUrl ? (
+                    <img
+                      src={recent[0].imageUrl}
+                      alt={recent[0].title}
+                      className="w-full h-full object-cover transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="bg-secondary/10 h-full flex items-center justify-center">
+                      <span className="text-gray-400 text-lg">Aucune image</span>
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+                    <span
+                      className="inline-block px-3 py-1 text-white text-xs font-semibold rounded-full mb-3"
+                      style={{ backgroundColor: getCategoryColor(recent[0].categoryId) }}
+                    >
+                      {getCategoryName(recent[0].categoryId)}
+                    </span>
+                    <Link href="#">
+                      <h3 className="text-xl md:text-3xl font-bold text-white mb-3 hover:underline cursor-pointer line-clamp-2 min-h-[3.5rem] md:min-h-[4.5rem]">
+                        {recent[0].title}
+                      </h3>
+                    </Link>
+                    <p className="text-white/80 text-sm md:text-base mb-4 line-clamp-2 min-h-[2.5rem]">
+                      {recent[0].excerpt}
+                    </p>
+                    <div className="text-white/70 text-sm">
+                      {getTimeAgo(recent[0].createdAt)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Remaining Articles Grid */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={staggerChildren}
+              initial="hidden"
+              animate="visible"
+            >
+              {recent.slice(1).map((article, index) => (
                 <motion.div
                   key={article.id}
                   className="news-card rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow duration-300"
@@ -195,15 +210,19 @@ const NewsWall: React.FC = () => {
                     <p className="text-dark/70 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
                       {article.excerpt}
                     </p>
-                    <div className="flex items-center text-dark/60 text-xs">
-                      <span>{getTimeAgo(article.createdAt)}</span>
+                    <div className="text-dark/60 text-xs">
+                      {getTimeAgo(article.createdAt)}
                     </div>
                   </div>
                 </motion.div>
               ))}
-        </motion.div>
-
-
+            </motion.div>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-lg text-gray-500">Aucun article disponible.</p>
+          </div>
+        )}
       </div>
     </section>
   );
