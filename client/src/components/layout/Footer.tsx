@@ -58,13 +58,13 @@ export const Footer: React.FC = () => {
                 →
               </button>
             </form>
-            <p className="text-gray-500 mt-2 text-xs">contact@politiquefacile.fr</p>
+            <p className="text-gray-500 mt-2 text-xs">contact@politiquensemble.fr</p>
           </div>
         </div>
         
         <div className="mt-8 pt-6 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} Politique Facile. Tous droits réservés.
+            © {new Date().getFullYear()} Politiquensemble. Tous droits réservés.
           </p>
           <div className="flex space-x-4 text-sm">
             <a href="#" className="text-gray-500 hover:text-white transition-colors duration-300">Mentions légales</a>

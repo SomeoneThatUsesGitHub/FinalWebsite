@@ -6,7 +6,7 @@ const HeroSection: React.FC = () => {
   return (
     <section className="relative bg-black text-white overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/75 z-10"></div>
         <div 
           className="absolute inset-0 bg-fixed"
           style={{

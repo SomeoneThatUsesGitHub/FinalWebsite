@@ -45,8 +45,8 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link href="/">
             <div className="flex items-center space-x-2 cursor-pointer">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold font-heading">PJ</div>
-              <span className="text-xl font-bold text-dark font-heading hidden sm:inline-block">Politique Jeune</span>
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold font-heading">P</div>
+              <span className="text-xl font-bold text-dark font-heading hidden sm:inline-block">Politiquensemble</span>
             </div>
           </Link>
           
