@@ -26,7 +26,7 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Contenu */}
-      <div className="container mx-auto px-4 py-40 md:py-40 lg:py-56 relative z-10">
+      <div className="container mx-auto px-4 py-40 md:py-64 lg:py-80 relative z-10">
         <div className={`max-w-4xl ${isMobile ? 'text-left mx-0 pt-16' : 'mx-auto text-center md:text-left md:mx-0'}`}>
           <motion.h1
             variants={fadeIn}

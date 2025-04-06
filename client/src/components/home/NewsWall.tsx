@@ -184,32 +184,7 @@ const NewsWall: React.FC = () => {
           <p className="text-gray-500 mb-6">Restez informé des dernières informations politiques en France et à l'international</p>
         </ScrollAnimation>
 
-        {/* Category Tabs */}
-        <ScrollAnimation className="mb-8 relative" threshold={0.1} delay={0.1}>
-          <div className="flex space-x-2 md:space-x-4 overflow-x-auto pb-2 scrollbar-hide">
-            <CategoryPill
-              category={{ id: 0, name: "Tout", slug: "all", color: "#FF4D4D" }}
-              isActive={selectedCategoryId === null}
-              onClick={() => handleCategoryClick(null)}
-            />
-            {categoriesLoading ? (
-              Array(5)
-                .fill(0)
-                .map((_, i) => (
-                  <Skeleton key={i} className="h-9 w-36 rounded-full" />
-                ))
-            ) : (
-              categories?.map((category) => (
-                <CategoryPill
-                  key={category.id}
-                  category={category}
-                  isActive={selectedCategoryId === category.id}
-                  onClick={() => handleCategoryClick(category.id)}
-                />
-              ))
-            )}
-          </div>
-        </ScrollAnimation>
+        {/* Removed Category Tabs as requested by client */}
 
         {/* Featured Content - Live Event or Featured Article */}
         {isLoading ? (
