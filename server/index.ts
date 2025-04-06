@@ -13,19 +13,25 @@ app.use(express.urlencoded({ extended: false }));
 // Configure session
 const MemoryStoreSession = MemoryStore(session);
 app.use(session({
-  secret: process.env.SESSION_SECRET || "politiquensemble-super-secret",
+  secret: process.env.SESSION_SECRET || "politiquensemble-super-secret-key-with-more-entropy",
   resave: false,
-  saveUninitialized: true, // Permettre les sessions non initialisées
+  saveUninitialized: false, // Ne pas stocker des sessions vides
+  rolling: true, // Réinitialiser le délai d'expiration à chaque requête
   cookie: { 
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 jours
-    secure: app.get("env") === "production",
+    secure: false, // Ne pas exiger HTTPS en développement
     httpOnly: true,
-    sameSite: 'lax'
+    sameSite: 'lax',
+    path: '/'
   },
   store: new MemoryStoreSession({
-    checkPeriod: 86400000 // 24 heures
+    checkPeriod: 86400000, // 24 heures
+    stale: false // Ne pas permettre aux sessions périmées d'être utilisées
   })
 }));
+
+// Activer le trust proxy pour fonctionner derrière un proxy
+app.set('trust proxy', 1);
 
 // Configure Passport
 const passportInstance = configurePassport();

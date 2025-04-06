@@ -389,16 +389,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const user = req.user as any;
+    
+    // Ajouter les propriétés explicitement pour s'assurer qu'elles existent
     const safeUser = {
       id: user.id,
       username: user.username,
-      displayName: user.displayName,
-      role: user.role,
-      avatarUrl: user.avatarUrl,
-      isAdmin: user.role === "admin"
+      displayName: user.displayName || user.username,
+      role: user.role || "user",
+      avatarUrl: user.avatarUrl || null,
+      isAdmin: user.role === "admin" || !!user.isAdmin
     };
     
-    res.json({ user: safeUser });
+    // Log pour debugging
+    console.log("Session active -", req.sessionID, "- Utilisateur:", safeUser);
+    
+    // Retourner l'utilisateur directement (sans l'encapsuler dans un objet)
+    res.json(safeUser);
   });
   
   // Routes admin pour les articles

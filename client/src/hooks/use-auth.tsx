@@ -42,13 +42,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(["/api/auth/me"], data.user);
+      // Adapter à la réponse modifiée de /api/auth/me
+      const userData = data.user;
+      
+      console.log("Login réussi, données utilisateur:", userData);
+      
+      // Mettre à jour le cache avec les données utilisateur
+      queryClient.setQueryData(["/api/auth/me"], userData);
+      
+      // Invalider le cache pour forcer un rechargement
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
       toast({
         title: "Connexion réussie",
-        description: `Bienvenue, ${data.user.displayName || data.user.username}`,
+        description: `Bienvenue, ${userData.displayName || userData.username}`,
       });
     },
     onError: (error: Error) => {
+      console.error("Erreur de connexion:", error);
       toast({
         title: "Échec de la connexion",
         description: error.message || "Identifiants incorrects",
