@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
@@ -111,6 +111,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
         title: "Article créé",
         description: "L'article a été créé avec succès"
       });
+      
       setLocation(`/admin/articles/${data.id}`);
     },
     onError: (error: Error) => {
@@ -126,7 +127,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
   const onSubmit = (data: ArticleFormValues) => {
     createArticleMutation.mutate(data);
   };
-  
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="space-y-6">
@@ -147,7 +148,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                 Nouvel article
               </h1>
               <p className="text-muted-foreground mt-2">
-                Créez un nouvel article pour Politiquensemble
+                Créez un nouvel article pour le site
               </p>
             </div>
           </div>
@@ -174,7 +175,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
             <CardHeader>
               <CardTitle>Informations de l'article</CardTitle>
               <CardDescription>
-                Remplissez les informations principales de l'article
+                Renseignez les informations principales de l'article
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -237,11 +238,21 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                 </TabsList>
                 <TabsContent value="editor" className="space-y-2">
                   <Label htmlFor="content">Contenu de l'article</Label>
-                  <RichTextEditor
-                    value={form.watch("content") || ""}
-                    onChange={(value) => form.setValue("content", value)}
-                    placeholder="Commencez à rédiger votre article..."
-                  />
+                  <div className="relative">
+                    {/* Indicateur de longueur */}
+                    <div className="absolute top-0 right-0 z-10 text-xs p-1 bg-amber-100 text-amber-900 rounded">
+                      Contenu: {(form.watch("content") || "").length} caractères
+                    </div>
+                    <RichTextEditor
+                      key="new-article-editor"
+                      value={form.watch("content") || ""}
+                      onChange={(value) => {
+                        console.log("RichTextEditor onChange - Nouveau contenu:", value.length);
+                        form.setValue("content", value);
+                      }}
+                      placeholder="Commencez à rédiger votre article..."
+                    />
+                  </div>
                   {form.formState.errors.content && (
                     <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
                   )}
@@ -341,26 +352,28 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   const params = useParams();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const [previewHtml, setPreviewHtml] = useState<string>(article.content || "");
+  const [previewHtml, setPreviewHtml] = useState<string>("");
+  const [editorKey, setEditorKey] = useState<number>(article.id); // Utiliser l'ID comme clé unique
   
-  console.log("EDIT FORM - Article data reçu par props:", article);
-  console.log("EDIT FORM - Content detail:", {
-    content: article.content,
-    type: typeof article.content,
-    length: article.content ? article.content.length : 0,
-    sample: article.content ? article.content.substring(0, 50) + "..." : "CONTENU VIDE"
+  // Log détaillé pour le débogage
+  console.log("EditArticleForm - Article reçu:", {
+    id: article.id,
+    title: article.title,
+    content_length: article.content ? article.content.length : 0,
+    content_type: typeof article.content,
+    content_preview: article.content ? article.content.substring(0, 50) + "..." : "CONTENU VIDE"
   });
   
-  // Force une mise à jour du contenu lors de l'initialisation
+  // Force une initialisation du contenu et de la prévisualisation
   useEffect(() => {
-    console.log("Setting initial content in state:", {
-      content: article.content,
-      article_id: article.id
-    });
+    console.log("EditArticleForm - Initialisation avec article ID:", article.id);
     setPreviewHtml(article.content || "");
-  }, [article.id, article.content]);
+    
+    // Forcer la recréation de l'éditeur
+    setEditorKey(prev => prev + 1);
+  }, [article.id]);
   
-  // Créer le formulaire avec résolution de schema Zod
+  // Initialiser le formulaire avec les données de l'article
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
     defaultValues: {
@@ -375,12 +388,9 @@ function EditArticleForm({ article, categories }: { article: Article, categories
     }
   });
   
-  // Force une réinitialisation des valeurs du formulaire quand l'article change
+  // Force une réinitialisation du formulaire quand l'article change
   useEffect(() => {
-    console.log("FORCE RESET du formulaire avec les données d'article:", {
-      article_id: article.id,
-      content_preview: article.content ? article.content.substring(0, 30) + "..." : "VIDE"
-    });
+    console.log("EditArticleForm - RESET du formulaire pour article ID:", article.id);
     
     form.reset({
       title: article.title || "",
@@ -392,22 +402,22 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       published: Boolean(article.published),
       featured: Boolean(article.featured),
     });
-  }, [article.id, article.content]);
+  }, [article.id]);
   
   // Observer les changements de contenu pour la prévisualisation
   const contentWatch = form.watch("content");
   
-  // Synchroniser le contenu de l'éditeur pour la prévisualisation
+  // Synchroniser la prévisualisation avec le contenu
   useEffect(() => {
     if (contentWatch) {
-      console.log("EditArticleForm - Content changed, updating preview:", {
-        content_length: contentWatch.length,
-        content_preview: contentWatch.substring(0, 30) + "..."
+      console.log("EditArticleForm - Mise à jour prévisualisation:", {
+        content_length: contentWatch.length
       });
       setPreviewHtml(contentWatch);
     }
   }, [contentWatch]);
   
+  // Mutation pour mettre à jour l'article
   const updateArticleMutation = useMutation({
     mutationFn: async (data: ArticleFormValues) => {
       const formattedData = {
@@ -419,7 +429,6 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       };
       console.log("Données pour mise à jour:", formattedData);
       
-      // Utiliser fetch directement au lieu d'apiRequest qui peut avoir des problèmes avec les booléens
       const res = await fetch(`/api/admin/articles/${params.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -436,7 +445,6 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       return await res.json();
     },
     onSuccess: () => {
-      // Invalider à la fois les requêtes publiques et admin
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
       
@@ -569,11 +577,27 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 </TabsList>
                 <TabsContent value="editor" className="space-y-2">
                   <Label htmlFor="content">Contenu de l'article</Label>
-                  <RichTextEditor
-                    value={form.watch("content") || ""}
-                    onChange={(value) => form.setValue("content", value)}
-                    placeholder="Commencez à rédiger votre article..."
-                  />
+                  <div className="relative">
+                    {/* Indicateur de longueur et debugging */}
+                    <div className="absolute top-0 right-0 z-10 text-xs p-1 bg-amber-100 text-amber-900 rounded flex gap-1">
+                      <span>ID: {article.id}</span>
+                      <span>•</span>
+                      <span>Contenu: {(form.watch("content") || "").length} caractères</span>
+                    </div>
+                    
+                    <RichTextEditor
+                      key={`editor-${editorKey}`} // Forcer la recréation de l'éditeur
+                      value={form.watch("content") || ""}
+                      onChange={(value) => {
+                        console.log("RichTextEditor onChange:", {
+                          value_length: value.length,
+                          prev_length: (form.watch("content") || "").length
+                        });
+                        form.setValue("content", value, { shouldDirty: true, shouldTouch: true });
+                      }}
+                      placeholder="Commencez à rédiger votre article..."
+                    />
+                  </div>
                   {form.formState.errors.content && (
                     <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
                   )}
@@ -681,7 +705,33 @@ export default function EditArticlePage() {
   // Récupérer l'article à modifier (si ID présent)
   const articleQuery = useQuery({
     queryKey: ["/api/admin/articles", params.id],
-    queryFn: getQueryFn({ on401: "throw" }),
+    queryFn: async () => {
+      console.log("Fetching article with ID:", params.id);
+      try {
+        const response = await fetch(`/api/admin/articles/${params.id}`, {
+          credentials: 'include' // Important pour envoyer les cookies d'authentification
+        });
+        
+        if (!response.ok) {
+          console.error("Error response:", response.status, response.statusText);
+          const errorText = await response.text();
+          console.error("Error fetching article:", errorText);
+          throw new Error(`Failed to fetch article: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log("Article data received:", {
+          id: data.id,
+          title: data.title,
+          content_length: data.content ? data.content.length : 0,
+          content_preview: data.content ? data.content.substring(0, 50) + "..." : "EMPTY CONTENT"
+        });
+        return data;
+      } catch (error) {
+        console.error("Error in custom query function:", error);
+        throw error;
+      }
+    },
     // Ne pas exécuter la requête si pas d'ID
     enabled: !!params.id,
   });
