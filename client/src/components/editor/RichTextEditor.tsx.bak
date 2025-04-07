@@ -32,14 +32,10 @@ import {
   Undo,
   Redo,
   Youtube as YoutubeIcon,
-  Highlighter,
-  FileCode,
-  Terminal,
-  Twitter
+  Highlighter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Popover,
   PopoverContent,
@@ -62,182 +58,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery } from '@tanstack/react-query';
-import { getQueryFn } from '@/lib/queryClient';
-import { Article } from '@shared/schema';function ArticleEmbedSelector({ onSelectArticle }: { onSelectArticle: (article: Article) => void }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const { data: articles = [], isLoading } = useQuery<Article[]>({
-    queryKey: ['/api/articles'],
-    queryFn: getQueryFn<Article[]>({ on401: 'returnNull' }),
-  });
-  
-  const filteredArticles = articles.filter(article => 
-    article.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    article.excerpt?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
-  return (
-    <div className="space-y-4">
-      <Input
-        placeholder="Rechercher un article..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full"
-      />
-      
-      {isLoading ? (
-        <div className="text-center py-4">Chargement des articles...</div>
-      ) : filteredArticles.length === 0 ? (
-        <div className="text-center py-4">Aucun article trouvé</div>
-      ) : (
-        <div className="max-h-[300px] overflow-y-auto space-y-2">
-          {filteredArticles.map((article) => (
-            <button
-              key={article.id}
-              type="button"
-              className="w-full text-left p-3 border rounded-md hover:bg-accent transition-colors flex flex-col"
-              onClick={() => onSelectArticle(article)}
-            >
-              <span className="font-medium">{article.title}</span>
-              {article.excerpt && (
-                <span className="text-sm text-muted-foreground line-clamp-2">{article.excerpt}</span>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function HTMLEmbed({ onInsert }: { onInsert: (html: string) => void }) {
-  const [htmlCode, setHtmlCode] = useState('');
-  
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Insérez du code HTML personnalisé. Attention : assurez-vous que le code est valide et sécurisé.
-      </p>
-      <Textarea
-        value={htmlCode}
-        onChange={(e) => setHtmlCode(e.target.value)}
-        placeholder="<div>Votre HTML ici</div>"
-        rows={6}
-        className="font-mono text-sm"
-      />
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button variant="outline">Annuler</Button>
-        </DialogClose>
-        <Button 
-          onClick={() => onInsert(htmlCode)}
-          disabled={!htmlCode.trim()}
-        >
-          Insérer le HTML
-        </Button>
-      </DialogFooter>
-    </div>
-  );
-}
-
-function TweetEmbed({ onInsert }: { onInsert: (tweetId: string) => void }) {
-  const [tweetUrl, setTweetUrl] = useState('');
-  const [tweetId, setTweetId] = useState('');
-  const { toast } = useToast();
-  
-  const extractTweetId = (url: string) => {
-    // Extraire l'ID du tweet à partir de l'URL
-    try {
-      // Formats possibles:
-      // https://twitter.com/username/status/1234567890123456789
-      // https://x.com/username/status/1234567890123456789
-      const regex = /(?:twitter|x)\.com\/[^/]+\/status\/(\d+)/;
-      const match = url.match(regex);
-      
-      if (match && match[1]) {
-        setTweetId(match[1]);
-        return match[1];
-      } else {
-        toast({
-          title: "Format d'URL invalide",
-          description: "L'URL du tweet n'est pas valide. Utilisez un lien vers un tweet spécifique.",
-          variant: "destructive"
-        });
-        return '';
-      }
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible d'extraire l'ID du tweet",
-        variant: "destructive"
-      });
-      return '';
-    }
-  };
-  
-  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value;
-    setTweetUrl(url);
-    if (url) {
-      extractTweetId(url);
-    } else {
-      setTweetId('');
-    }
-  };
-  
-  const handleInsert = () => {
-    if (!tweetId) {
-      const id = extractTweetId(tweetUrl);
-      if (id) {
-        onInsert(id);
-      }
-    } else {
-      onInsert(tweetId);
-    }
-  };
-  
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Collez l'URL d'un tweet pour l'intégrer dans votre article.
-      </p>
-      <Input
-        value={tweetUrl}
-        onChange={handleUrlChange}
-        placeholder="https://twitter.com/username/status/123456789"
-      />
-      {tweetId && (
-        <div className="p-2 bg-accent/50 rounded-md text-xs font-mono overflow-hidden text-ellipsis">
-          ID du tweet détecté: {tweetId}
-        </div>
-      )}
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button variant="outline">Annuler</Button>
-        </DialogClose>
-        <Button 
-          onClick={handleInsert}
-          disabled={!tweetUrl}
-        >
-          Intégrer le tweet
-        </Button>
-      </DialogFooter>
-    </div>
-  );
-}
 
 interface RichTextEditorProps {
   content: string;
@@ -288,53 +110,6 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
       editor.chain().focus().setYoutubeVideo({ src: youtubeUrl }).run();
       setYoutubeUrl('https://www.youtube.com/watch?v=');
     }
-  };
-  const insertArticleEmbed = (article: Article) => {
-    const articleUrl = `/articles/${article.slug}`;
-    const title = article.title;
-    const excerpt = article.excerpt || '';
-    const imageHtml = article.imageUrl 
-      ? `<img src="${article.imageUrl}" alt="${title}" class="mb-2 rounded-md max-w-full h-auto" />`
-      : '';
-    
-    const html = `
-      <div class="not-prose border rounded-md p-4 my-4 bg-card">
-        <a href="${articleUrl}" class="no-underline hover:underline block">
-          ${imageHtml}
-          <h4 class="text-lg font-medium">${title}</h4>
-          <p class="text-sm text-muted-foreground">${excerpt}</p>
-          <div class="mt-2 text-sm text-primary font-medium">Lire l'article →</div>
-        </a>
-      </div>
-    `;
-    
-    editor.chain().focus().insertContent(html).run();
-  };
-  
-  const insertHtmlContent = (html: string) => {
-    if (html.trim()) {
-      editor.chain().focus().insertContent(html).run();
-    }
-  };
-  
-  const insertTweet = (tweetId: string) => {
-    // Créer le HTML pour intégrer un tweet
-    const html = `
-      <div class="not-prose my-4">
-        <blockquote class="twitter-tweet" data-dnt="true">
-          <a href="https://twitter.com/x/status/${tweetId}"></a>
-        </blockquote>
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-      </div>
-    `;
-    
-    editor.chain().focus().insertContent(html).run();
-    
-    // Notification pour expliquer comment le tweet s'affichera
-    toast({
-      title: "Tweet intégré",
-      description: "Le tweet sera affiché correctement dans l'article publié.",
-    });
   };
 
   return (
@@ -682,64 +457,6 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
                 </div>
               </PopoverContent>
             </Popover>
-          </div>
-          <div className="border-r border-border mx-1 h-8" />
-          
-          {/* Special embeds */}
-          <div className="flex">
-            {/* Article Embed */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" title="Intégrer un article">
-                  <FileCode className="h-4 w-4 text-blue-500" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Intégrer un article</DialogTitle>
-                  <DialogDescription>
-                    Sélectionnez un article à intégrer dans votre contenu
-                  </DialogDescription>
-                </DialogHeader>
-                <ArticleEmbedSelector onSelectArticle={insertArticleEmbed} />
-              </DialogContent>
-            </Dialog>
-            
-            {/* HTML Custom Embed */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" title="Intégrer du HTML personnalisé">
-                  <Terminal className="h-4 w-4 text-green-500" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Code HTML personnalisé</DialogTitle>
-                  <DialogDescription>
-                    Insérez du HTML personnalisé dans votre article
-                  </DialogDescription>
-                </DialogHeader>
-                <HTMLEmbed onInsert={insertHtmlContent} />
-              </DialogContent>
-            </Dialog>
-            
-            {/* Tweet Embed */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" title="Intégrer un tweet">
-                  <Twitter className="h-4 w-4 text-blue-400" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Intégrer un tweet</DialogTitle>
-                  <DialogDescription>
-                    Intégrez un tweet de Twitter/X dans votre article
-                  </DialogDescription>
-                </DialogHeader>
-                <TweetEmbed onInsert={insertTweet} />
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
       </TooltipProvider>

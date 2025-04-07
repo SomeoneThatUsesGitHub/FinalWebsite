@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Save, ArrowLeft, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
@@ -376,7 +377,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       if (!id) {
         throw new Error("ID de l'article manquant");
       }
-
+      
       const formattedData = {
         ...data,
         categoryId: Number(data.categoryId),
@@ -544,20 +545,38 @@ function EditArticleForm({ article, categories }: { article: Article, categories
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="content">Contenu de l'article</Label>
-                <input type="hidden" {...form.register("content")} />
-                <RichTextEditor 
-                  content={form.watch("content") || ""}
-                  onChange={(html) => {
-                    form.setValue("content", html);
-                    setPreviewHtml(html);
-                  }}
-                  placeholder="Commencez à rédiger votre article ici..."
-                  className="min-h-[500px]"
-                />
-                {form.formState.errors.content && (
-                  <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
-                )}
+                <Tabs defaultValue="editor" className="w-full">
+                  <TabsList className="w-full grid grid-cols-2">
+                    <TabsTrigger value="editor">Éditeur</TabsTrigger>
+                    <TabsTrigger value="preview">Prévisualisation</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="editor" className="pt-4">
+                    <input type="hidden" {...form.register("content")} />
+                    <RichTextEditor 
+                      content={form.watch("content") || ""}
+                      onChange={(html) => {
+                        form.setValue("content", html);
+                        setPreviewHtml(html);
+                      }}
+                      placeholder="Commencez à rédiger votre article ici..."
+                      className="min-h-[500px]"
+                    />
+                    {form.formState.errors.content && (
+                      <p className="text-sm text-red-500 mt-2">{form.formState.errors.content.message}</p>
+                    )}
+                  </TabsContent>
+                  <TabsContent value="preview">
+                    <div className="border rounded-md p-4 min-h-[500px] prose max-w-none">
+                      {previewHtml ? (
+                        <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                      ) : (
+                        <p className="text-muted-foreground text-center py-10">
+                          Le contenu s'affichera ici lorsque vous commencerez à écrire.
+                        </p>
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </div>
             </CardContent>
           </Card>

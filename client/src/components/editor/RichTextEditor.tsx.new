@@ -76,7 +76,18 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
-import { Article } from '@shared/schema';function ArticleEmbedSelector({ onSelectArticle }: { onSelectArticle: (article: Article) => void }) {
+import { Article } from '@shared/schema';
+
+interface RichTextEditorProps {
+  content: string;
+  onChange: (html: string) => void;
+  placeholder?: string;
+  className?: string;
+  autofocus?: boolean;
+  editable?: boolean;
+}
+
+function ArticleEmbedSelector({ onSelectArticle }: { onSelectArticle: (article: Article) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
   
   const { data: articles = [], isLoading } = useQuery<Article[]>({
@@ -239,15 +250,6 @@ function TweetEmbed({ onInsert }: { onInsert: (tweetId: string) => void }) {
   );
 }
 
-interface RichTextEditorProps {
-  content: string;
-  onChange: (html: string) => void;
-  placeholder?: string;
-  className?: string;
-  autofocus?: boolean;
-  editable?: boolean;
-}
-
 const MenuBar = ({ editor }: { editor: Editor | null }) => {
   const [linkUrl, setLinkUrl] = useState('https://');
   const [imageUrl, setImageUrl] = useState('https://');
@@ -289,6 +291,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
       setYoutubeUrl('https://www.youtube.com/watch?v=');
     }
   };
+  
   const insertArticleEmbed = (article: Article) => {
     const articleUrl = `/articles/${article.slug}`;
     const title = article.title;
@@ -683,6 +686,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
               </PopoverContent>
             </Popover>
           </div>
+          
           <div className="border-r border-border mx-1 h-8" />
           
           {/* Special embeds */}
@@ -758,63 +762,42 @@ export function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Underline,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-primary underline underline-offset-2 hover:text-primary/80',
-        },
-      }),
+      Image,
+      Link,
       Placeholder.configure({
         placeholder,
       }),
-      Image.configure({
-        HTMLAttributes: {
-          class: 'rounded-md max-w-full',
-        },
-      }),
-      YouTube.configure({
-        width: 640,
-        height: 360,
-        HTMLAttributes: {
-          class: 'w-full aspect-video rounded-md',
-        },
-        controls: true,
-      }),
-      CodeBlock.configure({
-        HTMLAttributes: {
-          class: 'bg-muted text-muted-foreground p-4 rounded-md font-mono my-4',
-        },
-      }),
+      YouTube,
+      CodeBlock,
+      Color,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Highlight.configure({
-        HTMLAttributes: {
-          class: 'bg-primary/20 text-primary px-1 py-0.5 rounded-sm',
-        },
-      }),
+      Underline,
+      Highlight,
       TextStyle,
-      Color,
     ],
     content,
+    editable,
+    autofocus,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    editable,
-    autofocus,
   });
 
+  // Pour s'assurer que le contenu est synchronisé si modifié à l'extérieur
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
+    if (editor && editor.getHTML() !== content) {
       editor.commands.setContent(content);
     }
-  }, [editor, content]);
+  }, [content, editor]);
 
   return (
-    <div className={cn('border border-input rounded-md bg-background', className)}>
-      {editor && editable && <MenuBar editor={editor} />}
-      <EditorContent editor={editor} className="prose prose-sm max-w-none dark:prose-invert min-h-[250px] p-4" />
+    <div className={cn('rich-text-editor border rounded-md overflow-hidden', className)}>
+      {editor && <MenuBar editor={editor} />}
+      <div className="p-4">
+        <EditorContent editor={editor} className="prose max-w-none focus:outline-none min-h-[200px]" />
+      </div>
     </div>
   );
 }
