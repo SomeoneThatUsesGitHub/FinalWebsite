@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Share2, Calendar, Clock, Bookmark, Facebook, Twitter } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
+import ArticleContent from "@/components/ArticleContent";
 
 interface Article {
   id: number;
@@ -220,10 +221,7 @@ const Article: React.FC = () => {
                   animate="visible"
                 >
                   <p className="text-xl font-medium text-dark/80 mb-8 leading-relaxed">{article.excerpt}</p>
-                  <div 
-                    className="article-content"
-                    dangerouslySetInnerHTML={{ __html: article.content }} 
-                  />
+                  <ArticleContent content={article.content} />
                 </motion.div>
                 
                 {/* Social sharing */}
