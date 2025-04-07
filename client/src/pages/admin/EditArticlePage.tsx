@@ -21,6 +21,9 @@ import { useToast } from "@/hooks/use-toast";
 // Schéma de validation étendu pour le formulaire
 const articleFormSchema = insertArticleSchema
   .extend({
+    // Renforcer la validation du slug pour qu'il ait au moins 3 caractères
+    slug: z.string().min(3, "Le slug doit contenir au moins 3 caractères")
+      .regex(/^[a-z0-9-]+$/, "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets"),
     content: z.string().min(20, "Le contenu doit contenir au moins 20 caractères"),
     imageUrl: z.string().url("Veuillez fournir une URL d'image valide").nullable().optional(),
     categoryId: z.number().or(z.string().transform(val => parseInt(val, 10))),

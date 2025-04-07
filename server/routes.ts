@@ -451,10 +451,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ errors: validation.error.errors });
       }
       
+      // S'assurer que le slug est valide et assez long
+      if (!req.body.slug || req.body.slug.length < 3) {
+        return res.status(400).json({ 
+          message: "Slug invalide", 
+          details: "Le slug doit contenir au moins 3 caractères" 
+        });
+      }
+      
+      // Vérifier si un article avec ce slug existe déjà
+      const existingArticle = await storage.getArticleBySlug(req.body.slug);
+      if (existingArticle) {
+        return res.status(400).json({ 
+          message: "Slug déjà utilisé", 
+          details: "Un article avec ce slug existe déjà. Veuillez en choisir un autre." 
+        });
+      }
+      
       // S'assurer que le statut de publication est correctement géré
       const articleData = {
         ...validation.data,
-        published: req.body.published === true || req.body.published === "true"
+        published: req.body.published === true || req.body.published === "true",
+        featured: req.body.featured === true || req.body.featured === "true"
       };
       
       console.log("Données validées pour création:", articleData);
@@ -463,7 +481,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(article);
     } catch (error) {
       console.error("Error creating article:", error);
-      res.status(500).json({ message: "Erreur lors de la création de l'article" });
+      
+      // Retourner un message d'erreur plus détaillé
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+      
+      // Détecter les erreurs de contrainte d'unicité
+      if (errorMessage.includes("unique constraint") && errorMessage.includes("slug")) {
+        return res.status(400).json({ 
+          message: "Slug déjà utilisé", 
+          details: "Un article avec ce slug existe déjà. Veuillez en choisir un autre." 
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "Erreur lors de la création de l'article",
+        details: errorMessage
+      });
     }
   });
   
@@ -483,6 +516,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Données incomplètes",
           details: "Les champs titre, slug, contenu et catégorie sont obligatoires" 
         });
+      }
+      
+      // S'assurer que le slug est valide et assez long
+      if (!req.body.slug || req.body.slug.length < 3) {
+        return res.status(400).json({ 
+          message: "Slug invalide", 
+          details: "Le slug doit contenir au moins 3 caractères" 
+        });
+      }
+      
+      // Obtenir l'article actuel pour vérifier si le slug a changé
+      const currentArticle = await storage.getArticleById(Number(id));
+      if (!currentArticle) {
+        return res.status(404).json({ message: "Article non trouvé" });
+      }
+      
+      // Si le slug a changé, vérifier qu'il n'est pas déjà utilisé par un autre article
+      if (currentArticle.slug !== req.body.slug) {
+        const existingArticle = await storage.getArticleBySlug(req.body.slug);
+        if (existingArticle && existingArticle.id !== Number(id)) {
+          return res.status(400).json({ 
+            message: "Slug déjà utilisé", 
+            details: "Un autre article utilise déjà ce slug. Veuillez en choisir un autre." 
+          });
+        }
       }
       
       // Validation partielle des données d'article
@@ -514,7 +572,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedArticle);
     } catch (error) {
       console.error("Error updating article:", error);
-      res.status(500).json({ message: "Erreur lors de la mise à jour de l'article" });
+      
+      // Retourner un message d'erreur plus détaillé
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+      
+      // Détecter les erreurs de contrainte d'unicité
+      if (errorMessage.includes("unique constraint") && errorMessage.includes("slug")) {
+        return res.status(400).json({ 
+          message: "Slug déjà utilisé", 
+          details: "Un article avec ce slug existe déjà. Veuillez en choisir un autre." 
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "Erreur lors de la mise à jour de l'article",
+        details: errorMessage
+      });
     }
   });
   
