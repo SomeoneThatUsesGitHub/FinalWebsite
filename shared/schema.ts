@@ -87,6 +87,7 @@ export const flashInfos = pgTable("flash_infos", {
   title: text("title").notNull(),
   content: text("content").notNull(),
   imageUrl: text("image_url"),
+  url: text("url"), // URL pour le lien "En savoir plus"
   active: boolean("active").notNull().default(true),
   priority: integer("priority").notNull().default(1), // Higher value = higher priority
   categoryId: integer("category_id").references(() => categories.id),
@@ -98,6 +99,7 @@ export const insertFlashInfoSchema = createInsertSchema(flashInfos).pick({
   title: true,
   content: true,
   imageUrl: true,
+  url: true,
   active: true,
   priority: true,
   categoryId: true,

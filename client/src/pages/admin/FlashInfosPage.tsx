@@ -32,6 +32,7 @@ const flashInfoSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères"),
   content: z.string().min(10, "Le contenu doit contenir au moins 10 caractères"),
   imageUrl: z.string().url("L'URL de l'image doit être valide").optional().or(z.literal("")),
+  url: z.string().url("L'URL du lien doit être valide").optional().or(z.literal("")),
   active: z.boolean().default(true),
 });
 
@@ -69,6 +70,7 @@ const FlashInfosPage = () => {
       title: "",
       content: "",
       imageUrl: "",
+      url: "",
       active: true,
     },
   });
@@ -80,6 +82,7 @@ const FlashInfosPage = () => {
       title: "",
       content: "",
       imageUrl: "",
+      url: "",
       active: true,
     },
   });
@@ -181,6 +184,7 @@ const FlashInfosPage = () => {
       title: flashInfo.title,
       content: flashInfo.content,
       imageUrl: flashInfo.imageUrl || "",
+      url: flashInfo.url || "",
       active: flashInfo.active,
     });
     setIsEditDialogOpen(true);
@@ -316,6 +320,22 @@ const FlashInfosPage = () => {
                         <FormControl>
                           <Input 
                             placeholder="https://example.com/image.jpg" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={createForm.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>URL "En savoir plus" (optionnel)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="https://example.com/article" 
                             {...field} 
                           />
                         </FormControl>
@@ -518,6 +538,22 @@ const FlashInfosPage = () => {
                     <FormControl>
                       <Input 
                         placeholder="https://example.com/image.jpg" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={editForm.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>URL "En savoir plus" (optionnel)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="https://example.com/article" 
                         {...field} 
                       />
                     </FormControl>

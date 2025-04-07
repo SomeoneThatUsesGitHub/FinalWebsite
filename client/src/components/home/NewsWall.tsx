@@ -35,6 +35,7 @@ type FlashInfo = {
   title: string;
   content: string;
   imageUrl: string | null;
+  url: string | null;
   active: boolean;
   priority: number;
   categoryId: number | null;
@@ -352,7 +353,18 @@ const NewsWall: React.FC = () => {
                     </div>
                   )}
                   <div className="mt-auto flex justify-end">
-                    <span className="text-red-600 text-xs font-medium hover:underline cursor-pointer">En savoir plus</span>
+                    {flashInfo.url ? (
+                      <a 
+                        href={flashInfo.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-red-600 text-xs font-medium hover:underline cursor-pointer"
+                      >
+                        En savoir plus
+                      </a>
+                    ) : (
+                      <span className="text-red-600 text-xs font-medium">En savoir plus</span>
+                    )}
                   </div>
                 </div>
               </div>
