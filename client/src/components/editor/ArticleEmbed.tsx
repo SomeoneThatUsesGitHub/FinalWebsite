@@ -1,73 +1,67 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import { formatDate } from '@/lib/utils';
+import { Clock } from 'lucide-react';
 import { Article } from '@shared/schema';
 import { cn } from '@/lib/utils';
 
 interface ArticleEmbedProps {
   article: Partial<Article>;
   className?: string;
-  variant?: 'default' | 'compact';
 }
 
 const ArticleEmbed: React.FC<ArticleEmbedProps> = ({ 
   article, 
-  className,
-  variant = 'default'
+  className
 }) => {
   if (!article || !article.slug) return null;
-
-  const isCompact = variant === 'compact';
+  
+  // Utilisez la date actuelle si l'article n'a pas de date de création
+  const createdAt = article.createdAt || new Date().toISOString();
+  
+  // Calcul du temps de lecture fictif (3 minutes par défaut)
+  const readTime = "3 min.";
   
   return (
-    <Card className={cn(
-      "overflow-hidden border-blue-100 my-4 hover:shadow-md transition-shadow duration-200",
-      isCompact ? "max-w-full" : "max-w-[350px] mx-auto",
+    <div className={cn(
+      "w-full border border-gray-200 bg-white rounded-none my-4 hover:shadow-sm transition-shadow duration-200",
       className
     )}>
       <Link href={`/articles/${article.slug}`} className="block">
-        <div className={cn(
-          "relative", 
-          isCompact ? "flex items-center gap-4" : ""
-        )}>
-          {article.imageUrl && (
-            <div className={cn(
-              "overflow-hidden bg-muted",
-              isCompact ? "w-24 h-24 min-w-[6rem]" : "h-[180px]"
-            )}>
-              <img 
-                src={article.imageUrl} 
-                alt={article.title} 
-                className="w-full h-full object-cover transition-transform hover:scale-105"
-              />
-            </div>
-          )}
-          
-          <CardContent className={cn(
-            isCompact ? "p-2 flex-1" : "p-4"
-          )}>
-            <h3 className={cn(
-              "font-semibold text-foreground line-clamp-2 mb-2 group-hover:text-primary",
-              isCompact ? "text-sm" : "text-lg"
-            )}>
+        <div className="flex items-stretch">
+          {/* Catégorie sur la gauche */}
+          <div className="w-12 h-auto bg-amber-400 flex items-center justify-center">
+            <span className="text-white font-bold uppercase text-xs transform -rotate-90">CAT</span>
+          </div>
+
+          {/* Contenu principal */}
+          <div className="flex-1 p-4">
+            <h3 className="font-semibold text-gray-800 text-lg mb-2">
               {article.title}
             </h3>
             
-            {article.excerpt && !isCompact && (
-              <p className="text-muted-foreground text-sm line-clamp-2 mb-3">
-                {article.excerpt}
-              </p>
-            )}
-            
-            <div className="text-primary flex items-center text-sm font-medium mt-auto">
-              Lire l'article
-              <ArrowRight className="h-4 w-4 ml-1" />
+            <div className="flex items-center text-sm text-gray-500 mt-2">
+              <span>Publié le {formatDate(createdAt, "dd MMMM yyyy 'à' HH'h'mm")}</span>
+              <div className="flex items-center ml-4">
+                <Clock className="h-4 w-4 mr-1" />
+                <span>Lecture {readTime}</span>
+              </div>
             </div>
-          </CardContent>
+          </div>
+
+          {/* Image de droite */}
+          {article.imageUrl && (
+            <div className="w-32 md:w-40 bg-gray-200">
+              <img 
+                src={article.imageUrl} 
+                alt={article.title || ''} 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
         </div>
       </Link>
-    </Card>
+    </div>
   );
 };
 

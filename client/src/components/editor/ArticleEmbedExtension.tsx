@@ -14,7 +14,7 @@ interface ArticleEmbedAttrs {
   articleTitle: string | null;
   articleImageUrl: string | null;
   articleExcerpt: string | null;
-  variant: 'default' | 'compact';
+  articleCreatedAt: string | null;
 }
 
 declare module '@tiptap/core' {
@@ -48,9 +48,9 @@ const ArticleEmbedNode = Node.create<ArticleEmbedOptions>({
       articleExcerpt: {
         default: null,
       },
-      variant: {
-        default: 'default',
-      },
+      articleCreatedAt: {
+        default: null,
+      }
     };
   },
 
@@ -97,15 +97,13 @@ const ArticleEmbedNode = Node.create<ArticleEmbedOptions>({
         title: node.attrs.articleTitle,
         imageUrl: node.attrs.articleImageUrl,
         excerpt: node.attrs.articleExcerpt,
+        createdAt: node.attrs.articleCreatedAt,
       };
 
       return (
         <NodeViewWrapper>
           <div contentEditable={false} style={{ userSelect: 'none' }}>
-            <ArticleEmbed 
-              article={articleData} 
-              variant={node.attrs.variant} 
-            />
+            <ArticleEmbed article={articleData} />
           </div>
         </NodeViewWrapper>
       );

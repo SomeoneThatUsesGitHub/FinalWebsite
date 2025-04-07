@@ -21,20 +21,18 @@ import { Search, FileText, CheckCircle2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
 import { Article, Category } from '@shared/schema';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
 interface ArticleSelectorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect: (article: Article, variant: 'default' | 'compact') => void;
+  onSelect: (article: Article) => void;
 }
 
 export function ArticleSelector({ open, onOpenChange, onSelect }: ArticleSelectorProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
-  const [displayVariant, setDisplayVariant] = useState<'default' | 'compact'>('default');
 
   // Récupération des articles et catégories
   const { data: articles = [] } = useQuery<Article[]>({
@@ -67,7 +65,7 @@ export function ArticleSelector({ open, onOpenChange, onSelect }: ArticleSelecto
 
   const handleSelect = () => {
     if (selectedArticle) {
-      onSelect(selectedArticle, displayVariant);
+      onSelect(selectedArticle);
       onOpenChange(false);
       // Réinitialiser l'état après la sélection
       setSelectedArticle(null);
@@ -171,29 +169,6 @@ export function ArticleSelector({ open, onOpenChange, onSelect }: ArticleSelecto
               </div>
             )}
           </div>
-
-          {selectedArticle && (
-            <>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-medium mb-2">Affichage</h4>
-                <RadioGroup
-                  value={displayVariant}
-                  onValueChange={(value) => setDisplayVariant(value as 'default' | 'compact')}
-                  className="flex gap-6"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="default" id="display-default" />
-                    <Label htmlFor="display-default">Grand (image + texte)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="compact" id="display-compact" />
-                    <Label htmlFor="display-compact">Compact (côte à côte)</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </>
-          )}
         </div>
 
         <DialogFooter>

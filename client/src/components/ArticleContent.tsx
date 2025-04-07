@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import ArticleEmbed from './editor/ArticleEmbed';
 import { Article } from '@shared/schema';
+import { formatDate } from '@/lib/utils';
 
 interface ArticleContentProps {
   content: string;
@@ -22,7 +22,6 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
     embeds.forEach(embed => {
       const articleId = Number(embed.getAttribute('data-article-id'));
       const articleSlug = embed.getAttribute('data-article-slug');
-      const variant = embed.getAttribute('data-variant') as 'default' | 'compact' || 'default';
       
       if (!articleId && !articleSlug) return;
 
@@ -38,63 +37,83 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
       const container = document.createElement('div');
       container.className = 'article-embed-container';
       
-      // Rend le composant React dans cet élément
-      const root = document.createElement('div');
-      container.appendChild(root);
-      
       // Remplace l'élément d'origine par le conteneur
       embed.replaceWith(container);
       
-      // Utilisation d'une IIFE pour capturer les variables dans la closure
-      (function(rootElement, articleData, variantType) {
-        // Création manuelle du DOM pour l'affichage de l'article intégré
-        const card = document.createElement('div');
-        card.className = `article-embed ${variantType === 'compact' ? 'article-embed-compact' : 'article-embed-default'}`;
-        
-        // Création du lien et de l'image
-        const link = document.createElement('a');
-        link.href = `/articles/${articleData.slug}`;
-        link.className = 'article-embed-link';
-        
-        // Structure de base
-        const content = document.createElement('div');
-        content.className = 'article-embed-content';
-        
-        // Image si disponible
-        if (articleData.imageUrl) {
-          const imgContainer = document.createElement('div');
-          imgContainer.className = 'article-embed-image';
-          
-          const img = document.createElement('img');
-          img.src = articleData.imageUrl;
-          img.alt = articleData.title || '';
-          
-          imgContainer.appendChild(img);
-          link.appendChild(imgContainer);
-        }
-        
-        // Contenu textuel
-        const title = document.createElement('h3');
-        title.textContent = articleData.title || '';
-        title.className = 'article-embed-title';
-        content.appendChild(title);
-        
-        if (articleData.excerpt && variantType !== 'compact') {
-          const excerpt = document.createElement('p');
-          excerpt.textContent = articleData.excerpt;
-          excerpt.className = 'article-embed-excerpt';
-          content.appendChild(excerpt);
-        }
-        
-        const readMore = document.createElement('div');
-        readMore.className = 'article-embed-read-more';
-        readMore.textContent = 'Lire l\'article →';
-        content.appendChild(readMore);
-        
-        link.appendChild(content);
-        card.appendChild(link);
-        rootElement.appendChild(card);
-      })(root, article, variant);
+      // Création manuelle du DOM pour l'affichage de l'article intégré
+      const embedCard = document.createElement('div');
+      embedCard.className = 'article-embed';
+      
+      // Création du lien
+      const link = document.createElement('a');
+      link.href = `/articles/${article.slug}`;
+      link.className = 'article-embed-link';
+      
+      // Structure de la carte d'article
+      const flexContainer = document.createElement('div');
+      flexContainer.className = 'article-embed-flex';
+      
+      // Indication de catégorie (jaune à gauche)
+      const categoryMarker = document.createElement('div');
+      categoryMarker.className = 'article-embed-category';
+      const categoryText = document.createElement('span');
+      categoryText.textContent = 'CAT';
+      categoryMarker.appendChild(categoryText);
+      
+      // Section du contenu principal
+      const contentSection = document.createElement('div');
+      contentSection.className = 'article-embed-content';
+      
+      // Titre de l'article
+      const title = document.createElement('h3');
+      title.textContent = article.title || '';
+      title.className = 'article-embed-title';
+      contentSection.appendChild(title);
+      
+      // Métadonnées (date et temps de lecture)
+      const metaContainer = document.createElement('div');
+      metaContainer.className = 'article-embed-meta';
+      
+      const publishedDate = document.createElement('span');
+      const dateStr = article.createdAt ? formatDate(article.createdAt, "dd MMMM yyyy 'à' HH'h'mm") : '';
+      publishedDate.textContent = `Publié le ${dateStr}`;
+      metaContainer.appendChild(publishedDate);
+      
+      const readTimeContainer = document.createElement('div');
+      readTimeContainer.className = 'article-embed-read-time';
+      
+      const clockIcon = document.createElement('span');
+      clockIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+      clockIcon.className = 'article-embed-clock-icon';
+      
+      const readTime = document.createElement('span');
+      readTime.textContent = 'Lecture 3 min.';
+      
+      readTimeContainer.appendChild(clockIcon);
+      readTimeContainer.appendChild(readTime);
+      metaContainer.appendChild(readTimeContainer);
+      
+      contentSection.appendChild(metaContainer);
+      
+      // Image de l'article à droite
+      const imageContainer = document.createElement('div');
+      imageContainer.className = 'article-embed-image';
+      
+      if (article.imageUrl) {
+        const img = document.createElement('img');
+        img.src = article.imageUrl;
+        img.alt = article.title || '';
+        imageContainer.appendChild(img);
+      }
+      
+      // Assembler tous les éléments
+      flexContainer.appendChild(categoryMarker);
+      flexContainer.appendChild(contentSection);
+      flexContainer.appendChild(imageContainer);
+      
+      link.appendChild(flexContainer);
+      embedCard.appendChild(link);
+      container.appendChild(embedCard);
     });
   }, [content, articles]);
 
@@ -107,26 +126,15 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
       />
       <style dangerouslySetInnerHTML={{ __html: `
         .article-embed {
-          overflow: hidden;
-          border: 1px solid #e5f0ff;
-          border-radius: 0.5rem;
-          margin: 1rem 0;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          width: 100%;
+          border: 1px solid #e5e7eb;
+          background-color: white;
+          margin: 1.5rem 0;
           transition: box-shadow 0.2s;
         }
         
         .article-embed:hover {
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .article-embed-default {
-          max-width: 350px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-        
-        .article-embed-compact {
-          width: 100%;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
         
         .article-embed-link {
@@ -135,81 +143,87 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
           text-decoration: none;
         }
         
-        .article-embed-compact .article-embed-link {
+        .article-embed-flex {
+          display: flex;
+          align-items: stretch;
+        }
+        
+        .article-embed-category {
+          width: 3rem;
+          background-color: #fbbf24;
           display: flex;
           align-items: center;
+          justify-content: center;
+        }
+        
+        .article-embed-category span {
+          color: white;
+          font-weight: bold;
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          transform: rotate(-90deg);
+        }
+        
+        .article-embed-content {
+          flex: 1;
+          padding: 1rem;
+        }
+        
+        .article-embed-title {
+          font-weight: 600;
+          font-size: 1.125rem;
+          color: #1f2937;
+          margin-bottom: 0.5rem;
+          line-height: 1.4;
+        }
+        
+        .article-embed-meta {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
           gap: 1rem;
+          font-size: 0.875rem;
+          color: #6b7280;
+          margin-top: 0.5rem;
+        }
+        
+        .article-embed-read-time {
+          display: flex;
+          align-items: center;
+        }
+        
+        .article-embed-clock-icon {
+          display: inline-flex;
+          margin-right: 0.25rem;
+        }
+        
+        .article-embed-clock-icon svg {
+          width: 0.875rem;
+          height: 0.875rem;
         }
         
         .article-embed-image {
+          width: 8rem;
+          background-color: #f3f4f6;
           overflow: hidden;
-          background-color: #f5f5f5;
-        }
-        
-        .article-embed-default .article-embed-image {
-          height: 180px;
-        }
-        
-        .article-embed-compact .article-embed-image {
-          width: 6rem;
-          height: 6rem;
-          min-width: 6rem;
         }
         
         .article-embed-image img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: transform 0.3s;
         }
         
-        .article-embed-link:hover .article-embed-image img {
-          transform: scale(1.05);
-        }
-        
-        .article-embed-content {
-          padding: 1rem;
-        }
-        
-        .article-embed-compact .article-embed-content {
-          padding: 0.5rem;
-          flex: 1;
-        }
-        
-        .article-embed-title {
-          font-weight: 600;
-          color: #333;
-          margin-bottom: 0.5rem;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        
-        .article-embed-default .article-embed-title {
-          font-size: 1.125rem;
-        }
-        
-        .article-embed-compact .article-embed-title {
-          font-size: 0.875rem;
-        }
-        
-        .article-embed-excerpt {
-          color: #666;
-          font-size: 0.875rem;
-          margin-bottom: 0.75rem;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        
-        .article-embed-read-more {
-          color: #3b82f6;
-          font-size: 0.875rem;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
+        @media (max-width: 640px) {
+          .article-embed-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+          }
+          
+          .article-embed-image {
+            width: 6rem;
+          }
         }
       ` }} />
     </div>

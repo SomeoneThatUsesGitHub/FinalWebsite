@@ -168,7 +168,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez √† r√
     }
   };
   
-  const handleArticleSelect = (article: any, variant: 'default' | 'compact') => {
+  const handleArticleSelect = (article: any) => {
     if (!editor) return;
     
     editor.chain().focus().setArticleEmbed({
@@ -177,7 +177,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez √† r√
       articleTitle: article.title,
       articleImageUrl: article.imageUrl,
       articleExcerpt: article.excerpt,
-      variant,
+      articleCreatedAt: article.createdAt,
     }).run();
   };
 
