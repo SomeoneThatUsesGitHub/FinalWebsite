@@ -24,25 +24,20 @@ const ArticleEmbed: React.FC<ArticleEmbedProps> = ({
   
   return (
     <div className={cn(
-      "w-full border border-gray-200 bg-white rounded-none my-4 hover:shadow-sm transition-shadow duration-200",
+      "w-full border border-gray-200 bg-white rounded my-4 hover:shadow-sm transition-shadow duration-200",
       className
     )}>
       <Link href={`/articles/${article.slug}`} className="block">
-        <div className="flex items-stretch">
-          {/* Catégorie sur la gauche */}
-          <div className="w-12 h-auto bg-amber-400 flex items-center justify-center">
-            <span className="text-white font-bold uppercase text-xs transform -rotate-90">CAT</span>
-          </div>
-
+        <div className="flex flex-col sm:flex-row items-stretch">
           {/* Contenu principal */}
           <div className="flex-1 p-4">
             <h3 className="font-semibold text-gray-800 text-lg mb-2">
               {article.title}
             </h3>
             
-            <div className="flex items-center text-sm text-gray-500 mt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-500 mt-2">
               <span>Publié le {formatDate(createdAt, "dd MMMM yyyy 'à' HH'h'mm")}</span>
-              <div className="flex items-center ml-4">
+              <div className="flex items-center">
                 <Clock className="h-4 w-4 mr-1" />
                 <span>Lecture {readTime}</span>
               </div>
@@ -51,7 +46,7 @@ const ArticleEmbed: React.FC<ArticleEmbedProps> = ({
 
           {/* Image de droite */}
           {article.imageUrl && (
-            <div className="w-32 md:w-40 bg-gray-200">
+            <div className="w-full h-32 sm:h-auto sm:w-32 md:w-48 bg-gray-100">
               <img 
                 src={article.imageUrl} 
                 alt={article.title || ''} 
