@@ -55,14 +55,15 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
       // Image (à gauche sur desktop, en haut sur mobile)
       if (article.imageUrl) {
         const imageContainer = document.createElement('div');
-        imageContainer.className = 'sm:w-1/3 md:w-1/4 sm:min-h-[160px] h-48 shrink-0 overflow-hidden rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none';
+        imageContainer.className = 'sm:w-1/3 md:w-1/4 h-48 shrink-0 overflow-hidden rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none p-0';
         
-        const img = document.createElement('img');
-        img.src = article.imageUrl;
-        img.alt = article.title || '';
-        img.className = 'w-full h-full object-cover';
+        // Utilisation du background CSS au lieu d'une image pour un meilleur contrôle
+        imageContainer.style.background = `url(${article.imageUrl}) top/cover no-repeat`;
+        imageContainer.style.backgroundPosition = '0 0';
+        imageContainer.style.backgroundOrigin = 'border-box';
+        imageContainer.style.margin = '0';
+        imageContainer.style.padding = '0';
         
-        imageContainer.appendChild(img);
         flexContainer.appendChild(imageContainer);
       }
       
