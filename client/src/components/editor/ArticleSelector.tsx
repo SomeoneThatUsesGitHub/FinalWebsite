@@ -32,7 +32,7 @@ interface ArticleSelectorProps {
 
 export function ArticleSelector({ open, onOpenChange, onSelect }: ArticleSelectorProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [displayVariant, setDisplayVariant] = useState<'default' | 'compact'>('default');
 
@@ -50,7 +50,7 @@ export function ArticleSelector({ open, onOpenChange, onSelect }: ArticleSelecto
   // Filtrer les articles en fonction des critères de recherche
   const filteredArticles = articles.filter((article) => {
     // Filtre par catégorie
-    if (selectedCategoryId && article.categoryId !== parseInt(selectedCategoryId)) {
+    if (selectedCategoryId && selectedCategoryId !== 'all' && article.categoryId !== parseInt(selectedCategoryId)) {
       return false;
     }
     
@@ -72,7 +72,7 @@ export function ArticleSelector({ open, onOpenChange, onSelect }: ArticleSelecto
       // Réinitialiser l'état après la sélection
       setSelectedArticle(null);
       setSearchTerm('');
-      setSelectedCategoryId('');
+      setSelectedCategoryId('all');
     }
   };
 
@@ -113,7 +113,7 @@ export function ArticleSelector({ open, onOpenChange, onSelect }: ArticleSelecto
                   <SelectValue placeholder="Toutes les catégories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes les catégories</SelectItem>
+                  <SelectItem value="all">Toutes les catégories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id.toString()}>
                       {category.name}

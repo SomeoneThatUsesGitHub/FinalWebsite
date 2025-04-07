@@ -47,8 +47,12 @@ export default function DashboardPage() {
   // Données de statistiques par défaut
   const totalArticles = articlesData?.length || 0;
   const totalViews = articlesData?.reduce((sum, article) => sum + (article.viewCount || 0), 0) || 0;
-  const publishedArticles = articlesData?.filter(article => article.published).length || 0;
-  const draftArticles = totalArticles - publishedArticles;
+  
+  // Vérifier que l'article a une propriété published qui est explicitement true
+  const publishedArticles = articlesData?.filter(article => article.published === true).length || 0;
+  
+  // Vérifier que l'article a une propriété published qui est explicitement false ou undefined
+  const draftArticles = articlesData?.filter(article => article.published === false || article.published === undefined || article.published === null).length || 0;
 
   return (
     <AdminLayout title="Tableau de bord">
@@ -104,12 +108,12 @@ export default function DashboardPage() {
                   <div className="col-span-2 text-right md:text-center">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        article.published
+                        article.published === true
                           ? "bg-green-100 text-green-800"
                           : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {article.published ? "Publié" : "Brouillon"}
+                      {article.published === true ? "Publié" : "Brouillon"}
                     </span>
                   </div>
                 </div>
