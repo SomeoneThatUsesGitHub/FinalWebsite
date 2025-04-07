@@ -21,6 +21,12 @@ const ArticleEmbed: React.FC<ArticleEmbedProps> = ({
   
   // Calcul du temps de lecture fictif (3 minutes par défaut)
   const readTime = "3 min.";
+
+  // Vérification d'URL valide pour éviter les problèmes d'affichage
+  const hasValidImage = article.imageUrl && 
+    (article.imageUrl.startsWith('http://') || 
+     article.imageUrl.startsWith('https://') ||
+     article.imageUrl.startsWith('/'));
   
   return (
     <div className={cn(
@@ -30,13 +36,21 @@ const ArticleEmbed: React.FC<ArticleEmbedProps> = ({
       <Link href={`/articles/${article.slug}`}>
         <div className="flex flex-col sm:flex-row w-full">
           {/* Image (gauche sur desktop, haut sur mobile) */}
-          {article.imageUrl && (
-            <div className="sm:w-1/3 md:w-1/4 sm:min-h-[160px] h-48 shrink-0 overflow-hidden rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none">
-              <img 
-                src={article.imageUrl}
-                alt={article.title || ''} 
-                className="w-full h-full object-cover"
-              />
+          {hasValidImage && (
+            <div className="sm:w-1/3 md:w-1/4 h-48 shrink-0 rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none bg-gray-100 relative overflow-hidden">
+              <div className="absolute inset-0">
+                <img 
+                  src={article.imageUrl}
+                  alt={article.title || ''} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback en cas d'erreur de chargement de l'image
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null; // Évite les boucles infinies
+                    target.style.display = 'none';
+                  }}
+                />
+              </div>
             </div>
           )}
           
