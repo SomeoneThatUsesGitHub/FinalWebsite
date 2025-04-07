@@ -1,5 +1,5 @@
 import { Node, mergeAttributes } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
+import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 import { Article } from '@shared/schema';
 import React from 'react';
 import ArticleEmbed from './ArticleEmbed';
@@ -100,12 +100,14 @@ const ArticleEmbedNode = Node.create<ArticleEmbedOptions>({
       };
 
       return (
-        <div contentEditable={false} style={{ userSelect: 'none' }}>
-          <ArticleEmbed 
-            article={articleData} 
-            variant={node.attrs.variant} 
-          />
-        </div>
+        <NodeViewWrapper>
+          <div contentEditable={false} style={{ userSelect: 'none' }}>
+            <ArticleEmbed 
+              article={articleData} 
+              variant={node.attrs.variant} 
+            />
+          </div>
+        </NodeViewWrapper>
       );
     });
   },
