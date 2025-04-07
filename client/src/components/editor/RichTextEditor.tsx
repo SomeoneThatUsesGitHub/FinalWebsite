@@ -44,7 +44,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez Ã  rÃ
         linkOnPaste: true,
       }),
     ],
-    content: value,
+    content: value || "",
     editorProps: {
       attributes: {
         class: 'min-h-[300px] max-h-[600px] overflow-y-auto p-4 focus:outline-none rounded-md border border-input bg-background',
@@ -57,7 +57,8 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez Ã  rÃ
 
   // Sync content with external value
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
+    if (editor && value !== undefined && value !== editor.getHTML()) {
+      console.log("RichTextEditor: syncing content with external value:", value);
       editor.commands.setContent(value);
     }
   }, [editor, value]);

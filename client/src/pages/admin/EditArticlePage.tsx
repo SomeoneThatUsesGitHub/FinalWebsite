@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
@@ -341,17 +341,23 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   const params = useParams();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const [previewHtml, setPreviewHtml] = useState(article.content || "");
+  const [previewHtml, setPreviewHtml] = useState<string>(article.content || "");
   
   console.log("EDIT FORM - Article data:", article);
+  
+  // Force une mise à jour du contenu lors de l'initialisation
+  useEffect(() => {
+    console.log("Setting initial content:", article.content);
+    setPreviewHtml(article.content || "");
+  }, [article.id, article.content]);
   
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
     defaultValues: {
-      title: article.title,
-      slug: article.slug,
+      title: article.title || "",
+      slug: article.slug || "",
       excerpt: article.excerpt || "",
-      content: article.content,
+      content: article.content || "",
       imageUrl: article.imageUrl || "",
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
@@ -360,11 +366,13 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   });
   
   // Observer les changements de contenu pour la prévisualisation
-  form.watch((value) => {
-    if (value.content) {
-      setPreviewHtml(value.content as string);
+  const contentWatch = form.watch("content");
+  
+  useEffect(() => {
+    if (contentWatch) {
+      setPreviewHtml(contentWatch);
     }
-  });
+  }, [contentWatch]);
   
   const updateArticleMutation = useMutation({
     mutationFn: async (data: ArticleFormValues) => {
@@ -685,6 +693,7 @@ export default function EditArticlePage() {
   
   // Mode édition - Article trouvé
   if (params.id && articleQuery.data) {
+    console.log("Données de l'article à modifier:", articleQuery.data);
     return (
       <AdminLayout>
         <EditArticleForm 
