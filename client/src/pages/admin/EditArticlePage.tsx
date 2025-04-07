@@ -76,14 +76,33 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
       const formattedData = {
         ...data,
         categoryId: Number(data.categoryId),
+        published: Boolean(data.published),
+        featured: Boolean(data.featured),
         imageUrl: data.imageUrl || null,
       };
       console.log("Données pour création:", formattedData);
-      const res = await apiRequest("POST", "/api/admin/articles", formattedData);
+      
+      // Utiliser fetch directement au lieu d'apiRequest qui peut avoir des problèmes avec les booléens
+      const res = await fetch("/api/admin/articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData),
+        credentials: "include"
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erreur de création:", errorText);
+        throw new Error(`Erreur ${res.status}: ${errorText || res.statusText}`);
+      }
+      
       return await res.json();
     },
     onSuccess: (data) => {
+      // Invalider à la fois les requêtes publiques et admin
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
+      
       toast({
         title: "Article créé",
         description: "L'article a été créé avec succès"
@@ -91,6 +110,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
       setLocation(`/admin/articles/${data.id}`);
     },
     onError: (error: Error) => {
+      console.error("Erreur de mutation:", error);
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue lors de la création",
@@ -349,20 +369,40 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       const formattedData = {
         ...data,
         categoryId: Number(data.categoryId),
+        published: Boolean(data.published),
+        featured: Boolean(data.featured),
         imageUrl: data.imageUrl || null,
       };
       console.log("Données pour mise à jour:", formattedData);
-      const res = await apiRequest("PUT", `/api/admin/articles/${params.id}`, formattedData);
+      
+      // Utiliser fetch directement au lieu d'apiRequest qui peut avoir des problèmes avec les booléens
+      const res = await fetch(`/api/admin/articles/${params.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData),
+        credentials: "include"
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erreur de mise à jour:", errorText);
+        throw new Error(`Erreur ${res.status}: ${errorText || res.statusText}`);
+      }
+      
       return await res.json();
     },
     onSuccess: () => {
+      // Invalider à la fois les requêtes publiques et admin
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
+      
       toast({
         title: "Article mis à jour",
         description: "L'article a été mis à jour avec succès"
       });
     },
     onError: (error: Error) => {
+      console.error("Erreur de mutation:", error);
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue lors de la mise à jour",
@@ -607,8 +647,26 @@ export default function EditArticlePage() {
     isError: articleError,
   } = useQuery<Article>({
     queryKey: ["/api/admin/articles", params.id],
-    queryFn: getQueryFn({ on401: "throw" }),
-    enabled: !isNewArticle,
+    queryFn: async ({ queryKey }) => {
+      const [_, id] = queryKey;
+      if (!id) throw new Error("ID d'article manquant");
+      
+      console.log("Fetching article ID:", id);
+      const res = await fetch(`/api/admin/articles/${id}`, {
+        credentials: "include"
+      });
+      
+      if (!res.ok) {
+        const error = await res.text();
+        console.error("Erreur lors de la récupération de l'article:", error);
+        throw new Error(`Erreur ${res.status}: ${error || res.statusText}`);
+      }
+      
+      const data = await res.json();
+      console.log("Article récupéré:", data);
+      return data;
+    },
+    enabled: !isNewArticle && !!params.id,
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({

@@ -442,13 +442,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/admin/articles", isAdmin, async (req: Request, res: Response) => {
     try {
+      console.log("Données reçues pour création d'article:", req.body);
+      
       // Validation du schéma d'article
       const validation = insertArticleSchema.safeParse(req.body);
       if (!validation.success) {
+        console.error("Erreur de validation pour création:", validation.error.errors);
         return res.status(400).json({ errors: validation.error.errors });
       }
       
-      const article = await storage.createArticle(validation.data);
+      // S'assurer que le statut de publication est correctement géré
+      const articleData = {
+        ...validation.data,
+        published: req.body.published === true || req.body.published === "true"
+      };
+      
+      console.log("Données validées pour création:", articleData);
+      
+      const article = await storage.createArticle(articleData);
       res.status(201).json(article);
     } catch (error) {
       console.error("Error creating article:", error);
@@ -484,10 +495,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Conversion explicite de categoryId en nombre
+      // Conversion explicite de categoryId en nombre et gestion correcte du statut publié/brouillon
       const updateData = {
         ...validation.data,
-        categoryId: Number(req.body.categoryId)
+        categoryId: Number(req.body.categoryId),
+        published: req.body.published === true || req.body.published === "true",
+        featured: req.body.featured === true || req.body.featured === "true"
       };
       
       console.log("Données validées pour mise à jour:", updateData);
