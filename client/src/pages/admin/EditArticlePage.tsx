@@ -397,8 +397,13 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   // Observer les changements de contenu pour la prévisualisation
   const contentWatch = form.watch("content");
   
+  // Synchroniser le contenu de l'éditeur pour la prévisualisation
   useEffect(() => {
     if (contentWatch) {
+      console.log("EditArticleForm - Content changed, updating preview:", {
+        content_length: contentWatch.length,
+        content_preview: contentWatch.substring(0, 30) + "..."
+      });
       setPreviewHtml(contentWatch);
     }
   }, [contentWatch]);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent, Extension, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -35,7 +35,19 @@ interface RichTextEditorProps {
 export function RichTextEditor({ value, onChange, placeholder = 'Commencez à rédiger...' }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState<string>('');
   const [showLinkInput, setShowLinkInput] = useState<boolean>(false);
-
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const initialContentRef = useRef<string>(value || "");
+  const editorInstanceRef = useRef<any>(null);
+  
+  // Conserver la valeur initiale pour référence
+  useEffect(() => {
+    initialContentRef.current = value || "";
+    console.log("RichTextEditor - Initial content reference set:", {
+      content_length: (value || "").length,
+      content_preview: value ? value.substring(0, 50) + "..." : "EMPTY"
+    });
+  }, []);
+  
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -44,38 +56,69 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez à r�
         linkOnPaste: true,
       }),
     ],
-    content: value || "",
+    content: initialContentRef.current,
     editorProps: {
       attributes: {
         class: 'min-h-[300px] max-h-[600px] overflow-y-auto p-4 focus:outline-none rounded-md border border-input bg-background',
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      // Ne pas déclencher onChange pendant l'initialisation
+      if (isInitialized) {
+        onChange(editor.getHTML());
+      }
     },
+    onCreate: ({ editor }) => {
+      editorInstanceRef.current = editor;
+      console.log("RichTextEditor - Editor created with content:", {
+        content: editor.getHTML(),
+        length: editor.getHTML().length,
+        preview: editor.getHTML().substring(0, 50) + "..."
+      });
+      
+      // Définir l'état initialisé après un court délai
+      setTimeout(() => {
+        setIsInitialized(true);
+      }, 100);
+    }
   });
-
-  // Sync content with external value
+  
+  // Fonction pour forcer la mise à jour du contenu de manière explicite
+  const forceContentUpdate = (newContent: string) => {
+    if (editorInstanceRef.current) {
+      console.log("RichTextEditor - Forcing content update:", {
+        new_content_length: (newContent || "").length,
+        new_content_preview: newContent ? newContent.substring(0, 50) + "..." : "EMPTY"
+      });
+      
+      editorInstanceRef.current.commands.setContent(newContent || "");
+    }
+  };
+  
+  // Synchroniser le contenu de façon robuste lors des changements de valeur
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || !isInitialized) return;
     
-    // Toujours définir le contenu lorsque la valeur change, même si le HTML actuel semble identique
-    // Cela aide à résoudre les problèmes de synchronisation quand le composant est réutilisé
-    console.log("RichTextEditor: syncing content with external value:", {
-      value: value,
-      current_html: editor.getHTML(),
-      are_different: value !== editor.getHTML(),
-      value_type: typeof value,
-      value_length: value ? value.length : 0
+    const currentContent = editor.getHTML();
+    const isDifferent = value !== currentContent;
+    
+    console.log("RichTextEditor - Value change detected:", {
+      is_initialized: isInitialized,
+      value_length: (value || "").length,
+      current_length: currentContent.length,
+      is_different: isDifferent,
+      value_preview: value ? value.substring(0, 40) + "..." : "EMPTY",
+      current_preview: currentContent.substring(0, 40) + "..."
     });
     
-    // Utiliser une légère temporisation pour s'assurer que l'éditeur est prêt
-    const timer = setTimeout(() => {
-      editor.commands.setContent(value || "");
-    }, 50);
-    
-    return () => clearTimeout(timer);
-  }, [editor, value]);
+    if (isDifferent) {
+      const timer = setTimeout(() => {
+        forceContentUpdate(value || "");
+      }, 50);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [editor, value, isInitialized]);
 
   if (!editor) {
     return null;

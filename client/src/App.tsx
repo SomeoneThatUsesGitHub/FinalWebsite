@@ -12,6 +12,7 @@ import ArticlesList from "@/pages/ArticlesList";
 import Article from "@/pages/Article";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/AuthPage";
+import TestEditor from "@/pages/test-editor";
 
 // Pages admin
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -58,6 +59,7 @@ function App() {
               <Route path="/articles" component={ArticlesList} />
               <Route path="/articles/:slug" component={Article} />
               <Route path="/auth" component={AuthPage} />
+              <Route path="/test-editor" component={TestEditor} />
               
               {/* Routes admin protégées */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
