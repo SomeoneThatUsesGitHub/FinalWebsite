@@ -80,6 +80,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       disabled: false,
     },
     {
+      name: "Utilisateurs",
+      href: "/admin/users",
+      icon: Users,
+      disabled: false,
+    },
+    {
       name: "Équipe",
       href: "/admin/team",
       icon: Users,

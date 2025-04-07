@@ -8,6 +8,7 @@ import * as schema from "@shared/schema";
 import { insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, insertVideoSchema, videos } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
+import { createUser, updateUserPassword, listUsers, deleteUser } from "./userManagement";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes - prefix all with /api
@@ -1020,6 +1021,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting video:", error);
       res.status(500).json({ error: "Erreur lors de la suppression de la vidéo" });
+    }
+  });
+
+  // Routes d'administration des utilisateurs
+  app.get("/api/admin/users", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = await listUsers();
+      if (result.success) {
+        return res.json(result.users);
+      } else {
+        return res.status(500).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs" });
+    }
+  });
+
+  app.post("/api/admin/users", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const userData = req.body;
+      if (!userData.username || !userData.password || !userData.displayName || !userData.role) {
+        return res.status(400).json({ 
+          message: "Données incomplètes",
+          details: "Tous les champs (username, password, displayName, role) sont requis"
+        });
+      }
+
+      // Vérifier que le rôle est valide
+      if (!["admin", "editor", "user"].includes(userData.role)) {
+        return res.status(400).json({ 
+          message: "Rôle invalide",
+          details: "Le rôle doit être 'admin', 'editor' ou 'user'"
+        });
+      }
+
+      const result = await createUser(userData);
+      if (result.success) {
+        return res.status(201).json(result.user);
+      } else {
+        return res.status(400).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Erreur lors de la création de l'utilisateur" });
+    }
+  });
+
+  app.delete("/api/admin/users/:username", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { username } = req.params;
+      
+      // Vérifier qu'on ne supprime pas le dernier utilisateur admin
+      const usersResult = await listUsers();
+      if (usersResult.success && usersResult.users) {
+        const adminUsers = usersResult.users.filter(user => user.role === "admin");
+        const targetUser = usersResult.users.find(user => user.username === username);
+        
+        if (adminUsers.length === 1 && targetUser && targetUser.role === "admin") {
+          return res.status(400).json({ 
+            message: "Impossible de supprimer le dernier administrateur",
+            details: "Il doit y avoir au moins un utilisateur avec le rôle 'admin'"
+          });
+        }
+      }
+      
+      const result = await deleteUser(username);
+      if (result.success) {
+        return res.json({ message: result.message });
+      } else {
+        return res.status(400).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression de l'utilisateur" });
+    }
+  });
+
+  app.put("/api/admin/users/:username/password", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { username } = req.params;
+      const { newPassword } = req.body;
+      
+      if (!newPassword || newPassword.length < 8) {
+        return res.status(400).json({ 
+          message: "Mot de passe invalide", 
+          details: "Le mot de passe doit contenir au moins 8 caractères" 
+        });
+      }
+      
+      const result = await updateUserPassword(username, newPassword);
+      if (result.success) {
+        return res.json({ message: result.message });
+      } else {
+        return res.status(400).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error("Error updating user password:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du mot de passe" });
     }
   });
 

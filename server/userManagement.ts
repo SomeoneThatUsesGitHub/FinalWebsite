@@ -1,56 +1,53 @@
 import { db } from "./db";
-import { users } from "@shared/schema";
-import { hashPassword } from "./auth";
+import { users, type User, type InsertUser } from "../shared/schema";
 import { eq } from "drizzle-orm";
+import { hashPassword } from "./auth";
 
 /**
  * Utilitaire pour gérer les utilisateurs en toute sécurité
  */
 export async function createUser(userData: {
   username: string;
-  password: string;
   displayName: string;
-  role: "admin" | "editor" | "user";
-  avatarUrl?: string | null;
-}) {
+  password: string;
+  role: string;
+}): Promise<{ success: boolean; user?: User; message?: string }> {
   try {
     // Vérifier si l'utilisateur existe déjà
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, userData.username));
-
-    if (existingUser) {
-      console.error(`L'utilisateur '${userData.username}' existe déjà`);
-      return { success: false, message: "Ce nom d'utilisateur est déjà pris" };
+    const existingUser = await db.select().from(users).where(eq(users.username, userData.username));
+    
+    if (existingUser.length > 0) {
+      return {
+        success: false,
+        message: "Un utilisateur avec ce nom d'utilisateur existe déjà."
+      };
     }
-
+    
     // Hasher le mot de passe
     const hashedPassword = await hashPassword(userData.password);
-
-    // Insérer le nouvel utilisateur
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        username: userData.username,
-        password: hashedPassword,
-        displayName: userData.displayName,
-        role: userData.role,
-        avatarUrl: userData.avatarUrl || null,
-      })
-      .returning();
-
-    console.log(`Utilisateur '${userData.username}' créé avec succès`);
     
-    // Retourner l'utilisateur sans le mot de passe
-    const { password, ...safeUser } = newUser;
-    return { success: true, user: safeUser };
+    // Créer l'utilisateur
+    const [newUser] = await db.insert(users).values({
+      username: userData.username,
+      displayName: userData.displayName,
+      password: hashedPassword,
+      role: userData.role as any,
+      avatarUrl: null,
+    }).returning();
+    
+    return {
+      success: true,
+      user: {
+        ...newUser,
+        password: "********" // Ne jamais renvoyer le mot de passe, même haché
+      }
+    };
+    
   } catch (error) {
     console.error("Erreur lors de la création de l'utilisateur:", error);
-    return { 
-      success: false, 
-      message: "Erreur lors de la création de l'utilisateur",
-      error: error instanceof Error ? error.message : String(error) 
+    return {
+      success: false,
+      message: "Une erreur est survenue lors de la création de l'utilisateur."
     };
   }
 }
@@ -61,34 +58,33 @@ export async function createUser(userData: {
 export async function updateUserPassword(username: string, newPassword: string) {
   try {
     // Vérifier si l'utilisateur existe
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, username));
-
-    if (!existingUser) {
-      console.error(`L'utilisateur '${username}' n'existe pas`);
-      return { success: false, message: "Cet utilisateur n'existe pas" };
+    const existingUser = await db.select().from(users).where(eq(users.username, username));
+    
+    if (existingUser.length === 0) {
+      return {
+        success: false,
+        message: "Utilisateur introuvable."
+      };
     }
-
+    
     // Hasher le nouveau mot de passe
     const hashedPassword = await hashPassword(newPassword);
-
+    
     // Mettre à jour le mot de passe
-    await db
-      .update(users)
+    await db.update(users)
       .set({ password: hashedPassword })
       .where(eq(users.username, username));
-
-    console.log(`Mot de passe pour '${username}' mis à jour avec succès`);
     
-    return { success: true, message: "Mot de passe mis à jour avec succès" };
+    return {
+      success: true,
+      message: "Mot de passe mis à jour avec succès."
+    };
+    
   } catch (error) {
     console.error("Erreur lors de la mise à jour du mot de passe:", error);
-    return { 
-      success: false, 
-      message: "Erreur lors de la mise à jour du mot de passe",
-      error: error instanceof Error ? error.message : String(error) 
+    return {
+      success: false,
+      message: "Une erreur est survenue lors de la mise à jour du mot de passe."
     };
   }
 }
@@ -98,21 +94,24 @@ export async function updateUserPassword(username: string, newPassword: string) 
  */
 export async function listUsers() {
   try {
-    const allUsers = await db.select().from(users);
+    const allUsers = await db.select({
+      id: users.id,
+      username: users.username,
+      displayName: users.displayName,
+      role: users.role,
+      avatarUrl: users.avatarUrl
+    }).from(users);
     
-    // Retourner les utilisateurs sans les mots de passe
-    const safeUsers = allUsers.map(user => {
-      const { password, ...safeUser } = user;
-      return safeUser;
-    });
+    return {
+      success: true,
+      users: allUsers
+    };
     
-    return { success: true, users: safeUsers };
   } catch (error) {
     console.error("Erreur lors de la récupération des utilisateurs:", error);
-    return { 
-      success: false, 
-      message: "Erreur lors de la récupération des utilisateurs",
-      error: error instanceof Error ? error.message : String(error) 
+    return {
+      success: false,
+      message: "Une erreur est survenue lors de la récupération des utilisateurs."
     };
   }
 }
@@ -123,30 +122,28 @@ export async function listUsers() {
 export async function deleteUser(username: string) {
   try {
     // Vérifier si l'utilisateur existe
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, username));
-
-    if (!existingUser) {
-      console.error(`L'utilisateur '${username}' n'existe pas`);
-      return { success: false, message: "Cet utilisateur n'existe pas" };
-    }
-
-    // Supprimer l'utilisateur
-    await db
-      .delete(users)
-      .where(eq(users.username, username));
-
-    console.log(`Utilisateur '${username}' supprimé avec succès`);
+    const existingUser = await db.select().from(users).where(eq(users.username, username));
     
-    return { success: true, message: "Utilisateur supprimé avec succès" };
+    if (existingUser.length === 0) {
+      return {
+        success: false,
+        message: "Utilisateur introuvable."
+      };
+    }
+    
+    // Supprimer l'utilisateur
+    await db.delete(users).where(eq(users.username, username));
+    
+    return {
+      success: true,
+      message: "Utilisateur supprimé avec succès."
+    };
+    
   } catch (error) {
     console.error("Erreur lors de la suppression de l'utilisateur:", error);
-    return { 
-      success: false, 
-      message: "Erreur lors de la suppression de l'utilisateur",
-      error: error instanceof Error ? error.message : String(error) 
+    return {
+      success: false,
+      message: "Une erreur est survenue lors de la suppression de l'utilisateur."
     };
   }
 }

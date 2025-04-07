@@ -21,6 +21,7 @@ import EditArticlePage from "@/pages/admin/EditArticlePage";
 import FlashInfosPage from "@/pages/admin/FlashInfosPage";
 import VideosPage from "@/pages/admin/VideosPage";
 import CategoriesPage from "@/pages/admin/CategoriesPage";
+import UsersPage from "@/pages/admin/UsersPage";
 
 // Layout
 import Header from "@/components/layout/Header";
@@ -72,6 +73,7 @@ function App() {
               <ProtectedRoute path="/admin/flash-infos" component={FlashInfosPage} adminOnly />
               <ProtectedRoute path="/admin/videos" component={VideosPage} adminOnly />
               <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
+              <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
               
               {/* Fallback */}
               <Route path="/:rest*" component={NotFound} />
