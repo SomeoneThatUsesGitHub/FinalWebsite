@@ -48,14 +48,17 @@ export default function ArticlesPage() {
   const [deleteArticleId, setDeleteArticleId] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Récupérer les articles
+  // Récupérer les articles (y compris les brouillons)
   const {
     data: articles,
     isLoading: articlesLoading,
     isError: articlesError,
   } = useQuery<Article[]>({
-    queryKey: ["/api/articles"],
-    queryFn: getQueryFn({ on401: "throw" }),
+    queryKey: ["/api/articles", { showAll: true }],
+    queryFn: ({ signal }) => fetch(`/api/articles?showAll=true`, { signal, credentials: 'include' }).then(res => {
+      if (!res.ok) throw new Error("Erreur lors de la récupération des articles");
+      return res.json();
+    }),
   });
 
   // Récupérer les catégories
@@ -73,7 +76,7 @@ export default function ArticlesPage() {
       await apiRequest("DELETE", `/api/admin/articles/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/articles", { showAll: true }] });
       toast({
         title: "Article supprimé",
         description: "L'article a été supprimé avec succès",
@@ -271,7 +274,7 @@ export default function ArticlesPage() {
             <Button 
               variant="outline" 
               className="mt-4" 
-              onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/articles"] })}
+              onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/articles", { showAll: true }] })}
             >
               Réessayer
             </Button>

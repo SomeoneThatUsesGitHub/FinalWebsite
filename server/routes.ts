@@ -28,13 +28,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Articles
   app.get("/api/articles", async (req: Request, res: Response) => {
-    const { categoryId, search, sort, year } = req.query;
+    const { categoryId, search, sort, year, showAll } = req.query;
     
     const filters: {
       categoryId?: number;
       search?: string;
       sort?: string;
       year?: number;
+      showUnpublished?: boolean;
     } = {};
     
     if (categoryId && !isNaN(Number(categoryId))) {
@@ -51,6 +52,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     if (year && !isNaN(Number(year))) {
       filters.year = Number(year);
+    }
+    
+    // Pour l'administration, montrer tous les articles (brouillons inclus)
+    // quand le paramètre showAll est présent et que l'utilisateur est admin
+    if (showAll === 'true' && req.isAuthenticated() && (req.user as any)?.role === 'admin') {
+      console.log("Admin view - Showing all articles including drafts");
+      filters.showUnpublished = true;
     }
     
     const articles = await storage.getAllArticles(filters);
