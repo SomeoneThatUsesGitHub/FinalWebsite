@@ -3,22 +3,31 @@ import { useQuery } from "@tanstack/react-query";
 import { Video } from "@shared/schema";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Play, ChevronRight, ChevronLeft } from "lucide-react";
+import { AlertCircle, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
-// Fonction pour formatter le nombre de vues
-const formatViews = (views: number): string => {
-  if (views >= 1000000) {
-    return (views / 1000000).toFixed(1) + "M";
-  } else if (views >= 1000) {
-    return (views / 1000).toFixed(1) + "K";
-  }
-  return views.toString();
+// Composant pour l'iframe YouTube Shorts
+const YouTubeShort = ({ videoId, title }: { videoId: string; title: string }) => {
+  return (
+    <div className="flex-shrink-0 w-full sm:w-[280px] md:w-[320px] overflow-hidden">
+      <div className="aspect-[9/16] relative">
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}?rel=0&amp;controls=1&amp;showinfo=0`}
+          title={title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full rounded-lg shadow-md"
+        ></iframe>
+      </div>
+      <div className="mt-2 px-1">
+        <h3 className="font-medium text-sm line-clamp-2">{title}</h3>
+      </div>
+    </div>
+  );
 };
 
 const VideosSection: React.FC = () => {
@@ -69,11 +78,6 @@ const VideosSection: React.FC = () => {
     }
   };
 
-  // Fonction pour ouvrir une vidéo YouTube
-  const openYouTubeVideo = (videoId: string) => {
-    window.open(`https://youtube.com/watch?v=${videoId}`, '_blank');
-  };
-
   return (
     <motion.section 
       ref={ref}
@@ -121,17 +125,14 @@ const VideosSection: React.FC = () => {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {Array(limit)
               .fill(0)
               .map((_, i) => (
-                <Card key={i} className="overflow-hidden">
-                  <Skeleton className="h-48 w-full" />
-                  <CardContent className="p-4">
-                    <Skeleton className="h-5 w-full mb-2" />
-                    <Skeleton className="h-4 w-20" />
-                  </CardContent>
-                </Card>
+                <div key={i} className="flex-shrink-0">
+                  <Skeleton className="aspect-[9/16] w-full rounded-lg" />
+                  <Skeleton className="h-5 w-full mt-2" />
+                </div>
               ))}
           </div>
         ) : error ? (
@@ -149,30 +150,13 @@ const VideosSection: React.FC = () => {
             onScroll={checkScrollButtons}
             onMouseEnter={checkScrollButtons}
           >
-            <div className="flex space-x-4 pb-4">
+            <div className="flex space-x-6 pb-4">
               {videos && videos.map((video: Video) => (
-                <Card
+                <YouTubeShort 
                   key={video.id}
-                  className="flex-shrink-0 overflow-hidden w-full sm:w-[280px] md:w-[320px] cursor-pointer hover:shadow-md transition-shadow duration-200"
-                  onClick={() => openYouTubeVideo(video.videoId)}
-                >
-                  <div className="relative aspect-video overflow-hidden group">
-                    <img
-                      src={`https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg`}
-                      alt={video.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-80 group-hover:opacity-90 transition-opacity">
-                      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground">
-                        <Play className="h-6 w-6 fill-current" />
-                      </div>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold line-clamp-2 mb-1">{video.title}</h3>
-                    <p className="text-sm text-muted-foreground">{formatViews(video.views || 0)} vues</p>
-                  </CardContent>
-                </Card>
+                  videoId={video.videoId}
+                  title={video.title}
+                />
               ))}
             </div>
             <ScrollBar orientation="horizontal" />
