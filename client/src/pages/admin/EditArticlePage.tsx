@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Save, ArrowLeft, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { ArticlePreview } from "@/components/admin/ArticlePreview";
 
 // Schéma de validation étendu pour le formulaire
 const articleFormSchema = insertArticleSchema
@@ -258,14 +259,36 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                   )}
                 </TabsContent>
                 <TabsContent value="preview">
-                  <div className="border rounded-md p-4 min-h-[300px] prose max-w-none">
-                    {previewHtml ? (
-                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
-                    ) : (
-                      <p className="text-muted-foreground text-center py-10">
-                        Le contenu s'affichera ici lorsque vous commencerez à écrire.
-                      </p>
-                    )}
+                  <div className="border rounded-md overflow-hidden">
+                    {/* Utiliser le nouveau composant de prévisualisation d article */}
+                    <div className="bg-background relative">
+                      {/* Badge "Prévisualisation" */}
+                      <div className="absolute top-2 right-2 z-50 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-medium">
+                        Prévisualisation
+                      </div>
+                      
+                      {/* Importer le composant ArticlePreview */}
+                      {form.watch("title") ? (
+                        <ArticlePreview 
+                          article={{
+                            title: form.watch("title"),
+                            slug: form.watch("slug"),
+                            excerpt: form.watch("excerpt"),
+                            content: form.watch("content"),
+                            imageUrl: form.watch("imageUrl"),
+                            categoryId: form.watch("categoryId"),
+                            published: form.watch("published"),
+                            featured: form.watch("featured"),
+                            createdAt: new Date().toISOString(),
+                          }}
+                          category={categories.find(c => c.id === Number(form.watch("categoryId")))}
+                        />
+                      ) : (
+                        <p className="text-muted-foreground text-center py-10">
+                          Remplissez au moins le titre de l article pour voir la prévisualisation.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -603,14 +626,36 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                   )}
                 </TabsContent>
                 <TabsContent value="preview">
-                  <div className="border rounded-md p-4 min-h-[300px] prose max-w-none">
-                    {previewHtml ? (
-                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
-                    ) : (
-                      <p className="text-muted-foreground text-center py-10">
-                        Le contenu s'affichera ici lorsque vous commencerez à écrire.
-                      </p>
-                    )}
+                  <div className="border rounded-md overflow-hidden">
+                    {/* Utiliser le nouveau composant de prévisualisation d article */}
+                    <div className="bg-background relative">
+                      {/* Badge "Prévisualisation" */}
+                      <div className="absolute top-2 right-2 z-50 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-medium">
+                        Prévisualisation
+                      </div>
+                      
+                      {/* Importer le composant ArticlePreview */}
+                      {form.watch("title") ? (
+                        <ArticlePreview 
+                          article={{
+                            title: form.watch("title"),
+                            slug: form.watch("slug"),
+                            excerpt: form.watch("excerpt"),
+                            content: form.watch("content"),
+                            imageUrl: form.watch("imageUrl"),
+                            categoryId: form.watch("categoryId"),
+                            published: form.watch("published"),
+                            featured: form.watch("featured"),
+                            createdAt: article?.createdAt || new Date().toISOString(),
+                          }}
+                          category={categories.find(c => c.id === Number(form.watch("categoryId")))}
+                        />
+                      ) : (
+                        <p className="text-muted-foreground text-center py-10">
+                          Remplissez au moins le titre de l article pour voir la prévisualisation.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
