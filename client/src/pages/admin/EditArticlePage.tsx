@@ -636,52 +636,41 @@ export default function EditArticlePage() {
     queryFn: getQueryFn({ on401: "throw" }),
   });
   
-  // Si nous avons un ID, c'est une modification
-  if (params.id) {
-    // Récupérer l'article à modifier
-    const articleQuery = useQuery({
-      queryKey: ["/api/admin/articles", params.id],
-      queryFn: getQueryFn({ on401: "throw" }),
-    });
-    
-    // Loading state
-    if (categoriesQuery.isLoading || articleQuery.isLoading) {
-      return (
-        <AdminLayout>
-          <div className="flex items-center justify-center min-h-[50vh]">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </div>
-        </AdminLayout>
-      );
-    }
-    
-    // Error state
-    if (categoriesQuery.error || articleQuery.error) {
-      return (
-        <AdminLayout>
-          <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
-            <h2 className="text-xl font-bold text-destructive">Erreur</h2>
-            <p>
-              {categoriesQuery.error?.message || articleQuery.error?.message || "Une erreur est survenue lors du chargement des données."}
-            </p>
-          </div>
-        </AdminLayout>
-      );
-    }
-    
-    // Article to edit found
-    if (articleQuery.data) {
-      return (
-        <AdminLayout>
-          <EditArticleForm 
-            article={articleQuery.data} 
-            categories={categoriesQuery.data || []} 
-          />
-        </AdminLayout>
-      );
-    }
-    
-    // Show error if article not found
+  // Récupérer l'article à modifier (si ID présent)
+  const articleQuery = useQuery({
+    queryKey: ["/api/admin/articles", params.id],
+    queryFn: getQueryFn({ on401: "throw" }),
+    // Ne pas exécuter la requête si pas d'ID
+    enabled: !!params.id,
+  });
+  
+  // Affichage - Chargement en cours
+  if ((params.id && articleQuery.isLoading) || categoriesQuery.isLoading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </AdminLayout>
+    );
+  }
+  
+  // Affichage - Erreur
+  if (categoriesQuery.error || (params.id && articleQuery.error)) {
+    return (
+      <AdminLayout>
+        <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
+          <h2 className="text-xl font-bold text-destructive">Erreur</h2>
+          <p>
+            {categoriesQuery.error?.message || articleQuery.error?.message || "Une erreur est survenue lors du chargement des données."}
+          </p>
+        </div>
+      </AdminLayout>
+    );
+  }
+  
+  // Mode édition - Article non trouvé
+  if (params.id && !articleQuery.isLoading && !articleQuery.data) {
     return (
       <AdminLayout>
         <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
@@ -694,33 +683,19 @@ export default function EditArticlePage() {
     );
   }
   
-  // Si pas d'ID, c'est un nouvel article
-  // Loading state
-  if (categoriesQuery.isLoading) {
+  // Mode édition - Article trouvé
+  if (params.id && articleQuery.data) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
+        <EditArticleForm 
+          article={articleQuery.data} 
+          categories={categoriesQuery.data || []} 
+        />
       </AdminLayout>
     );
   }
   
-  // Error state
-  if (categoriesQuery.error) {
-    return (
-      <AdminLayout>
-        <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
-          <h2 className="text-xl font-bold text-destructive">Erreur</h2>
-          <p>
-            {categoriesQuery.error.message || "Une erreur est survenue lors du chargement des catégories."}
-          </p>
-        </div>
-      </AdminLayout>
-    );
-  }
-  
-  // Create new article
+  // Mode création
   return (
     <AdminLayout>
       <NewArticleForm categories={categoriesQuery.data || []} />
