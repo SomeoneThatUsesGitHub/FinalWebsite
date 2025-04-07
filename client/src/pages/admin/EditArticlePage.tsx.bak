@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Save, ArrowLeft, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
@@ -229,22 +230,36 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                 )}
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="content">Contenu de l'article</Label>
-                <input type="hidden" {...form.register("content")} />
-                <RichTextEditor 
-                  content={form.watch("content") || ""}
-                  onChange={(html) => {
-                    form.setValue("content", html);
-                    setPreviewHtml(html);
-                  }}
-                  placeholder="Commencez à rédiger votre article ici..."
-                  className="min-h-[500px]"
-                />
-                {form.formState.errors.content && (
-                  <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
-                )}
-              </div>
+              <Tabs defaultValue="editor" className="w-full">
+                <TabsList className="w-full grid grid-cols-2">
+                  <TabsTrigger value="editor">Éditeur</TabsTrigger>
+                  <TabsTrigger value="preview">Prévisualisation</TabsTrigger>
+                </TabsList>
+                <TabsContent value="editor" className="space-y-2">
+                  <Label htmlFor="content">Contenu de l'article (HTML)</Label>
+                  <Textarea
+                    id="content"
+                    placeholder="Contenu de l'article en HTML"
+                    rows={15}
+                    {...form.register("content")}
+                    className="font-mono text-sm"
+                  />
+                  {form.formState.errors.content && (
+                    <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
+                  )}
+                </TabsContent>
+                <TabsContent value="preview">
+                  <div className="border rounded-md p-4 min-h-[300px] prose max-w-none">
+                    {previewHtml ? (
+                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                    ) : (
+                      <p className="text-muted-foreground text-center py-10">
+                        Le contenu s'affichera ici lorsque vous commencerez à écrire.
+                      </p>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
           
@@ -404,10 +419,6 @@ function EditArticleForm({ article, categories }: { article: Article, categories
     updateArticleMutation.mutate(data);
   };
   
-  const handleViewClick = () => {
-    window.open(`/articles/${article.slug}`, '_blank');
-  };
-  
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="space-y-6">
@@ -425,21 +436,19 @@ function EditArticleForm({ article, categories }: { article: Article, categories
             
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
-                Modifier l'article
+                Modifier l'article : {article.title}
               </h1>
               <p className="text-muted-foreground mt-2">
-                ID: {article.id} | Créé le: {new Date(article.createdAt).toLocaleDateString('fr-FR')}
+                Modifiez les informations de l'article
               </p>
             </div>
           </div>
           
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleViewClick}
-            >
-              <Eye className="mr-2 h-4 w-4" /> Voir
+          <div className="flex items-center gap-3">
+            <Button variant="outline" asChild>
+              <a href={`/articles/${article.slug}`} target="_blank" rel="noopener noreferrer">
+                <Eye className="mr-2 h-4 w-4" /> Voir l'article
+              </a>
             </Button>
             
             <Button
@@ -465,7 +474,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
             <CardHeader>
               <CardTitle>Informations de l'article</CardTitle>
               <CardDescription>
-                Informations essentielles de l'article
+                Modifiez les informations principales de l'article
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -521,22 +530,36 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 )}
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="content">Contenu de l'article</Label>
-                <input type="hidden" {...form.register("content")} />
-                <RichTextEditor 
-                  content={form.watch("content") || ""}
-                  onChange={(html) => {
-                    form.setValue("content", html);
-                    setPreviewHtml(html);
-                  }}
-                  placeholder="Commencez à rédiger votre article ici..."
-                  className="min-h-[500px]"
-                />
-                {form.formState.errors.content && (
-                  <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
-                )}
-              </div>
+              <Tabs defaultValue="editor" className="w-full">
+                <TabsList className="w-full grid grid-cols-2">
+                  <TabsTrigger value="editor">Éditeur</TabsTrigger>
+                  <TabsTrigger value="preview">Prévisualisation</TabsTrigger>
+                </TabsList>
+                <TabsContent value="editor" className="space-y-2">
+                  <Label htmlFor="content">Contenu de l'article (HTML)</Label>
+                  <Textarea
+                    id="content"
+                    placeholder="Contenu de l'article en HTML"
+                    rows={15}
+                    {...form.register("content")}
+                    className="font-mono text-sm"
+                  />
+                  {form.formState.errors.content && (
+                    <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
+                  )}
+                </TabsContent>
+                <TabsContent value="preview">
+                  <div className="border rounded-md p-4 min-h-[300px] prose max-w-none">
+                    {previewHtml ? (
+                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                    ) : (
+                      <p className="text-muted-foreground text-center py-10">
+                        Le contenu s'affichera ici lorsque vous commencerez à écrire.
+                      </p>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
           
@@ -551,7 +574,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
               </CardHeader>
               <CardContent>
                 <Select
-                  value={form.watch("categoryId")?.toString() || ""}
+                  value={(form.watch("categoryId") || 1).toString()}
                   onValueChange={(value) => form.setValue("categoryId", parseInt(value))}
                 >
                   <SelectTrigger>
@@ -615,89 +638,82 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   );
 }
 
+// Component principal qui décide quel formulaire afficher
 export default function EditArticlePage() {
   const params = useParams();
+  const isNewArticle = !params.id;
   const [location, setLocation] = useLocation();
-  const { toast } = useToast();
   
-  // Requête pour obtenir les catégories
-  const { data: categories = [] } = useQuery<Category[]>({
-    queryKey: ["/api/categories"],
-    queryFn: getQueryFn<Category[]>({ on401: "throw" }),
-  });
-  
-  // Si on a un ID d'article, c'est une modification, sinon c'est une création
-  const isEditMode = !!params.id;
-  
-  const { 
-    data: article, 
-    isLoading, 
-    isError, 
-    error 
+  // Récupérer l'article si on est en mode édition
+  const {
+    data: article,
+    isLoading: articleLoading,
+    isError: articleError,
   } = useQuery<Article>({
     queryKey: ["/api/admin/articles", params.id],
-    queryFn: getQueryFn<Article>({ on401: "throw" }),
-    enabled: isEditMode,
+    queryFn: async ({ queryKey }) => {
+      const [_, id] = queryKey;
+      if (!id) throw new Error("ID d'article manquant");
+      
+      console.log("Fetching article ID:", id);
+      const res = await fetch(`/api/admin/articles/${id}`, {
+        credentials: "include"
+      });
+      
+      if (!res.ok) {
+        const error = await res.text();
+        console.error("Erreur lors de la récupération de l'article:", error);
+        throw new Error(`Erreur ${res.status}: ${error || res.statusText}`);
+      }
+      
+      const data = await res.json();
+      console.log("Article récupéré:", data);
+      return data;
+    },
+    enabled: !isNewArticle && !!params.id,
+  });
+
+  const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+    queryFn: getQueryFn({ on401: "throw" }),
   });
   
-  if (isEditMode && isLoading) {
+  console.log("Main component - Article data:", article);
+  
+  // Afficher un loader pendant le chargement initial
+  if ((!isNewArticle && articleLoading) || categoriesLoading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-[calc(100vh-200px)]">
-          <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+        <div className="flex items-center justify-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  // Afficher une erreur si l'article n'est pas trouvé
+  if (!isNewArticle && articleError) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-96">
+          <h1 className="text-2xl font-bold text-red-500">Article non trouvé</h1>
+          <p className="text-muted-foreground mt-2">L'article que vous cherchez n'existe pas ou a été supprimé.</p>
+          <Button className="mt-4" onClick={() => setLocation("/admin/articles")}>
+            Retour à la liste des articles
+          </Button>
         </div>
       </AdminLayout>
     );
   }
   
-  if (isEditMode && isError) {
-    return (
-      <AdminLayout>
-        <div className="max-w-4xl mx-auto p-4 space-y-6">
-          <div className="flex items-center gap-2">
-            <Button 
-              type="button"
-              variant="outline" 
-              size="icon"
-              onClick={() => setLocation("/admin/articles")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Retour</span>
-            </Button>
-            
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-red-500">
-                Erreur
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Impossible de charger l'article
-              </p>
-            </div>
-          </div>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <p>
-                {error instanceof Error ? error.message : "Une erreur s'est produite lors du chargement de l'article."}
-              </p>
-              <Button className="mt-4" onClick={() => setLocation("/admin/articles")}>
-                Retour à la liste des articles
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </AdminLayout>
-    );
-  }
-  
+  // Retourner le formulaire approprié (nouveau ou édition)
   return (
     <AdminLayout>
-      <div className="max-w-4xl mx-auto p-4">
-        {isEditMode && article 
-          ? <EditArticleForm article={article} categories={categories} />
-          : <NewArticleForm categories={categories} />
-        }
-      </div>
+      {isNewArticle ? (
+        <NewArticleForm categories={categories || []} />
+      ) : (
+        article && <EditArticleForm article={article} categories={categories || []} />
+      )}
     </AdminLayout>
   );
 }

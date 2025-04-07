@@ -1,0 +1,37 @@
+Remplacez la section Tabs dans NewArticleForm (ligne 232-262) par :
+
+              <div className="space-y-2">
+                <Label htmlFor="content">Contenu de l'article</Label>
+                <input type="hidden" {...form.register("content")} />
+                <RichTextEditor 
+                  content={form.watch("content") || ""}
+                  onChange={(html) => {
+                    form.setValue("content", html);
+                    setPreviewHtml(html);
+                  }}
+                  placeholder="Commencez à rédiger votre article ici..."
+                  className="min-h-[500px]"
+                />
+                {form.formState.errors.content && (
+                  <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
+                )}
+              </div>
+
+Remplacez la section Tabs dans EditArticleForm (après la ligne 500) par :
+
+              <div className="space-y-2">
+                <Label htmlFor="content">Contenu de l'article</Label>
+                <input type="hidden" {...form.register("content")} />
+                <RichTextEditor 
+                  content={form.watch("content") || ""}
+                  onChange={(html) => {
+                    form.setValue("content", html);
+                    setPreviewHtml(html);
+                  }}
+                  placeholder="Commencez à rédiger votre article ici..."
+                  className="min-h-[500px]"
+                />
+                {form.formState.errors.content && (
+                  <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
+                )}
+              </div>
