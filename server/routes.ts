@@ -654,8 +654,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/flash-infos", isAdmin, async (req: Request, res: Response) => {
     try {
       console.log("Récupération de tous les flash infos pour l'admin");
-      // Récupérer tous les flash infos, pas seulement les actifs
-      const allFlashInfos = await db.select().from(flashInfos);
+      // Récupérer tous les flash infos, pas seulement les actifs, en utilisant l'interface de stockage
+      const allFlashInfos = await storage.getAllFlashInfos();
       res.json(allFlashInfos || []);
     } catch (error) {
       console.error("Erreur lors de la récupération des flash infos:", error);
@@ -715,6 +715,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Suppression du flash info via DELETE
+      // Nous devrions ajouter une méthode deleteFlashInfo à l'interface IStorage, mais pour l'instant,
+      // nous utilisons directement l'accès à la base de données
       const result = await db
         .delete(flashInfos)
         .where(eq(flashInfos.id, Number(id)))
@@ -747,6 +749,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Mise à jour du flash info
+      // Nous devrions ajouter une méthode updateFlashInfo à l'interface IStorage, mais pour l'instant,
+      // nous utilisons directement l'accès à la base de données
       const [updatedFlashInfo] = await db
         .update(flashInfos)
         .set(validation.data)

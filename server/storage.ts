@@ -42,6 +42,7 @@ export interface IStorage {
   
   // Flash Info operations
   getActiveFlashInfos(): Promise<FlashInfo[]>;
+  getAllFlashInfos(): Promise<FlashInfo[]>; // Ajout de cette méthode pour récupérer tous les Flash Infos
   getFlashInfoById(id: number): Promise<FlashInfo | undefined>;
   createFlashInfo(flashInfo: InsertFlashInfo): Promise<FlashInfo>;
   
@@ -309,6 +310,13 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(flashInfos)
       .where(eq(flashInfos.active, true))
+      .orderBy(desc(flashInfos.priority), desc(flashInfos.createdAt));
+  }
+  
+  async getAllFlashInfos(): Promise<FlashInfo[]> {
+    return db
+      .select()
+      .from(flashInfos)
       .orderBy(desc(flashInfos.priority), desc(flashInfos.createdAt));
   }
   
