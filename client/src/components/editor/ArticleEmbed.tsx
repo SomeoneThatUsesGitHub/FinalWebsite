@@ -37,20 +37,17 @@ const ArticleEmbed: React.FC<ArticleEmbedProps> = ({
         <div className="flex flex-col sm:flex-row w-full">
           {/* Image (gauche sur desktop, haut sur mobile) */}
           {hasValidImage && (
-            <div className="sm:w-1/3 md:w-1/4 h-48 shrink-0 rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none bg-gray-100 p-0 overflow-hidden">
-              <div className="w-full h-full relative">
-                <img 
-                  src={article.imageUrl}
-                  alt={article.title || ''} 
-                  className="absolute top-0 left-0 w-full h-full object-cover object-center"
-                  onError={(e) => {
-                    // Fallback en cas d'erreur de chargement de l'image
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null; // Évite les boucles infinies
-                    target.style.display = 'none';
-                  }}
-                />
-              </div>
+            <div 
+              className="sm:w-1/3 md:w-1/4 h-48 shrink-0 rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none p-0 overflow-hidden"
+              style={{ 
+                background: `url(${article.imageUrl}) top/cover no-repeat`,
+                backgroundPosition: '0 0',
+                backgroundOrigin: 'border-box',
+                margin: 0,
+                padding: 0
+              }}
+            >
+              {/* Image en arrière-plan via CSS */}
             </div>
           )}
           
