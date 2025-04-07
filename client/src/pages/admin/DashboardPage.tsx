@@ -66,15 +66,15 @@ export default function DashboardPage() {
           delay={0.2}
         />
         <StatsCard
-          title="Vues totales"
-          value={totalViews}
-          icon={<Eye />}
+          title="Brouillons"
+          value={draftArticles}
+          icon={<FileText className="text-yellow-500" />}
           delay={0.3}
         />
         <StatsCard
-          title="Rédacteurs"
-          value={userData?.length || 1}
-          icon={<Users />}
+          title="Vues totales"
+          value={totalViews}
+          icon={<Eye />}
           delay={0.4}
         />
       </div>

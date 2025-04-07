@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent, Extension, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
+import ArticleEmbedNode from './ArticleEmbedExtension';
+import ArticleSelector from './ArticleSelector';
 import './RichTextEditor.css';
 import { 
   Bold, 
@@ -15,7 +17,8 @@ import {
   Link as LinkIcon, 
   Undo, 
   Redo, 
-  Code
+  Code,
+  Newspaper
 } from 'lucide-react';
 import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
@@ -36,6 +39,7 @@ interface RichTextEditorProps {
 export function RichTextEditor({ value, onChange, placeholder = 'Commencez à rédiger...' }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState<string>('');
   const [showLinkInput, setShowLinkInput] = useState<boolean>(false);
+  const [showArticleSelector, setShowArticleSelector] = useState<boolean>(false);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const initialContentRef = useRef<string>(value || "");
   const editorInstanceRef = useRef<any>(null);
@@ -55,6 +59,11 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez à r�
       Link.configure({
         openOnClick: false,
         linkOnPaste: true,
+      }),
+      ArticleEmbedNode.configure({
+        HTMLAttributes: {
+          class: 'article-embed',
+        },
       }),
     ],
     content: initialContentRef.current,
@@ -157,6 +166,19 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez à r�
       setShowLinkInput(false);
       setLinkUrl('');
     }
+  };
+  
+  const handleArticleSelect = (article: any, variant: 'default' | 'compact') => {
+    if (!editor) return;
+    
+    editor.chain().focus().setArticleEmbed({
+      articleId: article.id,
+      articleSlug: article.slug,
+      articleTitle: article.title,
+      articleImageUrl: article.imageUrl,
+      articleExcerpt: article.excerpt,
+      variant,
+    }).run();
   };
 
   return (
@@ -287,6 +309,18 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez à r�
         </Popover>
 
         <Separator orientation="vertical" className="h-6 mx-1" />
+        
+        <Toggle
+          size="sm"
+          pressed={editor.isActive('articleEmbed')}
+          onPressedChange={() => setShowArticleSelector(true)}
+          aria-label="Insérer un article"
+          title="Insérer un article"
+        >
+          <Newspaper className="h-4 w-4" />
+        </Toggle>
+
+        <Separator orientation="vertical" className="h-6 mx-1" />
 
         <Button
           variant="outline"
@@ -338,6 +372,12 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez à r�
           </div>
         </BubbleMenu>
       )}
+      
+      <ArticleSelector 
+        open={showArticleSelector} 
+        onOpenChange={setShowArticleSelector} 
+        onSelect={handleArticleSelect} 
+      />
     </div>
   );
 }
