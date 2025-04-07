@@ -42,42 +42,76 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
       
       // Création manuelle du DOM pour l'affichage de l'article intégré
       const embedCard = document.createElement('div');
-      embedCard.className = 'w-full border border-gray-200 bg-white rounded-md shadow-sm overflow-hidden my-4';
+      embedCard.className = 'w-full rounded-lg border border-blue-100 bg-white my-6 shadow-sm hover:shadow transition-all duration-200';
       
       // Création du lien
       const link = document.createElement('a');
       link.href = `/articles/${article.slug}`;
-      link.className = 'block';
       
       // Structure de la carte d'article
       const flexContainer = document.createElement('div');
-      flexContainer.className = 'flex flex-col sm:flex-row';
+      flexContainer.className = 'flex flex-col sm:flex-row w-full';
+      
+      // Image (à gauche sur desktop, en haut sur mobile)
+      if (article.imageUrl) {
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'sm:w-1/3 md:w-1/4 sm:min-h-[160px] h-48 shrink-0 overflow-hidden rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none';
+        
+        const img = document.createElement('img');
+        img.src = article.imageUrl;
+        img.alt = article.title || '';
+        img.className = 'w-full h-full object-cover';
+        
+        imageContainer.appendChild(img);
+        flexContainer.appendChild(imageContainer);
+      }
       
       // Section du contenu principal
       const contentSection = document.createElement('div');
-      contentSection.className = 'flex-1 p-4';
+      contentSection.className = 'p-4 flex flex-col justify-between flex-grow';
+      
+      // Div pour le titre et le résumé
+      const textContent = document.createElement('div');
       
       // Titre de l'article
       const title = document.createElement('h3');
       title.textContent = article.title || '';
-      title.className = 'font-semibold text-gray-800 text-lg mb-2 line-clamp-2';
-      contentSection.appendChild(title);
+      title.className = 'font-bold text-gray-800 text-xl mb-2 line-clamp-2';
+      textContent.appendChild(title);
+      
+      // Extrait de l'article
+      if (article.excerpt) {
+        const excerpt = document.createElement('p');
+        excerpt.textContent = article.excerpt;
+        excerpt.className = 'text-gray-600 mb-4 line-clamp-2 text-sm';
+        textContent.appendChild(excerpt);
+      }
+      
+      contentSection.appendChild(textContent);
       
       // Métadonnées (date et temps de lecture)
       const metaContainer = document.createElement('div');
-      metaContainer.className = 'flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-500 mt-2';
+      metaContainer.className = 'flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-2';
+      
+      const dateContainer = document.createElement('span');
+      dateContainer.className = 'flex items-center';
+      
+      const calendarIcon = document.createElement('span');
+      calendarIcon.innerHTML = `<svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>`;
       
       const publishedDate = document.createElement('span');
-      const dateStr = article.createdAt ? formatDate(article.createdAt, "dd MMMM yyyy 'à' HH'h'mm") : '';
+      const dateStr = article.createdAt ? formatDate(article.createdAt, "dd MMM yyyy") : '';
       publishedDate.textContent = `Publié le ${dateStr}`;
-      metaContainer.appendChild(publishedDate);
       
-      const readTimeContainer = document.createElement('div');
+      dateContainer.appendChild(calendarIcon);
+      dateContainer.appendChild(publishedDate);
+      metaContainer.appendChild(dateContainer);
+      
+      const readTimeContainer = document.createElement('span');
       readTimeContainer.className = 'flex items-center';
       
       const clockIcon = document.createElement('span');
-      clockIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
-      clockIcon.className = 'mr-1';
+      clockIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
       
       const readTime = document.createElement('span');
       readTime.textContent = 'Lecture 3 min.';
@@ -88,21 +122,8 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
       
       contentSection.appendChild(metaContainer);
       
-      // Image de l'article à droite
-      const imageContainer = document.createElement('div');
-      imageContainer.className = 'relative h-40 sm:h-auto sm:w-32 md:w-40 border-t sm:border-t-0 sm:border-l border-gray-100';
-      
-      if (article.imageUrl) {
-        const img = document.createElement('img');
-        img.src = article.imageUrl;
-        img.alt = article.title || '';
-        img.className = 'w-full h-full object-cover';
-        imageContainer.appendChild(img);
-      }
-      
       // Assembler tous les éléments
       flexContainer.appendChild(contentSection);
-      flexContainer.appendChild(imageContainer);
       
       link.appendChild(flexContainer);
       embedCard.appendChild(link);
@@ -118,36 +139,48 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
         dangerouslySetInnerHTML={{ __html: content }} 
       />
       <style dangerouslySetInnerHTML={{ __html: `
-        /* Styles pour l'affichage mobile des classes Tailwind */
+        /* Styles supplémentaires pour assurer la compatibilité mobile */
         @media (max-width: 640px) {
-          .sm\\:h-auto {
-            height: 180px !important;
-          }
-          
-          .sm\\:w-32, .md\\:w-40 {
-            width: 100% !important;
-          }
-          
-          .sm\\:flex-row {
+          /* Assure que l'image est affichée en haut en mobile */
+          .article-content-wrapper .sm\\:flex-row {
             flex-direction: column !important;
           }
           
-          .sm\\:border-t-0 {
-            border-top-width: 1px !important;
+          /* Garantit que l'image est bien arrondie en mobile */
+          .article-content-wrapper .sm\\:rounded-l-lg {
+            border-top-left-radius: 0.5rem !important;
+            border-top-right-radius: 0.5rem !important;
+            border-bottom-left-radius: 0 !important;
           }
           
-          .sm\\:border-l {
-            border-left-width: 0 !important;
+          .article-content-wrapper .sm\\:rounded-tr-none {
+            border-top-right-radius: 0.5rem !important;
           }
           
-          .sm\\:items-center {
-            align-items: flex-start !important;
+          /* Assure que l'image prend toute la largeur en mobile */
+          .article-content-wrapper .sm\\:w-1\\/3,
+          .article-content-wrapper .md\\:w-1\\/4 {
+            width: 100% !important;
           }
           
-          .gap-2 > *:not(:first-child) {
-            margin-top: 0.5rem !important;
-            margin-left: 0 !important;
+          /* Garantit une bonne hauteur fixe pour l'image en mobile */
+          .article-content-wrapper .h-48 {
+            height: 12rem !important;
           }
+          
+          /* Ajuste les marges pour le mobile */
+          .article-content-wrapper .flex-wrap {
+            gap: 0.5rem !important;
+          }
+          
+          .article-content-wrapper .gap-4 > * {
+            margin-right: 1rem !important;
+          }
+        }
+        
+        /* Améliore l'apparence au survol */
+        .article-content-wrapper a:hover {
+          text-decoration: none;
         }
       ` }} />
     </div>

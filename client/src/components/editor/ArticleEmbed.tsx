@@ -24,36 +24,50 @@ const ArticleEmbed: React.FC<ArticleEmbedProps> = ({
   
   return (
     <div className={cn(
-      "w-full border border-gray-200 bg-white rounded-md my-4 shadow-sm transition-shadow duration-200 overflow-hidden",
+      "w-full rounded-lg border border-blue-100 bg-white my-6 shadow-sm hover:shadow transition-all duration-200",
       className
     )}>
-      <Link href={`/articles/${article.slug}`} className="block">
-        <div className="flex flex-col sm:flex-row">
-          {/* Contenu principal */}
-          <div className="flex-1 p-4">
-            <h3 className="font-semibold text-gray-800 text-lg mb-2 line-clamp-2">
-              {article.title}
-            </h3>
-            
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-500 mt-2">
-              <span>Publié le {formatDate(createdAt, "dd MMMM yyyy 'à' HH'h'mm")}</span>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>Lecture {readTime}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Image de droite */}
+      <Link href={`/articles/${article.slug}`}>
+        <div className="flex flex-col sm:flex-row w-full">
+          {/* Image (gauche sur desktop, haut sur mobile) */}
           {article.imageUrl && (
-            <div className="relative h-40 sm:h-auto sm:w-32 md:w-40 border-t sm:border-t-0 sm:border-l border-gray-100">
+            <div className="sm:w-1/3 md:w-1/4 sm:min-h-[160px] h-48 shrink-0 overflow-hidden rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none">
               <img 
-                src={article.imageUrl} 
+                src={article.imageUrl}
                 alt={article.title || ''} 
                 className="w-full h-full object-cover"
               />
             </div>
           )}
+          
+          {/* Contenu principal */}
+          <div className="p-4 flex flex-col justify-between flex-grow">
+            <div>
+              <h3 className="font-bold text-gray-800 text-xl mb-2 line-clamp-2">
+                {article.title}
+              </h3>
+              
+              {article.excerpt && (
+                <p className="text-gray-600 mb-4 line-clamp-2 text-sm">
+                  {article.excerpt}
+                </p>
+              )}
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-2">
+              <span className="flex items-center">
+                <svg className="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+                <span>Publié le {formatDate(createdAt, "dd MMM yyyy")}</span>
+              </span>
+              
+              <span className="flex items-center">
+                <Clock className="h-4 w-4 mr-1" />
+                <span>Lecture {readTime}</span>
+              </span>
+            </div>
+          </div>
         </div>
       </Link>
     </div>
