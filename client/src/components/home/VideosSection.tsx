@@ -1,12 +1,9 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Video } from "@shared/schema";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, ChevronRight, ChevronLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
@@ -29,9 +26,6 @@ const YouTubeShort = ({ videoId, title }: { videoId: string; title: string }) =>
 
 const VideosSection: React.FC = () => {
   const isMobile = useIsMobile();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
-  const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
 
   // Animation au scroll
   const { controls, ref } = useScrollAnimation();
@@ -50,31 +44,6 @@ const VideosSection: React.FC = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Fonction pour vérifier si le scroll est possible
-  const checkScrollButtons = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5); // Marge de 5px pour éviter les problèmes de précision
-    }
-  };
-
-  // Fonction pour scroller horizontalement
-  const scroll = (direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const scrollAmount = 400; // Quantité de scroll en pixels
-      const newScrollLeft = 
-        direction === "left" 
-          ? scrollRef.current.scrollLeft - scrollAmount 
-          : scrollRef.current.scrollLeft + scrollAmount;
-      
-      scrollRef.current.scrollTo({
-        left: newScrollLeft,
-        behavior: "smooth"
-      });
-    }
-  };
-
   return (
     <motion.section 
       ref={ref}
@@ -85,43 +54,16 @@ const VideosSection: React.FC = () => {
         visible: { opacity: 1, y: 0 }
       }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full py-14 bg-background"
+      className="w-full py-14 pb-20 bg-background"
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8">
           <div className="flex items-center">
             <div className="w-2 h-8 bg-primary rounded-full mr-3"></div>
             <h2 className="text-2xl md:text-3xl font-bold">Nos Vidéos</h2>
           </div>
-          
-          {!isMobile && videos && videos.length > 0 && (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => scroll("left")}
-                disabled={!canScrollLeft}
-                className={cn(
-                  "rounded-full",
-                  !canScrollLeft && "opacity-50 cursor-not-allowed"
-                )}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => scroll("right")}
-                disabled={!canScrollRight}
-                className={cn(
-                  "rounded-full",
-                  !canScrollRight && "opacity-50 cursor-not-allowed"
-                )}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+          <div className="h-[2px] w-12 bg-primary mt-2 mb-3"></div>
+          <p className="text-muted-foreground">Découvrez nos shorts YouTube</p>
         </div>
 
         {isLoading ? (
@@ -131,7 +73,6 @@ const VideosSection: React.FC = () => {
               .map((_, i) => (
                 <div key={i} className="flex-shrink-0">
                   <Skeleton className="aspect-[9/16] w-full rounded-lg" />
-                  <Skeleton className="h-5 w-full mt-2" />
                 </div>
               ))}
           </div>
@@ -144,23 +85,15 @@ const VideosSection: React.FC = () => {
             </p>
           </div>
         ) : (
-          <ScrollArea 
-            className="w-full" 
-            ref={scrollRef} 
-            onScroll={checkScrollButtons}
-            onMouseEnter={checkScrollButtons}
-          >
-            <div className="flex space-x-6 pb-4">
-              {videos && videos.map((video: Video) => (
-                <YouTubeShort 
-                  key={video.id}
-                  videoId={video.videoId}
-                  title={video.title}
-                />
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {videos && videos.map((video: Video) => (
+              <YouTubeShort 
+                key={video.id}
+                videoId={video.videoId}
+                title={video.title}
+              />
+            ))}
+          </div>
         )}
       </div>
     </motion.section>
