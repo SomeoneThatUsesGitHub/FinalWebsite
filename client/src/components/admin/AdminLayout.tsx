@@ -77,7 +77,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       name: "Vidéos",
       href: "/admin/videos",
       icon: Video,
-      disabled: true,
+      disabled: false,
     },
     {
       name: "Équipe",

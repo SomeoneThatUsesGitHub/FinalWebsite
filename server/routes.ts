@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import passport from "passport";
 import { isAuthenticated, isAdmin, loginSchema, hashPassword } from "./auth";
-import { insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos } from "@shared/schema";
+import { insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, insertVideoSchema, videos } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -765,6 +765,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erreur lors de la mise à jour du flash info:", error);
       res.status(500).json({ message: "Erreur lors de la mise à jour du flash info" });
+    }
+  });
+  
+  // Routes pour les vidéos (administration)
+  app.get("/api/admin/videos", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const videos = await storage.getAllVideos();
+      res.json(videos);
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des vidéos" });
+    }
+  });
+  
+  app.get("/api/admin/videos/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de vidéo invalide" });
+      }
+      
+      const video = await storage.getVideoById(Number(id));
+      
+      if (!video) {
+        return res.status(404).json({ message: "Vidéo non trouvée" });
+      }
+      
+      res.json(video);
+    } catch (error) {
+      console.error("Error fetching video:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération de la vidéo" });
+    }
+  });
+  
+  app.post("/api/admin/videos", isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Valider les données avec le schéma Zod
+      const videoData = insertVideoSchema.parse(req.body);
+      
+      const video = await storage.createVideo(videoData);
+      res.status(201).json(video);
+    } catch (error) {
+      console.error("Error creating video:", error);
+      
+      // Retourner un message d'erreur détaillé
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+      
+      res.status(400).json({ 
+        message: "Erreur lors de la création de la vidéo",
+        details: errorMessage
+      });
+    }
+  });
+  
+  app.put("/api/admin/videos/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de vidéo invalide" });
+      }
+      
+      // Validation du schéma de vidéo
+      const validation = insertVideoSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        console.error("Erreur de validation pour mise à jour:", validation.error.errors);
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const videoId = Number(id);
+      const existingVideo = await storage.getVideoById(videoId);
+      
+      if (!existingVideo) {
+        return res.status(404).json({ message: "Vidéo non trouvée" });
+      }
+      
+      // Mettre à jour la vidéo
+      const [updatedVideo] = await db
+        .update(videos)
+        .set(validation.data)
+        .where(eq(videos.id, videoId))
+        .returning();
+      
+      res.json(updatedVideo);
+    } catch (error) {
+      console.error("Error updating video:", error);
+      res.status(500).json({ error: "Erreur lors de la mise à jour de la vidéo" });
+    }
+  });
+  
+  app.delete("/api/admin/videos/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de vidéo invalide" });
+      }
+      
+      const videoId = Number(id);
+      const result = await db
+        .delete(videos)
+        .where(eq(videos.id, videoId))
+        .returning();
+      
+      if (!result.length) {
+        return res.status(404).json({ message: "Vidéo non trouvée" });
+      }
+      
+      res.json({ message: "Vidéo supprimée avec succès" });
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      res.status(500).json({ error: "Erreur lors de la suppression de la vidéo" });
     }
   });
 
