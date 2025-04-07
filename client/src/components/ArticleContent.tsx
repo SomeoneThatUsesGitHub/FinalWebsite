@@ -42,16 +42,16 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
       
       // Création manuelle du DOM pour l'affichage de l'article intégré
       const embedCard = document.createElement('div');
-      embedCard.className = 'article-embed';
+      embedCard.className = 'w-full border border-gray-200 bg-white rounded-md shadow-sm overflow-hidden my-4';
       
       // Création du lien
       const link = document.createElement('a');
       link.href = `/articles/${article.slug}`;
-      link.className = 'article-embed-link';
+      link.className = 'block';
       
       // Structure de la carte d'article
       const flexContainer = document.createElement('div');
-      flexContainer.className = 'flex flex-col sm:flex-row items-stretch';
+      flexContainer.className = 'flex flex-col sm:flex-row';
       
       // Section du contenu principal
       const contentSection = document.createElement('div');
@@ -60,7 +60,7 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
       // Titre de l'article
       const title = document.createElement('h3');
       title.textContent = article.title || '';
-      title.className = 'font-semibold text-gray-800 text-lg mb-2';
+      title.className = 'font-semibold text-gray-800 text-lg mb-2 line-clamp-2';
       contentSection.appendChild(title);
       
       // Métadonnées (date et temps de lecture)
@@ -90,7 +90,7 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
       
       // Image de l'article à droite
       const imageContainer = document.createElement('div');
-      imageContainer.className = 'w-full h-32 sm:h-auto sm:w-32 md:w-48 bg-gray-100';
+      imageContainer.className = 'relative h-40 sm:h-auto sm:w-32 md:w-40 border-t sm:border-t-0 sm:border-l border-gray-100';
       
       if (article.imageUrl) {
         const img = document.createElement('img');
@@ -118,70 +118,35 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
         dangerouslySetInnerHTML={{ __html: content }} 
       />
       <style dangerouslySetInnerHTML={{ __html: `
-        .article-embed {
-          width: 100%;
-          border: 1px solid #e5e7eb;
-          background-color: white;
-          border-radius: 0.25rem;
-          margin: 1.5rem 0;
-          transition: box-shadow 0.2s;
-        }
-        
-        .article-embed:hover {
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        .article-embed-link {
-          display: block;
-          color: inherit;
-          text-decoration: none;
-        }
-        
+        /* Styles pour l'affichage mobile des classes Tailwind */
         @media (max-width: 640px) {
-          .flex-col {
-            flex-direction: column;
-          }
-          
-          .sm\\:flex-row {
-            flex-direction: column;
-          }
-          
           .sm\\:h-auto {
-            height: 200px;
+            height: 180px !important;
           }
           
-          .sm\\:w-32 {
-            width: 100%;
-          }
-          
-          .md\\:w-48 {
-            width: 100%;
-          }
-          
-          .sm\\:items-center {
-            align-items: flex-start;
-          }
-          
-          .gap-2 > *:not(:first-child) {
-            margin-top: 0.5rem;
-          }
-        }
-        
-        @media (min-width: 641px) {
-          .flex-col {
-            flex-direction: column;
+          .sm\\:w-32, .md\\:w-40 {
+            width: 100% !important;
           }
           
           .sm\\:flex-row {
-            flex-direction: row;
+            flex-direction: column !important;
+          }
+          
+          .sm\\:border-t-0 {
+            border-top-width: 1px !important;
+          }
+          
+          .sm\\:border-l {
+            border-left-width: 0 !important;
           }
           
           .sm\\:items-center {
-            align-items: center;
+            align-items: flex-start !important;
           }
           
           .gap-2 > *:not(:first-child) {
-            margin-left: 0.5rem;
+            margin-top: 0.5rem !important;
+            margin-left: 0 !important;
           }
         }
       ` }} />

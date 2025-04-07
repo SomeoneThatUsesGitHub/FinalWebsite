@@ -24,14 +24,14 @@ const ArticleEmbed: React.FC<ArticleEmbedProps> = ({
   
   return (
     <div className={cn(
-      "w-full border border-gray-200 bg-white rounded my-4 hover:shadow-sm transition-shadow duration-200",
+      "w-full border border-gray-200 bg-white rounded-md my-4 shadow-sm transition-shadow duration-200 overflow-hidden",
       className
     )}>
       <Link href={`/articles/${article.slug}`} className="block">
-        <div className="flex flex-col sm:flex-row items-stretch">
+        <div className="flex flex-col sm:flex-row">
           {/* Contenu principal */}
           <div className="flex-1 p-4">
-            <h3 className="font-semibold text-gray-800 text-lg mb-2">
+            <h3 className="font-semibold text-gray-800 text-lg mb-2 line-clamp-2">
               {article.title}
             </h3>
             
@@ -46,7 +46,7 @@ const ArticleEmbed: React.FC<ArticleEmbedProps> = ({
 
           {/* Image de droite */}
           {article.imageUrl && (
-            <div className="w-full h-32 sm:h-auto sm:w-32 md:w-48 bg-gray-100">
+            <div className="relative h-40 sm:h-auto sm:w-32 md:w-40 border-t sm:border-t-0 sm:border-l border-gray-100">
               <img 
                 src={article.imageUrl} 
                 alt={article.title || ''} 
