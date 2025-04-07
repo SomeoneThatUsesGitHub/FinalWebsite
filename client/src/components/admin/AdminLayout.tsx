@@ -71,7 +71,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       name: "Flash infos",
       href: "/admin/flash-infos",
       icon: Megaphone,
-      disabled: true,
+      disabled: false,
     },
     {
       name: "Vidéos",

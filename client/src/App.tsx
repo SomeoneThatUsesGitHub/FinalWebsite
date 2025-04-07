@@ -18,6 +18,7 @@ import TestEditor from "@/pages/test-editor";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import ArticlesPage from "@/pages/admin/ArticlesPage";
 import EditArticlePage from "@/pages/admin/EditArticlePage";
+import FlashInfosPage from "@/pages/admin/FlashInfosPage";
 
 // Layout
 import Header from "@/components/layout/Header";
@@ -66,6 +67,7 @@ function App() {
               <ProtectedRoute path="/admin/articles" component={ArticlesPage} adminOnly />
               <ProtectedRoute path="/admin/articles/new" component={EditArticlePage} adminOnly />
               <ProtectedRoute path="/admin/articles/:id" component={EditArticlePage} adminOnly />
+              <ProtectedRoute path="/admin/flash-infos" component={FlashInfosPage} adminOnly />
               
               {/* Fallback */}
               <Route path="/:rest*" component={NotFound} />

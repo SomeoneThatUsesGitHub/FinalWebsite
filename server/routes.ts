@@ -4,7 +4,9 @@ import { storage } from "./storage";
 import { z } from "zod";
 import passport from "passport";
 import { isAuthenticated, isAdmin, loginSchema, hashPassword } from "./auth";
-import { insertArticleSchema, insertCategorySchema } from "@shared/schema";
+import { insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes - prefix all with /api
@@ -645,6 +647,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating category:", error);
       res.status(500).json({ message: "Erreur lors de la création de la catégorie" });
+    }
+  });
+  
+  // Routes d'administration des Flash Infos
+  app.get("/api/admin/flash-infos", isAdmin, async (req: Request, res: Response) => {
+    try {
+      console.log("Récupération de tous les flash infos pour l'admin");
+      // Récupérer tous les flash infos, pas seulement les actifs
+      const allFlashInfos = await db.select().from(flashInfos);
+      res.json(allFlashInfos || []);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des flash infos:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des flash infos" });
+    }
+  });
+  
+  app.post("/api/admin/flash-infos", isAdmin, async (req: Request, res: Response) => {
+    try {
+      console.log("Données reçues pour création de flash info:", req.body);
+      
+      // Validation du schéma de flash info
+      const validation = insertFlashInfoSchema.safeParse(req.body);
+      if (!validation.success) {
+        console.error("Erreur de validation pour création:", validation.error.errors);
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Flash info validé, création
+      console.log("Données validées pour création:", validation.data);
+      const newFlashInfo = await storage.createFlashInfo(validation.data);
+      res.status(201).json(newFlashInfo);
+      
+    } catch (error) {
+      console.error("Erreur lors de la création du flash info:", error);
+      res.status(500).json({ message: "Erreur lors de la création du flash info" });
+    }
+  });
+  
+  app.get("/api/admin/flash-infos/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de flash info invalide" });
+      }
+      
+      const flashInfo = await storage.getFlashInfoById(Number(id));
+      
+      if (!flashInfo) {
+        return res.status(404).json({ message: "Flash info non trouvé" });
+      }
+      
+      res.json(flashInfo);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du flash info:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération du flash info" });
+    }
+  });
+  
+  app.delete("/api/admin/flash-infos/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de flash info invalide" });
+      }
+      
+      // Suppression du flash info via DELETE
+      const result = await db
+        .delete(flashInfos)
+        .where(eq(flashInfos.id, Number(id)))
+        .returning();
+        
+      if (!result.length) {
+        return res.status(404).json({ message: "Flash info non trouvé" });
+      }
+      
+      res.json({ message: "Flash info supprimé avec succès" });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du flash info:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression du flash info" });
+    }
+  });
+  
+  app.put("/api/admin/flash-infos/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de flash info invalide" });
+      }
+      
+      // Validation du schéma de flash info
+      const validation = insertFlashInfoSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        console.error("Erreur de validation pour mise à jour:", validation.error.errors);
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Mise à jour du flash info
+      const [updatedFlashInfo] = await db
+        .update(flashInfos)
+        .set(validation.data)
+        .where(eq(flashInfos.id, Number(id)))
+        .returning();
+        
+      if (!updatedFlashInfo) {
+        return res.status(404).json({ message: "Flash info non trouvé" });
+      }
+      
+      res.json(updatedFlashInfo);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du flash info:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du flash info" });
     }
   });
 
