@@ -145,9 +145,11 @@ const NewsWall: React.FC = () => {
       return articlesToDisplay.slice(0, 4); 
     }
     
-    // For desktop, we need to consider if Flash Info is present
-    // If Flash Info exists, show 5 articles (total of 6 cards), otherwise show 6 articles
-    const maxArticles = (flashInfos && flashInfos.length > 0) ? 5 : 6;
+    // Pour desktop, nous devons prendre en compte le nombre de Flash Infos présents
+    // Afficher un maximum de 6 cartes au total (Flash Infos + articles)
+    // Le nombre d'articles à afficher est : 6 - nombre de Flash Infos
+    const flashInfosCount = flashInfos?.length || 0;
+    const maxArticles = Math.max(0, 6 - flashInfosCount); // Au moins 0, même si on a plus de 6 Flash Infos
     return articlesToDisplay.slice(0, maxArticles);
   }, [recent, featured, featuredContent, isMobile, flashInfos]);
 
@@ -320,9 +322,9 @@ const NewsWall: React.FC = () => {
 
         {/* Recent News Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-          {/* Flash Info Card (en premier dans la grille) */}
-          {!isLoading && flashInfos && flashInfos.length > 0 && (
-            <ScrollAnimation threshold={0.1} delay={0.1}>
+          {/* Flash Info Cards (en premier dans la grille) */}
+          {!isLoading && flashInfos && flashInfos.map((flashInfo, index) => (
+            <ScrollAnimation threshold={0.1} delay={0.1 * index} key={flashInfo.id}>
               <div className="bg-white overflow-hidden rounded-xl shadow-xl border border-red-200 relative hover:shadow-2xl transition-all duration-300 h-full">
                 <div className="absolute inset-y-0 left-0 w-2 bg-red-600"></div>
                 <div className="p-5 pl-6 flex flex-col h-full">
@@ -331,20 +333,20 @@ const NewsWall: React.FC = () => {
                       Flash info
                     </span>
                     <span className="text-gray-500 text-xs">
-                      {getTimeAgo(flashInfos[0].createdAt)}
+                      {getTimeAgo(flashInfo.createdAt)}
                     </span>
                   </div>
                   <h3 className="text-lg font-bold text-dark mb-2 line-clamp-2 min-h-[3.5rem]">
-                    {flashInfos[0].title}
+                    {flashInfo.title}
                   </h3>
                   <p className="text-dark/70 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
-                    {flashInfos[0].content}
+                    {flashInfo.content}
                   </p>
-                  {flashInfos[0].imageUrl && (
+                  {flashInfo.imageUrl && (
                     <div className="overflow-hidden h-32 mb-4 rounded-lg">
                       <img 
-                        src={flashInfos[0].imageUrl}
-                        alt={flashInfos[0].title}
+                        src={flashInfo.imageUrl}
+                        alt={flashInfo.title}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -355,7 +357,7 @@ const NewsWall: React.FC = () => {
                 </div>
               </div>
             </ScrollAnimation>
-          )}
+          ))}
           
           {/* Articles récents */}
           {isLoading
