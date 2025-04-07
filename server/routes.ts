@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import passport from "passport";
 import { isAuthenticated, isAdmin, loginSchema, hashPassword } from "./auth";
+import * as schema from "@shared/schema";
 import { insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, insertVideoSchema, videos } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -731,9 +732,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Mise à jour de la catégorie avec Drizzle directement
       const [updatedCategory] = await db
-        .update(categories as any)
+        .update(schema.categories)
         .set(validation.data)
-        .where(eq((categories as any).id, categoryId))
+        .where(eq(schema.categories.id, categoryId))
         .returning();
       
       res.json(updatedCategory);
@@ -781,8 +782,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Supprimer la catégorie
       await db
-        .delete(schema.categories as any)
-        .where(eq((schema.categories as any).id, categoryId));
+        .delete(schema.categories)
+        .where(eq(schema.categories.id, categoryId));
       
       res.json({ message: "Catégorie supprimée avec succès" });
     } catch (error) {
