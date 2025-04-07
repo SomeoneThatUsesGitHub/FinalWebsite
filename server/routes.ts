@@ -1102,16 +1102,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/users/:username/password", isAdmin, async (req: Request, res: Response) => {
     try {
       const { username } = req.params;
-      const { newPassword } = req.body;
+      const { password } = req.body;
       
-      if (!newPassword || newPassword.length < 8) {
+      if (!password || password.length < 8) {
         return res.status(400).json({ 
           message: "Mot de passe invalide", 
           details: "Le mot de passe doit contenir au moins 8 caractères" 
         });
       }
       
-      const result = await updateUserPassword(username, newPassword);
+      const result = await updateUserPassword(username, password);
       if (result.success) {
         return res.json({ message: result.message });
       } else {

@@ -9,7 +9,7 @@ import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 // Étendre le type User pour inclure isAdmin et role
-type User = BaseUser & { isAdmin?: boolean; role?: "user" | "admin" };
+type User = BaseUser & { isAdmin?: boolean; role?: "user" | "admin" | "editor" };
 
 type AuthContextType = {
   user: User | null;

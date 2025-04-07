@@ -34,6 +34,7 @@ import {
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  title?: string;
 }
 
 type NavItem = {
@@ -44,7 +45,7 @@ type NavItem = {
   isSeparator?: boolean;
 };
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
   const [location, setLocation] = useLocation();
   const { user, logoutMutation } = useAuth();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -65,7 +66,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       name: "Catégories",
       href: "/admin/categories",
       icon: Tag,
-      disabled: false,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Flash infos",
@@ -83,7 +84,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       name: "Utilisateurs",
       href: "/admin/users",
       icon: Users,
-      disabled: false,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Équipe",
@@ -310,7 +311,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto pb-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">{children}</div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+            {title && (
+              <div className="mb-6">
+                <h1 className="text-2xl font-semibold">{title}</h1>
+                <div className="w-10 h-1 bg-primary mt-2"></div>
+              </div>
+            )}
+            {children}
+          </div>
         </main>
       </div>
     </div>

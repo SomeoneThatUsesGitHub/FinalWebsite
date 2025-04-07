@@ -65,13 +65,15 @@ function App() {
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
               
-              {/* Routes admin protégées */}
+              {/* Routes admin protégées - accessibles aux admins et éditeurs */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
               <ProtectedRoute path="/admin/articles" component={ArticlesPage} adminOnly />
               <ProtectedRoute path="/admin/articles/new" component={EditArticlePage} adminOnly />
               <ProtectedRoute path="/admin/articles/:id" component={EditArticlePage} adminOnly />
               <ProtectedRoute path="/admin/flash-infos" component={FlashInfosPage} adminOnly />
               <ProtectedRoute path="/admin/videos" component={VideosPage} adminOnly />
+              
+              {/* Routes admin protégées - accessibles uniquement aux admins */}
               <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
               <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
               
