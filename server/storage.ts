@@ -113,8 +113,13 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Article operations
-  async getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number}): Promise<Article[]> {
+  async getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number, showUnpublished?: boolean}): Promise<Article[]> {
     let query = db.select().from(articles);
+    
+    // Par défaut, ne montrer que les articles publiés (sauf si explicitement demandé de montrer les brouillons)
+    if (!filters?.showUnpublished) {
+      query = query.where(eq(articles.published, true));
+    }
     
     if (filters) {
       // Filter by category

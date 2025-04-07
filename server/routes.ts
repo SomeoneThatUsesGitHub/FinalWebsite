@@ -410,7 +410,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Routes admin pour les articles
   app.get("/api/admin/articles", isAdmin, async (req: Request, res: Response) => {
     try {
-      const articles = await storage.getAllArticles();
+      // Montrer tous les articles, y compris les brouillons
+      const articles = await storage.getAllArticles({ showUnpublished: true });
       res.json(articles);
     } catch (error) {
       console.error("Error fetching articles for admin:", error);
