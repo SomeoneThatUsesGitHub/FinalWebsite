@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent, Extension, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
+import './RichTextEditor.css';
 import { 
   Bold, 
   Italic, 
@@ -59,7 +60,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez Ã  rÃ
     content: initialContentRef.current,
     editorProps: {
       attributes: {
-        class: 'min-h-[300px] max-h-[600px] overflow-y-auto p-4 focus:outline-none rounded-md border border-input bg-background',
+        class: 'min-h-[300px] max-h-[600px] overflow-y-auto p-4 focus:outline-none rounded-md border border-input bg-background prose prose-stone max-w-none',
       },
     },
     onUpdate: ({ editor }) => {

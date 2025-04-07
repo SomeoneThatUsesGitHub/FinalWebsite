@@ -1,0 +1,137 @@
+/* Styles pour l'éditeur de texte riche */
+
+/* Conteneur principal */
+.rich-text-editor .ProseMirror {
+  /* Styles de base */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+  outline: none;
+}
+
+/* Titres */
+.rich-text-editor .ProseMirror h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: hsl(var(--foreground));
+}
+
+.rich-text-editor .ProseMirror h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: hsl(var(--foreground));
+}
+
+.rich-text-editor .ProseMirror h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: hsl(var(--foreground));
+}
+
+/* Paragraphes */
+.rich-text-editor .ProseMirror p {
+  margin-bottom: 1rem;
+}
+
+/* Listes */
+.rich-text-editor .ProseMirror ul,
+.rich-text-editor .ProseMirror ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.rich-text-editor .ProseMirror li {
+  margin-bottom: 0.25rem;
+}
+
+.rich-text-editor .ProseMirror ul li {
+  list-style-type: disc;
+}
+
+.rich-text-editor .ProseMirror ol li {
+  list-style-type: decimal;
+}
+
+/* Blockquote */
+.rich-text-editor .ProseMirror blockquote {
+  border-left: 4px solid hsl(var(--primary));
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Liens */
+.rich-text-editor .ProseMirror a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.rich-text-editor .ProseMirror a:hover {
+  text-decoration: none;
+}
+
+/* Code */
+.rich-text-editor .ProseMirror code {
+  font-family: monospace;
+  background-color: hsl(var(--muted)/0.2);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+/* Séparateur horizontal */
+.rich-text-editor .ProseMirror hr {
+  border: none;
+  border-top: 2px solid hsl(var(--border));
+  margin: 2rem 0;
+}
+
+/* Style pour les éléments en cours d'édition / focus */
+.rich-text-editor .ProseMirror:focus {
+  outline: none;
+}
+
+/* Style pour le texte sélectionné */
+.rich-text-editor .ProseMirror ::selection {
+  background: hsl(var(--primary)/0.2);
+}
+
+/* Styles pour montrer la position où on peut déposer du contenu */
+.rich-text-editor .ProseMirror .is-dropTarget {
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 2px hsl(var(--primary)/0.5);
+}
+
+/* Styles pour les blocs de liste imbriqués */
+.rich-text-editor .ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.rich-text-editor .ProseMirror ul[data-type="taskList"] li > label {
+  margin-right: 0.5rem;
+}
+
+/* Styles pour rendre le texte en gras et en italique plus visible */
+.rich-text-editor .ProseMirror strong {
+  font-weight: 700;
+}
+
+.rich-text-editor .ProseMirror em {
+  font-style: italic;
+}
