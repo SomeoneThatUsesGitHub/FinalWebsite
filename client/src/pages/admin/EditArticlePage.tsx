@@ -343,14 +343,24 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   const { toast } = useToast();
   const [previewHtml, setPreviewHtml] = useState<string>(article.content || "");
   
-  console.log("EDIT FORM - Article data:", article);
+  console.log("EDIT FORM - Article data reçu par props:", article);
+  console.log("EDIT FORM - Content detail:", {
+    content: article.content,
+    type: typeof article.content,
+    length: article.content ? article.content.length : 0,
+    sample: article.content ? article.content.substring(0, 50) + "..." : "CONTENU VIDE"
+  });
   
   // Force une mise à jour du contenu lors de l'initialisation
   useEffect(() => {
-    console.log("Setting initial content:", article.content);
+    console.log("Setting initial content in state:", {
+      content: article.content,
+      article_id: article.id
+    });
     setPreviewHtml(article.content || "");
   }, [article.id, article.content]);
   
+  // Créer le formulaire avec résolution de schema Zod
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
     defaultValues: {
@@ -364,6 +374,25 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       featured: Boolean(article.featured),
     }
   });
+  
+  // Force une réinitialisation des valeurs du formulaire quand l'article change
+  useEffect(() => {
+    console.log("FORCE RESET du formulaire avec les données d'article:", {
+      article_id: article.id,
+      content_preview: article.content ? article.content.substring(0, 30) + "..." : "VIDE"
+    });
+    
+    form.reset({
+      title: article.title || "",
+      slug: article.slug || "",
+      excerpt: article.excerpt || "",
+      content: article.content || "",
+      imageUrl: article.imageUrl || "",
+      categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
+      published: Boolean(article.published),
+      featured: Boolean(article.featured),
+    });
+  }, [article.id, article.content]);
   
   // Observer les changements de contenu pour la prévisualisation
   const contentWatch = form.watch("content");
@@ -693,7 +722,14 @@ export default function EditArticlePage() {
   
   // Mode édition - Article trouvé
   if (params.id && articleQuery.data) {
+    // Afficher les données complètes de l'article pour débogage
     console.log("Données de l'article à modifier:", articleQuery.data);
+    console.log("Contenu de l'article à modifier:", {
+      content: articleQuery.data.content, 
+      content_length: articleQuery.data.content ? articleQuery.data.content.length : 0,
+      content_sample: articleQuery.data.content ? articleQuery.data.content.substring(0, 100) : "VIDE"
+    });
+    
     return (
       <AdminLayout>
         <EditArticleForm 

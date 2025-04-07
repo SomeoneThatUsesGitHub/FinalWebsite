@@ -435,11 +435,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "ID d'article invalide" });
       }
       
+      console.log(`Récupération de l'article ID: ${id} pour édition`);
       const article = await storage.getArticleById(Number(id));
       
       if (!article) {
+        console.log(`Article ID: ${id} non trouvé`);
         return res.status(404).json({ message: "Article non trouvé" });
       }
+      
+      console.log(`Article trouvé:`, {
+        id: article.id,
+        title: article.title,
+        slug: article.slug,
+        content: article.content ? article.content.substring(0, 50) + "..." : "Contenu vide", 
+        excerpt: article.excerpt,
+        categoryId: article.categoryId
+      });
       
       res.json(article);
     } catch (error) {

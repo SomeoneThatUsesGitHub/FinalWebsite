@@ -57,10 +57,24 @@ export function RichTextEditor({ value, onChange, placeholder = 'Commencez à r�
 
   // Sync content with external value
   useEffect(() => {
-    if (editor && value !== undefined && value !== editor.getHTML()) {
-      console.log("RichTextEditor: syncing content with external value:", value);
-      editor.commands.setContent(value);
-    }
+    if (!editor) return;
+    
+    // Toujours définir le contenu lorsque la valeur change, même si le HTML actuel semble identique
+    // Cela aide à résoudre les problèmes de synchronisation quand le composant est réutilisé
+    console.log("RichTextEditor: syncing content with external value:", {
+      value: value,
+      current_html: editor.getHTML(),
+      are_different: value !== editor.getHTML(),
+      value_type: typeof value,
+      value_length: value ? value.length : 0
+    });
+    
+    // Utiliser une légère temporisation pour s'assurer que l'éditeur est prêt
+    const timer = setTimeout(() => {
+      editor.commands.setContent(value || "");
+    }, 50);
+    
+    return () => clearTimeout(timer);
   }, [editor, value]);
 
   if (!editor) {
