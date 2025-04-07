@@ -634,6 +634,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Routes admin pour les catégories
+  app.get("/api/admin/categories", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const categories = await storage.getAllCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des catégories" });
+    }
+  });
+  
+  app.get("/api/admin/categories/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de catégorie invalide" });
+      }
+      
+      // Étant donné que nous n'avons pas de méthode getCategoryById, nous allons récupérer toutes les catégories
+      // et filtrer celle qui correspond à l'ID demandé
+      const categories = await storage.getAllCategories();
+      const category = categories.find(c => c.id === Number(id));
+      
+      if (!category) {
+        return res.status(404).json({ message: "Catégorie non trouvée" });
+      }
+      
+      res.json(category);
+    } catch (error) {
+      console.error("Error fetching category:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération de la catégorie" });
+    }
+  });
+  
   app.post("/api/admin/categories", isAdmin, async (req: Request, res: Response) => {
     try {
       // Validation du schéma de catégorie
@@ -642,11 +676,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ errors: validation.error.errors });
       }
       
+      // Vérifier si le slug existe déjà
+      const categories = await storage.getAllCategories();
+      const slugExists = categories.some(c => c.slug === validation.data.slug);
+      
+      if (slugExists) {
+        return res.status(400).json({ 
+          message: "Slug déjà utilisé", 
+          details: "Une catégorie avec ce slug existe déjà. Veuillez en choisir un autre." 
+        });
+      }
+      
       const category = await storage.createCategory(validation.data);
       res.status(201).json(category);
     } catch (error) {
       console.error("Error creating category:", error);
       res.status(500).json({ message: "Erreur lors de la création de la catégorie" });
+    }
+  });
+  
+  app.put("/api/admin/categories/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de catégorie invalide" });
+      }
+      
+      // Validation du schéma de catégorie
+      const validation = insertCategorySchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const categoryId = Number(id);
+      
+      // Vérifier si la catégorie existe
+      const categories = await storage.getAllCategories();
+      const categoryExists = categories.some(c => c.id === categoryId);
+      
+      if (!categoryExists) {
+        return res.status(404).json({ message: "Catégorie non trouvée" });
+      }
+      
+      // Vérifier si le slug est déjà utilisé par une autre catégorie
+      const slugConflict = categories.some(c => c.slug === validation.data.slug && c.id !== categoryId);
+      
+      if (slugConflict) {
+        return res.status(400).json({ 
+          message: "Slug déjà utilisé", 
+          details: "Une autre catégorie utilise déjà ce slug. Veuillez en choisir un autre." 
+        });
+      }
+      
+      // Mise à jour de la catégorie avec Drizzle directement
+      const [updatedCategory] = await db
+        .update(categories as any)
+        .set(validation.data)
+        .where(eq((categories as any).id, categoryId))
+        .returning();
+      
+      res.json(updatedCategory);
+    } catch (error) {
+      console.error("Error updating category:", error);
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+      
+      res.status(500).json({ 
+        message: "Erreur lors de la mise à jour de la catégorie",
+        details: errorMessage
+      });
+    }
+  });
+  
+  app.delete("/api/admin/categories/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de catégorie invalide" });
+      }
+      
+      const categoryId = Number(id);
+      
+      // Vérifier si la catégorie existe
+      const allCategories = await storage.getAllCategories();
+      const categoryExists = allCategories.some(c => c.id === categoryId);
+      
+      if (!categoryExists) {
+        return res.status(404).json({ message: "Catégorie non trouvée" });
+      }
+      
+      // Vérifier si des articles sont liés à cette catégorie
+      const articlesWithCategory = await db
+        .select()
+        .from(schema.articles)
+        .where(eq(schema.articles.categoryId, categoryId));
+      
+      if (articlesWithCategory.length > 0) {
+        return res.status(400).json({ 
+          message: "Impossible de supprimer cette catégorie", 
+          details: `${articlesWithCategory.length} article(s) utilisent cette catégorie. Veuillez d'abord modifier ou supprimer ces articles.`
+        });
+      }
+      
+      // Supprimer la catégorie
+      await db
+        .delete(schema.categories as any)
+        .where(eq((schema.categories as any).id, categoryId));
+      
+      res.json({ message: "Catégorie supprimée avec succès" });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression de la catégorie" });
     }
   });
   

@@ -65,7 +65,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       name: "Catégories",
       href: "/admin/categories",
       icon: Tag,
-      disabled: true,
+      disabled: false,
     },
     {
       name: "Flash infos",
