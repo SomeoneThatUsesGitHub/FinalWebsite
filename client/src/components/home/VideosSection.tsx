@@ -56,14 +56,15 @@ const VideosSection: React.FC = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="w-full py-14 pb-20 bg-background"
     >
-      <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <div className="flex items-center">
-            <div className="w-2 h-8 bg-primary rounded-full mr-3"></div>
-            <h2 className="text-2xl md:text-3xl font-bold">Nos Vidéos</h2>
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="mb-10">
+          <div className="mb-4">
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Nos Vidéos</h2>
+              <div className="absolute -bottom-2 left-0 w-24 h-1 bg-blue-600 rounded-full"></div>
+            </div>
           </div>
-          <div className="h-[2px] w-12 bg-primary mt-2 mb-3"></div>
-          <p className="text-muted-foreground">Découvrez nos shorts YouTube</p>
+          <p className="text-gray-500 mb-6">Découvrez nos shorts YouTube</p>
         </div>
 
         {isLoading ? (
