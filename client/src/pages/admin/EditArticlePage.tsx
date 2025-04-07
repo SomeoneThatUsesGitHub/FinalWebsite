@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Save, ArrowLeft, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { RichTextEditor } from "@/components/editor/RichTextEditor";
 
 // Schéma de validation étendu pour le formulaire
 const articleFormSchema = insertArticleSchema
@@ -235,13 +236,11 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                   <TabsTrigger value="preview">Prévisualisation</TabsTrigger>
                 </TabsList>
                 <TabsContent value="editor" className="space-y-2">
-                  <Label htmlFor="content">Contenu de l'article (HTML)</Label>
-                  <Textarea
-                    id="content"
-                    placeholder="Contenu de l'article en HTML"
-                    rows={15}
-                    {...form.register("content")}
-                    className="font-mono text-sm"
+                  <Label htmlFor="content">Contenu de l'article</Label>
+                  <RichTextEditor
+                    value={form.watch("content") || ""}
+                    onChange={(value) => form.setValue("content", value)}
+                    placeholder="Commencez à rédiger votre article..."
                   />
                   {form.formState.errors.content && (
                     <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
@@ -435,36 +434,28 @@ function EditArticleForm({ article, categories }: { article: Article, categories
             
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
-                Modifier l'article : {article.title}
+                Modifier l'article
               </h1>
               <p className="text-muted-foreground mt-2">
-                Modifiez les informations de l'article
+                Modifiez les détails de l'article
               </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <Button variant="outline" asChild>
-              <a href={`/articles/${article.slug}`} target="_blank" rel="noopener noreferrer">
-                <Eye className="mr-2 h-4 w-4" /> Voir l'article
-              </a>
-            </Button>
-            
-            <Button
-              type="submit"
-              disabled={updateArticleMutation.isPending}
-            >
-              {updateArticleMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enregistrement...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" /> Enregistrer
-                </>
-              )}
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            disabled={updateArticleMutation.isPending}
+          >
+            {updateArticleMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enregistrement...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" /> Enregistrer
+              </>
+            )}
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -500,7 +491,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                   <p className="text-sm text-red-500">{form.formState.errors.slug.message}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  L'URL de l'article sera : /articles/<span className="font-mono">{form.watch("slug") || article.slug}</span>
+                  L'URL de l'article sera : /articles/<span className="font-mono">{form.watch("slug") || "slug-de-article"}</span>
                 </p>
               </div>
               
@@ -535,13 +526,11 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                   <TabsTrigger value="preview">Prévisualisation</TabsTrigger>
                 </TabsList>
                 <TabsContent value="editor" className="space-y-2">
-                  <Label htmlFor="content">Contenu de l'article (HTML)</Label>
-                  <Textarea
-                    id="content"
-                    placeholder="Contenu de l'article en HTML"
-                    rows={15}
-                    {...form.register("content")}
-                    className="font-mono text-sm"
+                  <Label htmlFor="content">Contenu de l'article</Label>
+                  <RichTextEditor
+                    value={form.watch("content") || ""}
+                    onChange={(value) => form.setValue("content", value)}
+                    placeholder="Commencez à rédiger votre article..."
                   />
                   {form.formState.errors.content && (
                     <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
@@ -573,7 +562,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
               </CardHeader>
               <CardContent>
                 <Select
-                  value={(form.watch("categoryId") || 1).toString()}
+                  value={form.watch("categoryId")?.toString() || ""}
                   onValueChange={(value) => form.setValue("categoryId", parseInt(value))}
                 >
                   <SelectTrigger>
@@ -637,82 +626,104 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   );
 }
 
-// Component principal qui décide quel formulaire afficher
+// Page d'édition d'article (composant principal)
 export default function EditArticlePage() {
   const params = useParams();
-  const isNewArticle = !params.id;
-  const [location, setLocation] = useLocation();
   
-  // Récupérer l'article si on est en mode édition
-  const {
-    data: article,
-    isLoading: articleLoading,
-    isError: articleError,
-  } = useQuery<Article>({
-    queryKey: ["/api/admin/articles", params.id],
-    queryFn: async ({ queryKey }) => {
-      const [_, id] = queryKey;
-      if (!id) throw new Error("ID d'article manquant");
-      
-      console.log("Fetching article ID:", id);
-      const res = await fetch(`/api/admin/articles/${id}`, {
-        credentials: "include"
-      });
-      
-      if (!res.ok) {
-        const error = await res.text();
-        console.error("Erreur lors de la récupération de l'article:", error);
-        throw new Error(`Erreur ${res.status}: ${error || res.statusText}`);
-      }
-      
-      const data = await res.json();
-      console.log("Article récupéré:", data);
-      return data;
-    },
-    enabled: !isNewArticle && !!params.id,
-  });
-
-  const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
+  // Récupérer les catégories pour les listes déroulantes
+  const categoriesQuery = useQuery({
     queryKey: ["/api/categories"],
     queryFn: getQueryFn({ on401: "throw" }),
   });
   
-  console.log("Main component - Article data:", article);
-  
-  // Afficher un loader pendant le chargement initial
-  if ((!isNewArticle && articleLoading) || categoriesLoading) {
+  // Si nous avons un ID, c'est une modification
+  if (params.id) {
+    // Récupérer l'article à modifier
+    const articleQuery = useQuery({
+      queryKey: ["/api/admin/articles", params.id],
+      queryFn: getQueryFn({ on401: "throw" }),
+    });
+    
+    // Loading state
+    if (categoriesQuery.isLoading || articleQuery.isLoading) {
+      return (
+        <AdminLayout>
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </AdminLayout>
+      );
+    }
+    
+    // Error state
+    if (categoriesQuery.error || articleQuery.error) {
+      return (
+        <AdminLayout>
+          <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
+            <h2 className="text-xl font-bold text-destructive">Erreur</h2>
+            <p>
+              {categoriesQuery.error?.message || articleQuery.error?.message || "Une erreur est survenue lors du chargement des données."}
+            </p>
+          </div>
+        </AdminLayout>
+      );
+    }
+    
+    // Article to edit found
+    if (articleQuery.data) {
+      return (
+        <AdminLayout>
+          <EditArticleForm 
+            article={articleQuery.data} 
+            categories={categoriesQuery.data || []} 
+          />
+        </AdminLayout>
+      );
+    }
+    
+    // Show error if article not found
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-96">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
+          <h2 className="text-xl font-bold text-destructive">Article non trouvé</h2>
+          <p>
+            L'article avec l'identifiant {params.id} n'a pas été trouvé ou vous n'avez pas les droits d'accès nécessaires.
+          </p>
         </div>
       </AdminLayout>
     );
   }
-
-  // Afficher une erreur si l'article n'est pas trouvé
-  if (!isNewArticle && articleError) {
+  
+  // Si pas d'ID, c'est un nouvel article
+  // Loading state
+  if (categoriesQuery.isLoading) {
     return (
       <AdminLayout>
-        <div className="flex flex-col items-center justify-center h-96">
-          <h1 className="text-2xl font-bold text-red-500">Article non trouvé</h1>
-          <p className="text-muted-foreground mt-2">L'article que vous cherchez n'existe pas ou a été supprimé.</p>
-          <Button className="mt-4" onClick={() => setLocation("/admin/articles")}>
-            Retour à la liste des articles
-          </Button>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </AdminLayout>
     );
   }
   
-  // Retourner le formulaire approprié (nouveau ou édition)
+  // Error state
+  if (categoriesQuery.error) {
+    return (
+      <AdminLayout>
+        <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
+          <h2 className="text-xl font-bold text-destructive">Erreur</h2>
+          <p>
+            {categoriesQuery.error.message || "Une erreur est survenue lors du chargement des catégories."}
+          </p>
+        </div>
+      </AdminLayout>
+    );
+  }
+  
+  // Create new article
   return (
     <AdminLayout>
-      {isNewArticle ? (
-        <NewArticleForm categories={categories || []} />
-      ) : (
-        article && <EditArticleForm article={article} categories={categories || []} />
-      )}
+      <NewArticleForm categories={categoriesQuery.data || []} />
     </AdminLayout>
   );
 }
