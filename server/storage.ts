@@ -207,7 +207,12 @@ export class DatabaseStorage implements IStorage {
     const [article] = await db
       .select()
       .from(articles)
-      .where(eq(articles.slug, slug));
+      .where(
+        and(
+          eq(articles.slug, slug),
+          eq(articles.published, true)
+        )
+      );
     return article;
   }
   

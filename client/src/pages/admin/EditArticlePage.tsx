@@ -331,7 +331,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       excerpt: article.excerpt || "",
       content: article.content,
       imageUrl: article.imageUrl || "",
-      categoryId: article.categoryId,
+      categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
     }
@@ -530,7 +530,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
               </CardHeader>
               <CardContent>
                 <Select
-                  value={form.watch("categoryId")?.toString() || (article.categoryId?.toString() || "1")}
+                  value={(form.watch("categoryId") || 1).toString()}
                   onValueChange={(value) => form.setValue("categoryId", parseInt(value))}
                 >
                   <SelectTrigger>

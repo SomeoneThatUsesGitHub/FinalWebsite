@@ -77,9 +77,12 @@ export function isAuthenticated(req: any, res: any, next: any) {
 
 // Middleware pour vérifier si l'utilisateur est un admin
 export function isAdmin(req: any, res: any, next: any) {
-  if (req.isAuthenticated() && (req.user.role === "admin" || req.user.isAdmin)) {
+  console.log("Vérification admin - User:", req.user);
+  if (req.isAuthenticated() && (req.user.role === "admin" || Boolean(req.user.isAdmin))) {
+    console.log("Utilisateur authentifié comme admin");
     return next();
   }
+  console.log("Accès admin refusé");
   res.status(403).json({ message: "Accès refusé" });
 }
 
