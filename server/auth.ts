@@ -4,25 +4,6 @@ import { storage } from "./storage";
 import { compare, hash } from "bcryptjs";
 import { z } from "zod";
 import { type User } from "@shared/schema";
-import { scrypt, timingSafeEqual } from "crypto";
-import { promisify } from "util";
-
-const scryptAsync = promisify(scrypt);
-
-// Fonction pour vérifier un mot de passe avec scrypt
-async function compareWithScrypt(supplied: string, stored: string): Promise<boolean> {
-  try {
-    const [hashed, salt] = stored.split(".");
-    if (!hashed || !salt) return false;
-    
-    const hashedBuf = Buffer.from(hashed, "hex");
-    const suppliedBuf = await scryptAsync(supplied, salt, 64) as Buffer;
-    return timingSafeEqual(hashedBuf, suppliedBuf);
-  } catch (error) {
-    console.error("Erreur lors de la comparaison scrypt:", error);
-    return false;
-  }
-}
 
 // Configuration de Passport avec une stratégie locale
 export function configurePassport() {
@@ -34,13 +15,8 @@ export function configurePassport() {
   passport.deserializeUser(async (id: number, done) => {
     try {
       const user = await storage.getUser(id);
-      if (!user) {
-        console.error(`Utilisateur avec ID ${id} non trouvé lors de la désérialisation`);
-        return done(null, false);
-      }
       done(null, user);
     } catch (error) {
-      console.error(`Erreur lors de la désérialisation de l'utilisateur avec ID ${id}:`, error);
       done(error, null);
     }
   });
@@ -58,24 +34,16 @@ export function configurePassport() {
         }
         
         console.log("Utilisateur trouvé:", username);
+        console.log("Mot de passe fourni:", password);
+        console.log("Mot de passe stocké:", user.password);
         
-        // Vérification directe pour le développement uniquement (à éviter en production)
+        // Vérification directe pour le développement uniquement
         if (password === user.password) {
           console.log("Correspondance directe du mot de passe réussie");
           return done(null, user);
         }
         
-        // Vérifier si le mot de passe est stocké au format scrypt (contient un point séparant le hash et le sel)
-        if (user.password.includes('.')) {
-          const isMatch = await compareWithScrypt(password, user.password);
-          console.log("Résultat de la comparaison scrypt:", isMatch);
-          
-          if (isMatch) {
-            return done(null, user);
-          }
-        }
-        
-        // Si ce n'est pas un format scrypt ou si la vérification a échoué, essayer bcrypt
+        // Si la comparaison directe a échoué, essayez de comparer avec bcrypt
         try {
           const isMatch = await compare(password, user.password);
           console.log("Résultat de la comparaison bcrypt:", isMatch);
