@@ -23,9 +23,6 @@ const YouTubeShort = ({ videoId, title }: { videoId: string; title: string }) =>
           className="absolute inset-0 w-full h-full rounded-lg shadow-md"
         ></iframe>
       </div>
-      <div className="mt-2 px-1">
-        <h3 className="font-medium text-sm line-clamp-2">{title}</h3>
-      </div>
     </div>
   );
 };
@@ -39,8 +36,8 @@ const VideosSection: React.FC = () => {
   // Animation au scroll
   const { controls, ref } = useScrollAnimation();
 
-  // Limite de vidéos à afficher (2 sur mobile, 4 sur desktop)
-  const limit = isMobile ? 2 : 4;
+  // Limite de vidéos à afficher (3 sur mobile, 4 sur desktop)
+  const limit = isMobile ? 3 : 4;
 
   // Récupérer les vidéos depuis l'API
   const { data: videos, isLoading, error } = useQuery({
@@ -92,7 +89,10 @@ const VideosSection: React.FC = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold">Nos Vidéos</h2>
+          <div className="flex items-center">
+            <div className="w-2 h-8 bg-primary rounded-full mr-3"></div>
+            <h2 className="text-2xl md:text-3xl font-bold">Nos Vidéos</h2>
+          </div>
           
           {!isMobile && videos && videos.length > 0 && (
             <div className="flex gap-2">
