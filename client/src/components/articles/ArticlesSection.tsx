@@ -307,7 +307,7 @@ const ArticlesSection: React.FC = () => {
     queryKey: ['/api/categories'],
   });
   
-  const { data: articles, isLoading: articlesLoading } = useQuery<Article[]>({
+  const { data: articlesData, isLoading: articlesLoading } = useQuery<Article[]>({
     queryKey: ['/api/articles', selectedCategory, searchTerm, sortOrder, selectedYear],
     queryFn: async ({ queryKey }) => {
       const [_, categoryId, search, sort, year] = queryKey;
@@ -323,6 +323,12 @@ const ArticlesSection: React.FC = () => {
       return res.json();
     }
   });
+  
+  // Filtrer explicitement pour ne garder que les articles publiés
+  const articles = useMemo(() => {
+    if (!articlesData) return [];
+    return articlesData.filter(article => article.published === true);
+  }, [articlesData]);
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
