@@ -378,6 +378,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createArticle(insertArticle: InsertArticle): Promise<Article> {
+    // Si le nouvel article est défini comme "à la une", décocher tous les autres articles
+    if (insertArticle.featured === true) {
+      // Mettre à jour tous les articles pour désactiver leur statut "à la une"
+      await db.update(articles)
+        .set({ featured: false })
+        .where(eq(articles.featured, true));
+    }
+    
     const [article] = await db
       .insert(articles)
       .values({

@@ -113,7 +113,7 @@ export default function ArticlesPage() {
         return (
           <div className="max-w-[500px] flex items-start gap-2">
             {article.featured && (
-              <Star className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" title="Article à la une" />
+              <Star className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" aria-label="Article à la une" />
             )}
             <div>
               <div className="font-medium line-clamp-1">{article.title}</div>
