@@ -36,10 +36,31 @@ export default function TeamPage() {
   // Ajoutons un log avant tout pour voir ce qui est chargé
   console.log("TeamPage se charge à:", new Date().toISOString());
   
-  // Notre fonction précédente qui fonctionnait bien
-  const fixTeamMembers = (members: TeamMember[]) => {
-    // Pour le débogage
-    console.log("Membres reçus dans fixTeamMembers:", members);
+  // Fonction pour afficher les données dans la console et vérifier les champs sociaux
+  const showTeamMembers = (members: TeamMember[]) => {
+    // Pour le débogage détaillé
+    console.log("Membres reçus pour traitement:", JSON.stringify(members, null, 2));
+    
+    // Si Guest_1 a été mis à jour via l'admin, afficher ses détails
+    const guest = members.find(m => m.username === 'Guest_1');
+    if (guest) {
+      console.log("Données sociales de Guest_1:", {
+        twitter: guest.twitterHandle,
+        instagram: guest.instagramHandle,
+        email: guest.email
+      });
+    }
+    
+    // Si Noah a été mis à jour via l'admin, afficher ses détails  
+    const noah = members.find(m => m.username === 'Noah');
+    if (noah) {
+      console.log("Données sociales de Noah:", {
+        twitter: noah.twitterHandle,
+        instagram: noah.instagramHandle,
+        email: noah.email
+      });
+    }
+    
     return members;
   };
   
@@ -63,8 +84,8 @@ export default function TeamPage() {
     refetchOnWindowFocus: false,
   });
   
-  // Appliquer les corrections avant d'utiliser les données
-  const members = fixTeamMembers(membersRaw);
+  // Afficher les détails et journaliser les problèmes potentiels
+  const members = showTeamMembers(membersRaw);
 
   if (isLoading) {
     return (
