@@ -62,6 +62,7 @@ export default function TeamPage() {
 
   return (
     <>
+      <Header />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

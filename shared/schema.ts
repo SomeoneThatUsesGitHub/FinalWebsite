@@ -27,6 +27,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
   title: true,
   bio: true,
   isTeamMember: true,
+  twitterHandle: true,
+  instagramHandle: true,
+  email: true,
 });
 
 // Category schema - for categorizing content

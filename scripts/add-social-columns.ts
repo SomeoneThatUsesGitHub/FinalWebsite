@@ -1,60 +1,64 @@
-import { pool } from '../server/db';
-
 /**
  * Ce script ajoute les colonnes pour les réseaux sociaux à la table utilisateurs
  */
+import { pool, db } from "../server/db";
+import { sql } from "drizzle-orm";
+
 async function main() {
+  console.log("Ajout des colonnes pour les réseaux sociaux à la table users...");
+  
   try {
-    console.log('Ajout des colonnes pour les réseaux sociaux à la table users...');
-    
-    // Vérifier si la colonne twitter_handle existe déjà
-    const checkTwitterColumn = await pool.query(`
+    // Vérifier si les colonnes existent déjà
+    const checkColumnsSQL = `
       SELECT column_name 
       FROM information_schema.columns 
-      WHERE table_name = 'users' AND column_name = 'twitter_handle'
-    `);
+      WHERE table_name = 'users' 
+      AND column_name IN ('twitter_handle', 'instagram_handle', 'email');
+    `;
     
-    if (checkTwitterColumn.rows.length === 0) {
-      console.log('Ajout de la colonne "twitter_handle"...');
-      await pool.query(`ALTER TABLE users ADD COLUMN twitter_handle TEXT`);
-    } else {
-      console.log('La colonne "twitter_handle" existe déjà.');
+    const result = await pool.query(checkColumnsSQL);
+    const existingColumns = result.rows.map(row => row.column_name);
+    
+    console.log("Colonnes existantes:", existingColumns);
+    
+    // Ajouter les colonnes manquantes
+    const queries: string[] = [];
+    
+    if (!existingColumns.includes('twitter_handle')) {
+      queries.push("ALTER TABLE users ADD COLUMN twitter_handle TEXT;");
     }
     
-    // Vérifier si la colonne instagram_handle existe déjà
-    const checkInstagramColumn = await pool.query(`
-      SELECT column_name 
-      FROM information_schema.columns 
-      WHERE table_name = 'users' AND column_name = 'instagram_handle'
-    `);
-    
-    if (checkInstagramColumn.rows.length === 0) {
-      console.log('Ajout de la colonne "instagram_handle"...');
-      await pool.query(`ALTER TABLE users ADD COLUMN instagram_handle TEXT`);
-    } else {
-      console.log('La colonne "instagram_handle" existe déjà.');
+    if (!existingColumns.includes('instagram_handle')) {
+      queries.push("ALTER TABLE users ADD COLUMN instagram_handle TEXT;");
     }
     
-    // Vérifier si la colonne email existe déjà
-    const checkEmailColumn = await pool.query(`
-      SELECT column_name 
-      FROM information_schema.columns 
-      WHERE table_name = 'users' AND column_name = 'email'
-    `);
-    
-    if (checkEmailColumn.rows.length === 0) {
-      console.log('Ajout de la colonne "email"...');
-      await pool.query(`ALTER TABLE users ADD COLUMN email TEXT`);
-    } else {
-      console.log('La colonne "email" existe déjà.');
+    if (!existingColumns.includes('email')) {
+      queries.push("ALTER TABLE users ADD COLUMN email TEXT;");
     }
     
-    console.log('Opération terminée avec succès!');
+    if (queries.length > 0) {
+      console.log("Exécution des requêtes suivantes:");
+      queries.forEach(q => console.log(" - " + q));
+      
+      // Exécuter chaque requête
+      for (const query of queries) {
+        await pool.query(query);
+      }
+      
+      console.log("Colonnes ajoutées avec succès!");
+    } else {
+      console.log("Toutes les colonnes existent déjà.");
+    }
+    
   } catch (error) {
-    console.error('Erreur lors de l\'exécution du script:', error);
+    console.error("Erreur lors de l'ajout des colonnes:", error);
   } finally {
+    // Fermer la connexion
     await pool.end();
   }
 }
 
-main();
+main().catch(e => {
+  console.error("Erreur non gérée:", e);
+  process.exit(1);
+});
