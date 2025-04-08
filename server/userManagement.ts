@@ -208,67 +208,47 @@ export async function updateUserProfile(username: string, userData: {
 export async function getTeamMembers() {
   try {
     console.log("getTeamMembers appelé à:", new Date().toISOString());
-    
-    // Avant: requête directe pour vérifier
-    const rawData = await db.execute(`
-      SELECT id, username, display_name, role, is_team_member, twitter_handle, instagram_handle, email 
+
+    // Requête SQL directe pour le débogage - récupère explicitement tous les champs nécessaires
+    const completeData = await db.execute(`
+      SELECT 
+        id, 
+        username, 
+        display_name as "displayName", 
+        role, 
+        avatar_url as "avatarUrl", 
+        title, 
+        bio, 
+        is_team_member as "isTeamMember", 
+        twitter_handle as "twitterHandle", 
+        instagram_handle as "instagramHandle", 
+        email
       FROM users 
       WHERE is_team_member = true
     `);
-    console.log("DONNÉES BRUTES SQL:", JSON.stringify(rawData.rows, null, 2));
-
-    // Vérifier directement les valeurs de Noah
-    const noahData = await db.execute(`
-      SELECT id, username, display_name, twitter_handle, instagram_handle, email 
-      FROM users 
-      WHERE username = 'Noah'
-    `);
-    console.log("DONNÉES NOAH SQL:", JSON.stringify(noahData.rows, null, 2));
-
-    // Mise à jour directe des réseaux sociaux pour Noah
-    await db.execute(`
-      UPDATE users 
-      SET twitter_handle = 'politinoah', 
-          instagram_handle = 'noah_politique', 
-          email = 'noah@politiquen.fr' 
-      WHERE username = 'Noah'
-    `);
-    console.log("Mise à jour directe des données de Noah effectuée");
-
-    // Sélectionner uniquement les utilisateurs qui sont membres de l'équipe
-    const teamMembers = await db.select({
-      id: users.id,
-      username: users.username,
-      displayName: users.displayName,
-      role: users.role,
-      avatarUrl: users.avatarUrl,
-      title: users.title,
-      bio: users.bio,
-      twitterHandle: users.twitterHandle,
-      instagramHandle: users.instagramHandle,
-      email: users.email
-    })
-    .from(users)
-    .where(eq(users.isTeamMember, true));
     
-    // Important: hard-coder les valeurs pour Noah
-    const fixedMembers = teamMembers.map(member => {
-      if (member.username === 'Noah') {
-        return {
-          ...member,
-          twitterHandle: 'politinoah',
-          instagramHandle: 'noah_politique',
-          email: 'noah@politiquen.fr'
-        };
-      }
-      return member;
-    });
+    console.log("DONNÉES COMPLÈTES DES MEMBRES TEAM:", JSON.stringify(completeData.rows, null, 2));
+
+    // Si les données sont correctes dans la base mais pas dans la réponse, on utilise les données SQL brutes
+    // Mais on s'assure de la bonne structure avec des valeurs par défaut pour les champs manquants
+    const teamMembers = completeData.rows.map(member => ({
+      id: member.id,
+      username: member.username,
+      displayName: member.displayName,
+      role: member.role || 'editor',
+      avatarUrl: member.avatarUrl || null,
+      title: member.title || null,
+      bio: member.bio || null,
+      twitterHandle: member.twitterHandle || '',
+      instagramHandle: member.instagramHandle || '',
+      email: member.email || ''
+    }));
     
-    console.log("Les membres d'équipe APRÈS CORRECTION:", JSON.stringify(fixedMembers, null, 2));
+    console.log("Les membres d'équipe formatés:", JSON.stringify(teamMembers, null, 2));
     
     return {
       success: true,
-      members: fixedMembers
+      members: teamMembers
     };
     
   } catch (error) {

@@ -36,20 +36,16 @@ export default function TeamPage() {
   // Ajoutons un log avant tout pour voir ce qui est chargé
   console.log("TeamPage se charge à:", new Date().toISOString());
   
-  // Créons une fonction utilitaire pour vérifier les réseaux sociaux
-  const fixTeamMembers = (members: TeamMember[]) => {
+  // Fonction utilitaire pour s'assurer que les champs sociaux ne sont jamais undefined
+  const ensureSocialFields = (members: TeamMember[]) => {
     return members.map(member => {
-      // Pour Noah spécifiquement, on force les valeurs correctes
-      if (member.username === 'Noah') {
-        console.log("Correction des données pour Noah:", member);
-        return {
-          ...member,
-          twitterHandle: 'politiquensemble',
-          instagramHandle: 'politique.ensemble',
-          email: 'contact@politiquensemble.fr'
-        };
-      }
-      return member;
+      console.log("Traitement des données pour", member.username, ":", member);
+      return {
+        ...member,
+        twitterHandle: member.twitterHandle || '',
+        instagramHandle: member.instagramHandle || '',
+        email: member.email || ''
+      };
     });
   };
   
@@ -74,7 +70,7 @@ export default function TeamPage() {
   });
   
   // Appliquer les corrections avant d'utiliser les données
-  const members = fixTeamMembers(membersRaw);
+  const members = ensureSocialFields(membersRaw);
 
   if (isLoading) {
     return (
@@ -136,7 +132,7 @@ export default function TeamPage() {
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {members.map((member, index) => (
+            {members.map((member: TeamMember, index: number) => (
               <motion.div
                 key={member.id}
                 initial={{ opacity: 0, y: 20 }}
