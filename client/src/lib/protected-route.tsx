@@ -48,7 +48,9 @@ function ProtectedContent({
   const strictAdminRoutes = [
     "/admin/categories",
     "/admin/team",
-    "/admin/users"
+    "/admin/users",
+    "/admin/directs/nouveau",
+    "/admin/directs/editer"
   ];
   
   // Vérifier si l'URL actuelle est dans les routes strictement réservées aux admins

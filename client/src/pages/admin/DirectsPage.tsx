@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { LiveCoverage } from "@shared/schema";
@@ -13,17 +13,51 @@ import { Pencil, Plus, Radio, Trash2, Users } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function DirectsPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [directToDelete, setDirectToDelete] = useState<number | null>(null);
+  const [userEditorAssignments, setUserEditorAssignments] = useState<Record<number, boolean>>({});
+  const isAdmin = user?.isAdmin || user?.role === "admin";
 
   // Récupérer tous les suivis en direct
   const { data: directs, isLoading, error } = useQuery<LiveCoverage[]>({
     queryKey: ["/api/admin/live-coverages"],
   });
+  
+  // Pour chaque suivi en direct, vérifier si l'utilisateur actuel est un éditeur
+  // (seulement nécessaire pour les éditeurs, pas pour les admins qui ont accès à tout)
+  useEffect(() => {
+    if (!isAdmin && user && directs && directs.length > 0) {
+      const checkEditorStatus = async () => {
+        const editorAssignments: Record<number, boolean> = {};
+        
+        // Pour chaque suivi en direct, vérifier si l'utilisateur est éditeur
+        for (const direct of directs) {
+          try {
+            const response = await fetch(`/api/live-coverages/${direct.id}/editors`);
+            if (response.ok) {
+              const editors = await response.json();
+              // Vérifier si l'utilisateur actuel est dans la liste des éditeurs de ce suivi
+              const isEditor = editors.some((editor: any) => editor.editorId === user.id);
+              editorAssignments[direct.id] = isEditor;
+            }
+          } catch (error) {
+            console.error(`Erreur lors de la vérification des éditeurs pour le direct ${direct.id}:`, error);
+            editorAssignments[direct.id] = false;
+          }
+        }
+        
+        setUserEditorAssignments(editorAssignments);
+      };
+      
+      checkEditorStatus();
+    }
+  }, [directs, user, isAdmin]);
 
   // Mutation pour supprimer un suivi en direct
   const deleteMutation = useMutation({
@@ -74,19 +108,21 @@ export default function DirectsPage() {
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
-            Créez et gérez les suivis en direct d'événements, élections et actualités importantes.
+            {isAdmin ? "Créez et gérez" : "Gérez"} les suivis en direct d'événements, élections et actualités importantes.
             {activeDirectsCount > 0 && (
               <span className="font-medium"> {activeDirectsCount} suivi{activeDirectsCount > 1 ? "s" : ""} actif{activeDirectsCount > 1 ? "s" : ""} en ce moment.</span>
             )}
           </p>
         </div>
-        <Button 
-          onClick={() => navigate("/admin/directs/nouveau")}
-          disabled={activeDirectsCount >= 3}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Nouveau suivi en direct
-        </Button>
+        {isAdmin && (
+          <Button 
+            onClick={() => navigate("/admin/directs/nouveau")}
+            disabled={activeDirectsCount >= 3}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Nouveau suivi en direct
+          </Button>
+        )}
       </div>
 
       {activeDirectsCount >= 3 && (
@@ -166,38 +202,53 @@ export default function DirectsPage() {
                 </div>
               </CardContent>
               <CardFooter className="flex flex-wrap gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1"
-                  onClick={() => navigate(`/admin/directs/editer/${direct.id}`)}
-                >
-                  <Pencil className="mr-2 h-4 w-4" /> Modifier
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1" 
-                  onClick={() => navigate(`/admin/directs/${direct.id}/editeurs`)}
-                >
-                  <Users className="mr-2 h-4 w-4" /> Éditeurs
-                </Button>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="flex-1 mt-2 w-full"
-                  onClick={() => navigate(`/admin/directs/${direct.id}/mises-a-jour`)}
-                >
-                  <Radio className="mr-2 h-4 w-4" /> Mises à jour
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-destructive hover:text-destructive mt-2"
-                  onClick={() => handleDeleteClick(direct.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {/* Bouton Modifier - visible seulement pour les admins */}
+                {isAdmin && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => navigate(`/admin/directs/editer/${direct.id}`)}
+                  >
+                    <Pencil className="mr-2 h-4 w-4" /> Modifier
+                  </Button>
+                )}
+                
+                {/* Bouton Éditeurs - visible seulement pour les admins */}
+                {isAdmin && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1" 
+                    onClick={() => navigate(`/admin/directs/${direct.id}/editeurs`)}
+                  >
+                    <Users className="mr-2 h-4 w-4" /> Éditeurs
+                  </Button>
+                )}
+                
+                {/* Bouton Mises à jour - visible pour les admins OU les éditeurs assignés à ce direct */}
+                {(isAdmin || userEditorAssignments[direct.id]) && (
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className={`flex-1 ${!isAdmin ? "w-full" : "mt-2 w-full"}`}
+                    onClick={() => navigate(`/admin/directs/${direct.id}/mises-a-jour`)}
+                  >
+                    <Radio className="mr-2 h-4 w-4" /> Mises à jour
+                  </Button>
+                )}
+                
+                {/* Bouton Supprimer - visible seulement pour les admins */}
+                {isAdmin && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-destructive hover:text-destructive mt-2"
+                    onClick={() => handleDeleteClick(direct.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
@@ -207,15 +258,19 @@ export default function DirectsPage() {
           <Radio className="h-10 w-10 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium">Aucun suivi en direct</h3>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Créez votre premier suivi en direct pour couvrir un événement important en temps réel.
+            {isAdmin 
+              ? "Créez votre premier suivi en direct pour couvrir un événement important en temps réel."
+              : "Aucun suivi en direct n'est disponible pour le moment."}
           </p>
-          <Button 
-            className="mt-4"
-            onClick={() => navigate("/admin/directs/nouveau")}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Créer un suivi en direct
-          </Button>
+          {isAdmin && (
+            <Button 
+              className="mt-4"
+              onClick={() => navigate("/admin/directs/nouveau")}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Créer un suivi en direct
+            </Button>
+          )}
         </div>
       )}
 
