@@ -195,10 +195,15 @@ export class DatabaseStorage implements IStorage {
 
     const results = await query;
     
-    return results.map(row => ({
-      ...row.article,
-      author: row.author.displayName ? row.author : undefined
-    }));
+    return results.map(row => {
+      // Safe handling of possible null author
+      const authorData = row.author && row.author.displayName ? row.author : undefined;
+      
+      return {
+        ...row.article,
+        author: authorData
+      };
+    });
   }
 
   async getFeaturedArticles(limit: number = 3): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
