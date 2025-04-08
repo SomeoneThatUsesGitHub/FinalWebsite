@@ -36,6 +36,7 @@ import {
   Eye,
   EyeOff,
   Search,
+  Star,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -110,10 +111,15 @@ export default function ArticlesPage() {
       cell: ({ row }: any) => {
         const article = row.original as Article;
         return (
-          <div className="max-w-[500px]">
-            <div className="font-medium line-clamp-1">{article.title}</div>
-            <div className="text-sm text-muted-foreground line-clamp-1">
-              {article.excerpt}
+          <div className="max-w-[500px] flex items-start gap-2">
+            {article.featured && (
+              <Star className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" title="Article à la une" />
+            )}
+            <div>
+              <div className="font-medium line-clamp-1">{article.title}</div>
+              <div className="text-sm text-muted-foreground line-clamp-1">
+                {article.excerpt}
+              </div>
             </div>
           </div>
         );

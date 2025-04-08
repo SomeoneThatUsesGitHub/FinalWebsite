@@ -402,8 +402,8 @@ export class DatabaseStorage implements IStorage {
         .set({ featured: false })
         .where(
           and(
-            neq(articles.id, id),   // Tous les articles sauf celui en cours de modification
-            eq(articles.featured, true)  // Qui sont actuellement définis comme "à la une"
+            eq(articles.featured, true),  // Qui sont actuellement définis comme "à la une"
+            sql`${articles.id} <> ${id}`  // Tous les articles sauf celui en cours de modification
           )
         );
     }
