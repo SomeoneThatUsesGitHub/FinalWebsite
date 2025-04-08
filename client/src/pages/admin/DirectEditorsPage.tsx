@@ -309,7 +309,7 @@ export default function DirectEditorsPage() {
                       <SelectValue placeholder="Sélectionner un rôle (optionnel)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Aucun rôle spécifique</SelectItem>
+                      <SelectItem value="default">Aucun rôle spécifique</SelectItem>
                       <SelectItem value="Coordinateur">Coordinateur</SelectItem>
                       <SelectItem value="Reporter">Reporter</SelectItem>
                       <SelectItem value="Analyste">Analyste</SelectItem>
