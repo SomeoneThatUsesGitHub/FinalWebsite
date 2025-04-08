@@ -157,42 +157,45 @@ export default function TeamPage() {
                         Membre de l'équipe Politiquensemble
                       </p>
                     )}
-                    
-                    {/* Débogage - à enlever en production */}
-                    <div className="mt-3 text-xs">
-                      <p>Twitter: {member.twitterHandle || "Non défini"}</p>
-                      <p>Instagram: {member.instagramHandle || "Non défini"}</p>
-                      <p>Email: {member.email || "Non défini"}</p>
-                    </div>
+
                   </CardContent>
                   <CardFooter className="flex justify-center space-x-2 border-t p-4 mt-auto">
-                    {member.twitterHandle && member.twitterHandle !== "" && (
-                      <Button variant="ghost" size="icon" asChild>
-                        <a href={`https://twitter.com/${member.twitterHandle}`} target="_blank" rel="noopener noreferrer" title={`Twitter: @${member.twitterHandle}`}>
-                          <Twitter className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    )}
-                    {member.instagramHandle && member.instagramHandle !== "" && (
-                      <Button variant="ghost" size="icon" asChild>
-                        <a href={`https://instagram.com/${member.instagramHandle}`} target="_blank" rel="noopener noreferrer" title={`Instagram: @${member.instagramHandle}`}>
-                          <Instagram className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    )}
-                    {member.email && member.email !== "" && (
-                      <Button variant="ghost" size="icon" asChild>
-                        <a href={`mailto:${member.email}`} title={`Email: ${member.email}`}>
-                          <Mail className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    )}
-                    {/* Si aucun réseau social n'est défini, on affiche un message */}
-                    {(!member.twitterHandle || member.twitterHandle === "") && 
-                     (!member.instagramHandle || member.instagramHandle === "") && 
-                     (!member.email || member.email === "") && (
-                      <span className="text-xs text-muted-foreground">Aucun réseau social disponible</span>
-                    )}
+                    {(() => {
+                      // Vérifier si au moins un réseau social est défini
+                      const hasTwitter = member.twitterHandle && member.twitterHandle !== "";
+                      const hasInstagram = member.instagramHandle && member.instagramHandle !== "";
+                      const hasEmail = member.email && member.email !== "";
+                      const hasSocialMedia = hasTwitter || hasInstagram || hasEmail;
+                      
+                      // Retourner les boutons ou le message
+                      return hasSocialMedia ? (
+                        <>
+                          {hasTwitter && (
+                            <Button variant="ghost" size="icon" asChild>
+                              <a href={`https://twitter.com/${member.twitterHandle}`} target="_blank" rel="noopener noreferrer" title={`Twitter: @${member.twitterHandle}`}>
+                                <Twitter className="h-4 w-4" />
+                              </a>
+                            </Button>
+                          )}
+                          {hasInstagram && (
+                            <Button variant="ghost" size="icon" asChild>
+                              <a href={`https://instagram.com/${member.instagramHandle}`} target="_blank" rel="noopener noreferrer" title={`Instagram: @${member.instagramHandle}`}>
+                                <Instagram className="h-4 w-4" />
+                              </a>
+                            </Button>
+                          )}
+                          {hasEmail && (
+                            <Button variant="ghost" size="icon" asChild>
+                              <a href={`mailto:${member.email}`} title={`Email: ${member.email}`}>
+                                <Mail className="h-4 w-4" />
+                              </a>
+                            </Button>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Aucun réseau social disponible</span>
+                      );
+                    })()}
                   </CardFooter>
                 </Card>
               </motion.div>
