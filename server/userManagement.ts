@@ -110,9 +110,7 @@ export async function listUsers() {
       title: users.title,
       bio: users.bio,
       isTeamMember: users.isTeamMember,
-      twitterHandle: users.twitterHandle,
-      instagramHandle: users.instagramHandle,
-      email: users.email
+      // Champs de réseaux sociaux supprimés
     }).from(users);
     
     return {
@@ -139,9 +137,7 @@ export async function updateUserProfile(username: string, userData: {
   title?: string;
   bio?: string;
   isTeamMember?: boolean;
-  twitterHandle?: string;
-  instagramHandle?: string;
-  email?: string;
+  // Champs de réseaux sociaux supprimés
 }) {
   try {
     console.log("Mise à jour du profil de", username, "avec les données:", JSON.stringify(userData, null, 2));
@@ -167,15 +163,10 @@ export async function updateUserProfile(username: string, userData: {
       title: userData.title !== undefined ? userData.title : existingUser[0].title,
       bio: userData.bio !== undefined ? userData.bio : existingUser[0].bio,
       isTeamMember: userData.isTeamMember !== undefined ? userData.isTeamMember : existingUser[0].isTeamMember,
-      twitterHandle: userData.twitterHandle !== undefined ? userData.twitterHandle : existingUser[0].twitterHandle,
-      instagramHandle: userData.instagramHandle !== undefined ? userData.instagramHandle : existingUser[0].instagramHandle,
-      email: userData.email !== undefined ? userData.email : existingUser[0].email,
+      // Les champs de réseaux sociaux ont été supprimés
     };
     
     console.log("Données de mise à jour formatées:", JSON.stringify(updateData, null, 2));
-    console.log("La valeur twitterHandle est:", updateData.twitterHandle);
-    console.log("La valeur instagramHandle est:", updateData.instagramHandle);
-    console.log("La valeur email est:", updateData.email);
     
     // Mettre à jour le profil avec tous les champs
     const [updatedUser] = await db.update(users)
@@ -209,7 +200,7 @@ export async function getTeamMembers() {
   try {
     console.log("getTeamMembers appelé à:", new Date().toISOString());
 
-    // Requête SQL directe pour le débogage - récupère explicitement tous les champs nécessaires
+    // Requête SQL directe pour récupérer les membres de l'équipe
     const completeData = await db.execute(`
       SELECT 
         id, 
@@ -219,18 +210,14 @@ export async function getTeamMembers() {
         avatar_url as "avatarUrl", 
         title, 
         bio, 
-        is_team_member as "isTeamMember", 
-        twitter_handle as "twitterHandle", 
-        instagram_handle as "instagramHandle", 
-        email
+        is_team_member as "isTeamMember"
       FROM users 
       WHERE is_team_member = true
     `);
     
     console.log("DONNÉES COMPLÈTES DES MEMBRES TEAM:", JSON.stringify(completeData.rows, null, 2));
 
-    // Si les données sont correctes dans la base mais pas dans la réponse, on utilise les données SQL brutes
-    // Mais on s'assure de la bonne structure avec des valeurs par défaut pour les champs manquants
+    // Formater les données pour la réponse
     const teamMembers = completeData.rows.map(member => ({
       id: member.id,
       username: member.username,
@@ -238,10 +225,8 @@ export async function getTeamMembers() {
       role: member.role || 'editor',
       avatarUrl: member.avatarUrl || null,
       title: member.title || null,
-      bio: member.bio || null,
-      twitterHandle: member.twitterHandle || '',
-      instagramHandle: member.instagramHandle || '',
-      email: member.email || ''
+      bio: member.bio || null
+      // Champs de réseaux sociaux supprimés
     }));
     
     console.log("Les membres d'équipe formatés:", JSON.stringify(teamMembers, null, 2));
