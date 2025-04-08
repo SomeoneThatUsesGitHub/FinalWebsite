@@ -186,7 +186,7 @@ export default function LiveCoveragePage() {
                   <div className="flex justify-center py-4">
                     <Loader2 className="h-6 w-6 animate-spin text-primary/70" />
                   </div>
-                ) : editors && editors.length > 0 ? (
+                ) : editors && Array.isArray(editors) && editors.length > 0 ? (
                   <div className="space-y-4">
                     {editors.map((editor) => (
                       <div key={editor.editorId} className="flex items-center gap-3">
