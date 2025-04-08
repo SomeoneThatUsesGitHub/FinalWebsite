@@ -17,8 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, ExternalLink, Loader2 } from 'lucide-react';
 // Layout
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+// Header et Footer sont fournis par App.tsx
 
 type TeamMember = {
   id: number;
@@ -47,22 +46,17 @@ export default function TeamPage() {
 
   if (isLoading) {
     return (
-      <>
-        <Header />
-        <div className="container mx-auto py-16">
-          <div className="flex flex-col items-center justify-center min-h-[400px]">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <h3 className="mt-4 text-lg font-medium">Chargement de l'équipe...</h3>
-          </div>
+      <div className="container mx-auto py-16">
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <h3 className="mt-4 text-lg font-medium">Chargement de l'équipe...</h3>
         </div>
-        <Footer />
-      </>
+      </div>
     );
   }
 
   return (
     <>
-      <Header />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -198,8 +192,6 @@ export default function TeamPage() {
       
       {/* Ajout de beaucoup plus d'espace avant le footer */}
       <div className="pb-40"></div>
-      
-      <Footer />
     </>
   );
 }

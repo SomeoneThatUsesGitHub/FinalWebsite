@@ -144,6 +144,8 @@ export async function updateUserProfile(username: string, userData: {
   email?: string;
 }) {
   try {
+    console.log("Mise à jour du profil de", username, "avec les données:", JSON.stringify(userData, null, 2));
+    
     // Vérifier si l'utilisateur existe
     const existingUser = await db.select().from(users).where(eq(users.username, username));
     
@@ -153,6 +155,9 @@ export async function updateUserProfile(username: string, userData: {
         message: "Utilisateur introuvable."
       };
     }
+    
+    // Afficher l'utilisateur existant pour le débogage
+    console.log("Utilisateur existant avant la mise à jour:", JSON.stringify(existingUser[0], null, 2));
     
     // Mettre à jour le profil avec tous les champs
     const [updatedUser] = await db.update(users)
@@ -207,6 +212,9 @@ export async function getTeamMembers() {
     })
     .from(users)
     .where(eq(users.isTeamMember, true));
+    
+    // Débogage: Afficher les données de réseaux sociaux
+    console.log("Les membres d'équipe récupérés:", JSON.stringify(teamMembers, null, 2));
     
     return {
       success: true,
