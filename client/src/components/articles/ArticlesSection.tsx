@@ -35,6 +35,11 @@ type Article = {
   commentCount: number;
   createdAt: string;
   updatedAt: string;
+  author?: {
+    displayName: string;
+    title: string | null;
+    avatarUrl: string | null;
+  };
 };
 
 // Liste des années pour la barre de navigation temporelle
@@ -188,11 +193,14 @@ const GridArticleCard: React.FC<{
         <div className="flex items-center justify-between text-dark/60 text-xs pt-3 border-t border-gray-100">
           <div className="flex items-center">
             <img 
-              src="https://randomuser.me/api/portraits/men/32.jpg" 
-              alt="Author" 
+              src={article.author?.avatarUrl || '/assets/default-avatar.svg'} 
+              alt={article.author?.displayName || "Auteur"} 
               className="w-6 h-6 rounded-full mr-2"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/assets/default-avatar.svg';
+              }}
             />
-            <span>Jean Dupont</span>
+            <span>{article.author?.displayName || "Auteur inconnu"}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
@@ -254,11 +262,14 @@ const ListArticleCard: React.FC<{
           <div className="flex items-center gap-2 text-dark/60 text-sm">
             <div className="flex items-center">
               <img 
-                src="https://randomuser.me/api/portraits/men/32.jpg" 
-                alt="Author" 
+                src={article.author?.avatarUrl || '/assets/default-avatar.svg'} 
+                alt={article.author?.displayName || "Auteur"} 
                 className="w-6 h-6 rounded-full mr-2"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/assets/default-avatar.svg';
+                }}
               />
-              <span>Jean Dupont</span>
+              <span>{article.author?.displayName || "Auteur inconnu"}</span>
             </div>
             <span className="mx-2">•</span>
             <span>{formatDate(article.createdAt, "d MMMM yyyy")}</span>

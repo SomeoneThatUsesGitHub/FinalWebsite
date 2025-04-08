@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Share2, Calendar, Clock, Bookmark, Facebook, Twitter } from "lucide-react";
+import { ChevronLeft, Share2, Calendar } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
 import ArticleContent from "@/components/ArticleContent";
@@ -78,10 +78,6 @@ const Article: React.FC = () => {
               {article?.title || "Article"}
             </h2>
             <div className="flex items-center gap-1">
-              <Button variant="ghost" size="sm" className="flex items-center text-white hover:bg-blue-600 min-w-0 p-1 sm:p-2">
-                <Bookmark className="h-4 w-4" />
-                <span className="hidden lg:ml-1 lg:inline-block">Sauvegarder</span>
-              </Button>
               <Button variant="ghost" size="sm" className="flex items-center text-white hover:bg-blue-600 min-w-0 p-1 sm:p-2">
                 <Share2 className="h-4 w-4" />
                 <span className="hidden lg:ml-1 lg:inline-block">Partager</span>
@@ -186,10 +182,6 @@ const Article: React.FC = () => {
                       <Calendar className="w-4 h-4 mr-1" />
                       <span>{formatDate(article.createdAt, "d MMMM yyyy")}</span>
                     </div>
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" />
-                      <span>8 min de lecture</span>
-                    </div>
                   </motion.div>
                 </motion.div>
                 
@@ -216,14 +208,6 @@ const Article: React.FC = () => {
                     <p className="text-sm text-dark/70">Partagez-le avec vos amis</p>
                   </div>
                   <div className="flex gap-3">
-                    <Button variant="outline" size="sm" className="bg-white">
-                      <Facebook className="h-4 w-4 mr-2" />
-                      Facebook
-                    </Button>
-                    <Button variant="outline" size="sm" className="bg-white">
-                      <Twitter className="h-4 w-4 mr-2" />
-                      Twitter
-                    </Button>
                     <Button variant="outline" size="sm" className="bg-white">
                       <Share2 className="h-4 w-4 mr-2" />
                       Partager
