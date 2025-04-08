@@ -114,86 +114,161 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Article operations
-  async getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number, showUnpublished?: boolean}): Promise<Article[]> {
-    let query = db.select().from(articles);
-    
-    // Par défaut, ne montrer que les articles publiés (sauf si explicitement demandé de montrer les brouillons)
-    if (!filters?.showUnpublished) {
-      query = query.where(eq(articles.published, true));
-    }
-    
-    if (filters) {
-      // Filter by category
-      if (filters.categoryId) {
-        query = query.where(eq(articles.categoryId, filters.categoryId));
-      }
-      
-      // Filter by search term
-      if (filters.search) {
-        const searchTerm = `%${filters.search}%`;
-        query = query.where(
-          or(
+  async getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number, showUnpublished?: boolean}): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
+    // Récupération des articles avec jointure sur l'auteur
+    const result = await db
+      .select({
+        article: articles,
+        authorDisplayName: users.displayName,
+        authorTitle: users.title,
+        authorAvatarUrl: users.avatarUrl
+      })
+      .from(articles)
+      .leftJoin(users, eq(articles.authorId, users.id))
+      .where((qb) => {
+        // Par défaut, ne montrer que les articles publiés
+        if (!filters?.showUnpublished) {
+          return eq(articles.published, true);
+        }
+        return undefined;
+      })
+      .where((qb) => {
+        // Filter by category
+        if (filters?.categoryId) {
+          return eq(articles.categoryId, filters.categoryId);
+        }
+        return undefined;
+      })
+      .where((qb) => {
+        // Filter by search term
+        if (filters?.search) {
+          const searchTerm = `%${filters.search}%`;
+          return or(
             like(articles.title, searchTerm),
             like(articles.excerpt, searchTerm),
             like(articles.content, searchTerm)
-          )
-        );
-      }
-      
-      // Filter by year
-      if (filters.year) {
-        const startOfYear = new Date(filters.year, 0, 1);
-        const endOfYear = new Date(filters.year, 11, 31, 23, 59, 59);
-        
-        query = query.where(
-          and(
+          );
+        }
+        return undefined;
+      })
+      .where((qb) => {
+        // Filter by year
+        if (filters?.year) {
+          const startOfYear = new Date(filters.year, 0, 1);
+          const endOfYear = new Date(filters.year, 11, 31, 23, 59, 59);
+          
+          return and(
             gte(articles.createdAt, startOfYear),
             lte(articles.createdAt, endOfYear)
-          )
-        );
+          );
+        }
+        return undefined;
+      })
+      .orderBy(desc(articles.createdAt));
+    
+    // Transformation des résultats pour correspondre au format attendu
+    const articlesWithAuthors = result.map(row => {
+      const article = { ...row.article };
+      
+      if (row.authorDisplayName) {
+        article.author = {
+          displayName: row.authorDisplayName,
+          title: row.authorTitle,
+          avatarUrl: row.authorAvatarUrl
+        };
       }
-    }
+      
+      return article;
+    });
     
-    // Default sorting by recency
-    const articlesData = await query.orderBy(desc(articles.createdAt));
-    
-    // Apply custom sort (if needed, although DB ordering should be preferred)
+    // Apply custom sort (if needed)
     if (filters?.sort && filters.sort !== 'recent') {
       switch (filters.sort) {
         case 'popular':
-          articlesData.sort((a, b) => b.viewCount - a.viewCount);
+          articlesWithAuthors.sort((a, b) => b.viewCount - a.viewCount);
           break;
         case 'commented':
-          articlesData.sort((a, b) => b.commentCount - a.commentCount);
+          articlesWithAuthors.sort((a, b) => b.commentCount - a.commentCount);
           break;
       }
     }
     
-    return articlesData;
+    return articlesWithAuthors;
   }
   
-  async getFeaturedArticles(limit: number = 3): Promise<Article[]> {
-    return db
-      .select()
+  async getFeaturedArticles(limit: number = 3): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
+    // Récupération des articles avec jointure sur l'auteur
+    const result = await db
+      .select({
+        article: articles,
+        authorDisplayName: users.displayName,
+        authorTitle: users.title,
+        authorAvatarUrl: users.avatarUrl
+      })
       .from(articles)
+      .leftJoin(users, eq(articles.authorId, users.id))
       .where(eq(articles.featured, true))
       .orderBy(desc(articles.createdAt))
       .limit(limit);
+    
+    // Transformation des résultats pour correspondre au format attendu
+    return result.map(row => {
+      const article = { ...row.article };
+      
+      if (row.authorDisplayName) {
+        article.author = {
+          displayName: row.authorDisplayName,
+          title: row.authorTitle,
+          avatarUrl: row.authorAvatarUrl
+        };
+      }
+      
+      return article;
+    });
   }
   
-  async getRecentArticles(limit: number = 9): Promise<Article[]> {
-    return db
-      .select()
+  async getRecentArticles(limit: number = 9): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
+    // Récupération des articles avec jointure sur l'auteur
+    const result = await db
+      .select({
+        article: articles,
+        authorDisplayName: users.displayName,
+        authorTitle: users.title,
+        authorAvatarUrl: users.avatarUrl
+      })
       .from(articles)
+      .leftJoin(users, eq(articles.authorId, users.id))
       .where(eq(articles.published, true))
       .orderBy(desc(articles.createdAt))
       .limit(limit);
+    
+    // Transformation des résultats pour correspondre au format attendu
+    return result.map(row => {
+      const article = { ...row.article };
+      
+      if (row.authorDisplayName) {
+        article.author = {
+          displayName: row.authorDisplayName,
+          title: row.authorTitle,
+          avatarUrl: row.authorAvatarUrl
+        };
+      }
+      
+      return article;
+    });
   }
   
-  async getArticlesByCategory(categoryId: number, limit: number = 6): Promise<Article[]> {
-    return db
-      .select()
+  async getArticlesByCategory(categoryId: number, limit: number = 6): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
+    // Récupération des articles avec jointure sur l'auteur
+    const result = await db
+      .select({
+        article: articles,
+        authorDisplayName: users.displayName,
+        authorTitle: users.title,
+        authorAvatarUrl: users.avatarUrl
+      })
       .from(articles)
+      .leftJoin(users, eq(articles.authorId, users.id))
       .where(
         and(
           eq(articles.published, true),
@@ -202,6 +277,21 @@ export class DatabaseStorage implements IStorage {
       )
       .orderBy(desc(articles.createdAt))
       .limit(limit);
+    
+    // Transformation des résultats pour correspondre au format attendu
+    return result.map(row => {
+      const article = { ...row.article };
+      
+      if (row.authorDisplayName) {
+        article.author = {
+          displayName: row.authorDisplayName,
+          title: row.authorTitle,
+          avatarUrl: row.authorAvatarUrl
+        };
+      }
+      
+      return article;
+    });
   }
   
   async getArticleBySlug(slug: string): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } }) | undefined> {
