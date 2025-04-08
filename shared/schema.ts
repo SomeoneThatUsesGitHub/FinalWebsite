@@ -226,3 +226,68 @@ export const insertVideoSchema = createInsertSchema(videos).pick({
 
 export type Video = typeof videos.$inferSelect;
 export type InsertVideo = z.infer<typeof insertVideoSchema>;
+
+// Suivi en direct (Live Coverage) schema
+export const liveCoverages = pgTable("live_coverages", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  subject: text("subject").notNull(),
+  context: text("context").notNull(),
+  imageUrl: text("image_url"),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertLiveCoverageSchema = createInsertSchema(liveCoverages).pick({
+  title: true,
+  slug: true,
+  subject: true,
+  context: true,
+  imageUrl: true,
+  active: true,
+});
+
+// Équipe de rédacteurs pour chaque suivi en direct
+export const liveCoverageEditors = pgTable("live_coverage_editors", {
+  id: serial("id").primaryKey(),
+  coverageId: integer("coverage_id").notNull().references(() => liveCoverages.id),
+  editorId: integer("editor_id").notNull().references(() => users.id),
+  role: text("role"), // Rôle spécifique pour ce suivi (optionnel)
+});
+
+export const insertLiveCoverageEditorSchema = createInsertSchema(liveCoverageEditors).pick({
+  coverageId: true,
+  editorId: true,
+  role: true,
+});
+
+// Mises à jour en direct pour chaque suivi
+export const liveCoverageUpdates = pgTable("live_coverage_updates", {
+  id: serial("id").primaryKey(),
+  coverageId: integer("coverage_id").notNull().references(() => liveCoverages.id),
+  content: text("content").notNull(),
+  authorId: integer("author_id").references(() => users.id),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  imageUrl: text("image_url"),
+  important: boolean("important").default(false),
+});
+
+export const insertLiveCoverageUpdateSchema = createInsertSchema(liveCoverageUpdates).pick({
+  coverageId: true,
+  content: true,
+  authorId: true,
+  timestamp: true,
+  imageUrl: true,
+  important: true,
+});
+
+export type LiveCoverage = typeof liveCoverages.$inferSelect;
+export type InsertLiveCoverage = z.infer<typeof insertLiveCoverageSchema>;
+
+export type LiveCoverageEditor = typeof liveCoverageEditors.$inferSelect;
+export type InsertLiveCoverageEditor = z.infer<typeof insertLiveCoverageEditorSchema>;
+
+export type LiveCoverageUpdate = typeof liveCoverageUpdates.$inferSelect;
+export type InsertLiveCoverageUpdate = z.infer<typeof insertLiveCoverageUpdateSchema>;

@@ -5,7 +5,11 @@ import { z } from "zod";
 import passport from "passport";
 import { isAuthenticated, isAdmin, loginSchema, hashPassword } from "./auth";
 import * as schema from "@shared/schema";
-import { insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, insertVideoSchema, videos } from "@shared/schema";
+import { 
+  insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
+  insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
+  insertLiveCoverageUpdateSchema 
+} from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { createUser, updateUserPassword, listUsers, deleteUser, updateUserProfile, getTeamMembers } from "./userManagement";
@@ -1253,6 +1257,259 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error removing user from team:", error);
       res.status(500).json({ message: "Erreur lors du retrait de l'équipe" });
+    }
+  });
+
+  // Suivis en direct (Live Coverage) routes
+  
+  // Routes publiques pour les suivis en direct
+  app.get("/api/live-coverages", async (req: Request, res: Response) => {
+    try {
+      const liveCoverages = await storage.getActiveLiveCoverages();
+      res.json(liveCoverages);
+    } catch (error) {
+      console.error("Error fetching live coverages:", error);
+      res.status(500).json({ error: "Error fetching live coverages" });
+    }
+  });
+  
+  app.get("/api/live-coverages/:slug", async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      
+      const coverage = await storage.getLiveCoverageBySlug(slug);
+      
+      if (!coverage) {
+        return res.status(404).json({ message: "Suivi en direct non trouvé" });
+      }
+      
+      res.json(coverage);
+    } catch (error) {
+      console.error("Error fetching live coverage:", error);
+      res.status(500).json({ error: "Error fetching live coverage" });
+    }
+  });
+  
+  app.get("/api/live-coverages/:coverageId/updates", async (req: Request, res: Response) => {
+    try {
+      const { coverageId } = req.params;
+      
+      if (isNaN(Number(coverageId))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      const updates = await storage.getLiveCoverageUpdates(Number(coverageId));
+      res.json(updates);
+    } catch (error) {
+      console.error("Error fetching live coverage updates:", error);
+      res.status(500).json({ error: "Error fetching live coverage updates" });
+    }
+  });
+  
+  app.get("/api/live-coverages/:coverageId/editors", async (req: Request, res: Response) => {
+    try {
+      const { coverageId } = req.params;
+      
+      if (isNaN(Number(coverageId))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      const editors = await storage.getLiveCoverageEditors(Number(coverageId));
+      res.json(editors);
+    } catch (error) {
+      console.error("Error fetching live coverage editors:", error);
+      res.status(500).json({ error: "Error fetching live coverage editors" });
+    }
+  });
+  
+  // Routes admin pour les suivis en direct
+  app.get("/api/admin/live-coverages", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const liveCoverages = await storage.getAllLiveCoverages();
+      res.json(liveCoverages);
+    } catch (error) {
+      console.error("Error fetching all live coverages:", error);
+      res.status(500).json({ error: "Error fetching all live coverages" });
+    }
+  });
+  
+  app.get("/api/admin/live-coverages/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      const coverage = await storage.getLiveCoverageById(Number(id));
+      
+      if (!coverage) {
+        return res.status(404).json({ message: "Suivi en direct non trouvé" });
+      }
+      
+      res.json(coverage);
+    } catch (error) {
+      console.error("Error fetching live coverage by ID:", error);
+      res.status(500).json({ error: "Error fetching live coverage" });
+    }
+  });
+  
+  app.post("/api/admin/live-coverages", isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Validation du schéma
+      const validation = insertLiveCoverageSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const liveCoverage = await storage.createLiveCoverage(validation.data);
+      res.status(201).json(liveCoverage);
+    } catch (error) {
+      console.error("Error creating live coverage:", error);
+      res.status(500).json({ error: "Error creating live coverage" });
+    }
+  });
+  
+  app.put("/api/admin/live-coverages/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      const validation = insertLiveCoverageSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const updatedCoverage = await storage.updateLiveCoverage(Number(id), validation.data);
+      
+      if (!updatedCoverage) {
+        return res.status(404).json({ message: "Suivi en direct non trouvé" });
+      }
+      
+      res.json(updatedCoverage);
+    } catch (error) {
+      console.error("Error updating live coverage:", error);
+      res.status(500).json({ error: "Error updating live coverage" });
+    }
+  });
+  
+  app.delete("/api/admin/live-coverages/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      const result = await storage.deleteLiveCoverage(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Suivi en direct non trouvé" });
+      }
+      
+      res.json({ message: "Suivi en direct supprimé avec succès" });
+    } catch (error) {
+      console.error("Error deleting live coverage:", error);
+      res.status(500).json({ error: "Error deleting live coverage" });
+    }
+  });
+  
+  // Gestion des éditeurs pour les suivis en direct
+  app.post("/api/admin/live-coverages/:coverageId/editors", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { coverageId } = req.params;
+      
+      if (isNaN(Number(coverageId))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      const validation = insertLiveCoverageEditorSchema.safeParse({
+        ...req.body,
+        coverageId: Number(coverageId)
+      });
+      
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const editor = await storage.addEditorToLiveCoverage(validation.data);
+      res.status(201).json(editor);
+    } catch (error) {
+      console.error("Error adding editor to live coverage:", error);
+      res.status(500).json({ error: "Error adding editor to live coverage" });
+    }
+  });
+  
+  app.delete("/api/admin/live-coverages/:coverageId/editors/:editorId", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { coverageId, editorId } = req.params;
+      
+      if (isNaN(Number(coverageId)) || isNaN(Number(editorId))) {
+        return res.status(400).json({ message: "IDs invalides" });
+      }
+      
+      const result = await storage.removeEditorFromLiveCoverage(Number(coverageId), Number(editorId));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Éditeur non trouvé pour ce suivi" });
+      }
+      
+      res.json({ message: "Éditeur retiré avec succès" });
+    } catch (error) {
+      console.error("Error removing editor from live coverage:", error);
+      res.status(500).json({ error: "Error removing editor from live coverage" });
+    }
+  });
+  
+  // Gestion des mises à jour pour les suivis en direct
+  app.post("/api/admin/live-coverages/:coverageId/updates", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { coverageId } = req.params;
+      const user = req.user as any;
+      
+      if (isNaN(Number(coverageId))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      const validation = insertLiveCoverageUpdateSchema.safeParse({
+        ...req.body,
+        coverageId: Number(coverageId),
+        authorId: user.id
+      });
+      
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const update = await storage.createLiveCoverageUpdate(validation.data);
+      res.status(201).json(update);
+    } catch (error) {
+      console.error("Error creating live coverage update:", error);
+      res.status(500).json({ error: "Error creating live coverage update" });
+    }
+  });
+  
+  app.delete("/api/admin/live-coverages/updates/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de mise à jour invalide" });
+      }
+      
+      const result = await storage.deleteLiveCoverageUpdate(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Mise à jour non trouvée" });
+      }
+      
+      res.json({ message: "Mise à jour supprimée avec succès" });
+    } catch (error) {
+      console.error("Error deleting live coverage update:", error);
+      res.status(500).json({ error: "Error deleting live coverage update" });
     }
   });
 
