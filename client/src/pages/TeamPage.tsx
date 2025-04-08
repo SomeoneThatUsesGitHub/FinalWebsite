@@ -40,7 +40,9 @@ export default function TeamPage() {
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des membres de l\'équipe');
       }
-      return response.json();
+      const data = await response.json();
+      console.log("Membres récupérés du serveur:", JSON.stringify(data, null, 2));
+      return data;
     },
   });
 
@@ -155,31 +157,40 @@ export default function TeamPage() {
                         Membre de l'équipe Politiquensemble
                       </p>
                     )}
+                    
+                    {/* Débogage - à enlever en production */}
+                    <div className="mt-3 text-xs">
+                      <p>Twitter: {member.twitterHandle || "Non défini"}</p>
+                      <p>Instagram: {member.instagramHandle || "Non défini"}</p>
+                      <p>Email: {member.email || "Non défini"}</p>
+                    </div>
                   </CardContent>
                   <CardFooter className="flex justify-center space-x-2 border-t p-4 mt-auto">
-                    {member.twitterHandle && (
+                    {member.twitterHandle && member.twitterHandle !== "" && (
                       <Button variant="ghost" size="icon" asChild>
-                        <a href={`https://twitter.com/${member.twitterHandle}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://twitter.com/${member.twitterHandle}`} target="_blank" rel="noopener noreferrer" title={`Twitter: @${member.twitterHandle}`}>
                           <Twitter className="h-4 w-4" />
                         </a>
                       </Button>
                     )}
-                    {member.instagramHandle && (
+                    {member.instagramHandle && member.instagramHandle !== "" && (
                       <Button variant="ghost" size="icon" asChild>
-                        <a href={`https://instagram.com/${member.instagramHandle}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://instagram.com/${member.instagramHandle}`} target="_blank" rel="noopener noreferrer" title={`Instagram: @${member.instagramHandle}`}>
                           <Instagram className="h-4 w-4" />
                         </a>
                       </Button>
                     )}
-                    {member.email && (
+                    {member.email && member.email !== "" && (
                       <Button variant="ghost" size="icon" asChild>
-                        <a href={`mailto:${member.email}`}>
+                        <a href={`mailto:${member.email}`} title={`Email: ${member.email}`}>
                           <Mail className="h-4 w-4" />
                         </a>
                       </Button>
                     )}
                     {/* Si aucun réseau social n'est défini, on affiche un message */}
-                    {!member.twitterHandle && !member.instagramHandle && !member.email && (
+                    {(!member.twitterHandle || member.twitterHandle === "") && 
+                     (!member.instagramHandle || member.instagramHandle === "") && 
+                     (!member.email || member.email === "") && (
                       <span className="text-xs text-muted-foreground">Aucun réseau social disponible</span>
                     )}
                   </CardFooter>
