@@ -135,8 +135,21 @@ function ProfileForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
+    // Préparation des données avec vérification explicite pour les réseaux sociaux
+    const dataToSend = {
+      ...formData,
+      // S'assurer que les valeurs vides sont préservées mais pas transformées en null
+      twitterHandle: formData.twitterHandle,
+      instagramHandle: formData.instagramHandle,
+      email: formData.email
+    };
+    
+    console.log("Envoi des données de profil:", JSON.stringify(dataToSend, null, 2));
+    
     try {
-      await updateProfileMutation.mutateAsync(formData);
+      const result = await updateProfileMutation.mutateAsync(dataToSend);
+      console.log("Résultat de la mise à jour:", result);
     } catch (error) {
       console.error('Erreur lors de la mise à jour du profil:', error);
     } finally {

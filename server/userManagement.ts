@@ -159,21 +159,31 @@ export async function updateUserProfile(username: string, userData: {
     // Afficher l'utilisateur existant pour le débogage
     console.log("Utilisateur existant avant la mise à jour:", JSON.stringify(existingUser[0], null, 2));
     
+    // Préparer les données pour la mise à jour
+    const updateData = {
+      displayName: userData.displayName !== undefined ? userData.displayName : existingUser[0].displayName,
+      role: userData.role !== undefined ? userData.role as any : existingUser[0].role,
+      avatarUrl: userData.avatarUrl !== undefined ? userData.avatarUrl : existingUser[0].avatarUrl,
+      title: userData.title !== undefined ? userData.title : existingUser[0].title,
+      bio: userData.bio !== undefined ? userData.bio : existingUser[0].bio,
+      isTeamMember: userData.isTeamMember !== undefined ? userData.isTeamMember : existingUser[0].isTeamMember,
+      twitterHandle: userData.twitterHandle !== undefined ? userData.twitterHandle : existingUser[0].twitterHandle,
+      instagramHandle: userData.instagramHandle !== undefined ? userData.instagramHandle : existingUser[0].instagramHandle,
+      email: userData.email !== undefined ? userData.email : existingUser[0].email,
+    };
+    
+    console.log("Données de mise à jour formatées:", JSON.stringify(updateData, null, 2));
+    console.log("La valeur twitterHandle est:", updateData.twitterHandle);
+    console.log("La valeur instagramHandle est:", updateData.instagramHandle);
+    console.log("La valeur email est:", updateData.email);
+    
     // Mettre à jour le profil avec tous les champs
     const [updatedUser] = await db.update(users)
-      .set({
-        displayName: userData.displayName !== undefined ? userData.displayName : existingUser[0].displayName,
-        role: userData.role !== undefined ? userData.role as any : existingUser[0].role,
-        avatarUrl: userData.avatarUrl !== undefined ? userData.avatarUrl : existingUser[0].avatarUrl,
-        title: userData.title !== undefined ? userData.title : existingUser[0].title,
-        bio: userData.bio !== undefined ? userData.bio : existingUser[0].bio,
-        isTeamMember: userData.isTeamMember !== undefined ? userData.isTeamMember : existingUser[0].isTeamMember,
-        twitterHandle: userData.twitterHandle !== undefined ? userData.twitterHandle : existingUser[0].twitterHandle,
-        instagramHandle: userData.instagramHandle !== undefined ? userData.instagramHandle : existingUser[0].instagramHandle,
-        email: userData.email !== undefined ? userData.email : existingUser[0].email,
-      })
+      .set(updateData)
       .where(eq(users.username, username))
       .returning();
+      
+    console.log("Profil mis à jour:", JSON.stringify(updatedUser, null, 2));
     
     return {
       success: true,
