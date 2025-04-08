@@ -71,7 +71,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     console.log("Récupération des articles avec filtres:", filters);
     const articles = await storage.getAllArticles(filters);
-    res.json(articles);
+    
+    // Double vérification de ne retourner que les articles publiés sauf pour les admins
+    // avec showAll=true
+    const filteredArticles = showAll === 'true' && req.isAuthenticated() && (req.user as any)?.role === 'admin'
+      ? articles
+      : articles.filter(article => article.published === true);
+      
+    res.json(filteredArticles);
   });
   
   app.get("/api/articles/featured", async (req: Request, res: Response) => {
@@ -87,7 +94,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 9;
     
     const articles = await storage.getRecentArticles(limitNum);
-    res.json(articles);
+    // Double vérification pour ne renvoyer que les articles publiés
+    const filteredArticles = articles.filter(article => article.published === true);
+    res.json(filteredArticles);
   });
   
   app.get("/api/articles/by-category/:categoryId", async (req: Request, res: Response) => {
