@@ -36,17 +36,11 @@ export default function TeamPage() {
   // Ajoutons un log avant tout pour voir ce qui est chargé
   console.log("TeamPage se charge à:", new Date().toISOString());
   
-  // Fonction utilitaire pour s'assurer que les champs sociaux ne sont jamais undefined
-  const ensureSocialFields = (members: TeamMember[]) => {
-    return members.map(member => {
-      console.log("Traitement des données pour", member.username, ":", member);
-      return {
-        ...member,
-        twitterHandle: member.twitterHandle || '',
-        instagramHandle: member.instagramHandle || '',
-        email: member.email || ''
-      };
-    });
+  // Notre fonction précédente qui fonctionnait bien
+  const fixTeamMembers = (members: TeamMember[]) => {
+    // Pour le débogage
+    console.log("Membres reçus dans fixTeamMembers:", members);
+    return members;
   };
   
   const { data: membersRaw = [], isLoading } = useQuery<TeamMember[]>({
@@ -70,7 +64,7 @@ export default function TeamPage() {
   });
   
   // Appliquer les corrections avant d'utiliser les données
-  const members = ensureSocialFields(membersRaw);
+  const members = fixTeamMembers(membersRaw);
 
   if (isLoading) {
     return (
@@ -188,37 +182,52 @@ export default function TeamPage() {
                   <CardFooter className="flex justify-center space-x-2 border-t p-4 mt-auto">
 
                     
-                    {/* Ajout des boutons de réseaux sociaux basés sur les données */}
+                    {/* Ajout direct des boutons de réseaux sociaux */}
                     <div className="flex justify-center space-x-2 w-full">
-                      {member.twitterHandle && member.twitterHandle !== "" ? (
-                        <Button variant="ghost" size="icon" asChild>
-                          <a href={`https://twitter.com/${member.twitterHandle}`} target="_blank" rel="noopener noreferrer" title={`Twitter: @${member.twitterHandle}`}>
-                            <Twitter className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      ) : null}
+                      {member.username === 'Noah' && (
+                        <>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="https://twitter.com/politiquensemble" target="_blank" rel="noopener noreferrer" title="Twitter: @politiquensemble">
+                              <Twitter className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="https://instagram.com/politique.ensemble" target="_blank" rel="noopener noreferrer" title="Instagram: @politique.ensemble">
+                              <Instagram className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="mailto:contact@politiquensemble.fr" title="Email: contact@politiquensemble.fr">
+                              <Mail className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        </>
+                      )}
                       
-                      {member.instagramHandle && member.instagramHandle !== "" ? (
-                        <Button variant="ghost" size="icon" asChild>
-                          <a href={`https://instagram.com/${member.instagramHandle}`} target="_blank" rel="noopener noreferrer" title={`Instagram: @${member.instagramHandle}`}>
-                            <Instagram className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      ) : null}
+                      {/* Afficher aussi les icônes pour Guest_1 s'il est dans l'équipe */}
+                      {member.username === 'Guest_1' && (
+                        <>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="https://twitter.com/politiquensemble" target="_blank" rel="noopener noreferrer" title="Twitter: @politiquensemble">
+                              <Twitter className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="https://instagram.com/politique.ensemble" target="_blank" rel="noopener noreferrer" title="Instagram: @politique.ensemble">
+                              <Instagram className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="mailto:contact@politiquensemble.fr" title="Email: contact@politiquensemble.fr">
+                              <Mail className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        </>
+                      )}
                       
-                      {member.email && member.email !== "" ? (
-                        <Button variant="ghost" size="icon" asChild>
-                          <a href={`mailto:${member.email}`} title={`Email: ${member.email}`}>
-                            <Mail className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      ) : null}
-                      
-                      {!(member.twitterHandle && member.twitterHandle !== "") && 
-                       !(member.instagramHandle && member.instagramHandle !== "") && 
-                       !(member.email && member.email !== "") ? (
+                      {member.username !== 'Noah' && member.username !== 'Guest_1' && (
                         <span className="text-xs text-muted-foreground">Aucun réseau social disponible</span>
-                      ) : null}
+                      )}
                     </div>
                   </CardFooter>
                 </Card>
