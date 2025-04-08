@@ -86,9 +86,7 @@ function ProfileForm({
     title: user.title || '',
     bio: user.bio || '',
     isTeamMember: user.isTeamMember || false,
-    twitterHandle: user.twitterHandle || '',
-    instagramHandle: user.instagramHandle || '',
-    email: user.email || '',
+    // Champs réseaux sociaux supprimés
   });
 
   const updateProfileMutation = useMutation({
@@ -136,14 +134,14 @@ function ProfileForm({
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Préparation des données avec vérification explicite pour les réseaux sociaux
+    // Envoyer les données sans les réseaux sociaux
     const dataToSend = {
       ...formData,
-      // S'assurer que les valeurs vides sont préservées mais pas transformées en null
-      twitterHandle: formData.twitterHandle,
-      instagramHandle: formData.instagramHandle,
-      email: formData.email
-    };
+      // On définit les champs de réseaux sociaux à vide pour nettoyer ceux existants dans la BD
+      twitterHandle: '',
+      instagramHandle: '',
+      email: ''
+    } as any; // Utilisation temporaire de 'any' pour éviter les erreurs de type
     
     console.log("Envoi des données de profil:", JSON.stringify(dataToSend, null, 2));
     
@@ -237,63 +235,7 @@ function ProfileForm({
         </Label>
       </div>
       
-      <h3 className="font-medium text-lg mt-6 mb-2">Réseaux sociaux</h3>
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="twitterHandle">Twitter</Label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
-              @
-            </span>
-            <Input
-              id="twitterHandle"
-              name="twitterHandle"
-              value={formData.twitterHandle}
-              onChange={handleChange}
-              placeholder="pseudo"
-              className="rounded-l-none"
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Pseudo Twitter sans le @
-          </p>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="instagramHandle">Instagram</Label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
-              @
-            </span>
-            <Input
-              id="instagramHandle"
-              name="instagramHandle"
-              value={formData.instagramHandle}
-              onChange={handleChange}
-              placeholder="pseudo"
-              className="rounded-l-none"
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Pseudo Instagram sans le @
-          </p>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="exemple@politiquensemble.fr"
-          />
-          <p className="text-xs text-muted-foreground">
-            Adresse email publique
-          </p>
-        </div>
-      </div>
+      {/* Les champs de réseaux sociaux ont été supprimés */}
 
       <DialogFooter>
         <Button
@@ -498,18 +440,7 @@ export default function TeamPage() {
                       <p className="text-sm text-muted-foreground">{user.bio}</p>
                     )}
                     
-                    {/* Afficher les réseaux sociaux si disponibles */}
-                    <div className="flex space-x-1 mt-2">
-                      {user.twitterHandle && (
-                        <span className="text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-1">Twitter</span>
-                      )}
-                      {user.instagramHandle && (
-                        <span className="text-xs bg-pink-100 text-pink-800 rounded-full px-2 py-1">Instagram</span>
-                      )}
-                      {user.email && (
-                        <span className="text-xs bg-gray-100 text-gray-800 rounded-full px-2 py-1">Email</span>
-                      )}
-                    </div>
+                    {/* Affichage des réseaux sociaux supprimé */}
                   </CardContent>
                   <CardFooter className="border-t bg-muted/50 px-6 py-3">
                     <div className="text-xs font-medium">
