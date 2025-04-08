@@ -165,7 +165,7 @@ export default function DirectsPage() {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex gap-2">
+              <CardFooter className="flex flex-wrap gap-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -183,9 +183,17 @@ export default function DirectsPage() {
                   <Users className="mr-2 h-4 w-4" /> Éditeurs
                 </Button>
                 <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="flex-1 mt-2 w-full"
+                  onClick={() => navigate(`/admin/directs/${direct.id}/mises-a-jour`)}
+                >
+                  <Radio className="mr-2 h-4 w-4" /> Mises à jour
+                </Button>
+                <Button 
                   variant="outline" 
                   size="sm" 
-                  className="text-destructive hover:text-destructive"
+                  className="text-destructive hover:text-destructive mt-2"
                   onClick={() => handleDeleteClick(direct.id)}
                 >
                   <Trash2 className="h-4 w-4" />
