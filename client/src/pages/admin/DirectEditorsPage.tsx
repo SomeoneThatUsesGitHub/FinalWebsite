@@ -314,6 +314,12 @@ export default function DirectEditorsPage() {
                       <SelectItem value="Reporter">Reporter</SelectItem>
                       <SelectItem value="Analyste">Analyste</SelectItem>
                       <SelectItem value="Fact-checker">Fact-checker</SelectItem>
+                      <SelectItem value="Expert thématique">Expert thématique</SelectItem>
+                      <SelectItem value="Rédacteur en chef">Rédacteur en chef</SelectItem>
+                      <SelectItem value="Journaliste">Journaliste</SelectItem>
+                      <SelectItem value="Photographe">Photographe</SelectItem>
+                      <SelectItem value="Vidéaste">Vidéaste</SelectItem>
+                      <SelectItem value="Responsable réseaux sociaux">Responsable réseaux sociaux</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

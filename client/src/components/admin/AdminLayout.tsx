@@ -85,7 +85,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       name: "Directs",
       href: "/admin/directs",
       icon: Radio,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      disabled: false, // Les éditeurs ont accès aux directs
     },
     {
       name: "Utilisateurs",

@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { getQueryFn } from "@/lib/queryClient";
-import { Article, Category, FlashInfo } from "@shared/schema";
+import { Article, Category, FlashInfo, LiveCoverage } from "@shared/schema";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, FileText, Tag, Eye, AlertCircle, Calendar, ZapIcon, Zap, Radio } from "lucide-react";
+import { ArrowRight, BarChart3, FileText, Tag, Eye, AlertCircle, Calendar, ZapIcon, Zap, Radio, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminDashboard() {
   const [_, setLocation] = useLocation();
@@ -29,6 +30,12 @@ export default function AdminDashboard() {
     queryKey: ["/api/admin/flash-infos"],
     queryFn: getQueryFn({ on401: "throw" }),
   });
+
+  // Récupérer les suivis en direct
+  const { data: liveCoverages, isLoading: liveCoveragesLoading } = useQuery<LiveCoverage[]>({
+    queryKey: ["/api/admin/live-coverages"],
+    queryFn: getQueryFn({ on401: "throw" }),
+  });
   
   // Statistiques pour le dashboard
   const stats = {
@@ -36,6 +43,8 @@ export default function AdminDashboard() {
     publishedArticlesCount: articles?.filter(article => article.published).length || 0,
     activeFlashInfosCount: flashInfos?.filter(flash => flash.active).length || 0,
     categoriesCount: categories?.length || 0,
+    liveCoveragesCount: liveCoverages?.length || 0,
+    activeLiveCoveragesCount: liveCoverages?.filter(coverage => coverage.active).length || 0,
   };
   
   // Derniers articles publiés (6 maximum)
@@ -104,6 +113,35 @@ export default function AdminDashboard() {
               <div className="text-2xl font-bold">{stats.categoriesCount}</div>
               <p className="text-xs text-muted-foreground">
                 Catégories d'articles
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Statistiques de directs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Directs actifs</CardTitle>
+              <Radio className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.activeLiveCoveragesCount}</div>
+              <p className="text-xs text-muted-foreground">
+                Suivis en direct actuellement actifs
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Total des directs</CardTitle>
+              <Radio className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.liveCoveragesCount}</div>
+              <p className="text-xs text-muted-foreground">
+                Tous les suivis en direct créés
               </p>
             </CardContent>
           </Card>
@@ -182,8 +220,84 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
           
-          {/* Liens rapides */}
+          {/* Section Suivis en direct */}
           <Card className="col-span-1">
+            <CardHeader className="pb-3">
+              <CardTitle>Suivis en direct</CardTitle>
+              <CardDescription>
+                Les suivis en direct actifs et récents
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {liveCoveragesLoading ? (
+                <div className="flex items-center justify-center h-40">
+                  <div className="h-8 w-8 animate-pulse rounded-full bg-muted"></div>
+                </div>
+              ) : liveCoverages && liveCoverages.length > 0 ? (
+                <>
+                  {liveCoverages
+                    .sort((a, b) => a.active === b.active ? 0 : a.active ? -1 : 1)
+                    .slice(0, 4)
+                    .map((coverage) => (
+                      <div key={coverage.id} className="flex items-start space-x-3 pb-3 border-b last:border-0">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium line-clamp-1">{coverage.title}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant={coverage.active ? "default" : "outline"}>
+                              {coverage.active ? "Actif" : "Inactif"}
+                            </Badge>
+                            <a 
+                              href={`/suivis-en-direct/${coverage.slug}`} 
+                              target="_blank" 
+                              className="text-xs text-primary hover:underline flex items-center"
+                            >
+                              Voir <ExternalLink className="h-3 w-3 ml-1" />
+                            </a>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setLocation(`/admin/directs/${coverage.id}`)}
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  <Button
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={() => setLocation("/admin/directs")}
+                  >
+                    Gérer tous les directs
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={() => setLocation("/admin/directs/new")}
+                  >
+                    <Radio className="mr-2 h-4 w-4" />
+                    Créer un nouveau direct
+                  </Button>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Radio className="h-10 w-10 text-muted-foreground mb-3" />
+                  <p className="text-muted-foreground">Aucun suivi en direct</p>
+                  <Button
+                    variant="outline"
+                    onClick={() => setLocation("/admin/directs/new")}
+                    className="mt-4"
+                  >
+                    Créer un suivi en direct
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Liens rapides */}
+          <Card className="col-span-1 md:col-span-2">
             <CardHeader>
               <CardTitle>Actions rapides</CardTitle>
               <CardDescription>
@@ -191,7 +305,7 @@ export default function AdminDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <Button
                   variant="outline"
                   className="w-full justify-start"
@@ -241,7 +355,7 @@ export default function AdminDashboard() {
                 
                 <Button
                   variant="outline"
-                  className="w-full justify-start col-span-1 md:col-span-2"
+                  className="w-full justify-start"
                   onClick={() => setLocation("/home")}
                 >
                   <Eye className="mr-2 h-4 w-4" />
