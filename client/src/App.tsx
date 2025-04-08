@@ -13,8 +13,6 @@ import Article from "@/pages/Article";
 import TeamPage from "@/pages/TeamPage";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/AuthPage";
-import LiveCoveragesList from "@/pages/LiveCoveragesList";
-import LiveCoveragePage from "@/pages/LiveCoveragePage";
 import TestEditor from "@/pages/test-editor";
 
 // Pages admin
@@ -25,7 +23,6 @@ import FlashInfosPage from "@/pages/admin/FlashInfosPage";
 import VideosPage from "@/pages/admin/VideosPage";
 import CategoriesPage from "@/pages/admin/CategoriesPage";
 import UsersPage from "@/pages/admin/UsersPage";
-import LiveCoveragesPage from "@/pages/admin/LiveCoveragesPage";
 
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
@@ -69,8 +66,6 @@ function App() {
               <Route path="/home" component={Home} />
               <Route path="/articles" component={ArticlesList} />
               <Route path="/articles/:slug" component={Article} />
-              <Route path="/suivis-en-direct" component={() => <Redirector to="/home" />} />
-              <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
               <Route path="/team" component={TeamPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
@@ -88,7 +83,6 @@ function App() {
               <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
               <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
               <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
-              <ProtectedRoute path="/admin/live-coverages" component={LiveCoveragesPage} adminOnly />
               
               {/* Fallback */}
               <Route path="/:rest*" component={NotFound} />

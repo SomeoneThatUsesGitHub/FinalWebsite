@@ -470,7 +470,7 @@ export class DatabaseStorage implements IStorage {
     const [liveEvent] = await db.select()
       .from(liveEvents)
       .where(eq(liveEvents.active, true))
-      .orderBy(desc(liveEvents.scheduledFor));
+      .orderBy(liveEvents.startDate);
     
     return liveEvent;
   }

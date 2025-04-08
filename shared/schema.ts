@@ -236,7 +236,6 @@ export const liveCoverages = pgTable("live_coverages", {
   context: text("context").notNull(),
   imageUrl: text("image_url"),
   active: boolean("active").notNull().default(true),
-  endDate: timestamp("end_date"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -248,7 +247,6 @@ export const insertLiveCoverageSchema = createInsertSchema(liveCoverages).pick({
   context: true,
   imageUrl: true,
   active: true,
-  endDate: true,
 });
 
 // Équipe de rédacteurs pour chaque suivi en direct
