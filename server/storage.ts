@@ -248,7 +248,12 @@ export class DatabaseStorage implements IStorage {
     })
     .from(articles)
     .leftJoin(users, eq(articles.authorId, users.id))
-    .where(eq(articles.published, true))
+    .where(
+      and(
+        eq(articles.published, true),
+        eq(articles.featured, false) // Exclure les articles à la une
+      )
+    )
     .orderBy(desc(articles.createdAt))
     .limit(limit);
     
