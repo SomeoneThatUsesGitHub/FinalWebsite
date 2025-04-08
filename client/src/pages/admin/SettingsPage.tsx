@@ -20,10 +20,15 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("articles");
 
   // Récupérer les articles de l'utilisateur connecté
-  const { data: userArticles, isLoading: articlesLoading } = useQuery<Article[]>({
+  const { data: userArticles, isLoading: articlesLoading, error: articlesError } = useQuery<Article[]>({
     queryKey: ["/api/auth/my-articles"],
     queryFn: getQueryFn({ on401: "throw" }),
   });
+  
+  // Logs de débogage pour voir ce qui se passe
+  console.log('User Articles:', userArticles);
+  console.log('Articles Loading:', articlesLoading);
+  console.log('Articles Error:', articlesError);
 
   // Récupérer les catégories pour l'affichage des étiquettes
   const { data: categories } = useQuery<Category[]>({

@@ -40,7 +40,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       sort?: string;
       year?: number;
       showUnpublished?: boolean;
-    } = {};
+    } = {
+      // Par défaut, ne montrer que les articles publiés 
+      // (sauf si explicitement écrasé ci-dessous)
+      showUnpublished: false 
+    };
     
     if (categoryId && !isNaN(Number(categoryId))) {
       filters.categoryId = Number(categoryId);
@@ -65,6 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       filters.showUnpublished = true;
     }
     
+    console.log("Récupération des articles avec filtres:", filters);
     const articles = await storage.getAllArticles(filters);
     res.json(articles);
   });
