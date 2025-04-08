@@ -5,7 +5,7 @@ import { getQueryFn } from "@/lib/queryClient";
 import { LiveCoverage, LiveCoverageUpdate } from "@shared/schema";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, Calendar, Clock, RefreshCw } from "lucide-react";
+import { Loader2, Calendar, Clock, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -24,7 +24,7 @@ export default function LiveCoveragePage() {
     isError: coverageError,
     refetch: refetchCoverage
   } = useQuery<LiveCoverage>({
-    queryKey: ["/api/live-coverages", slug],
+    queryKey: [`/api/live-coverages/${slug}`],
     queryFn: getQueryFn,
     enabled: !!slug,
   });
@@ -109,9 +109,9 @@ export default function LiveCoveragePage() {
           <Button 
             className="mt-8" 
             variant="outline" 
-            onClick={() => window.location.assign("/suivis-en-direct")}
+            onClick={() => window.location.assign("/home")}
           >
-            Voir tous les suivis en direct
+            Retour à l'accueil
           </Button>
         </div>
       </div>
@@ -123,15 +123,25 @@ export default function LiveCoveragePage() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <Badge variant="secondary" className="font-medium">
-              Suivi en direct
-            </Badge>
-            {coverage.active ? (
-              <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Actif</Badge>
-            ) : (
-              <Badge variant="outline">Terminé</Badge>
-            )}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="font-medium">
+                Suivi en direct
+              </Badge>
+              {coverage.active ? (
+                <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Actif</Badge>
+              ) : (
+                <Badge variant="outline">Terminé</Badge>
+              )}
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.location.assign("/home")}
+            >
+              <Home className="mr-2 h-4 w-4" />
+              Accueil
+            </Button>
           </div>
           
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{coverage.title}</h1>

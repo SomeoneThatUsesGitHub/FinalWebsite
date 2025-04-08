@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { LiveCoverage, insertLiveCoverageSchema } from "@shared/schema";
+import { LiveCoverage, insertLiveCoverageSchema, User } from "@shared/schema";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { 
   AlertDialog,
@@ -73,6 +74,7 @@ import { fr } from "date-fns/locale";
 // Form schema for live coverage
 const liveCoverageFormSchema = insertLiveCoverageSchema.extend({
   endDate: z.date().nullable().optional(),
+  selectedEditors: z.array(z.number()).optional(),
 });
 
 type LiveCoverageFormValues = z.infer<typeof liveCoverageFormSchema>;
@@ -87,6 +89,12 @@ export default function LiveCoveragesPage() {
     queryKey: ["/api/admin/live-coverages"],
     queryFn: getQueryFn({ on401: "throw" }),
   });
+  
+  // Get all users for editor selection
+  const { data: users, isLoading: isLoadingUsers } = useQuery<User[]>({
+    queryKey: ["/api/admin/users"],
+    queryFn: getQueryFn({ on401: "throw" }),
+  });
 
   // Form setup
   const form = useForm<LiveCoverageFormValues>({
@@ -99,6 +107,7 @@ export default function LiveCoveragesPage() {
       imageUrl: "",
       active: true,
       endDate: null,
+      selectedEditors: [],
     },
   });
 
@@ -205,6 +214,7 @@ export default function LiveCoveragesPage() {
       imageUrl: "",
       active: true,
       endDate: null,
+      selectedEditors: [],
     });
     setSelectedCoverage(null);
     setIsDialogOpen(true);
@@ -212,17 +222,55 @@ export default function LiveCoveragesPage() {
 
   // Open dialog for editing a live coverage
   const handleEditClick = (coverage: LiveCoverage) => {
-    form.reset({
-      title: coverage.title,
-      slug: coverage.slug,
-      subject: coverage.subject,
-      context: coverage.context,
-      imageUrl: coverage.imageUrl || "",
-      active: coverage.active,
-      endDate: coverage.endDate ? new Date(coverage.endDate) : null,
-    });
-    setSelectedCoverage(coverage);
-    setIsDialogOpen(true);
+    // Fetch the current editors for this coverage
+    const fetchEditors = async () => {
+      try {
+        const res = await fetch(`/api/admin/live-coverages/${coverage.id}/editors`);
+        if (res.ok) {
+          const editors = await res.json();
+          const editorIds = editors.map((editor: any) => editor.editorId);
+          
+          form.reset({
+            title: coverage.title,
+            slug: coverage.slug,
+            subject: coverage.subject,
+            context: coverage.context,
+            imageUrl: coverage.imageUrl || "",
+            active: coverage.active,
+            endDate: coverage.endDate ? new Date(coverage.endDate) : null,
+            selectedEditors: editorIds || [],
+          });
+        } else {
+          form.reset({
+            title: coverage.title,
+            slug: coverage.slug,
+            subject: coverage.subject,
+            context: coverage.context,
+            imageUrl: coverage.imageUrl || "",
+            active: coverage.active,
+            endDate: coverage.endDate ? new Date(coverage.endDate) : null,
+            selectedEditors: [],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching editors:", error);
+        form.reset({
+          title: coverage.title,
+          slug: coverage.slug,
+          subject: coverage.subject,
+          context: coverage.context,
+          imageUrl: coverage.imageUrl || "",
+          active: coverage.active,
+          endDate: coverage.endDate ? new Date(coverage.endDate) : null,
+          selectedEditors: [],
+        });
+      }
+      
+      setSelectedCoverage(coverage);
+      setIsDialogOpen(true);
+    };
+    
+    fetchEditors();
   };
 
   // Auto-generate slug from title
@@ -385,6 +433,80 @@ export default function LiveCoveragesPage() {
             </FormItem>
           )}
         />
+
+        <div className="space-y-3 pt-4">
+          <FormLabel className="text-base">Éditeurs du suivi en direct</FormLabel>
+          <FormDescription>
+            Sélectionnez les utilisateurs qui pourront éditer ce suivi en direct
+          </FormDescription>
+          
+          {isLoadingUsers ? (
+            <div className="flex items-center justify-center h-20">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          ) : users && users.length > 0 ? (
+            <div className="grid gap-2 pt-2">
+              <FormField
+                control={form.control}
+                name="selectedEditors"
+                render={() => (
+                  <FormItem>
+                    {users.map((user) => (
+                      <FormField
+                        key={user.id}
+                        control={form.control}
+                        name="selectedEditors"
+                        render={({ field }) => {
+                          return (
+                            <FormItem
+                              key={user.id}
+                              className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-3"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(user.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([...field.value || [], user.id])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== user.id
+                                          )
+                                        )
+                                  }}
+                                />
+                              </FormControl>
+                              <div className="flex items-center gap-2">
+                                {user.avatarUrl && (
+                                  <img
+                                    src={user.avatarUrl}
+                                    alt={user.displayName}
+                                    className="h-8 w-8 rounded-full object-cover"
+                                  />
+                                )}
+                                <div className="space-y-1 leading-none">
+                                  <FormLabel className="font-medium">
+                                    {user.displayName}
+                                  </FormLabel>
+                                  <p className="text-xs text-muted-foreground">
+                                    {user.title || user.role}
+                                  </p>
+                                </div>
+                              </div>
+                            </FormItem>
+                          )
+                        }}
+                      />
+                    ))}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Aucun utilisateur disponible</p>
+          )}
+        </div>
       </div>
     </>
   );

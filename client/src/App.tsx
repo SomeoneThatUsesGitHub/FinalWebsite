@@ -69,7 +69,7 @@ function App() {
               <Route path="/home" component={Home} />
               <Route path="/articles" component={ArticlesList} />
               <Route path="/articles/:slug" component={Article} />
-              <Route path="/suivis-en-direct" component={LiveCoveragesList} />
+              <Route path="/suivis-en-direct" component={() => <Redirector to="/home" />} />
               <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
               <Route path="/team" component={TeamPage} />
               <Route path="/auth" component={AuthPage} />

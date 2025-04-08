@@ -1356,13 +1356,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/admin/live-coverages", isAdmin, async (req: Request, res: Response) => {
     try {
+      // Extract editors array before validation
+      const { selectedEditors, ...liveCoverageData } = req.body;
+      
       // Validation du schéma
-      const validation = insertLiveCoverageSchema.safeParse(req.body);
+      const validation = insertLiveCoverageSchema.safeParse(liveCoverageData);
       if (!validation.success) {
         return res.status(400).json({ errors: validation.error.errors });
       }
       
+      // Create the live coverage
       const liveCoverage = await storage.createLiveCoverage(validation.data);
+      
+      // Add editors if any
+      if (selectedEditors && Array.isArray(selectedEditors) && selectedEditors.length > 0) {
+        for (const editorId of selectedEditors) {
+          await storage.addEditorToLiveCoverage({
+            coverageId: liveCoverage.id,
+            editorId: editorId
+          });
+        }
+      }
+      
       res.status(201).json(liveCoverage);
     } catch (error) {
       console.error("Error creating live coverage:", error);
@@ -1378,7 +1393,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "ID de suivi invalide" });
       }
       
-      const validation = insertLiveCoverageSchema.partial().safeParse(req.body);
+      // Extract editors array before validation
+      const { selectedEditors, ...liveCoverageData } = req.body;
+      
+      const validation = insertLiveCoverageSchema.partial().safeParse(liveCoverageData);
       if (!validation.success) {
         return res.status(400).json({ errors: validation.error.errors });
       }
@@ -1387,6 +1405,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!updatedCoverage) {
         return res.status(404).json({ message: "Suivi en direct non trouvé" });
+      }
+      
+      // Update editors if provided
+      if (selectedEditors && Array.isArray(selectedEditors)) {
+        // Get current editors
+        const currentEditors = await storage.getLiveCoverageEditors(Number(id));
+        const currentEditorIds = currentEditors.map(editor => editor.editorId);
+        
+        // Add new editors
+        for (const editorId of selectedEditors) {
+          if (!currentEditorIds.includes(editorId)) {
+            await storage.addEditorToLiveCoverage({
+              coverageId: Number(id),
+              editorId: editorId
+            });
+          }
+        }
+        
+        // Remove editors not in the new list
+        for (const editor of currentEditors) {
+          if (!selectedEditors.includes(editor.editorId)) {
+            await storage.removeEditorFromLiveCoverage(Number(id), editor.editorId);
+          }
+        }
       }
       
       res.json(updatedCoverage);
