@@ -46,7 +46,13 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link href="/home">
             <div className="flex items-center space-x-2 cursor-pointer">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold font-heading">P</div>
+              <div className="bg-[#001158] rounded-full overflow-hidden w-10 h-10">
+                <img 
+                  src="/Logos%20Politiquensemble.png" 
+                  alt="Logo Politiquensemble" 
+                  className="w-full h-full object-contain p-0.5"
+                />
+              </div>
               <span className="text-xl font-bold text-dark font-heading hidden sm:inline-block">Politiquensemble</span>
             </div>
           </Link>

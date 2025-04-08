@@ -127,6 +127,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
         <div className="flex flex-col flex-grow border-r border-border bg-card">
           <div className="px-4 py-5 flex items-center border-b border-border h-16">
             <div className="flex-shrink-0 flex items-center">
+              <div className="bg-[#001158] rounded-full overflow-hidden w-8 h-8 mr-2">
+                <img 
+                  src="/Logos%20Politiquensemble.png" 
+                  alt="Logo Politiquensemble" 
+                  className="w-full h-full object-contain p-0.5"
+                />
+              </div>
               <span className="text-xl font-semibold">Admin</span>
               <span className="ml-2 text-muted-foreground text-xs bg-muted px-1.5 py-0.5 rounded">
                 Politiquensemble
@@ -211,6 +218,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
         <SheetContent side="left" className="w-[300px] sm:w-[300px] p-0">
           <SheetHeader className="px-4 py-5 border-b border-border h-16">
             <SheetTitle className="text-left flex items-center">
+              <div className="bg-[#001158] rounded-full overflow-hidden w-8 h-8 mr-2">
+                <img 
+                  src="/Logos%20Politiquensemble.png" 
+                  alt="Logo Politiquensemble" 
+                  className="w-full h-full object-contain p-0.5"
+                />
+              </div>
               <span className="font-semibold text-xl">Admin</span>
               <span className="ml-2 text-muted-foreground text-xs bg-muted px-1.5 py-0.5 rounded">
                 Politiquensemble
@@ -289,7 +303,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <span className="ml-2 font-semibold">Admin</span>
+              <div className="bg-[#001158] rounded-full overflow-hidden w-7 h-7 mr-2">
+                <img 
+                  src="/Logos%20Politiquensemble.png" 
+                  alt="Logo Politiquensemble" 
+                  className="w-full h-full object-contain p-0.5"
+                />
+              </div>
+              <span className="font-semibold">Admin</span>
             </div>
             <div className="flex items-center">
               <DropdownMenu>
