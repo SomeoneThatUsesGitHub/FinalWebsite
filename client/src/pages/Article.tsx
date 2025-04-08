@@ -78,7 +78,25 @@ const Article: React.FC = () => {
               {article?.title || "Article"}
             </h2>
             <div className="flex items-center gap-1">
-              <Button variant="ghost" size="sm" className="flex items-center text-white hover:bg-blue-600 min-w-0 p-1 sm:p-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="flex items-center text-white hover:bg-blue-600 min-w-0 p-1 sm:p-2"
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: article?.title || "Article de Politiquensemble",
+                      text: article?.excerpt || "Découvrez cet article intéressant sur Politiquensemble",
+                      url: window.location.href
+                    }).catch(error => console.log('Erreur de partage :', error));
+                  } else {
+                    // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
+                    navigator.clipboard.writeText(window.location.href)
+                      .then(() => alert("Lien copié dans le presse-papier"))
+                      .catch(err => console.error("Impossible de copier le lien", err));
+                  }
+                }}
+              >
                 <Share2 className="h-4 w-4" />
                 <span className="hidden lg:ml-1 lg:inline-block">Partager</span>
               </Button>
@@ -208,7 +226,25 @@ const Article: React.FC = () => {
                     <p className="text-sm text-dark/70">Partagez-le avec vos amis</p>
                   </div>
                   <div className="flex gap-3">
-                    <Button variant="outline" size="sm" className="bg-white">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-white"
+                      onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({
+                            title: article.title,
+                            text: article.excerpt,
+                            url: window.location.href
+                          }).catch(error => console.log('Erreur de partage :', error));
+                        } else {
+                          // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
+                          navigator.clipboard.writeText(window.location.href)
+                            .then(() => alert("Lien copié dans le presse-papier"))
+                            .catch(err => console.error("Impossible de copier le lien", err));
+                        }
+                      }}
+                    >
                       <Share2 className="h-4 w-4 mr-2" />
                       Partager
                     </Button>
@@ -248,7 +284,7 @@ const Article: React.FC = () => {
                             )}
                             <div className="p-4">
                               <Link href={`/articles/${relatedArticle.slug}`}>
-                                <h4 className="text-lg font-bold text-dark hover:text-primary transition-colors">
+                                <h4 className="text-lg font-bold text-dark hover:text-primary hover:underline transition-colors">
                                   {relatedArticle.title}
                                 </h4>
                               </Link>

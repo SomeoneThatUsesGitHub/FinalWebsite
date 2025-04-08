@@ -265,7 +265,7 @@ const NewsWall: React.FC = () => {
             ) : (
               // Featured Article Card
               <div className="group bg-white overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200">
-                <Link href="#" className="block">
+                <Link href={`/articles/${(featuredContent.data as Article).slug}`} className="block">
                   <div className="flex flex-col md:grid md:grid-cols-2 h-auto md:h-[360px]">
                     <div className="relative h-64 md:h-full overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
@@ -385,7 +385,7 @@ const NewsWall: React.FC = () => {
                   delay={0.1 * index}
                 >
                   <div className="news-card group rounded-xl overflow-hidden shadow-xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
-                    <Link href="#" className="block">
+                    <Link href={`/articles/${article.slug}`} className="block">
                       <div className="overflow-hidden h-48 relative">
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
                         {article.imageUrl ? (
