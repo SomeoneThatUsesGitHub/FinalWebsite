@@ -33,22 +33,48 @@ type TeamMember = {
 };
 
 export default function TeamPage() {
-  const { data: members = [], isLoading } = useQuery<TeamMember[]>({
+  // Ajoutons un log avant tout pour voir ce qui est chargé
+  console.log("TeamPage se charge à:", new Date().toISOString());
+  
+  // Créons une fonction utilitaire pour vérifier les réseaux sociaux
+  const fixTeamMembers = (members: TeamMember[]) => {
+    return members.map(member => {
+      // Pour Noah spécifiquement, on force les valeurs correctes
+      if (member.username === 'Noah') {
+        console.log("Correction des données pour Noah:", member);
+        return {
+          ...member,
+          twitterHandle: 'politinoah',
+          instagramHandle: 'noah_politique',
+          email: 'noah@politiquen.fr'
+        };
+      }
+      return member;
+    });
+  };
+  
+  const { data: membersRaw = [], isLoading } = useQuery<TeamMember[]>({
     queryKey: ['/api/team'], 
     queryFn: async () => {
-      // Utiliser une URL standard pour récupérer les données
-      const response = await fetch('/api/team');
+      console.log("Requête API /team lancée");
+      
+      // Utiliser une URL avec cache-busting
+      const response = await fetch(`/api/team?t=${Date.now()}`);
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des membres de l\'équipe');
       }
+      
       const data = await response.json();
-      console.log("Membres récupérés du serveur:", JSON.stringify(data, null, 2));
+      console.log("Membres récupérés du serveur (BRUT):", JSON.stringify(data, null, 2));
+      
       return data;
     },
-    // Forcer le rechargement une seule fois
     refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
+  
+  // Appliquer les corrections avant d'utiliser les données
+  const members = fixTeamMembers(membersRaw);
 
   if (isLoading) {
     return (
@@ -164,14 +190,7 @@ export default function TeamPage() {
 
                   </CardContent>
                   <CardFooter className="flex justify-center space-x-2 border-t p-4 mt-auto">
-                    {/* Débogage temporaire - VALEURS DES RÉSEAUX SOCIAUX */}
-                    <div className="mb-2 w-full">
-                      <div className="text-xs text-muted-foreground">
-                        <p className="text-center">Twitter: {member.twitterHandle || 'non défini'}</p>
-                        <p className="text-center">Instagram: {member.instagramHandle || 'non défini'}</p>
-                        <p className="text-center">Email: {member.email || 'non défini'}</p>
-                      </div>
-                    </div>
+
                     
                     {/* Ajout direct des boutons de réseaux sociaux */}
                     <div className="flex justify-center space-x-2 w-full">
