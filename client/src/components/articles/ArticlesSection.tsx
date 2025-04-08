@@ -307,28 +307,61 @@ const ArticlesSection: React.FC = () => {
     queryKey: ['/api/categories'],
   });
   
+  // Récupérer tous les articles en une seule requête 
+  // et appliquer les filtres côté client pour une meilleure réactivité
   const { data: articlesData, isLoading: articlesLoading } = useQuery<Article[]>({
-    queryKey: ['/api/articles', selectedCategory, searchTerm, sortOrder, selectedYear],
-    queryFn: async ({ queryKey }) => {
-      const [_, categoryId, search, sort, year] = queryKey;
-      let url = '/api/articles?';
-      
-      if (categoryId && categoryId !== 'all') url += `categoryId=${categoryId}&`;
-      if (search) url += `search=${encodeURIComponent(search as string)}&`;
-      if (sort) url += `sort=${sort}&`;
-      if (year && year !== 'all') url += `year=${year}`;
-      
-      const res = await fetch(url);
+    queryKey: ['/api/articles'],
+    queryFn: async () => {
+      const res = await fetch('/api/articles');
       if (!res.ok) throw new Error('Failed to fetch articles');
       return res.json();
     }
   });
   
   // Filtrer explicitement pour ne garder que les articles publiés
+  // et pour appliquer les filtres côté client
   const articles = useMemo(() => {
     if (!articlesData) return [];
-    return articlesData.filter(article => article.published === true);
-  }, [articlesData]);
+    
+    // Filtrer d'abord par statut de publication
+    let filtered = articlesData.filter(article => article.published === true);
+    
+    // Ensuite appliquer les autres filtres
+    if (selectedCategory && selectedCategory !== 'all') {
+      filtered = filtered.filter(article => 
+        article.categoryId === parseInt(selectedCategory)
+      );
+    }
+    
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(article => 
+        article.title.toLowerCase().includes(searchLower) || 
+        article.excerpt.toLowerCase().includes(searchLower) ||
+        article.content.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    if (selectedYear && selectedYear !== 'all') {
+      const year = parseInt(selectedYear);
+      filtered = filtered.filter(article => {
+        const articleDate = new Date(article.createdAt);
+        return articleDate.getFullYear() === year;
+      });
+    }
+    
+    // Tri
+    if (sortOrder === 'popular') {
+      filtered.sort((a, b) => b.viewCount - a.viewCount);
+    } else if (sortOrder === 'commented') {
+      filtered.sort((a, b) => b.commentCount - a.commentCount);
+    } else {
+      // Par défaut, tri par date de création (plus récent d'abord)
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    
+    return filtered;
+  }, [articlesData, selectedCategory, searchTerm, sortOrder, selectedYear]);
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
