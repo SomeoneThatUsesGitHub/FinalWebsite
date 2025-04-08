@@ -10,12 +10,10 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, ExternalLink, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 // Layout
 // Header et Footer sont fournis par App.tsx
 
@@ -200,59 +198,7 @@ export default function TeamPage() {
                     )}
 
                   </CardContent>
-                  <CardFooter className="flex justify-center space-x-2 border-t p-4 mt-auto">
-
-                    
-                    {/* Affichage des réseaux sociaux depuis les données de la DB */}
-                    <div className="flex justify-center space-x-2 w-full">
-                      {/* Twitter */}
-                      {member.twitterHandle && member.twitterHandle.trim() !== "" && (
-                        <Button variant="ghost" size="icon" asChild>
-                          <a 
-                            href={`https://twitter.com/${member.twitterHandle}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            title={`Twitter: @${member.twitterHandle}`}
-                          >
-                            <Twitter className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
-                      
-                      {/* Instagram */}
-                      {member.instagramHandle && member.instagramHandle.trim() !== "" && (
-                        <Button variant="ghost" size="icon" asChild>
-                          <a 
-                            href={`https://instagram.com/${member.instagramHandle}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            title={`Instagram: @${member.instagramHandle}`}
-                          >
-                            <Instagram className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
-                      
-                      {/* Email */}
-                      {member.email && member.email.trim() !== "" && (
-                        <Button variant="ghost" size="icon" asChild>
-                          <a 
-                            href={`mailto:${member.email}`} 
-                            title={`Email: ${member.email}`}
-                          >
-                            <Mail className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
-                      
-                      {/* Message si aucun réseau social n'est disponible */}
-                      {(!member.twitterHandle || member.twitterHandle.trim() === "") && 
-                       (!member.instagramHandle || member.instagramHandle.trim() === "") && 
-                       (!member.email || member.email.trim() === "") && (
-                        <span className="text-xs text-muted-foreground">Aucun réseau social disponible</span>
-                      )}
-                    </div>
-                  </CardFooter>
+                  {/* Carte sans fonctionnalité de réseaux sociaux */}
                 </Card>
               </motion.div>
             ))}
