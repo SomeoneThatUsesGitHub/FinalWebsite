@@ -336,9 +336,7 @@ const ArticlesSection: React.FC = () => {
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(article => 
-        article.title.toLowerCase().includes(searchLower) || 
-        article.excerpt.toLowerCase().includes(searchLower) ||
-        article.content.toLowerCase().includes(searchLower)
+        article.title.toLowerCase().includes(searchLower)
       );
     }
     
@@ -350,11 +348,10 @@ const ArticlesSection: React.FC = () => {
       });
     }
     
-    // Tri
-    if (sortOrder === 'popular') {
-      filtered.sort((a, b) => b.viewCount - a.viewCount);
-    } else if (sortOrder === 'commented') {
-      filtered.sort((a, b) => b.commentCount - a.commentCount);
+    // Tri par date de création
+    if (sortOrder === 'oldest') {
+      // Tri par date de création (plus ancien d'abord)
+      filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     } else {
       // Par défaut, tri par date de création (plus récent d'abord)
       filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -419,7 +416,7 @@ const ArticlesSection: React.FC = () => {
               <div className="relative md:col-span-5">
                 <Input
                   type="text"
-                  placeholder="Rechercher un article..."
+                  placeholder="Rechercher par titre..."
                   value={searchTerm}
                   onChange={handleSearch}
                   className="pl-10 w-full"
@@ -463,8 +460,7 @@ const ArticlesSection: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="recent">Les plus récents</SelectItem>
-                    <SelectItem value="popular">Les plus lus</SelectItem>
-                    <SelectItem value="commented">Les plus commentés</SelectItem>
+                    <SelectItem value="oldest">Les plus anciens</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
