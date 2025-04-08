@@ -128,7 +128,8 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(articles.authorId, users.id))
       .where((qb) => {
         // Par défaut, ne montrer que les articles publiés
-        if (!filters?.showUnpublished) {
+        // Le paramètre doit être explicitement true pour montrer les non-publiés
+        if (filters?.showUnpublished !== true) {
           return eq(articles.published, true);
         }
         return undefined;
