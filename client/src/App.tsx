@@ -14,6 +14,7 @@ import TeamPage from "@/pages/TeamPage";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/AuthPage";
 import TestEditor from "@/pages/test-editor";
+import LiveCoveragePage from "@/pages/LiveCoveragePage";
 
 // Pages admin
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -23,6 +24,10 @@ import FlashInfosPage from "@/pages/admin/FlashInfosPage";
 import VideosPage from "@/pages/admin/VideosPage";
 import CategoriesPage from "@/pages/admin/CategoriesPage";
 import UsersPage from "@/pages/admin/UsersPage";
+import DirectsPage from "@/pages/admin/DirectsPage";
+import DirectForm from "@/pages/admin/DirectForm";
+import DirectEditorsPage from "@/pages/admin/DirectEditorsPage";
+import DirectUpdatesPage from "@/pages/admin/DirectUpdatesPage";
 
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
@@ -69,6 +74,7 @@ function App() {
               <Route path="/team" component={TeamPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
+              <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
               
               {/* Routes admin protégées - accessibles aux admins et éditeurs */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
@@ -83,6 +89,13 @@ function App() {
               <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
               <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
               <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
+              
+              {/* Routes pour les suivis en direct */}
+              <ProtectedRoute path="/admin/directs" component={DirectsPage} adminOnly />
+              <ProtectedRoute path="/admin/directs/nouveau" component={DirectForm} adminOnly />
+              <ProtectedRoute path="/admin/directs/editer/:id" component={DirectForm} adminOnly />
+              <ProtectedRoute path="/admin/directs/:id/editeurs" component={DirectEditorsPage} adminOnly />
+              <ProtectedRoute path="/admin/directs/:id/mises-a-jour" component={DirectUpdatesPage} adminOnly />
               
               {/* Fallback */}
               <Route path="/:rest*" component={NotFound} />
