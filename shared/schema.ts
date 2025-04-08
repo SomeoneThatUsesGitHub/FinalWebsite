@@ -10,6 +10,9 @@ export const users = pgTable("users", {
   displayName: text("display_name").notNull(),
   role: text("role").notNull().default("editor"),
   avatarUrl: text("avatar_url"),
+  title: text("title"),  // Grade (Journaliste politique, éditeur, etc.)
+  bio: text("bio"),      // Courte biographie
+  isTeamMember: boolean("is_team_member").default(false),  // Indique si l'utilisateur doit être affiché dans l'équipe
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -18,6 +21,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
   displayName: true,
   role: true,
   avatarUrl: true,
+  title: true,
+  bio: true,
+  isTeamMember: true,
 });
 
 // Category schema - for categorizing content

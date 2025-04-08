@@ -11,6 +11,10 @@ export async function createUser(userData: {
   displayName: string;
   password: string;
   role: string;
+  avatarUrl?: string;
+  title?: string;
+  bio?: string;
+  isTeamMember?: boolean;
 }): Promise<{ success: boolean; user?: User; message?: string }> {
   try {
     // Vérifier si l'utilisateur existe déjà
@@ -32,7 +36,10 @@ export async function createUser(userData: {
       displayName: userData.displayName,
       password: hashedPassword,
       role: userData.role as any,
-      avatarUrl: null,
+      avatarUrl: userData.avatarUrl || null,
+      title: userData.title || null,
+      bio: userData.bio || null,
+      isTeamMember: userData.isTeamMember || false,
     }).returning();
     
     return {
@@ -99,7 +106,10 @@ export async function listUsers() {
       username: users.username,
       displayName: users.displayName,
       role: users.role,
-      avatarUrl: users.avatarUrl
+      avatarUrl: users.avatarUrl,
+      title: users.title,
+      bio: users.bio,
+      isTeamMember: users.isTeamMember
     }).from(users);
     
     return {
@@ -112,6 +122,88 @@ export async function listUsers() {
     return {
       success: false,
       message: "Une erreur est survenue lors de la récupération des utilisateurs."
+    };
+  }
+}
+
+/**
+ * Mettre à jour le profil d'un utilisateur
+ */
+export async function updateUserProfile(username: string, userData: {
+  displayName?: string;
+  role?: string;
+  avatarUrl?: string;
+  title?: string;
+  bio?: string;
+  isTeamMember?: boolean;
+}) {
+  try {
+    // Vérifier si l'utilisateur existe
+    const existingUser = await db.select().from(users).where(eq(users.username, username));
+    
+    if (existingUser.length === 0) {
+      return {
+        success: false,
+        message: "Utilisateur introuvable."
+      };
+    }
+    
+    // Mettre à jour le profil
+    const [updatedUser] = await db.update(users)
+      .set({
+        displayName: userData.displayName !== undefined ? userData.displayName : existingUser[0].displayName,
+        role: userData.role !== undefined ? userData.role as any : existingUser[0].role,
+        avatarUrl: userData.avatarUrl !== undefined ? userData.avatarUrl : existingUser[0].avatarUrl,
+        title: userData.title !== undefined ? userData.title : existingUser[0].title,
+        bio: userData.bio !== undefined ? userData.bio : existingUser[0].bio,
+        isTeamMember: userData.isTeamMember !== undefined ? userData.isTeamMember : existingUser[0].isTeamMember,
+      })
+      .where(eq(users.username, username))
+      .returning();
+    
+    return {
+      success: true,
+      user: {
+        ...updatedUser,
+        password: "********" // Ne jamais renvoyer le mot de passe, même haché
+      }
+    };
+    
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du profil:", error);
+    return {
+      success: false,
+      message: "Une erreur est survenue lors de la mise à jour du profil."
+    };
+  }
+}
+
+/**
+ * Récupérer les membres de l'équipe
+ */
+export async function getTeamMembers() {
+  try {
+    const teamMembers = await db.select({
+      id: users.id,
+      username: users.username,
+      displayName: users.displayName,
+      role: users.role,
+      avatarUrl: users.avatarUrl,
+      title: users.title,
+      bio: users.bio
+    }).from(users)
+      .where(eq(users.isTeamMember, true));
+    
+    return {
+      success: true,
+      members: teamMembers
+    };
+    
+  } catch (error) {
+    console.error("Erreur lors de la récupération des membres de l'équipe:", error);
+    return {
+      success: false,
+      message: "Une erreur est survenue lors de la récupération des membres de l'équipe."
     };
   }
 }

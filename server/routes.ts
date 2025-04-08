@@ -8,7 +8,7 @@ import * as schema from "@shared/schema";
 import { insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, insertVideoSchema, videos } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
-import { createUser, updateUserPassword, listUsers, deleteUser } from "./userManagement";
+import { createUser, updateUserPassword, listUsers, deleteUser, updateUserProfile, getTeamMembers } from "./userManagement";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes - prefix all with /api
@@ -1120,6 +1120,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating user password:", error);
       res.status(500).json({ message: "Erreur lors de la mise à jour du mot de passe" });
+    }
+  });
+
+  // Route pour mettre à jour le profil d'un utilisateur
+  app.put("/api/admin/users/:username/profile", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { username } = req.params;
+      const profileData = req.body;
+      
+      // Validation de base
+      if (profileData.role && !["admin", "editor", "user"].includes(profileData.role)) {
+        return res.status(400).json({ 
+          message: "Rôle invalide",
+          details: "Le rôle doit être 'admin', 'editor' ou 'user'"
+        });
+      }
+      
+      // Mettre à jour le profil
+      const result = await updateUserProfile(username, profileData);
+      if (result.success) {
+        return res.json(result.user);
+      } else {
+        return res.status(400).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du profil" });
+    }
+  });
+
+  // Routes pour l'équipe
+  // Récupérer tous les membres de l'équipe (public)
+  app.get("/api/team", async (req: Request, res: Response) => {
+    try {
+      const result = await getTeamMembers();
+      if (result.success) {
+        return res.json(result.members);
+      } else {
+        return res.status(500).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des membres de l'équipe" });
+    }
+  });
+
+  // Ajouter un utilisateur à l'équipe
+  app.post("/api/admin/team/add/:username", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { username } = req.params;
+      const result = await updateUserProfile(username, { isTeamMember: true });
+      
+      if (result.success) {
+        return res.json({ message: "Utilisateur ajouté à l'équipe avec succès", user: result.user });
+      } else {
+        return res.status(400).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error("Error adding user to team:", error);
+      res.status(500).json({ message: "Erreur lors de l'ajout à l'équipe" });
+    }
+  });
+
+  // Retirer un utilisateur de l'équipe
+  app.post("/api/admin/team/remove/:username", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { username } = req.params;
+      const result = await updateUserProfile(username, { isTeamMember: false });
+      
+      if (result.success) {
+        return res.json({ message: "Utilisateur retiré de l'équipe avec succès", user: result.user });
+      } else {
+        return res.status(400).json({ message: result.message });
+      }
+    } catch (error) {
+      console.error("Error removing user from team:", error);
+      res.status(500).json({ message: "Erreur lors du retrait de l'équipe" });
     }
   });
 

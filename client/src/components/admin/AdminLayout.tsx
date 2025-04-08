@@ -90,7 +90,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       name: "Équipe",
       href: "/admin/team",
       icon: Users,
-      disabled: true,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Notes Éditoriales",

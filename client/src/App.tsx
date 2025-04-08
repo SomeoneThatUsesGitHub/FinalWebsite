@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import Home from "@/pages/Home";
 import ArticlesList from "@/pages/ArticlesList";
 import Article from "@/pages/Article";
+import TeamPage from "@/pages/TeamPage";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/AuthPage";
 import TestEditor from "@/pages/test-editor";
@@ -22,6 +23,8 @@ import FlashInfosPage from "@/pages/admin/FlashInfosPage";
 import VideosPage from "@/pages/admin/VideosPage";
 import CategoriesPage from "@/pages/admin/CategoriesPage";
 import UsersPage from "@/pages/admin/UsersPage";
+// Team admin page
+import AdminTeamPage from "@/pages/admin/TeamPage";
 
 // Layout
 import Header from "@/components/layout/Header";
@@ -62,6 +65,7 @@ function App() {
               <Route path="/home" component={Home} />
               <Route path="/articles" component={ArticlesList} />
               <Route path="/articles/:slug" component={Article} />
+              <Route path="/team" component={TeamPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
               
@@ -76,6 +80,7 @@ function App() {
               {/* Routes admin protégées - accessibles uniquement aux admins */}
               <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
               <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
+              <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
               
               {/* Fallback */}
               <Route path="/:rest*" component={NotFound} />

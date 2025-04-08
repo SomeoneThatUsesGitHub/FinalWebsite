@@ -33,7 +33,7 @@ const Header: React.FC = () => {
   const navItems = [
     { href: "/home", label: "Accueil", active: location === "/home" || location === "/" },
     { href: "/a-propos", label: "A propos", active: location === "/a-propos" },
-    { href: "/equipe", label: "Equipe", active: location === "/equipe" },
+    { href: "/team", label: "Equipe", active: location === "/team" },
     { href: "/elections", label: "Elections", active: location === "/elections" },
     { href: "/articles", label: "Articles", active: location === "/articles" },
     { href: "/apprendre", label: "Apprendre", active: location === "/apprendre" },
