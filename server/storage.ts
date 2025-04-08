@@ -395,6 +395,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateArticle(id: number, articleData: Partial<InsertArticle>): Promise<Article | undefined> {
+    // Si l'article est défini comme "à la une", décocher tous les autres articles
+    if (articleData.featured === true) {
+      // Mettre à jour tous les autres articles pour désactiver leur statut "à la une"
+      await db.update(articles)
+        .set({ featured: false })
+        .where(
+          and(
+            neq(articles.id, id),   // Tous les articles sauf celui en cours de modification
+            eq(articles.featured, true)  // Qui sont actuellement définis comme "à la une"
+          )
+        );
+    }
+    
+    // Mise à jour de l'article demandé
     const [article] = await db.update(articles)
       .set({
         ...articleData,
