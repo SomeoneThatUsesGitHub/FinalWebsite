@@ -23,6 +23,7 @@ import FlashInfosPage from "@/pages/admin/FlashInfosPage";
 import VideosPage from "@/pages/admin/VideosPage";
 import CategoriesPage from "@/pages/admin/CategoriesPage";
 import UsersPage from "@/pages/admin/UsersPage";
+import LiveCoveragesPage from "@/pages/admin/LiveCoveragesPage";
 
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
@@ -83,6 +84,7 @@ function App() {
               <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
               <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
               <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
+              <ProtectedRoute path="/admin/live-coverages" component={LiveCoveragesPage} adminOnly />
               
               {/* Fallback */}
               <Route path="/:rest*" component={NotFound} />

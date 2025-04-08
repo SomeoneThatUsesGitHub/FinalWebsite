@@ -12,6 +12,7 @@ import {
   LogOut,
   ChevronDown,
   Menu,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -73,6 +74,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       href: "/admin/flash-infos",
       icon: Megaphone,
       disabled: false,
+    },
+    {
+      name: "Suivis en direct",
+      href: "/admin/live-coverages",
+      icon: Activity,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Vidéos",
