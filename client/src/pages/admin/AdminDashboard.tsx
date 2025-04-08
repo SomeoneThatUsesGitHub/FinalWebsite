@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { getQueryFn } from "@/lib/queryClient";
-import { Article, Category } from "@shared/schema";
+import { Article, Category, FlashInfo } from "@shared/schema";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, FileText, Tag, Eye, AlertCircle, Calendar } from "lucide-react";
+import { ArrowRight, BarChart3, FileText, Tag, Eye, AlertCircle, Calendar, ZapIcon, Zap } from "lucide-react";
 
 export default function AdminDashboard() {
   const [_, setLocation] = useLocation();
@@ -22,11 +22,17 @@ export default function AdminDashboard() {
     queryFn: getQueryFn({ on401: "throw" }),
   });
   
+  // Récupérer les flash infos
+  const { data: flashInfos, isLoading: flashInfosLoading } = useQuery<FlashInfo[]>({
+    queryKey: ["/api/admin/flash-infos"],
+    queryFn: getQueryFn({ on401: "throw" }),
+  });
+  
   // Statistiques pour le dashboard
   const stats = {
     articlesCount: articles?.length || 0,
     publishedArticlesCount: articles?.filter(article => article.published).length || 0,
-    draftArticlesCount: articles?.filter(article => !article.published).length || 0,
+    activeFlashInfosCount: flashInfos?.filter(flash => flash.active).length || 0,
     categoriesCount: categories?.length || 0,
   };
   
@@ -76,13 +82,13 @@ export default function AdminDashboard() {
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Brouillons</CardTitle>
-              <AlertCircle className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Flash infos</CardTitle>
+              <Zap className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.draftArticlesCount}</div>
+              <div className="text-2xl font-bold">{stats.activeFlashInfosCount}</div>
               <p className="text-xs text-muted-foreground">
-                Articles non publiés
+                Flash infos actifs
               </p>
             </CardContent>
           </Card>
@@ -206,7 +212,6 @@ export default function AdminDashboard() {
                   variant="outline"
                   className="w-full justify-start"
                   onClick={() => setLocation("/admin/categories")}
-                  disabled
                 >
                   <Tag className="mr-2 h-4 w-4" />
                   Gérer les catégories
@@ -216,9 +221,8 @@ export default function AdminDashboard() {
                   variant="outline"
                   className="w-full justify-start"
                   onClick={() => setLocation("/admin/flash-infos")}
-                  disabled
                 >
-                  <AlertCircle className="mr-2 h-4 w-4" />
+                  <Zap className="mr-2 h-4 w-4 text-red-500" />
                   Flash infos
                 </Button>
                 

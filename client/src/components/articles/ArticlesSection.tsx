@@ -143,71 +143,77 @@ const GridArticleCard: React.FC<{
         y: -5,
         transition: { duration: 0.2 }
       }}
-      className="rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col bg-white"
+      className="rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col bg-white group cursor-pointer"
     >
-      <div className="relative overflow-hidden h-48">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-        {article.imageUrl ? (
-          <img
-            src={article.imageUrl}
-            alt={article.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+      <Link href={`/articles/${article.slug}`} className="flex flex-col flex-1">
+        <div className="relative overflow-hidden h-48">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
+          {article.imageUrl ? (
+            <img
+              src={article.imageUrl}
+              alt={article.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </div>
+          )}
+          <div className="absolute top-2 right-2 z-20">
+            <span
+              className="inline-block px-2 py-1 text-xs font-semibold rounded-full transition-transform duration-300 hover:scale-110"
+              style={{
+                backgroundColor: categories?.find(c => c.id === article.categoryId)?.color || "#3b82f6",
+                color: "#FFFFFF"
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onCategoryClick(article.categoryId);
+              }}
+            >
+              {categories?.find(c => c.id === article.categoryId)?.name || "Catégorie"}
+            </span>
           </div>
-        )}
-        <div className="absolute top-2 right-2 z-20" onClick={() => onCategoryClick(article.categoryId)}>
-          <span
-            className="inline-block px-2 py-1 text-xs font-semibold rounded-full transition-transform duration-300 hover:scale-110"
-            style={{
-              backgroundColor: categories?.find(c => c.id === article.categoryId)?.color || "#3b82f6",
-              color: "#FFFFFF"
+        </div>
+        <div className="p-5 flex-1 flex flex-col">
+          <motion.h3 
+            className="text-lg font-bold text-dark mb-3 transition-colors duration-300 group-hover:text-blue-600 line-clamp-2 min-h-[3.5rem]"
+            variants={{
+              hidden: { opacity: 0, y: 5 },
+              visible: { 
+                opacity: 1, 
+                y: 0,
+                transition: { 
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 20
+                }
+              }
             }}
           >
-            {categories?.find(c => c.id === article.categoryId)?.name || "Catégorie"}
-          </span>
-        </div>
-      </div>
-      <div className="p-5 flex-1 flex flex-col">
-        <motion.h3 
-          className="text-lg font-bold text-dark mb-3 transition-colors duration-300 hover:text-blue-600 line-clamp-2 min-h-[3.5rem]"
-          whileHover={{ scale: 1.01 }}
-          variants={{
-            hidden: { opacity: 0, y: 5 },
-            visible: { 
-              opacity: 1, 
-              y: 0,
-              transition: { 
-                type: "spring",
-                stiffness: 120,
-                damping: 20
-              }
-            }
-          }}
-        >
-          <Link href={`/articles/${article.slug}`}>{article.title}</Link>
-        </motion.h3>
-        <p className="text-dark/70 text-sm mb-4 line-clamp-2 flex-1">{article.excerpt}</p>
-        <div className="flex items-center justify-between text-dark/60 text-xs pt-3 border-t border-gray-100">
-          <div className="flex items-center">
-            <img 
-              src={article.author?.avatarUrl || '/assets/default-avatar.svg'} 
-              alt={article.author?.displayName || "Auteur"} 
-              className="w-6 h-6 rounded-full mr-2"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/assets/default-avatar.svg';
-              }}
-            />
-            <span>{article.author?.displayName || "Auteur inconnu"}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            <span>{getTimeAgo(article.createdAt)}</span>
+            {article.title}
+          </motion.h3>
+          <p className="text-dark/70 text-sm mb-4 line-clamp-2 flex-1">{article.excerpt}</p>
+          <div className="flex items-center justify-between text-dark/60 text-xs pt-3 border-t border-gray-100">
+            <div className="flex items-center">
+              <img 
+                src={article.author?.avatarUrl || '/assets/default-avatar.svg'} 
+                alt={article.author?.displayName || "Auteur"} 
+                className="w-6 h-6 rounded-full mr-2"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/assets/default-avatar.svg';
+                }}
+              />
+              <span>{article.author?.displayName || "Auteur inconnu"}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              <span>{getTimeAgo(article.createdAt)}</span>
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
     </motion.article>
   );
 };
