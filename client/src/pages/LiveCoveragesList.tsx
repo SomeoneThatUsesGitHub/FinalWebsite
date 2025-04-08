@@ -62,7 +62,7 @@ export default function LiveCoveragesList() {
   }
   
   // Trier les suivis: d'abord les actifs, puis par date de création décroissante
-  const sortedCoverages = coverages ? [...coverages].sort((a, b) => {
+  const sortedCoverages = coverages && Array.isArray(coverages) ? [...coverages].sort((a, b) => {
     // D'abord trier par statut actif
     if (a.active && !b.active) return -1;
     if (!a.active && b.active) return 1;

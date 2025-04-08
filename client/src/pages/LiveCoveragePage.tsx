@@ -291,9 +291,18 @@ export default function LiveCoveragePage() {
                   Réessayer
                 </Button>
               </div>
-            ) : updates && updates.length > 0 ? (
+            ) : updates && Array.isArray(updates) && updates.length > 0 ? (
               <div className="space-y-8">
-                {updates.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                {[...updates].sort((a, b) => {
+                    try {
+                      // Utiliser timestamp si disponible, sinon createdAt
+                      const dateA = a.timestamp || a.createdAt;
+                      const dateB = b.timestamp || b.createdAt;
+                      return new Date(dateB).getTime() - new Date(dateA).getTime();
+                    } catch (error) {
+                      return 0;
+                    }
+                  })
                   .map((update) => (
                     <div key={update.id} className="relative pl-6 border-l-2 border-muted">
                       <div className="absolute left-[-8px] top-0">
@@ -302,7 +311,7 @@ export default function LiveCoveragePage() {
                       
                       <div className="mb-1 flex items-center gap-2">
                         <span className="text-sm font-semibold text-muted-foreground">
-                          {formatUpdateDate(update.createdAt)}
+                          {formatUpdateDate(update.timestamp || update.createdAt)}
                         </span>
                         
                         {update.author && (
