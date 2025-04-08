@@ -58,16 +58,17 @@ export default function TeamPage() {
 
   return (
     <>
-      <Header />
-      <div className="container mx-auto py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Notre Équipe</h1>
-          <div className="w-24 h-1 bg-primary mx-auto mb-6"></div>
-          <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
-            Découvrez l'équipe passionnée qui se cache derrière Politiquensemble, 
-            travaillant chaque jour pour vous apporter une information politique de qualité.
-          </p>
+      <div className="bg-blue-600 py-12 mb-12">
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-white text-center">Notre Équipe</h1>
+          <div className="w-24 h-1 bg-white mx-auto mt-4"></div>
         </div>
+      </div>
+      <div className="container mx-auto py-6 px-4">
+        <p className="max-w-3xl mx-auto text-lg text-muted-foreground text-center mb-16">
+          Découvrez l'équipe passionnée qui se cache derrière Politiquensemble, 
+          travaillant chaque jour pour vous apporter une information politique de qualité.
+        </p>
 
         {members.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
@@ -129,19 +130,6 @@ export default function TeamPage() {
             ))}
           </div>
         )}
-
-        <div className="mt-20 bg-blue-50 rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Rejoignez Notre Équipe</h2>
-          <p className="text-muted-foreground mb-6 max-w-3xl mx-auto">
-            Vous êtes passionné(e) par la politique et souhaitez contribuer à un média innovant ? 
-            Nous sommes toujours à la recherche de nouveaux talents pour renforcer notre équipe.
-          </p>
-          <Button asChild>
-            <a href="/contact">
-              <ExternalLink className="mr-2 h-4 w-4" /> Nous contacter
-            </a>
-          </Button>
-        </div>
       </div>
       <Footer />
     </>
