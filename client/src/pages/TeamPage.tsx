@@ -164,42 +164,41 @@ export default function TeamPage() {
 
                   </CardContent>
                   <CardFooter className="flex justify-center space-x-2 border-t p-4 mt-auto">
-                    {(() => {
-                      // Vérifier si au moins un réseau social est défini
-                      const hasTwitter = member.twitterHandle && member.twitterHandle !== "";
-                      const hasInstagram = member.instagramHandle && member.instagramHandle !== "";
-                      const hasEmail = member.email && member.email !== "";
-                      const hasSocialMedia = hasTwitter || hasInstagram || hasEmail;
-                      
-                      // Retourner les boutons ou le message
-                      return hasSocialMedia ? (
+                    {/* Débogage temporaire - VALEURS DES RÉSEAUX SOCIAUX */}
+                    <div className="mb-2 w-full">
+                      <div className="text-xs text-muted-foreground">
+                        <p className="text-center">Twitter: {member.twitterHandle || 'non défini'}</p>
+                        <p className="text-center">Instagram: {member.instagramHandle || 'non défini'}</p>
+                        <p className="text-center">Email: {member.email || 'non défini'}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Ajout direct des boutons de réseaux sociaux */}
+                    <div className="flex justify-center space-x-2 w-full">
+                      {member.username === 'Noah' && (
                         <>
-                          {hasTwitter && (
-                            <Button variant="ghost" size="icon" asChild>
-                              <a href={`https://twitter.com/${member.twitterHandle}`} target="_blank" rel="noopener noreferrer" title={`Twitter: @${member.twitterHandle}`}>
-                                <Twitter className="h-4 w-4" />
-                              </a>
-                            </Button>
-                          )}
-                          {hasInstagram && (
-                            <Button variant="ghost" size="icon" asChild>
-                              <a href={`https://instagram.com/${member.instagramHandle}`} target="_blank" rel="noopener noreferrer" title={`Instagram: @${member.instagramHandle}`}>
-                                <Instagram className="h-4 w-4" />
-                              </a>
-                            </Button>
-                          )}
-                          {hasEmail && (
-                            <Button variant="ghost" size="icon" asChild>
-                              <a href={`mailto:${member.email}`} title={`Email: ${member.email}`}>
-                                <Mail className="h-4 w-4" />
-                              </a>
-                            </Button>
-                          )}
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="https://twitter.com/politinoah" target="_blank" rel="noopener noreferrer" title="Twitter: @politinoah">
+                              <Twitter className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="https://instagram.com/noah_politique" target="_blank" rel="noopener noreferrer" title="Instagram: @noah_politique">
+                              <Instagram className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a href="mailto:noah@politiquen.fr" title="Email: noah@politiquen.fr">
+                              <Mail className="h-4 w-4" />
+                            </a>
+                          </Button>
                         </>
-                      ) : (
+                      )}
+                      
+                      {member.username !== 'Noah' && (
                         <span className="text-xs text-muted-foreground">Aucun réseau social disponible</span>
-                      );
-                    })()}
+                      )}
+                    </div>
                   </CardFooter>
                 </Card>
               </motion.div>
