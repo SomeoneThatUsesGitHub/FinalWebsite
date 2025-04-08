@@ -11,30 +11,7 @@ import { ChevronLeft, Share2, Calendar, Clock, Bookmark, Facebook, Twitter } fro
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
 import ArticleContent from "@/components/ArticleContent";
-
-interface Article {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string;
-  imageUrl: string | null;
-  authorId: number;
-  categoryId: number;
-  published: boolean;
-  featured: boolean;
-  viewCount: number;
-  commentCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  color: string;
-}
+import { Article as ArticleType, Category } from "@/types/article";
 
 const Article: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -44,7 +21,7 @@ const Article: React.FC = () => {
     window.scrollTo(0, 0);
   }, [slug]);
   
-  const { data: article, isLoading: articleLoading } = useQuery<Article>({
+  const { data: article, isLoading: articleLoading } = useQuery<ArticleType>({
     queryKey: [`/api/articles/${slug}`],
   });
   
@@ -53,7 +30,7 @@ const Article: React.FC = () => {
     enabled: !!article,
   });
   
-  const { data: relatedArticles } = useQuery<Article[]>({
+  const { data: relatedArticles } = useQuery<ArticleType[]>({
     queryKey: ['/api/articles/by-category', article?.categoryId, 3],
     enabled: !!article?.categoryId,
     queryFn: async ({ queryKey }) => {
@@ -190,14 +167,17 @@ const Article: React.FC = () => {
                   <motion.div variants={staggerItem} className="flex items-center mb-4 md:mb-0">
                     <div className="flex-shrink-0 mr-4">
                       <img 
-                        src="https://randomuser.me/api/portraits/men/32.jpg" 
-                        alt="Author" 
-                        className="w-12 h-12 rounded-full border-2 border-primary/20" 
+                        src={article.author?.avatarUrl || '/assets/default-avatar.svg'} 
+                        alt={article.author?.displayName || "Auteur"} 
+                        className="w-12 h-12 rounded-full border-2 border-primary/20 bg-gray-100 object-cover" 
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/assets/default-avatar.svg';
+                        }}
                       />
                     </div>
                     <div>
-                      <div className="font-semibold text-dark">Jean Dupont</div>
-                      <div className="text-sm text-dark/60">Journaliste politique</div>
+                      <div className="font-semibold text-dark">{article.author?.displayName || "Auteur inconnu"}</div>
+                      <div className="text-sm text-dark/60">{article.author?.title || "Rédacteur"}</div>
                     </div>
                   </motion.div>
                   

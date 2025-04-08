@@ -492,13 +492,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // S'assurer que le statut de publication est correctement géré
+      // Utiliser l'ID de l'utilisateur connecté comme ID de l'auteur
+      const user = req.user as any;
       const articleData = {
         ...validation.data,
+        authorId: user.id, // Définir l'auteur comme l'utilisateur connecté
         published: req.body.published === true || req.body.published === "true",
         featured: req.body.featured === true || req.body.featured === "true"
       };
       
-      console.log("Données validées pour création:", articleData);
+      console.log("Données validées pour création:", articleData, "par l'utilisateur:", user.displayName);
       
       const article = await storage.createArticle(articleData);
       res.status(201).json(article);

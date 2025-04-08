@@ -204,25 +204,69 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
   
-  async getArticleBySlug(slug: string): Promise<Article | undefined> {
-    const [article] = await db
-      .select()
+  async getArticleBySlug(slug: string): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } }) | undefined> {
+    // Récupération de l'article avec jointure sur l'auteur
+    const result = await db
+      .select({
+        article: articles,
+        authorDisplayName: users.displayName,
+        authorTitle: users.title,
+        authorAvatarUrl: users.avatarUrl
+      })
       .from(articles)
+      .leftJoin(users, eq(articles.authorId, users.id))
       .where(
         and(
           eq(articles.slug, slug),
           eq(articles.published, true)
         )
       );
-    return article;
+    
+    if (result.length === 0) {
+      return undefined;
+    }
+    
+    // Formatage du résultat pour inclure les informations de l'auteur
+    const article = result[0].article;
+    
+    return {
+      ...article,
+      author: {
+        displayName: result[0].authorDisplayName,
+        title: result[0].authorTitle,
+        avatarUrl: result[0].authorAvatarUrl
+      }
+    };
   }
   
-  async getArticleById(id: number): Promise<Article | undefined> {
-    const [article] = await db
-      .select()
+  async getArticleById(id: number): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } }) | undefined> {
+    // Récupération de l'article avec jointure sur l'auteur
+    const result = await db
+      .select({
+        article: articles,
+        authorDisplayName: users.displayName,
+        authorTitle: users.title,
+        authorAvatarUrl: users.avatarUrl
+      })
       .from(articles)
+      .leftJoin(users, eq(articles.authorId, users.id))
       .where(eq(articles.id, id));
-    return article;
+    
+    if (result.length === 0) {
+      return undefined;
+    }
+    
+    // Formatage du résultat pour inclure les informations de l'auteur
+    const article = result[0].article;
+    
+    return {
+      ...article,
+      author: {
+        displayName: result[0].authorDisplayName,
+        title: result[0].authorTitle,
+        avatarUrl: result[0].authorAvatarUrl
+      }
+    };
   }
   
   async createArticle(insertArticle: InsertArticle): Promise<Article> {
