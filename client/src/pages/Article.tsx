@@ -284,7 +284,7 @@ const Article: React.FC = () => {
                             )}
                             <div className="p-4">
                               <Link href={`/articles/${relatedArticle.slug}`}>
-                                <h4 className="text-lg font-bold text-dark hover:text-primary hover:underline transition-colors">
+                                <h4 className="text-lg font-bold text-dark hover:text-primary transition-colors">
                                   {relatedArticle.title}
                                 </h4>
                               </Link>

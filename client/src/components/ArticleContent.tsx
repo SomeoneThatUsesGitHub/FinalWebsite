@@ -179,9 +179,13 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ content }) => {
           }
         }
         
-        /* Améliore l'apparence au survol */
-        .article-content-wrapper a:hover {
+        /* Style des liens d'articles insérés */
+        .article-content-wrapper a {
           text-decoration: none;
+        }
+        .article-content-wrapper a:hover h3 {
+          text-decoration: underline;
+          color: #3B82F6;
         }
       ` }} />
     </div>

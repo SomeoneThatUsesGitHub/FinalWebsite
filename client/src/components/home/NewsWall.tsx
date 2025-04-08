@@ -176,7 +176,6 @@ const NewsWall: React.FC = () => {
     <section id="actualites" className="pt-6 pb-16 md:pt-12 md:pb-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
 
-
         <ScrollAnimation className="mb-10" threshold={0.1}>
           <div className="mb-4">
             <div className="relative">
@@ -186,8 +185,6 @@ const NewsWall: React.FC = () => {
           </div>
           <p className="text-gray-500 mb-6">Restez informé des dernières informations politiques en France et à l'international</p>
         </ScrollAnimation>
-
-        {/* Removed Category Tabs as requested by client */}
 
         {/* Featured Content - Live Event or Featured Article */}
         {isLoading ? (
@@ -385,7 +382,7 @@ const NewsWall: React.FC = () => {
                   delay={0.1 * index}
                 >
                   <div className="news-card group rounded-xl overflow-hidden shadow-xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
-                    <Link href={`/articles/${article.slug}`} className="block">
+                    <Link href={`/articles/${article.slug}`} className="block w-full h-full">
                       <div className="overflow-hidden h-48 relative">
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
                         {article.imageUrl ? (
