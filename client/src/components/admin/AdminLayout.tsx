@@ -180,7 +180,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => setLocation("/admin/settings")} disabled>
+                  <DropdownMenuItem onClick={() => setLocation("/admin/settings")}>
                     <Settings className="h-4 w-4 mr-2" /> Paramètres
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -299,7 +299,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => setLocation("/admin/settings")} disabled>
+                  <DropdownMenuItem onClick={() => setLocation("/admin/settings")}>
                     <Settings className="h-4 w-4 mr-2" /> Paramètres
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

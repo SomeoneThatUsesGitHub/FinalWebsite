@@ -23,6 +23,7 @@ import FlashInfosPage from "@/pages/admin/FlashInfosPage";
 import VideosPage from "@/pages/admin/VideosPage";
 import CategoriesPage from "@/pages/admin/CategoriesPage";
 import UsersPage from "@/pages/admin/UsersPage";
+import SettingsPage from "@/pages/admin/SettingsPage";
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
 
@@ -76,6 +77,7 @@ function App() {
               <ProtectedRoute path="/admin/articles/:id" component={EditArticlePage} adminOnly />
               <ProtectedRoute path="/admin/flash-infos" component={FlashInfosPage} adminOnly />
               <ProtectedRoute path="/admin/videos" component={VideosPage} adminOnly />
+              <ProtectedRoute path="/admin/settings" component={SettingsPage} adminOnly />
               
               {/* Routes admin protégées - accessibles uniquement aux admins */}
               <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />

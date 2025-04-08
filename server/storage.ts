@@ -25,10 +25,11 @@ export interface IStorage {
   createCategory(category: InsertCategory): Promise<Category>;
   
   // Article operations
-  getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number}): Promise<Article[]>;
+  getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number, showUnpublished?: boolean, authorId?: number}): Promise<Article[]>;
   getFeaturedArticles(limit?: number): Promise<Article[]>;
   getRecentArticles(limit?: number): Promise<Article[]>;
   getArticlesByCategory(categoryId: number, limit?: number): Promise<Article[]>;
+  getArticlesByAuthor(authorId: number, showUnpublished?: boolean): Promise<Article[]>;
   getArticleBySlug(slug: string): Promise<Article | undefined>;
   getArticleById(id: number): Promise<Article | undefined>;
   createArticle(article: InsertArticle): Promise<Article>;
@@ -277,6 +278,41 @@ export class DatabaseStorage implements IStorage {
       )
       .orderBy(desc(articles.createdAt))
       .limit(limit);
+    
+    // Transformation des résultats pour correspondre au format attendu
+    return result.map(row => {
+      const article = { ...row.article };
+      
+      if (row.authorDisplayName) {
+        article.author = {
+          displayName: row.authorDisplayName,
+          title: row.authorTitle,
+          avatarUrl: row.authorAvatarUrl
+        };
+      }
+      
+      return article;
+    });
+  }
+  
+  async getArticlesByAuthor(authorId: number, showUnpublished: boolean = false): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
+    // Récupération des articles avec jointure sur l'auteur
+    const result = await db
+      .select({
+        article: articles,
+        authorDisplayName: users.displayName,
+        authorTitle: users.title,
+        authorAvatarUrl: users.avatarUrl
+      })
+      .from(articles)
+      .leftJoin(users, eq(articles.authorId, users.id))
+      .where(
+        and(
+          showUnpublished ? undefined : eq(articles.published, true),
+          eq(articles.authorId, authorId)
+        )
+      )
+      .orderBy(desc(articles.createdAt));
     
     // Transformation des résultats pour correspondre au format attendu
     return result.map(row => {

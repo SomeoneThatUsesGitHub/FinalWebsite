@@ -419,6 +419,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(safeUser);
   });
   
+  // Route pour récupérer les articles d'un utilisateur connecté
+  app.get("/api/auth/my-articles", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as any;
+      
+      if (!user || !user.id) {
+        return res.status(401).json({ message: "Utilisateur non authentifié" });
+      }
+      
+      // Récupérer tous les articles de l'utilisateur (publiés ou non)
+      const articles = await storage.getArticlesByAuthor(user.id, true);
+      res.json(articles);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des articles de l'utilisateur:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des articles" });
+    }
+  });
+  
   // Routes admin pour les articles
   app.get("/api/admin/articles", isAdmin, async (req: Request, res: Response) => {
     try {
