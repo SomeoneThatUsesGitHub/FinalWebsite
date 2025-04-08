@@ -70,7 +70,12 @@ export default function LiveCoveragePage() {
   
   // Format de date pour les mises à jour
   const formatUpdateDate = (date: string | Date) => {
-    return format(new Date(date), "d MMMM yyyy à HH:mm", { locale: fr });
+    try {
+      return format(new Date(date), "d MMMM yyyy à HH:mm", { locale: fr });
+    } catch (error) {
+      console.error("Date format error:", error);
+      return "Date indisponible";
+    }
   };
   
   // Si en cours de chargement
@@ -92,7 +97,11 @@ export default function LiveCoveragePage() {
           <p className="mt-4 text-muted-foreground">
             Le suivi en direct demandé n'existe pas ou n'est plus disponible.
           </p>
-          <Button className="mt-8" href="/suivis-en-direct" variant="outline">
+          <Button 
+            className="mt-8" 
+            variant="outline" 
+            onClick={() => window.location.assign("/suivis-en-direct")}
+          >
             Voir tous les suivis en direct
           </Button>
         </div>
