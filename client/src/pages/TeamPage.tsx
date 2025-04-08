@@ -44,9 +44,9 @@ export default function TeamPage() {
         console.log("Correction des données pour Noah:", member);
         return {
           ...member,
-          twitterHandle: 'politinoah',
-          instagramHandle: 'noah_politique',
-          email: 'noah@politiquen.fr'
+          twitterHandle: 'politiquensemble',
+          instagramHandle: 'politique.ensemble',
+          email: 'contact@politiquensemble.fr'
         };
       }
       return member;
@@ -192,31 +192,37 @@ export default function TeamPage() {
                   <CardFooter className="flex justify-center space-x-2 border-t p-4 mt-auto">
 
                     
-                    {/* Ajout direct des boutons de réseaux sociaux */}
+                    {/* Ajout des boutons de réseaux sociaux basés sur les données */}
                     <div className="flex justify-center space-x-2 w-full">
-                      {member.username === 'Noah' && (
-                        <>
-                          <Button variant="ghost" size="icon" asChild>
-                            <a href="https://twitter.com/politinoah" target="_blank" rel="noopener noreferrer" title="Twitter: @politinoah">
-                              <Twitter className="h-4 w-4" />
-                            </a>
-                          </Button>
-                          <Button variant="ghost" size="icon" asChild>
-                            <a href="https://instagram.com/noah_politique" target="_blank" rel="noopener noreferrer" title="Instagram: @noah_politique">
-                              <Instagram className="h-4 w-4" />
-                            </a>
-                          </Button>
-                          <Button variant="ghost" size="icon" asChild>
-                            <a href="mailto:noah@politiquen.fr" title="Email: noah@politiquen.fr">
-                              <Mail className="h-4 w-4" />
-                            </a>
-                          </Button>
-                        </>
-                      )}
+                      {member.twitterHandle && member.twitterHandle !== "" ? (
+                        <Button variant="ghost" size="icon" asChild>
+                          <a href={`https://twitter.com/${member.twitterHandle}`} target="_blank" rel="noopener noreferrer" title={`Twitter: @${member.twitterHandle}`}>
+                            <Twitter className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      ) : null}
                       
-                      {member.username !== 'Noah' && (
+                      {member.instagramHandle && member.instagramHandle !== "" ? (
+                        <Button variant="ghost" size="icon" asChild>
+                          <a href={`https://instagram.com/${member.instagramHandle}`} target="_blank" rel="noopener noreferrer" title={`Instagram: @${member.instagramHandle}`}>
+                            <Instagram className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      ) : null}
+                      
+                      {member.email && member.email !== "" ? (
+                        <Button variant="ghost" size="icon" asChild>
+                          <a href={`mailto:${member.email}`} title={`Email: ${member.email}`}>
+                            <Mail className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      ) : null}
+                      
+                      {!(member.twitterHandle && member.twitterHandle !== "") && 
+                       !(member.instagramHandle && member.instagramHandle !== "") && 
+                       !(member.email && member.email !== "") ? (
                         <span className="text-xs text-muted-foreground">Aucun réseau social disponible</span>
-                      )}
+                      ) : null}
                     </div>
                   </CardFooter>
                 </Card>
