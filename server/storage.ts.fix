@@ -221,15 +221,10 @@ export class DatabaseStorage implements IStorage {
     .orderBy(desc(articles.createdAt))
     .limit(limit);
     
-    return results.map(row => {
-      // Safe handling of possible null author
-      const authorData = row.author && row.author.displayName ? row.author : undefined;
-      
-      return {
-        ...row.article,
-        author: authorData
-      };
-    });
+    return results.map(row => ({
+      ...row.article,
+      author: row.author.displayName ? row.author : undefined
+    }));
   }
 
   async getRecentArticles(limit: number = 9): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
@@ -247,15 +242,10 @@ export class DatabaseStorage implements IStorage {
     .orderBy(desc(articles.createdAt))
     .limit(limit);
     
-    return results.map(row => {
-      // Safe handling of possible null author
-      const authorData = row.author && row.author.displayName ? row.author : undefined;
-      
-      return {
-        ...row.article,
-        author: authorData
-      };
-    });
+    return results.map(row => ({
+      ...row.article,
+      author: row.author.displayName ? row.author : undefined
+    }));
   }
 
   async getArticlesByCategory(categoryId: number, limit: number = 6): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
@@ -278,15 +268,10 @@ export class DatabaseStorage implements IStorage {
     .orderBy(desc(articles.createdAt))
     .limit(limit);
     
-    return results.map(row => {
-      // Safe handling of possible null author
-      const authorData = row.author && row.author.displayName ? row.author : undefined;
-      
-      return {
-        ...row.article,
-        author: authorData
-      };
-    });
+    return results.map(row => ({
+      ...row.article,
+      author: row.author.displayName ? row.author : undefined
+    }));
   }
 
   async getArticlesByAuthor(authorId: number, showUnpublished: boolean = false): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } })[]> {
@@ -308,15 +293,10 @@ export class DatabaseStorage implements IStorage {
 
     const results = await query.orderBy(desc(articles.createdAt));
     
-    return results.map(row => {
-      // Safe handling of possible null author
-      const authorData = row.author && row.author.displayName ? row.author : undefined;
-      
-      return {
-        ...row.article,
-        author: authorData
-      };
-    });
+    return results.map(row => ({
+      ...row.article,
+      author: row.author.displayName ? row.author : undefined
+    }));
   }
 
   async getArticleBySlug(slug: string): Promise<(Article & { author?: { displayName: string, title: string | null, avatarUrl: string | null } }) | undefined> {
@@ -334,12 +314,9 @@ export class DatabaseStorage implements IStorage {
     
     if (!result) return undefined;
     
-    // Safe handling of possible null author
-    const authorData = result.author && result.author.displayName ? result.author : undefined;
-    
     return {
       ...result.article,
-      author: authorData
+      author: result.author.displayName ? result.author : undefined
     };
   }
 
@@ -358,12 +335,9 @@ export class DatabaseStorage implements IStorage {
     
     if (!result) return undefined;
     
-    // Safe handling of possible null author
-    const authorData = result.author && result.author.displayName ? result.author : undefined;
-    
     return {
       ...result.article,
-      author: authorData
+      author: result.author.displayName ? result.author : undefined
     };
   }
 
@@ -465,7 +439,7 @@ export class DatabaseStorage implements IStorage {
     const [liveEvent] = await db.select()
       .from(liveEvents)
       .where(eq(liveEvents.active, true))
-      .orderBy(liveEvents.startDate);
+      .orderBy(desc(liveEvents.startDate));
     
     return liveEvent;
   }
