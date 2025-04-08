@@ -1154,10 +1154,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Récupérer tous les membres de l'équipe (public)
   app.get("/api/team", async (req: Request, res: Response) => {
     try {
+      console.log("Requête API /team reçue");
       const result = await getTeamMembers();
+      
       if (result.success) {
-        return res.json(result.members);
+        console.log("Membres de l'équipe récupérés avec succès, envoi au client");
+        
+        // Vérification des champs sociaux avant envoi
+        const members = result.members;
+        
+        // Ajouter des header pour éviter le cache
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Surrogate-Control', 'no-store');
+        
+        return res.json(members);
       } else {
+        console.error("Erreur dans le résultat:", result.message);
         return res.status(500).json({ message: result.message });
       }
     } catch (error) {
