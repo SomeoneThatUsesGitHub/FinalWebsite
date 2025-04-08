@@ -207,6 +207,13 @@ export async function updateUserProfile(username: string, userData: {
  */
 export async function getTeamMembers() {
   try {
+    // Avant: vérifier les valeurs de twitter_handle, instagram_handle, email directement depuis la BDD
+    const rawTeamMembers = await db.select()
+      .from(users)
+      .where(eq(users.isTeamMember, true));
+      
+    console.log("DONNÉES RAW DE LA BASE:", JSON.stringify(rawTeamMembers, null, 2));
+
     // Sélectionner uniquement les utilisateurs qui sont membres de l'équipe
     const teamMembers = await db.select({
       id: users.id,
@@ -224,11 +231,21 @@ export async function getTeamMembers() {
     .where(eq(users.isTeamMember, true));
     
     // Débogage: Afficher les données de réseaux sociaux
-    console.log("Les membres d'équipe récupérés:", JSON.stringify(teamMembers, null, 2));
+    console.log("Les membres d'équipe récupérés avec structure select():", JSON.stringify(teamMembers, null, 2));
+    
+    // Forcer les valeurs pour éliminer les problèmes de null/undefined
+    const processedMembers = teamMembers.map(member => ({
+      ...member,
+      twitterHandle: member.twitterHandle || "",
+      instagramHandle: member.instagramHandle || "",
+      email: member.email || ""
+    }));
+    
+    console.log("Les membres d'équipe après traitement:", JSON.stringify(processedMembers, null, 2));
     
     return {
       success: true,
-      members: teamMembers
+      members: processedMembers
     };
     
   } catch (error) {

@@ -34,9 +34,10 @@ type TeamMember = {
 
 export default function TeamPage() {
   const { data: members = [], isLoading } = useQuery<TeamMember[]>({
-    queryKey: ['/api/team'],
+    queryKey: ['/api/team', Date.now()], // Ajout d'un timestamp pour forcer l'actualisation
     queryFn: async () => {
-      const response = await fetch('/api/team');
+      // Utiliser une URL avec un paramètre aléatoire pour éviter la mise en cache du navigateur
+      const response = await fetch(`/api/team?_nocache=${Date.now()}`);
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des membres de l\'équipe');
       }
@@ -44,6 +45,9 @@ export default function TeamPage() {
       console.log("Membres récupérés du serveur:", JSON.stringify(data, null, 2));
       return data;
     },
+    // Ne pas mettre en cache les données
+    staleTime: 0, 
+    gcTime: 0,
   });
 
   if (isLoading) {
