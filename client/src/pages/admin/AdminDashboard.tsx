@@ -5,10 +5,12 @@ import { Article, Category, FlashInfo } from "@shared/schema";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, FileText, Tag, Eye, AlertCircle, Calendar, ZapIcon, Zap } from "lucide-react";
+import { ArrowRight, BarChart3, FileText, Tag, Eye, AlertCircle, Calendar, ZapIcon, Zap, Radio } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AdminDashboard() {
   const [_, setLocation] = useLocation();
+  const { user } = useAuth();
   
   // Récupérer les articles
   const { data: articles, isLoading: articlesLoading } = useQuery<Article[]>({
@@ -208,14 +210,16 @@ export default function AdminDashboard() {
                   Gérer les articles
                 </Button>
                 
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setLocation("/admin/categories")}
-                >
-                  <Tag className="mr-2 h-4 w-4" />
-                  Gérer les catégories
-                </Button>
+                {user?.isAdmin && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => setLocation("/admin/categories")}
+                  >
+                    <Tag className="mr-2 h-4 w-4" />
+                    Gérer les catégories
+                  </Button>
+                )}
                 
                 <Button
                   variant="outline"
@@ -224,6 +228,15 @@ export default function AdminDashboard() {
                 >
                   <Zap className="mr-2 h-4 w-4 text-red-500" />
                   Flash infos
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => setLocation("/admin/directs")}
+                >
+                  <Radio className="mr-2 h-4 w-4" />
+                  Suivis en direct
                 </Button>
                 
                 <Button

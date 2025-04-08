@@ -90,12 +90,12 @@ function App() {
               <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
               <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
               
-              {/* Routes pour les suivis en direct */}
-              <ProtectedRoute path="/admin/directs" component={DirectsPage} adminOnly />
+              {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
+              <ProtectedRoute path="/admin/directs" component={DirectsPage} />
               <ProtectedRoute path="/admin/directs/nouveau" component={DirectForm} adminOnly />
               <ProtectedRoute path="/admin/directs/editer/:id" component={DirectForm} adminOnly />
               <ProtectedRoute path="/admin/directs/:id/editeurs" component={DirectEditorsPage} adminOnly />
-              <ProtectedRoute path="/admin/directs/:id/mises-a-jour" component={DirectUpdatesPage} adminOnly />
+              <ProtectedRoute path="/admin/directs/:id/mises-a-jour" component={DirectUpdatesPage} />
               
               {/* Fallback */}
               <Route path="/:rest*" component={NotFound} />
