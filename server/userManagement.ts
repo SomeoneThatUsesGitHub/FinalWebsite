@@ -109,7 +109,10 @@ export async function listUsers() {
       avatarUrl: users.avatarUrl,
       title: users.title,
       bio: users.bio,
-      isTeamMember: users.isTeamMember
+      isTeamMember: users.isTeamMember,
+      twitterHandle: users.twitterHandle,
+      instagramHandle: users.instagramHandle,
+      email: users.email
     }).from(users);
     
     return {
@@ -136,6 +139,9 @@ export async function updateUserProfile(username: string, userData: {
   title?: string;
   bio?: string;
   isTeamMember?: boolean;
+  twitterHandle?: string;
+  instagramHandle?: string;
+  email?: string;
 }) {
   try {
     // Vérifier si l'utilisateur existe
@@ -157,6 +163,9 @@ export async function updateUserProfile(username: string, userData: {
         title: userData.title !== undefined ? userData.title : existingUser[0].title,
         bio: userData.bio !== undefined ? userData.bio : existingUser[0].bio,
         isTeamMember: userData.isTeamMember !== undefined ? userData.isTeamMember : existingUser[0].isTeamMember,
+        twitterHandle: userData.twitterHandle !== undefined ? userData.twitterHandle : existingUser[0].twitterHandle,
+        instagramHandle: userData.instagramHandle !== undefined ? userData.instagramHandle : existingUser[0].instagramHandle,
+        email: userData.email !== undefined ? userData.email : existingUser[0].email,
       })
       .where(eq(users.username, username))
       .returning();
@@ -191,7 +200,10 @@ export async function getTeamMembers() {
       role: users.role,
       avatarUrl: users.avatarUrl,
       title: users.title,
-      bio: users.bio
+      bio: users.bio,
+      twitterHandle: users.twitterHandle,
+      instagramHandle: users.instagramHandle,
+      email: users.email
     })
     .from(users)
     .where(eq(users.isTeamMember, true));

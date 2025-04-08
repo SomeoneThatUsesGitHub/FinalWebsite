@@ -28,6 +28,9 @@ type TeamMember = {
   avatarUrl: string | null;
   title: string | null;
   bio: string | null;
+  twitterHandle?: string | null;
+  instagramHandle?: string | null;
+  email?: string | null;
 };
 
 export default function TeamPage() {
@@ -159,21 +162,31 @@ export default function TeamPage() {
                     )}
                   </CardContent>
                   <CardFooter className="flex justify-center space-x-2 border-t p-4 mt-auto">
-                    <Button variant="ghost" size="icon" asChild>
-                      <a href={`https://twitter.com/${member.username}`} target="_blank" rel="noopener noreferrer">
-                        <Twitter className="h-4 w-4" />
-                      </a>
-                    </Button>
-                    <Button variant="ghost" size="icon" asChild>
-                      <a href={`https://linkedin.com/in/${member.username}`} target="_blank" rel="noopener noreferrer">
-                        <Linkedin className="h-4 w-4" />
-                      </a>
-                    </Button>
-                    <Button variant="ghost" size="icon" asChild>
-                      <a href={`mailto:${member.username}@politiquensemble.fr`}>
-                        <Mail className="h-4 w-4" />
-                      </a>
-                    </Button>
+                    {member.twitterHandle && (
+                      <Button variant="ghost" size="icon" asChild>
+                        <a href={`https://twitter.com/${member.twitterHandle}`} target="_blank" rel="noopener noreferrer">
+                          <Twitter className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    )}
+                    {member.instagramHandle && (
+                      <Button variant="ghost" size="icon" asChild>
+                        <a href={`https://instagram.com/${member.instagramHandle}`} target="_blank" rel="noopener noreferrer">
+                          <Instagram className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    )}
+                    {member.email && (
+                      <Button variant="ghost" size="icon" asChild>
+                        <a href={`mailto:${member.email}`}>
+                          <Mail className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    )}
+                    {/* Si aucun réseau social n'est défini, on affiche un message */}
+                    {!member.twitterHandle && !member.instagramHandle && !member.email && (
+                      <span className="text-xs text-muted-foreground">Aucun réseau social disponible</span>
+                    )}
                   </CardFooter>
                 </Card>
               </motion.div>

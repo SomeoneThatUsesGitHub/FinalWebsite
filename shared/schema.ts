@@ -13,6 +13,9 @@ export const users = pgTable("users", {
   title: text("title"),  // Grade (Journaliste politique, éditeur, etc.)
   bio: text("bio"),      // Courte biographie
   isTeamMember: boolean("is_team_member").default(false),  // Indique si l'utilisateur doit être affiché dans l'équipe
+  twitterHandle: text("twitter_handle"),  // @ sans le @ (ex: "politiquensemble")
+  instagramHandle: text("instagram_handle"), // @ sans le @ (ex: "politiquensemble")
+  email: text("email"),  // Email de contact direct
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
