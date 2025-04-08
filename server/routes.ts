@@ -424,12 +424,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as any;
       
+      console.log("Récupération des articles pour l'utilisateur:", user);
+      
       if (!user || !user.id) {
         return res.status(401).json({ message: "Utilisateur non authentifié" });
       }
       
       // Récupérer tous les articles de l'utilisateur (publiés ou non)
       const articles = await storage.getArticlesByAuthor(user.id, true);
+      console.log("Articles trouvés:", articles.length, articles);
       res.json(articles);
     } catch (error) {
       console.error("Erreur lors de la récupération des articles de l'utilisateur:", error);
