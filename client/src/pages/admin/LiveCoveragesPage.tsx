@@ -73,7 +73,6 @@ import { fr } from "date-fns/locale";
 
 // Form schema for live coverage
 const liveCoverageFormSchema = insertLiveCoverageSchema.extend({
-  endDate: z.date().nullable().optional(),
   selectedEditors: z.array(z.number()).optional(),
 });
 
@@ -106,7 +105,6 @@ export default function LiveCoveragesPage() {
       context: "",
       imageUrl: "",
       active: true,
-      endDate: null,
       selectedEditors: [],
     },
   });
@@ -213,7 +211,6 @@ export default function LiveCoveragesPage() {
       context: "",
       imageUrl: "",
       active: true,
-      endDate: null,
       selectedEditors: [],
     });
     setSelectedCoverage(null);
@@ -237,7 +234,6 @@ export default function LiveCoveragesPage() {
             context: coverage.context,
             imageUrl: coverage.imageUrl || "",
             active: coverage.active,
-            endDate: coverage.endDate ? new Date(coverage.endDate) : null,
             selectedEditors: editorIds || [],
           });
         } else {
@@ -248,7 +244,6 @@ export default function LiveCoveragesPage() {
             context: coverage.context,
             imageUrl: coverage.imageUrl || "",
             active: coverage.active,
-            endDate: coverage.endDate ? new Date(coverage.endDate) : null,
             selectedEditors: [],
           });
         }
@@ -261,7 +256,6 @@ export default function LiveCoveragesPage() {
           context: coverage.context,
           imageUrl: coverage.imageUrl || "",
           active: coverage.active,
-          endDate: coverage.endDate ? new Date(coverage.endDate) : null,
           selectedEditors: [],
         });
       }
@@ -373,45 +367,7 @@ export default function LiveCoveragesPage() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="endDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date de fin (optionnelle)</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP", { locale: fr })
-                      ) : (
-                        <span>Choisir une date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value || undefined}
-                    onSelect={field.onChange}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormDescription>
-                Date à laquelle le suivi ne sera plus affiché comme actif
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
 
         <FormField
           control={form.control}
@@ -618,7 +574,7 @@ export default function LiveCoveragesPage() {
       
       {/* Dialog for creating/editing a live coverage */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {selectedCoverage ? "Modifier un suivi en direct" : "Créer un suivi en direct"}
