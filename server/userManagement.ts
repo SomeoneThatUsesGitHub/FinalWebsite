@@ -148,13 +148,15 @@ export async function updateUserProfile(username: string, userData: {
       };
     }
     
-    // Mettre à jour le profil (uniquement avec les colonnes qui existent)
+    // Mettre à jour le profil avec tous les champs
     const [updatedUser] = await db.update(users)
       .set({
         displayName: userData.displayName !== undefined ? userData.displayName : existingUser[0].displayName,
         role: userData.role !== undefined ? userData.role as any : existingUser[0].role,
         avatarUrl: userData.avatarUrl !== undefined ? userData.avatarUrl : existingUser[0].avatarUrl,
-        // Les champs title, bio et isTeamMember ne sont pas pris en compte car ils n'existent pas encore en base
+        title: userData.title !== undefined ? userData.title : existingUser[0].title,
+        bio: userData.bio !== undefined ? userData.bio : existingUser[0].bio,
+        isTeamMember: userData.isTeamMember !== undefined ? userData.isTeamMember : existingUser[0].isTeamMember,
       })
       .where(eq(users.username, username))
       .returning();
@@ -181,25 +183,22 @@ export async function updateUserProfile(username: string, userData: {
  */
 export async function getTeamMembers() {
   try {
-    // Sélectionner les utilisateurs (uniquement les colonnes qui existent vraiment en base)
+    // Sélectionner uniquement les utilisateurs qui sont membres de l'équipe
     const teamMembers = await db.select({
       id: users.id,
       username: users.username,
       displayName: users.displayName,
       role: users.role,
-      avatarUrl: users.avatarUrl
-    }).from(users);
-    
-    // Simuler temporairement quelques données manquantes
-    const enhancedMembers = teamMembers.map(user => ({
-      ...user,
-      title: user.role === 'admin' ? 'Rédacteur en chef' : 'Journaliste politique',
-      bio: `Membre de l'équipe Politiquensemble spécialisé en ${user.role === 'admin' ? 'analyse politique' : 'reportage de terrain'}.`
-    }));
+      avatarUrl: users.avatarUrl,
+      title: users.title,
+      bio: users.bio
+    })
+    .from(users)
+    .where(eq(users.isTeamMember, true));
     
     return {
       success: true,
-      members: enhancedMembers
+      members: teamMembers
     };
     
   } catch (error) {

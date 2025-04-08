@@ -1170,8 +1170,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/team/add/:username", isAdmin, async (req: Request, res: Response) => {
     try {
       const { username } = req.params;
-      // Pour l'instant, on ne gère pas le isTeamMember car la colonne n'existe pas
-      const result = await updateUserProfile(username, {});
+      
+      // Ajouter l'utilisateur à l'équipe
+      const result = await updateUserProfile(username, { isTeamMember: true });
       
       if (result.success) {
         return res.json({ message: "Utilisateur ajouté à l'équipe avec succès", user: result.user });
@@ -1188,8 +1189,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/team/remove/:username", isAdmin, async (req: Request, res: Response) => {
     try {
       const { username } = req.params;
-      // Pour l'instant, on ne gère pas le isTeamMember car la colonne n'existe pas
-      const result = await updateUserProfile(username, {});
+      
+      // Retirer l'utilisateur de l'équipe
+      const result = await updateUserProfile(username, { isTeamMember: false });
       
       if (result.success) {
         return res.json({ message: "Utilisateur retiré de l'équipe avec succès", user: result.user });
