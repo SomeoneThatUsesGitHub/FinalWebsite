@@ -13,6 +13,8 @@ import Article from "@/pages/Article";
 import TeamPage from "@/pages/TeamPage";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/AuthPage";
+import LiveCoveragesList from "@/pages/LiveCoveragesList";
+import LiveCoveragePage from "@/pages/LiveCoveragePage";
 import TestEditor from "@/pages/test-editor";
 
 // Pages admin
@@ -67,6 +69,8 @@ function App() {
               <Route path="/home" component={Home} />
               <Route path="/articles" component={ArticlesList} />
               <Route path="/articles/:slug" component={Article} />
+              <Route path="/suivis-en-direct" component={LiveCoveragesList} />
+              <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
               <Route path="/team" component={TeamPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
