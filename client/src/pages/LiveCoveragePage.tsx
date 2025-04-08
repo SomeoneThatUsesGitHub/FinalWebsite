@@ -36,9 +36,9 @@ export default function LiveCoveragePage() {
     isError: updatesError,
     refetch: refetchUpdates
   } = useQuery<LiveCoverageUpdate[]>({
-    queryKey: ["/api/live-coverages", slug, "updates"],
+    queryKey: [`/api/live-coverages/${coverage?.id}/updates`],
     queryFn: getQueryFn,
-    enabled: !!slug && !!coverage,
+    enabled: !!coverage?.id,
     refetchInterval: refreshInterval,
   });
   
@@ -47,20 +47,29 @@ export default function LiveCoveragePage() {
     data: editors,
     isLoading: editorsLoading
   } = useQuery<any[]>({
-    queryKey: ["/api/live-coverages", slug, "editors"],
+    queryKey: [`/api/live-coverages/${coverage?.id}/editors`],
     queryFn: getQueryFn,
-    enabled: !!slug && !!coverage,
+    enabled: !!coverage?.id,
   });
   
-  // Mettre à jour le titre de la page
+  // Mettre à jour le titre de la page et log des données pour le debug
   useEffect(() => {
     if (coverage) {
       document.title = `${coverage.title} | Politiquensemble`;
+      console.log("Coverage data:", coverage);
     }
     return () => {
       document.title = "Politiquensemble";
     };
   }, [coverage]);
+  
+  useEffect(() => {
+    console.log("Updates data:", updates);
+  }, [updates]);
+  
+  useEffect(() => {
+    console.log("Editors data:", editors);
+  }, [editors]);
   
   // Fonction pour rafraîchir les données
   const handleRefresh = () => {

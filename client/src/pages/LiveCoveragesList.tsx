@@ -3,7 +3,7 @@ import { getQueryFn } from "@/lib/queryClient";
 import { LiveCoverage } from "@shared/schema";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, ArrowRight, Activity } from "lucide-react";
+import { Loader2, ArrowRight, Activity, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -79,7 +79,9 @@ export default function LiveCoveragesList() {
     <div className="container mx-auto py-12 px-4 md:px-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Suivis en direct</h1>
+          <div className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-full mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Suivis en direct</h1>
+          </div>
           <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
             Retrouvez l'actualité politique et les événements importants en temps réel
           </p>
@@ -95,22 +97,35 @@ export default function LiveCoveragesList() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {activeCoverages.map((coverage) => (
-                <Card key={coverage.id} className="flex flex-col h-full overflow-hidden">
-                  {coverage.imageUrl && (
-                    <div className="aspect-video w-full overflow-hidden">
-                      <img 
-                        src={coverage.imageUrl} 
-                        alt={coverage.title} 
-                        className="w-full h-full object-cover transition-transform hover:scale-105"
-                      />
-                    </div>
-                  )}
+                <Card 
+                  key={coverage.id} 
+                  className="flex flex-col h-full overflow-hidden border-primary/10 shadow-md hover:shadow-lg transition-all duration-300"
+                  onClick={() => setLocation(`/suivis-en-direct/${coverage.slug}`)}
+                >
+                  <div className="relative">
+                    {coverage.imageUrl ? (
+                      <div className="aspect-video w-full overflow-hidden">
+                        <img 
+                          src={coverage.imageUrl} 
+                          alt={coverage.title} 
+                          className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
+                        />
+                        <div className="absolute top-3 left-3">
+                          <Badge className="bg-primary text-white hover:bg-primary/90 shadow-sm">En direct</Badge>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-video w-full bg-gradient-to-r from-primary/20 to-primary/5 flex items-center justify-center">
+                        <Activity className="h-12 w-12 text-primary/50" />
+                        <div className="absolute top-3 left-3">
+                          <Badge className="bg-primary text-white hover:bg-primary/90 shadow-sm">En direct</Badge>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   
                   <CardHeader>
-                    <div className="flex justify-between items-start gap-2 mb-2">
-                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100">En direct</Badge>
-                    </div>
-                    <CardTitle className="line-clamp-2">{coverage.title}</CardTitle>
+                    <CardTitle className="line-clamp-2 text-lg">{coverage.title}</CardTitle>
                   </CardHeader>
                   
                   <CardContent className="flex-grow">
@@ -118,18 +133,18 @@ export default function LiveCoveragesList() {
                       {coverage.subject}
                     </p>
                     
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="h-3 w-3" />
                       Depuis le {formatUpdateDate(coverage.createdAt)}
                     </p>
                   </CardContent>
                   
                   <CardFooter className="pt-0">
                     <Button 
-                      className="w-full" 
-                      onClick={() => setLocation(`/suivis-en-direct/${coverage.slug}`)}
+                      className="w-full group" 
                     >
-                      Suivre en direct
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      <span className="group-hover:translate-x-1 transition-transform">Suivre en direct</span>
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </CardFooter>
                 </Card>
@@ -147,22 +162,35 @@ export default function LiveCoveragesList() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {inactiveCoverages.map((coverage) => (
-                <Card key={coverage.id} className="flex flex-col h-full overflow-hidden border-muted/50 bg-muted/10">
-                  {coverage.imageUrl && (
-                    <div className="aspect-video w-full overflow-hidden grayscale">
-                      <img 
-                        src={coverage.imageUrl} 
-                        alt={coverage.title} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
+                <Card 
+                  key={coverage.id} 
+                  className="flex flex-col h-full overflow-hidden shadow-sm hover:shadow transition-all duration-300"
+                  onClick={() => setLocation(`/suivis-en-direct/${coverage.slug}`)}
+                >
+                  <div className="relative">
+                    {coverage.imageUrl ? (
+                      <div className="aspect-video w-full overflow-hidden grayscale">
+                        <img 
+                          src={coverage.imageUrl} 
+                          alt={coverage.title} 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-3 left-3">
+                          <Badge variant="outline" className="bg-muted/80 backdrop-blur-sm">Terminé</Badge>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-video w-full bg-muted/20 flex items-center justify-center grayscale">
+                        <Activity className="h-12 w-12 text-muted-foreground/30" />
+                        <div className="absolute top-3 left-3">
+                          <Badge variant="outline" className="bg-muted/80 backdrop-blur-sm">Terminé</Badge>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   
                   <CardHeader>
-                    <div className="flex justify-between items-start gap-2 mb-2">
-                      <Badge variant="outline">Terminé</Badge>
-                    </div>
-                    <CardTitle className="line-clamp-2">{coverage.title}</CardTitle>
+                    <CardTitle className="line-clamp-2 text-lg">{coverage.title}</CardTitle>
                   </CardHeader>
                   
                   <CardContent className="flex-grow">
@@ -170,10 +198,15 @@ export default function LiveCoveragesList() {
                       {coverage.subject}
                     </p>
                     
-                    <div className="text-xs text-muted-foreground">
-                      <p>Du {formatUpdateDate(coverage.createdAt)}</p>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="h-3 w-3" />
+                        Du {formatUpdateDate(coverage.createdAt)}
+                      </p>
                       {coverage.endDate && (
-                        <p className="mt-1">au {formatUpdateDate(coverage.endDate)}</p>
+                        <p className="text-xs flex items-center gap-2 text-muted-foreground pl-5">
+                          au {formatUpdateDate(coverage.endDate)}
+                        </p>
                       )}
                     </div>
                   </CardContent>
@@ -181,11 +214,10 @@ export default function LiveCoveragesList() {
                   <CardFooter className="pt-0">
                     <Button 
                       variant="outline"
-                      className="w-full" 
-                      onClick={() => setLocation(`/suivis-en-direct/${coverage.slug}`)}
+                      className="w-full group" 
                     >
-                      Voir le récapitulatif
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      <span className="group-hover:translate-x-1 transition-transform">Voir le récapitulatif</span>
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </CardFooter>
                 </Card>
