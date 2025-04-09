@@ -205,72 +205,81 @@ export default function LiveCoveragePage() {
         </div>
       </div>
       
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="container max-w-4xl mx-auto px-4 py-6">
         <div className="space-y-6">
-          {/* Section de l'équipe éditoriale - toujours affichée même si vide */}
-          <div className="bg-muted/20 rounded-lg p-6 border border-muted/30">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <UserIcon className="h-5 w-5 mr-2 text-primary" />
-              Équipe éditoriale
-            </h2>
-            {editors && editors.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {editors.map((editor) => (
-                  <div key={editor.id} className="flex items-center gap-3 bg-background p-3 rounded-lg shadow-sm">
-                    <Avatar className="h-12 w-12 border-2 border-primary/10">
-                      {editor.editor?.avatarUrl ? (
-                        <AvatarImage src={editor.editor.avatarUrl} alt={editor.editor.displayName} />
-                      ) : (
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {editor.editor?.displayName?.charAt(0) || "?"}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <div>
-                      <div className="font-medium">{editor.editor?.displayName || "Éditeur"}</div>
-                      {editor.role && (
-                        <div className="text-xs text-muted-foreground">{editor.role}</div>
-                      )}
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Section de l'équipe éditoriale - compact version */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-muted/30 to-background rounded-lg border border-muted/30 shadow-sm">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-primary/5 rounded-full -ml-8 -mb-8"></div>
+              
+              <div className="p-4 relative z-10">
+                <h2 className="text-base font-medium mb-2 flex items-center text-primary">
+                  <UserIcon className="h-4 w-4 mr-1.5" />
+                  Équipe éditoriale
+                </h2>
+                
+                {editors && editors.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {editors.map((editor) => (
+                      <div key={editor.id} className="flex items-center gap-2 bg-background/80 px-2 py-1 rounded-full text-sm shadow-sm">
+                        <Avatar className="h-6 w-6">
+                          {editor.editor?.avatarUrl ? (
+                            <AvatarImage src={editor.editor.avatarUrl} alt={editor.editor.displayName} />
+                          ) : (
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                              {editor.editor?.displayName?.charAt(0) || "?"}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <span className="font-medium truncate max-w-[100px]">{editor.editor?.displayName || "Éditeur"}</span>
+                        {editor.role && (
+                          <span className="text-xs text-muted-foreground whitespace-nowrap bg-background/50 px-1.5 rounded">
+                            {editor.role}
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <UserIcon className="h-4 w-4" />
+                    <span>Animé par l'équipe Politiquensemble</span>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="text-center py-6 bg-background/50 rounded-lg">
-                <UserIcon className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
-                <p className="text-muted-foreground">
-                  Ce direct est animé par les journalistes de Politiquensemble.
+            </div>
+            
+            {/* Section des questions des visiteurs - compact version */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-background rounded-lg border border-muted/30 shadow-sm">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-primary/5 rounded-full -ml-10 -mt-10"></div>
+              <div className="absolute bottom-0 right-0 w-12 h-12 bg-primary/5 rounded-full -mr-6 -mb-6"></div>
+              
+              <div className="p-4 relative z-10">
+                <h2 className="text-base font-medium mb-2 flex items-center text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                  Posez vos questions
+                </h2>
+                
+                <div className="flex gap-2 mb-1">
+                  <input 
+                    type="text" 
+                    placeholder="Votre question..." 
+                    className="flex-1 px-3 py-1.5 text-sm rounded-md border border-input bg-background/80"
+                    disabled
+                  />
+                  <Button variant="default" size="sm" className="h-8" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Questions modérées avant publication
                 </p>
               </div>
-            )}
-          </div>
-          
-          {/* Section des questions des visiteurs */}
-          <div className="bg-muted/20 rounded-lg p-6 border border-muted/30">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-              Posez vos questions
-            </h2>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Avez-vous des questions sur cet événement ? Les journalistes tenteront d'y répondre en direct.
-              </p>
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  placeholder="Votre question..." 
-                  className="flex-1 px-3 py-2 text-sm rounded-md border border-input bg-background"
-                  disabled
-                />
-                <Button variant="default" size="sm" disabled>
-                  Envoyer
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Les questions sont modérées avant publication. Veuillez rester courtois.
-              </p>
             </div>
           </div>
           
