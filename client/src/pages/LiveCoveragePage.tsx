@@ -227,7 +227,7 @@ export default function LiveCoveragePage() {
           </Button>
         </div>
         
-        <div className="container max-w-4xl mx-auto px-4 py-14 sm:py-20 md:py-24 relative z-10">
+        <div className="container max-w-4xl mx-auto px-4 py-16 sm:py-24 md:py-28 relative z-10">
           <div className="space-y-4 pt-10 sm:pt-4">
             <div className="flex flex-wrap gap-2 items-center text-sm">
               <Badge variant="outline" className="bg-red-600/80 text-white border-0 flex items-center">
@@ -269,9 +269,19 @@ export default function LiveCoveragePage() {
                       
                       {/* Liste déroulante des éditeurs */}
                       {isEditorListOpen && (
-                        <div className="absolute mt-2 bg-gray-800/90 backdrop-blur-sm border border-white/20 rounded-md shadow-lg overflow-hidden z-50 p-2">
+                        <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800/95 backdrop-blur-sm border border-white/20 rounded-md shadow-lg overflow-hidden z-50 p-2 w-72">
+                          <div className="flex justify-between items-center border-b border-white/20 pb-2 mb-2 px-3">
+                            <h4 className="font-semibold text-white">Équipe éditoriale</h4>
+                            <button 
+                              onClick={() => setIsEditorListOpen(false)}
+                              className="text-white/70 hover:text-white"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
                           <div className="py-1 text-sm text-white">
-                            <h4 className="font-semibold px-3 py-1 text-white/70">Équipe éditoriale</h4>
                             <ul className="max-h-60 overflow-auto">
                               {editors.map(editor => (
                                 <li key={editor.id} className="px-3 py-2 hover:bg-white/10 rounded flex items-center gap-2">
