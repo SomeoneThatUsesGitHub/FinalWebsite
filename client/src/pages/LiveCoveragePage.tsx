@@ -286,10 +286,67 @@ export default function LiveCoveragePage() {
           <Separator className="my-8" />
           
           <div className="space-y-6">
-            <h2 className="text-xl font-bold flex items-center">
-              <Radio className="h-5 w-5 mr-2 text-primary" />
-              Dernières mises à jour
-            </h2>
+            <div className="flex justify-between items-start">
+              <h2 className="text-xl font-bold flex items-center">
+                <Radio className="h-5 w-5 mr-2 text-primary" />
+                Dernières mises à jour
+              </h2>
+              
+              <div className="relative group">
+                <button
+                  className="flex items-center gap-1 text-sm px-3 py-1 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors"
+                >
+                  <span className="font-medium text-primary">Les faits essentiels</span>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-4 w-4 text-primary"
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                <div className="absolute right-0 mt-1 w-72 bg-white dark:bg-gray-900 border border-border rounded-md shadow-lg overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <div className="p-0">
+                    <div className="bg-red-600 text-white p-2 flex justify-between items-center">
+                      <h3 className="font-bold text-sm uppercase">Les faits essentiels (1)</h3>
+                      <button className="text-white/80 hover:text-white text-xs">
+                        Masquer
+                      </button>
+                    </div>
+                    <ul className="py-1 max-h-60 overflow-auto">
+                      <li className="hover:bg-muted/50 cursor-pointer">
+                        <button 
+                          className="w-full text-left px-3 py-2 text-sm flex items-start"
+                          onClick={() => {
+                            // Logique pour défiler jusqu'à la mise à jour correspondante
+                            // Ici, on simule un défilement vers le premier élément important
+                            const importantUpdates = updates?.filter(u => u.important) || [];
+                            if (importantUpdates.length > 0) {
+                              const element = document.getElementById(`update-${importantUpdates[0].id}`);
+                              if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                setTimeout(() => {
+                                  element.classList.add('highlight-pulse');
+                                  setTimeout(() => {
+                                    element.classList.remove('highlight-pulse');
+                                  }, 2000);
+                                }, 500);
+                              }
+                            }
+                          }}
+                        >
+                          <span className="font-bold mr-2 text-black dark:text-white">•</span>
+                          <span>Le point sur la situation mardi 8 avril à 21 heures</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
             
             {isLoadingUpdates ? (
               <div className="space-y-4">
@@ -327,7 +384,11 @@ export default function LiveCoveragePage() {
                   const formattedTime = format(updateTime, "HH:mm", { locale: fr });
                   
                   return (
-                    <Card key={update.id} className={update.important ? "border-primary" : undefined}>
+                    <Card 
+                      key={update.id} 
+                      id={`update-${update.id}`}
+                      className={`transition-all duration-300 ${update.important ? "border-primary" : ""}`}
+                    >
                       <CardContent className="py-6">
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex items-center gap-2">
