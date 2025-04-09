@@ -244,12 +244,6 @@ export default function LiveCoveragePage() {
               </p>
             )}
             
-            {coverage.context && (
-              <p className="text-sm sm:text-base mt-2 max-w-3xl leading-relaxed text-white/70">
-                {coverage.context}
-              </p>
-            )}
-            
             {editors && editors.length > 0 && (
               <div className="mt-4 pt-4 border-t border-white/20 text-sm">
                 <span className="text-white/70">
