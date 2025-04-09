@@ -263,6 +263,24 @@ export const insertLiveCoverageEditorSchema = createInsertSchema(liveCoverageEdi
   role: true,
 });
 
+// Questions des visiteurs pour un suivi en direct
+export const liveCoverageQuestions = pgTable("live_coverage_questions", {
+  id: serial("id").primaryKey(),
+  coverageId: integer("coverage_id").notNull().references(() => liveCoverages.id),
+  username: text("username").notNull(),
+  content: text("content").notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected
+  answered: boolean("answered").default(false),
+});
+
+export const insertLiveCoverageQuestionSchema = createInsertSchema(liveCoverageQuestions).pick({
+  coverageId: true,
+  username: true,
+  content: true,
+  status: true,
+});
+
 // Mises à jour en direct pour chaque suivi
 export const liveCoverageUpdates = pgTable("live_coverage_updates", {
   id: serial("id").primaryKey(),
@@ -272,6 +290,9 @@ export const liveCoverageUpdates = pgTable("live_coverage_updates", {
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   imageUrl: text("image_url"),
   important: boolean("important").default(false),
+  // Pour les réponses aux questions
+  isAnswer: boolean("is_answer").default(false),
+  questionId: integer("question_id").references(() => liveCoverageQuestions.id),
 });
 
 export const insertLiveCoverageUpdateSchema = createInsertSchema(liveCoverageUpdates).pick({
@@ -281,6 +302,8 @@ export const insertLiveCoverageUpdateSchema = createInsertSchema(liveCoverageUpd
   timestamp: true,
   imageUrl: true,
   important: true,
+  isAnswer: true,
+  questionId: true,
 });
 
 export type LiveCoverage = typeof liveCoverages.$inferSelect;
@@ -288,6 +311,9 @@ export type InsertLiveCoverage = z.infer<typeof insertLiveCoverageSchema>;
 
 export type LiveCoverageEditor = typeof liveCoverageEditors.$inferSelect;
 export type InsertLiveCoverageEditor = z.infer<typeof insertLiveCoverageEditorSchema>;
+
+export type LiveCoverageQuestion = typeof liveCoverageQuestions.$inferSelect;
+export type InsertLiveCoverageQuestion = z.infer<typeof insertLiveCoverageQuestionSchema>;
 
 export type LiveCoverageUpdate = typeof liveCoverageUpdates.$inferSelect;
 export type InsertLiveCoverageUpdate = z.infer<typeof insertLiveCoverageUpdateSchema>;

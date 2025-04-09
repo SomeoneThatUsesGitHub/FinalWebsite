@@ -6,6 +6,7 @@ import {
   liveCoverages, type LiveCoverage, type InsertLiveCoverage,
   liveCoverageEditors, type LiveCoverageEditor, type InsertLiveCoverageEditor,
   liveCoverageUpdates, type LiveCoverageUpdate, type InsertLiveCoverageUpdate,
+  liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion,
   users
 } from "@shared/schema";
 
@@ -174,4 +175,66 @@ export async function deleteLiveCoverageUpdate(id: number): Promise<boolean> {
     .returning({ id: liveCoverageUpdates.id });
   
   return result.length > 0;
+}
+
+// Live Coverage Questions operations
+export async function getLiveCoverageQuestions(coverageId: number, status?: string): Promise<LiveCoverageQuestion[]> {
+  let query = db.select().from(liveCoverageQuestions)
+    .where(eq(liveCoverageQuestions.coverageId, coverageId))
+    .orderBy(desc(liveCoverageQuestions.timestamp));
+  
+  if (status) {
+    query = query.where(eq(liveCoverageQuestions.status, status));
+  }
+  
+  return query;
+}
+
+export async function createLiveCoverageQuestion(insertQuestion: InsertLiveCoverageQuestion): Promise<LiveCoverageQuestion> {
+  const [question] = await db.insert(liveCoverageQuestions)
+    .values({
+      ...insertQuestion,
+      timestamp: new Date(),
+    })
+    .returning();
+  return question;
+}
+
+export async function updateLiveCoverageQuestionStatus(id: number, status: string, answered: boolean = false): Promise<LiveCoverageQuestion | undefined> {
+  const [question] = await db.update(liveCoverageQuestions)
+    .set({ 
+      status, 
+      answered,
+      ...(answered ? { answered: true } : {})
+    })
+    .where(eq(liveCoverageQuestions.id, id))
+    .returning();
+  
+  return question;
+}
+
+export async function createAnswerToQuestion(
+  questionId: number, 
+  coverageId: number, 
+  content: string, 
+  authorId: number,
+  important: boolean = false
+): Promise<LiveCoverageUpdate> {
+  // Créer une mise à jour de type réponse
+  const [update] = await db.insert(liveCoverageUpdates)
+    .values({
+      coverageId,
+      content,
+      authorId,
+      timestamp: new Date(),
+      important,
+      isAnswer: true,
+      questionId
+    })
+    .returning();
+  
+  // Marquer la question comme répondue
+  await updateLiveCoverageQuestionStatus(questionId, "approved", true);
+  
+  return update;
 }

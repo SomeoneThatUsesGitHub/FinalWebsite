@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { LiveCoverage, LiveCoverageEditor, LiveCoverageUpdate } from "@shared/schema";
+import { LiveCoverage, LiveCoverageEditor, LiveCoverageUpdate, LiveCoverageQuestion } from "@shared/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Radio, Clock, AlertTriangle, User as UserIcon, Home, Share2 } from "lucide-react";
+import { ChevronLeft, Radio, Clock, AlertTriangle, User as UserIcon, Home, Share2, Send } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { fr } from "date-fns/locale";
 import { format, formatDistanceToNow } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function LiveCoveragePage() {
   const params = useParams();
@@ -19,6 +21,10 @@ export default function LiveCoveragePage() {
   const { slug } = params;
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 secondes par défaut
   const [isMenuOpen, setIsMenuOpen] = useState(false); // État pour contrôler l'ouverture/fermeture du menu
+  const [questionText, setQuestionText] = useState("");
+  const [username, setUsername] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const { toast } = useToast();
 
   // Récupérer les détails du suivi en direct
   const {
@@ -60,6 +66,49 @@ export default function LiveCoveragePage() {
       navigate("/");
     }
   }, [coverage, navigate]);
+
+  // Définir la mutation pour soumettre une question
+  const submitQuestionMutation = useMutation({
+    mutationFn: async ({ username, content }: { username: string, content: string }) => {
+      const res = await apiRequest("POST", `/api/live-coverages/${coverage?.id}/questions`, {
+        username,
+        content
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      setQuestionText("");
+      setShowSuccessMessage(true);
+      
+      // Masquer le message de succès après 5 secondes
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000);
+      
+      toast({
+        title: "Question envoyée",
+        description: "Votre question a été soumise et sera publiée après modération.",
+        variant: "default",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer votre question. Veuillez réessayer plus tard.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Fonction pour soumettre une question
+  const handleSubmitQuestion = () => {
+    if (!questionText.trim() || !username.trim() || !coverage?.id) return;
+    
+    submitQuestionMutation.mutate({
+      username: username.trim(),
+      content: questionText.trim()
+    });
+  };
 
   // Augmenter la fréquence de rafraîchissement si des mises à jour importantes sont détectées récemment
   useEffect(() => {
@@ -211,7 +260,7 @@ export default function LiveCoveragePage() {
         </div>
       </div>
       
-      <div className="container max-w-4xl mx-auto px-4 py-6">
+      <div className="container max-w-4xl mx-auto px-4 py-6 mb-12">
         <div className="space-y-6">
           {/* Section des questions des visiteurs - version améliorée */}
           <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-background rounded-lg border border-muted/30 shadow-sm">
@@ -226,20 +275,61 @@ export default function LiveCoveragePage() {
                 Posez vos questions
               </h2>
               
-              <div className="flex gap-2 mb-1">
-                <input 
-                  type="text" 
-                  placeholder="Votre question..." 
-                  className="flex-1 px-3 py-1.5 text-sm rounded-md border border-input bg-background/80"
-                  disabled
-                />
-                <Button variant="default" size="sm" className="h-8" disabled>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
+              {showSuccessMessage ? (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/30 rounded-md p-3 mb-3 text-sm text-green-800 dark:text-green-400">
+                  <p className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Question envoyée ! Elle sera examinée par nos modérateurs.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-2">
+                    <input 
+                      type="text" 
+                      placeholder="Votre nom..." 
+                      className="w-full px-3 py-1.5 text-sm rounded-md border border-input bg-background/80 mb-2"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex gap-2 mb-1">
+                    <input 
+                      type="text" 
+                      placeholder="Votre question..." 
+                      className="flex-1 px-3 py-1.5 text-sm rounded-md border border-input bg-background/80"
+                      value={questionText}
+                      onChange={(e) => setQuestionText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSubmitQuestion();
+                        }
+                      }}
+                    />
+                    <Button 
+                      variant="default" 
+                      size="sm" 
+                      className="h-8"
+                      onClick={handleSubmitQuestion}
+                      disabled={submitQuestionMutation.isPending || !questionText.trim() || !username.trim()}
+                    >
+                      {submitQuestionMutation.isPending ? (
+                        <svg className="animate-spin h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
+              
+              <p className="text-xs text-muted-foreground mt-1">
                 Questions modérées avant publication
               </p>
             </div>

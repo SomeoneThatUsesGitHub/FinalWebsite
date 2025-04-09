@@ -1512,6 +1512,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Error deleting live coverage update" });
     }
   });
+  
+  // ===== API pour les questions des utilisateurs =====
+  // Récupérer les questions pour un suivi en direct (filtré par status pour les admins)
+  app.get("/api/admin/live-coverages/:coverageId/questions", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { coverageId } = req.params;
+      const { status } = req.query;
+      
+      if (isNaN(Number(coverageId))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      const questions = await storage.getLiveCoverageQuestions(
+        Number(coverageId), 
+        status ? String(status) : undefined
+      );
+      res.json(questions);
+    } catch (error) {
+      console.error("Error fetching live coverage questions:", error);
+      res.status(500).json({ error: "Error fetching live coverage questions" });
+    }
+  });
+
+  // Soumettre une question pour un suivi en direct (accès public)
+  app.post("/api/live-coverages/:coverageId/questions", async (req: Request, res: Response) => {
+    try {
+      const { coverageId } = req.params;
+      const { username, content } = req.body;
+      
+      if (isNaN(Number(coverageId))) {
+        return res.status(400).json({ message: "ID de suivi invalide" });
+      }
+      
+      if (!username || !content) {
+        return res.status(400).json({ message: "Le nom d'utilisateur et le contenu sont requis" });
+      }
+      
+      // Vérifier que le suivi en direct existe et est actif
+      const coverage = await storage.getLiveCoverageById(Number(coverageId));
+      if (!coverage || !coverage.active) {
+        return res.status(404).json({ message: "Suivi en direct non trouvé ou inactif" });
+      }
+      
+      const newQuestion = await storage.createLiveCoverageQuestion({
+        coverageId: Number(coverageId),
+        username,
+        content,
+        status: "pending", // Toutes les questions sont en attente de modération par défaut
+      });
+      
+      res.status(201).json({ 
+        message: "Question soumise avec succès et en attente de modération",
+        questionId: newQuestion.id
+      });
+    } catch (error) {
+      console.error("Error submitting question:", error);
+      res.status(500).json({ error: "Error submitting question" });
+    }
+  });
+
+  // Modifier le statut d'une question (admin uniquement)
+  app.put("/api/admin/live-coverages/questions/:questionId/status", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { questionId } = req.params;
+      const { status } = req.body;
+      
+      if (isNaN(Number(questionId))) {
+        return res.status(400).json({ message: "ID de question invalide" });
+      }
+      
+      if (!status || !['pending', 'approved', 'rejected'].includes(status)) {
+        return res.status(400).json({ message: "Statut invalide" });
+      }
+      
+      const updatedQuestion = await storage.updateLiveCoverageQuestionStatus(Number(questionId), status);
+      
+      if (!updatedQuestion) {
+        return res.status(404).json({ message: "Question non trouvée" });
+      }
+      
+      res.json(updatedQuestion);
+    } catch (error) {
+      console.error("Error updating question status:", error);
+      res.status(500).json({ error: "Error updating question status" });
+    }
+  });
+
+  // Répondre à une question (admins et éditeurs du direct uniquement)
+  app.post("/api/admin/live-coverages/questions/:questionId/answer", async (req: Request, res: Response) => {
+    // Cette route nécessite une authentification, mais on vérifie si l'utilisateur est
+    // soit admin soit un éditeur du suivi en direct concerné
+    try {
+      // Vérifier si l'utilisateur est authentifié
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Non authentifié" });
+      }
+      
+      const user = req.user as any;
+      
+      const { questionId } = req.params;
+      const { content, important, coverageId } = req.body;
+      
+      if (isNaN(Number(questionId)) || isNaN(Number(coverageId))) {
+        return res.status(400).json({ message: "IDs invalides" });
+      }
+      
+      if (!content) {
+        return res.status(400).json({ message: "Le contenu est requis" });
+      }
+      
+      // Vérifier que l'utilisateur est soit admin soit un éditeur du suivi en direct
+      const isUserAdmin = user.role === 'admin';
+      let isEditor = false;
+      
+      if (!isUserAdmin) {
+        const editors = await storage.getLiveCoverageEditors(Number(coverageId));
+        isEditor = editors.some((e: any) => e.editorId === user.id);
+        
+        if (!isEditor) {
+          return res.status(403).json({ message: "Vous n'êtes pas autorisé à répondre aux questions pour ce suivi" });
+        }
+      }
+      
+      // Créer la réponse et mettre à jour le statut de la question
+      const answer = await storage.createAnswerToQuestion(
+        Number(questionId),
+        Number(coverageId),
+        content,
+        user.id,
+        important || false
+      );
+      
+      res.status(201).json({ 
+        message: "Réponse publiée avec succès", 
+        answer 
+      });
+    } catch (error) {
+      console.error("Error answering question:", error);
+      res.status(500).json({ error: "Error answering question" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

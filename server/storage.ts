@@ -10,7 +10,8 @@ import {
   videos, type Video, type InsertVideo,
   liveCoverages, type LiveCoverage, type InsertLiveCoverage,
   liveCoverageEditors, type LiveCoverageEditor, type InsertLiveCoverageEditor,
-  liveCoverageUpdates, type LiveCoverageUpdate, type InsertLiveCoverageUpdate
+  liveCoverageUpdates, type LiveCoverageUpdate, type InsertLiveCoverageUpdate,
+  liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte, sql, lt } from "drizzle-orm";
@@ -77,6 +78,12 @@ export interface IStorage {
   })[]>;
   createLiveCoverageUpdate(update: InsertLiveCoverageUpdate): Promise<LiveCoverageUpdate>;
   deleteLiveCoverageUpdate(id: number): Promise<boolean>;
+  
+  // Live Coverage Questions operations
+  getLiveCoverageQuestions(coverageId: number, status?: string): Promise<LiveCoverageQuestion[]>;
+  createLiveCoverageQuestion(question: InsertLiveCoverageQuestion): Promise<LiveCoverageQuestion>;
+  updateLiveCoverageQuestionStatus(id: number, status: string, answered?: boolean): Promise<LiveCoverageQuestion | undefined>;
+  createAnswerToQuestion(questionId: number, coverageId: number, content: string, authorId: number, important?: boolean): Promise<LiveCoverageUpdate>;
   
   // Election operations
   getAllElections(): Promise<Election[]>;
@@ -786,6 +793,69 @@ export class DatabaseStorage implements IStorage {
     const result = await db.delete(liveCoverageUpdates)
       .where(eq(liveCoverageUpdates.id, id));
     return result.rowCount > 0;
+  }
+  
+  // Live Coverage Questions operations
+  async getLiveCoverageQuestions(coverageId: number, status?: string): Promise<LiveCoverageQuestion[]> {
+    let query = db.select().from(liveCoverageQuestions)
+      .where(eq(liveCoverageQuestions.coverageId, coverageId))
+      .orderBy(desc(liveCoverageQuestions.timestamp));
+    
+    if (status) {
+      query = query.where(eq(liveCoverageQuestions.status, status));
+    }
+    
+    return query;
+  }
+  
+  async createLiveCoverageQuestion(question: InsertLiveCoverageQuestion): Promise<LiveCoverageQuestion> {
+    const [newQuestion] = await db.insert(liveCoverageQuestions)
+      .values({
+        ...question,
+        timestamp: new Date(),
+        answered: false
+      })
+      .returning();
+    return newQuestion;
+  }
+  
+  async updateLiveCoverageQuestionStatus(id: number, status: string, answered: boolean = false): Promise<LiveCoverageQuestion | undefined> {
+    const [question] = await db.update(liveCoverageQuestions)
+      .set({ 
+        status, 
+        answered,
+        updatedAt: new Date()
+      })
+      .where(eq(liveCoverageQuestions.id, id))
+      .returning();
+    
+    return question;
+  }
+  
+  async createAnswerToQuestion(
+    questionId: number, 
+    coverageId: number, 
+    content: string, 
+    authorId: number,
+    important: boolean = false
+  ): Promise<LiveCoverageUpdate> {
+    // Créer une mise à jour de type réponse
+    const [update] = await db.insert(liveCoverageUpdates)
+      .values({
+        coverageId,
+        content,
+        authorId,
+        timestamp: new Date(),
+        important,
+        isAnswer: true,
+        questionId
+      })
+      .returning();
+    
+    // Marquer la question comme répondue
+    await this.updateLiveCoverageQuestionStatus(questionId, "approved", true);
+    
+    return update;
   }
 }
 
