@@ -608,10 +608,10 @@ export default function LiveCoveragePage() {
                       id={`update-${update.id}`}
                       className="transition-all duration-300"
                     >
-                      <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"} bg-white dark:bg-gray-950`}>
-                        <CardContent className="p-0">
+                      <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"} bg-white dark:bg-gray-950`} style={{ background: 'white' }}>
+                        <CardContent className="p-0" style={{ background: 'white' }}>
                           {/* En-tête de la mise à jour */}
-                          <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b ${update.important ? "bg-red-50 dark:bg-red-900/10" : "bg-muted/30"}`}>
+                          <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b ${update.important ? "bg-red-50 dark:bg-red-900/10" : "bg-muted/30"}`} style={{ background: update.important ? '#fef2f2' : '#f8f9fa' }}>
                             <div className="flex items-center gap-2">
                               {update.important && (
                                 <Badge className="bg-red-500">Important</Badge>
@@ -649,7 +649,7 @@ export default function LiveCoveragePage() {
                           </div>
                           
                           {/* Contenu de la mise à jour */}
-                          <div className="p-4 md:p-5 prose prose-sm dark:prose-invert max-w-none">
+                          <div className="p-4 md:p-5 prose prose-sm dark:prose-invert max-w-none" style={{ background: 'white' }}>
                             {update.isAnswer && update.questionContent && (
                               <div className="mb-4 bg-gray-100 dark:bg-gray-800 p-3 rounded-md border-l-4 border-blue-500">
                                 <p className="text-sm text-muted-foreground mb-1">Question de {update.questionUsername || "Visiteur"} :</p>
