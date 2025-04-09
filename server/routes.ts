@@ -1541,6 +1541,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { coverageId } = req.params;
       const { username, content } = req.body;
       
+      console.log("Réception d'une question:", { coverageId, username, content });
+      
       if (isNaN(Number(coverageId))) {
         return res.status(400).json({ message: "ID de suivi invalide" });
       }
@@ -1562,13 +1564,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: "pending", // Toutes les questions sont en attente de modération par défaut
       });
       
-      res.status(201).json({ 
+      // Forcer explicitement le type de contenu pour être sûr
+      res.setHeader('Content-Type', 'application/json');
+      
+      return res.status(201).json({ 
+        success: true,
         message: "Question soumise avec succès et en attente de modération",
         questionId: newQuestion.id
       });
     } catch (error) {
-      console.error("Error submitting question:", error);
-      res.status(500).json({ error: "Error submitting question" });
+      console.error("Erreur lors de la soumission d'une question:", error);
+      
+      // Forcer explicitement le type de contenu pour être sûr
+      res.setHeader('Content-Type', 'application/json');
+      
+      return res.status(500).json({ 
+        success: false,
+        message: "Erreur lors de la soumission de la question" 
+      });
     }
   });
 

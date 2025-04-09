@@ -78,11 +78,25 @@ export default function LiveCoveragePage() {
         
         // Vérifier si la réponse est OK
         if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || "Erreur lors de l'envoi de la question");
+          try {
+            // Essayer de parser comme JSON d'abord
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Erreur lors de l'envoi de la question");
+          } catch (jsonError) {
+            // Si ce n'est pas du JSON, utiliser le texte ou un message par défaut
+            const errorText = await res.text();
+            throw new Error("Erreur lors de l'envoi de la question");
+          }
         }
         
-        return await res.json();
+        // Pour éviter les erreurs de parsing JSON, vérifions le Content-Type
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return await res.json();
+        } else {
+          // Si la réponse n'est pas du JSON, retourner un objet simple
+          return { success: true };
+        }
       } catch (err) {
         console.error("Erreur lors de la soumission de la question:", err);
         throw err;
