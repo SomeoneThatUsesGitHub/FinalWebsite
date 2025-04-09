@@ -689,18 +689,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteLiveCoverage(id: number): Promise<boolean> {
-    // First delete linked editors
-    await db.delete(liveCoverageEditors)
-      .where(eq(liveCoverageEditors.coverageId, id));
-    
-    // Then delete linked updates
-    await db.delete(liveCoverageUpdates)
-      .where(eq(liveCoverageUpdates.coverageId, id));
-    
-    // Finally delete the coverage itself
-    const result = await db.delete(liveCoverages)
-      .where(eq(liveCoverages.id, id));
-    return result.rowCount > 0;
+    try {
+      // Supprimer les questions associées d'abord
+      await db.delete(liveCoverageQuestions)
+        .where(eq(liveCoverageQuestions.coverageId, id));
+        
+      // Ensuite supprimer les éditeurs associés
+      await db.delete(liveCoverageEditors)
+        .where(eq(liveCoverageEditors.coverageId, id));
+      
+      // Puis supprimer les mises à jour associées
+      await db.delete(liveCoverageUpdates)
+        .where(eq(liveCoverageUpdates.coverageId, id));
+      
+      // Enfin supprimer le direct lui-même
+      const result = await db.delete(liveCoverages)
+        .where(eq(liveCoverages.id, id));
+        
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Erreur lors de la suppression du direct:", error);
+      throw error;
+    }
   }
 
   async getLiveCoverageEditors(coverageId: number): Promise<(LiveCoverageEditor & { 
