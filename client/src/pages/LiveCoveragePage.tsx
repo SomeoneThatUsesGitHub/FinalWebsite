@@ -115,15 +115,6 @@ export default function LiveCoveragePage() {
 
   return (
     <div className="min-h-screen bg-muted/20">
-      {/* Bannière fixe "LIVE EN COURS" */}
-      <div className="sticky top-0 z-50 bg-red-600 text-white py-2 px-4 text-sm font-medium flex items-center justify-center shadow-md">
-        <Radio className="h-4 w-4 mr-2 animate-pulse" />
-        <span>LIVE EN COURS</span>
-        <span className="ml-2 text-xs hidden sm:inline-block">
-          Mis à jour {formatDistanceToNow(new Date(), { addSuffix: true, locale: fr })}
-        </span>
-      </div>
-      
       {/* Bannière principale avec fond sombre et dégradé */}
       <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         <div className="absolute inset-0 opacity-40" style={{
@@ -134,16 +125,18 @@ export default function LiveCoveragePage() {
         }}></div>
         
         <div className="container max-w-4xl mx-auto px-4 py-6 sm:py-10 relative z-10">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="mb-4 bg-black/30 text-white border-white/30 hover:bg-black/50 hover:text-white" 
-            onClick={() => navigate("/")}
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" /> Retour à l'accueil
-          </Button>
+          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="bg-black/30 text-white border-white/30 hover:bg-black/50 hover:text-white" 
+              onClick={() => navigate("/")}
+            >
+              <ChevronLeft className="mr-2 h-4 w-4" /> Retour
+            </Button>
+          </div>
           
-          <div className="space-y-3">
+          <div className="space-y-3 pt-10 sm:pt-4">
             <div className="flex flex-wrap gap-2 items-center text-sm">
               <Badge variant="outline" className="bg-red-600/80 text-white border-0 flex items-center">
                 <Radio className="h-3 w-3 mr-1 animate-pulse" /> LIVE EN COURS
@@ -186,15 +179,22 @@ export default function LiveCoveragePage() {
                 size="sm" 
                 variant="outline"
                 className="rounded-full bg-white/10 hover:bg-white/20 border-white/30 text-white"
+                title="Partager"
               >
-                <Star className="h-4 w-4" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
               </Button>
               <Button 
                 size="sm" 
                 variant="outline" 
                 className="rounded-full bg-white/10 hover:bg-white/20 border-white/30 text-white"
+                title="Accueil"
+                onClick={() => navigate("/")}
               >
-                <Clock className="h-4 w-4" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
               </Button>
             </div>
           </div>
@@ -203,6 +203,66 @@ export default function LiveCoveragePage() {
       
       <div className="container max-w-4xl mx-auto px-4 py-8">
         <div className="space-y-6">
+          {/* Section de l'équipe éditoriale */}
+          {editors && editors.length > 0 && (
+            <div className="bg-muted/30 rounded-lg p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center">
+                <UserIcon className="h-5 w-5 mr-2 text-primary" />
+                Équipe éditoriale
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {editors.map((editor) => (
+                  <div key={editor.id} className="flex items-center gap-3 bg-background p-3 rounded-lg shadow-sm">
+                    <Avatar className="h-12 w-12 border-2 border-primary/10">
+                      {editor.editor?.avatarUrl ? (
+                        <AvatarImage src={editor.editor.avatarUrl} alt={editor.editor.displayName} />
+                      ) : (
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {editor.editor?.displayName?.charAt(0) || "?"}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <div>
+                      <div className="font-medium">{editor.editor?.displayName || "Éditeur"}</div>
+                      {editor.role && (
+                        <div className="text-xs text-muted-foreground">{editor.role}</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Section des questions des visiteurs */}
+          <div className="bg-primary/5 rounded-lg p-6 border border-primary/10">
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+              Posez vos questions
+            </h2>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Avez-vous des questions sur cet événement ? Les journalistes tenteront d'y répondre en direct.
+              </p>
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  placeholder="Votre question..." 
+                  className="flex-1 px-3 py-2 text-sm rounded-md border border-input bg-background"
+                  disabled
+                />
+                <Button variant="default" size="sm" disabled>
+                  Envoyer
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Les questions sont modérées avant publication. Veuillez rester courtois.
+              </p>
+            </div>
+          </div>
+          
           <Separator className="my-8" />
           
           <div className="space-y-6">
