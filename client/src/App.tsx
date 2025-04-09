@@ -28,6 +28,7 @@ import DirectsPage from "@/pages/admin/DirectsPage";
 import DirectForm from "@/pages/admin/DirectForm";
 import DirectEditorsPage from "@/pages/admin/DirectEditorsPage";
 import DirectUpdatesPage from "@/pages/admin/DirectUpdatesPage";
+import DirectQuestionsPage from "@/pages/admin/DirectQuestionsPage";
 
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
@@ -95,6 +96,7 @@ function App() {
               <ProtectedRoute path="/admin/directs/nouveau" component={DirectForm} adminOnly />
               <ProtectedRoute path="/admin/directs/editer/:id" component={DirectForm} adminOnly />
               <ProtectedRoute path="/admin/directs/:id/editeurs" component={DirectEditorsPage} adminOnly />
+              <ProtectedRoute path="/admin/directs/:id/questions" component={DirectQuestionsPage} adminOnly />
               <ProtectedRoute path="/admin/directs/:id/mises-a-jour" component={DirectUpdatesPage} />
               
               {/* Fallback */}

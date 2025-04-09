@@ -55,6 +55,9 @@ export function getTimeAgo(date: string | Date): string {
   return `il y a ${diffInYears} an${diffInYears > 1 ? 's' : ''}`;
 }
 
+// Alias de getTimeAgo pour rester compatible avec formatDistanceToNow importé par certains composants
+export const formatDistanceToNow = getTimeAgo;
+
 export function getCategoryColor(color: string): string {
   return color || "#FF4D4D";
 }

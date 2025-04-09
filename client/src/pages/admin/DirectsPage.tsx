@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { queryClient } from "@/lib/queryClient";
-import { Pencil, Plus, Radio, Trash2, Users } from "lucide-react";
+import { Pencil, Plus, Radio, Trash2, Users, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
@@ -211,6 +211,18 @@ export default function DirectsPage() {
                     onClick={() => navigate(`/admin/directs/editer/${direct.id}`)}
                   >
                     <Pencil className="mr-2 h-4 w-4" /> Modifier
+                  </Button>
+                )}
+                
+                {/* Bouton Questions - visible seulement pour les admins */}
+                {isAdmin && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1" 
+                    onClick={() => navigate(`/admin/directs/${direct.id}/questions`)}
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" /> Questions
                   </Button>
                 )}
                 
