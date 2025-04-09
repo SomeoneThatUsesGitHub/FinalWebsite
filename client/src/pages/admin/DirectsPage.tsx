@@ -214,8 +214,8 @@ export default function DirectsPage() {
                   </Button>
                 )}
                 
-                {/* Bouton Questions - visible seulement pour les admins */}
-                {isAdmin && (
+                {/* Bouton Questions - visible pour les admins OU les éditeurs assignés à ce direct */}
+                {(isAdmin || userEditorAssignments[direct.id]) && (
                   <Button 
                     variant="outline" 
                     size="sm" 

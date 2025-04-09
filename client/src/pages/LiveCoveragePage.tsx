@@ -618,6 +618,35 @@ export default function LiveCoveragePage() {
                                 />
                               </div>
                             )}
+                            {update.youtubeUrl && (
+                              <div className="mt-4 aspect-video">
+                                <iframe
+                                  className="w-full h-full rounded-md"
+                                  src={update.youtubeUrl.replace("watch?v=", "embed/")}
+                                  title="YouTube video player"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                ></iframe>
+                              </div>
+                            )}
+                            {update.articleId && (
+                              <Card className="mt-4 overflow-hidden border-primary/20">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center gap-2 text-primary">
+                                    <span className="text-xs font-medium uppercase">Article lié</span>
+                                  </div>
+                                  <Button 
+                                    variant="link" 
+                                    className="p-0 h-auto mt-1 font-semibold"
+                                    asChild
+                                  >
+                                    <a href={`/articles/${update.articleId}`} target="_blank" rel="noopener noreferrer">
+                                      Voir l'article complet
+                                    </a>
+                                  </Button>
+                                </CardContent>
+                              </Card>
+                            )}
                           </div>
                         </CardContent>
                       </Card>

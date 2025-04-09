@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { LiveCoverage, LiveCoverageUpdate } from "@shared/schema";
+import { LiveCoverage, LiveCoverageUpdate, Article } from "@shared/schema";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -30,13 +31,15 @@ const updateSchema = z.object({
   content: z.string().min(3, "Le contenu est requis (minimum 3 caractères)"),
   imageUrl: z.string().optional(),
   important: z.boolean().default(false),
+  youtubeUrl: z.string().optional(),
+  articleId: z.number().optional(),
 });
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
 
 export default function DirectUpdatesPage() {
   const params = useParams();
-  const id = parseInt(params.id);
+  const id = params.id ? parseInt(params.id) : 0;
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -57,6 +60,12 @@ export default function DirectUpdatesPage() {
     enabled: !isNaN(id),
     refetchInterval: 10000, // Rafraîchir toutes les 10 secondes
   });
+  
+  // Récupérer les articles pour le menu déroulant
+  const { data: articles, isLoading: isLoadingArticles } = useQuery<Article[]>({
+    queryKey: ["/api/articles"],
+    enabled: !isNaN(id),
+  });
 
   // Initialiser le formulaire
   const form = useForm<UpdateFormValues>({
@@ -65,6 +74,8 @@ export default function DirectUpdatesPage() {
       content: "",
       imageUrl: "",
       important: false,
+      youtubeUrl: "",
+      articleId: undefined,
     },
   });
 
@@ -96,6 +107,8 @@ export default function DirectUpdatesPage() {
         content: "",
         imageUrl: "",
         important: false,
+        youtubeUrl: "",
+        articleId: undefined,
       });
     },
     onError: (error: Error) => {
@@ -243,6 +256,58 @@ export default function DirectUpdatesPage() {
                       </FormControl>
                       <FormDescription>
                         URL d'une image à joindre à cette mise à jour.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="youtubeUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vidéo YouTube (optionnel)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXXX" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        URL d'une vidéo YouTube à intégrer dans cette mise à jour.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="articleId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Article à intégrer (optionnel)</FormLabel>
+                      <Select 
+                        onValueChange={(value) => field.onChange(parseInt(value) || undefined)} 
+                        value={field.value?.toString() || ""}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionnez un article à intégrer" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="">Aucun article</SelectItem>
+                          {articles?.map(article => (
+                            <SelectItem key={article.id} value={article.id.toString()}>
+                              {article.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Intégrer un de nos articles dans cette mise à jour.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -427,6 +492,40 @@ export default function DirectUpdatesPage() {
                             className="rounded-md max-h-80 object-contain"
                           />
                         </div>
+                      )}
+                      {update.youtubeUrl && (
+                        <div className="mt-2 aspect-video">
+                          <iframe
+                            className="w-full h-full rounded-md"
+                            src={update.youtubeUrl.replace("watch?v=", "embed/")}
+                            title="YouTube video player"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          ></iframe>
+                        </div>
+                      )}
+                      {update.articleId && articles?.find(a => a.id === update.articleId) && (
+                        <Card className="mt-4 overflow-hidden">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-base line-clamp-2">{articles.find(a => a.id === update.articleId)?.title}</CardTitle>
+                            <CardDescription className="text-xs">
+                              Article lié: {articles.find(a => a.id === update.articleId)?.slug}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="pb-4 pt-0">
+                            <p className="text-sm line-clamp-3">{articles.find(a => a.id === update.articleId)?.excerpt}</p>
+                            <Button 
+                              variant="link" 
+                              size="sm" 
+                              className="p-0 h-auto mt-1"
+                              asChild
+                            >
+                              <a href={`/articles/${articles.find(a => a.id === update.articleId)?.slug}`} target="_blank">
+                                Lire l'article complet
+                              </a>
+                            </Button>
+                          </CardContent>
+                        </Card>
                       )}
                     </div>
                     

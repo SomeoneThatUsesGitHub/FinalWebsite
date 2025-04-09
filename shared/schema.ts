@@ -293,6 +293,9 @@ export const liveCoverageUpdates = pgTable("live_coverage_updates", {
   // Pour les réponses aux questions
   isAnswer: boolean("is_answer").default(false),
   questionId: integer("question_id").references(() => liveCoverageQuestions.id),
+  // Nouveaux types de contenu
+  youtubeUrl: text("youtube_url"),
+  articleId: integer("article_id").references(() => articles.id),
 });
 
 export const insertLiveCoverageUpdateSchema = createInsertSchema(liveCoverageUpdates).pick({
@@ -304,6 +307,8 @@ export const insertLiveCoverageUpdateSchema = createInsertSchema(liveCoverageUpd
   important: true,
   isAnswer: true,
   questionId: true,
+  youtubeUrl: true,
+  articleId: true,
 });
 
 export type LiveCoverage = typeof liveCoverages.$inferSelect;
