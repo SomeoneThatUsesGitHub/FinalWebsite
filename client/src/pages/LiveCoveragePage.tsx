@@ -596,7 +596,7 @@ export default function LiveCoveragePage() {
                       id={`update-${update.id}`}
                       className="transition-all duration-300"
                     >
-                      <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"}`}>
+                      <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"} bg-background`}>
                         <CardContent className="p-0">
                           {/* En-tête de la mise à jour */}
                           <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b ${update.important ? "bg-red-50 dark:bg-red-900/10" : "bg-muted/30"}`}>
