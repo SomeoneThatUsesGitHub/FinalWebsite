@@ -18,6 +18,7 @@ export default function LiveCoveragePage() {
   const [, navigate] = useLocation();
   const { slug } = params;
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 secondes par défaut
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // État pour contrôler l'ouverture/fermeture du menu
 
   // Récupérer les détails du suivi en direct
   const {
@@ -207,79 +208,35 @@ export default function LiveCoveragePage() {
       
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Section de l'équipe éditoriale - compact version */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-muted/30 to-background rounded-lg border border-muted/30 shadow-sm">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-primary/5 rounded-full -ml-8 -mb-8"></div>
-              
-              <div className="p-4 relative z-10">
-                <h2 className="text-base font-medium mb-2 flex items-center text-primary">
-                  <UserIcon className="h-4 w-4 mr-1.5" />
-                  Équipe éditoriale
-                </h2>
-                
-                {editors && editors.length > 0 ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {editors.map((editor) => (
-                      <div key={editor.id} className="flex items-center gap-2 bg-background/80 px-2 py-1 rounded-full text-sm shadow-sm">
-                        <Avatar className="h-6 w-6">
-                          {editor.editor?.avatarUrl ? (
-                            <AvatarImage src={editor.editor.avatarUrl} alt={editor.editor.displayName} />
-                          ) : (
-                            <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {editor.editor?.displayName?.charAt(0) || "?"}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <span className="font-medium truncate max-w-[100px]">{editor.editor?.displayName || "Éditeur"}</span>
-                        {editor.role && (
-                          <span className="text-xs text-muted-foreground whitespace-nowrap bg-background/50 px-1.5 rounded">
-                            {editor.role}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <UserIcon className="h-4 w-4" />
-                    <span>Animé par l'équipe Politiquensemble</span>
-                  </div>
-                )}
-              </div>
-            </div>
+          {/* Section des questions des visiteurs - version améliorée */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-background rounded-lg border border-muted/30 shadow-sm">
+            <div className="absolute top-0 left-0 w-20 h-20 bg-primary/5 rounded-full -ml-10 -mt-10"></div>
+            <div className="absolute bottom-0 right-0 w-12 h-12 bg-primary/5 rounded-full -mr-6 -mb-6"></div>
             
-            {/* Section des questions des visiteurs - compact version */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-background rounded-lg border border-muted/30 shadow-sm">
-              <div className="absolute top-0 left-0 w-20 h-20 bg-primary/5 rounded-full -ml-10 -mt-10"></div>
-              <div className="absolute bottom-0 right-0 w-12 h-12 bg-primary/5 rounded-full -mr-6 -mb-6"></div>
+            <div className="p-4 relative z-10">
+              <h2 className="text-base font-medium mb-2 flex items-center text-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                Posez vos questions
+              </h2>
               
-              <div className="p-4 relative z-10">
-                <h2 className="text-base font-medium mb-2 flex items-center text-primary">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              <div className="flex gap-2 mb-1">
+                <input 
+                  type="text" 
+                  placeholder="Votre question..." 
+                  className="flex-1 px-3 py-1.5 text-sm rounded-md border border-input bg-background/80"
+                  disabled
+                />
+                <Button variant="default" size="sm" className="h-8" disabled>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
-                  Posez vos questions
-                </h2>
-                
-                <div className="flex gap-2 mb-1">
-                  <input 
-                    type="text" 
-                    placeholder="Votre question..." 
-                    className="flex-1 px-3 py-1.5 text-sm rounded-md border border-input bg-background/80"
-                    disabled
-                  />
-                  <Button variant="default" size="sm" className="h-8" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Questions modérées avant publication
-                </p>
+                </Button>
               </div>
+              <p className="text-xs text-muted-foreground">
+                Questions modérées avant publication
+              </p>
             </div>
           </div>
           
@@ -292,14 +249,15 @@ export default function LiveCoveragePage() {
                 Dernières mises à jour
               </h2>
               
-              <div className="relative group">
+              <div className="relative">
                 <button
                   className="flex items-center gap-1 text-sm px-3 py-1 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                   <span className="font-medium text-primary">Les faits essentiels</span>
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 
-                    className="h-4 w-4 text-primary"
+                    className={`h-4 w-4 text-primary transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`}
                     fill="none" 
                     viewBox="0 0 24 24" 
                     stroke="currentColor"
@@ -308,43 +266,64 @@ export default function LiveCoveragePage() {
                   </svg>
                 </button>
                 
-                <div className="absolute right-0 mt-1 w-72 bg-white dark:bg-gray-900 border border-border rounded-md shadow-lg overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <div className="p-0">
-                    <div className="bg-red-600 text-white p-2 flex justify-between items-center">
-                      <h3 className="font-bold text-sm uppercase">Les faits essentiels (1)</h3>
-                      <button className="text-white/80 hover:text-white text-xs">
-                        Masquer
-                      </button>
+                {isMenuOpen && (
+                  <div className="absolute right-0 mt-1 w-72 bg-white dark:bg-gray-900 border border-border rounded-md shadow-lg overflow-hidden z-50">
+                    <div className="p-0">
+                      {/* Filtrer les mises à jour importantes */}
+                      {(() => {
+                        const importantUpdates = updates?.filter(u => u.important) || [];
+                        return (
+                          <>
+                            <div className="bg-red-600 text-white p-2 flex justify-between items-center">
+                              <h3 className="font-bold text-sm uppercase">
+                                Les faits essentiels ({importantUpdates.length})
+                              </h3>
+                              <button 
+                                className="text-white/80 hover:text-white text-xs"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Masquer
+                              </button>
+                            </div>
+                            
+                            {importantUpdates.length > 0 ? (
+                              <ul className="py-1 max-h-60 overflow-auto">
+                                {importantUpdates.map(update => (
+                                  <li key={update.id} className="hover:bg-muted/50 cursor-pointer">
+                                    <button 
+                                      className="w-full text-left px-3 py-2 text-sm flex items-start"
+                                      onClick={() => {
+                                        // Défiler jusqu'à la mise à jour
+                                        const element = document.getElementById(`update-${update.id}`);
+                                        if (element) {
+                                          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                          setTimeout(() => {
+                                            element.classList.add('highlight-pulse');
+                                            setTimeout(() => {
+                                              element.classList.remove('highlight-pulse');
+                                            }, 2000);
+                                          }, 500);
+                                        }
+                                        setIsMenuOpen(false);
+                                      }}
+                                    >
+                                      <span className="font-bold mr-2 text-black dark:text-white">•</span>
+                                      <span>{update.content.split('\n')[0].slice(0, 60)}{update.content.length > 60 ? '...' : ''}</span>
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="py-3 px-4 text-sm text-muted-foreground text-center">
+                                Aucun fait essentiel pour le moment
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
-                    <ul className="py-1 max-h-60 overflow-auto">
-                      <li className="hover:bg-muted/50 cursor-pointer">
-                        <button 
-                          className="w-full text-left px-3 py-2 text-sm flex items-start"
-                          onClick={() => {
-                            // Logique pour défiler jusqu'à la mise à jour correspondante
-                            // Ici, on simule un défilement vers le premier élément important
-                            const importantUpdates = updates?.filter(u => u.important) || [];
-                            if (importantUpdates.length > 0) {
-                              const element = document.getElementById(`update-${importantUpdates[0].id}`);
-                              if (element) {
-                                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                setTimeout(() => {
-                                  element.classList.add('highlight-pulse');
-                                  setTimeout(() => {
-                                    element.classList.remove('highlight-pulse');
-                                  }, 2000);
-                                }, 500);
-                              }
-                            }
-                          }}
-                        >
-                          <span className="font-bold mr-2 text-black dark:text-white">•</span>
-                          <span>Le point sur la situation mardi 8 avril à 21 heures</span>
-                        </button>
-                      </li>
-                    </ul>
                   </div>
-                </div>
+                )}
               </div>
             </div>
             
