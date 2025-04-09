@@ -15,10 +15,16 @@ import { format, formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
+// Import du composant de graphique d'élections
+import ElectionResultsChart, { ElectionResultsData } from "@/components/ElectionResultsChart";
+
 // Extension du type LiveCoverageUpdate pour inclure les données de la question associée
-interface LiveCoverageUpdateWithQuestion extends LiveCoverageUpdate {
+// et les résultats d'élection
+interface LiveCoverageUpdateWithQuestion extends Omit<LiveCoverageUpdate, 'updateType' | 'electionResults'> {
   questionContent?: string;
   questionUsername?: string;
+  electionResults?: ElectionResultsData | string;
+  updateType?: 'normal' | 'youtube' | 'article' | 'election';
 }
 
 export default function LiveCoveragePage() {
@@ -62,7 +68,7 @@ export default function LiveCoveragePage() {
 
   // Récupérer les mises à jour du suivi en direct
   const {
-    data: updates,
+    data: rawUpdates,
     isLoading: isLoadingUpdates,
     error: updatesError,
   } = useQuery<(LiveCoverageUpdateWithQuestion & {
@@ -72,6 +78,29 @@ export default function LiveCoveragePage() {
     enabled: !!coverage?.id,
     refetchInterval: refreshInterval,
   });
+
+  // Traiter les mises à jour pour intégrer les graphiques d'élection
+  const updates = React.useMemo(() => {
+    if (!rawUpdates) return undefined;
+    
+    return rawUpdates.map(update => {
+      // Vérifier si cette mise à jour contient des données d'élection
+      if (update.updateType === 'election' && update.electionResults) {
+        try {
+          // Convertir la chaîne JSON en objet ElectionResultsData
+          const electionData = JSON.parse(update.electionResults as string) as ElectionResultsData;
+          return {
+            ...update,
+            electionResults: electionData
+          };
+        } catch (e) {
+          console.error("Erreur lors du parsing des données d'élection:", e);
+          return update;
+        }
+      }
+      return update;
+    });
+  }, [rawUpdates]);
 
   // Si le suivi n'est pas actif, rediriger vers la page d'accueil
   useEffect(() => {
@@ -207,7 +236,7 @@ export default function LiveCoveragePage() {
 
   return (
     <div className="min-h-screen bg-muted/20 relative">
-      <div className="absolute inset-0 pointer-events-none opacity-5 pattern-grid"></div>
+      <div className="absolute inset-0 pointer-events-none opacity-20 pattern-grid"></div>
       {/* Bannière principale avec fond sombre et dégradé */}
       <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         {coverage.imageUrl ? (
@@ -626,7 +655,7 @@ export default function LiveCoveragePage() {
                               </div>
                             )}
                             {update.youtubeUrl && (
-                              <div className="mt-4 w-full max-w-2xl mx-auto">
+                              <div className="mt-4 w-full max-w-2xl">
                                 <div className="aspect-video">
                                   <iframe
                                     className="w-full h-full rounded-md"
@@ -636,6 +665,13 @@ export default function LiveCoveragePage() {
                                     allowFullScreen
                                   ></iframe>
                                 </div>
+                              </div>
+                            )}
+                            {update.updateType === 'election' && update.electionResults && (
+                              <div className="mt-4 w-full max-w-3xl">
+                                <ElectionResultsChart data={typeof update.electionResults === 'string' 
+                                  ? JSON.parse(update.electionResults) 
+                                  : update.electionResults as ElectionResultsData} />
                               </div>
                             )}
                             {update.articleId && (
@@ -673,7 +709,9 @@ export default function LiveCoveragePage() {
                                           <div className="flex items-center">
                                             <Clock className="mr-1 h-3 w-3" />
                                             <span>Publié le {articles.find(a => a.id === update.articleId)?.createdAt ? 
-                                              formatDate(new Date(articles.find(a => a.id === update.articleId)?.createdAt as string)) : ''}</span>
+                                              formatDate(typeof articles.find(a => a.id === update.articleId)?.createdAt === 'string' 
+                                              ? new Date(articles.find(a => a.id === update.articleId)?.createdAt as string) 
+                                              : articles.find(a => a.id === update.articleId)?.createdAt as Date) : ''}</span>
                                           </div>
                                           <div className="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -714,6 +752,7 @@ export default function LiveCoveragePage() {
                                 </div>
                               </Card>
                             )}
+
                           </div>
                         </CardContent>
                       </Card>

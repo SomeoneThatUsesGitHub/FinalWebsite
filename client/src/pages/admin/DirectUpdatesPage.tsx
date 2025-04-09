@@ -16,7 +16,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon } from "lucide-react";
+import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon, BarChartIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { queryClient } from "@/lib/queryClient";
@@ -25,6 +25,25 @@ import { formatDate, cn } from "@/lib/utils";
 import { z } from "zod";
 import { format, formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+import ElectionResultsChart, { ElectionResultsData, ElectionResult } from "@/components/ElectionResultsChart";
+
+// Schéma pour les résultats d'élections
+const electionResultSchema = z.object({
+  title: z.string(),
+  date: z.string(),
+  type: z.string(),
+  round: z.number().optional(),
+  location: z.string().optional(),
+  totalVotes: z.number().optional(),
+  results: z.array(z.object({
+    candidate: z.string(),
+    party: z.string(),
+    votes: z.number().optional(),
+    percentage: z.number(),
+    color: z.string()
+  })),
+  displayType: z.enum(["bar", "pie"]).default("bar")
+});
 
 // Schéma de validation pour les mises à jour
 const updateSchema = z.object({
@@ -33,7 +52,8 @@ const updateSchema = z.object({
   important: z.boolean().default(false),
   youtubeUrl: z.string().optional(),
   articleId: z.number().optional(),
-  updateType: z.enum(["normal", "youtube", "article"]).default("normal"),
+  updateType: z.enum(["normal", "youtube", "article", "election"]).default("normal"),
+  electionResults: z.string().optional(), // On stocke les données JSON sous forme de chaîne
 });
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
@@ -46,6 +66,23 @@ export default function DirectUpdatesPage() {
   const { user } = useAuth();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [updateToDelete, setUpdateToDelete] = useState<number | null>(null);
+  
+  // État pour le constructeur de graphique d'élections
+  const [electionData, setElectionData] = useState<ElectionResultsData>({
+    title: "Résultats des élections",
+    date: new Date().toLocaleDateString(),
+    type: "Élections législatives",
+    results: [
+      { candidate: "Candidat 1", party: "Parti A", percentage: 35.8, color: "#FF4D4D" },
+      { candidate: "Candidat 2", party: "Parti B", percentage: 28.4, color: "#2D95BF" },
+      { candidate: "Candidat 3", party: "Parti C", percentage: 20.1, color: "#4CAF50" },
+      { candidate: "Candidat 4", party: "Parti D", percentage: 15.7, color: "#FFA726" }
+    ],
+    displayType: "bar"
+  });
+  
+  // État pour gérer l'ajout/suppression de candidats
+  const [newCandidate, setNewCandidate] = useState({ candidate: "", party: "", percentage: 0, color: "#000000" });
 
   // Récupérer les détails du suivi en direct
   const { data: coverage, isLoading: isLoadingCoverage } = useQuery<LiveCoverage>({
@@ -154,7 +191,67 @@ export default function DirectUpdatesPage() {
     },
   });
 
+  // Fonction pour ajouter un candidat au graphique
+  const addCandidate = () => {
+    if (!newCandidate.candidate || !newCandidate.party || newCandidate.percentage <= 0) {
+      toast({
+        title: "Données incomplètes",
+        description: "Veuillez remplir tous les champs pour ajouter un candidat",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setElectionData(prev => ({
+      ...prev,
+      results: [...prev.results, { ...newCandidate }]
+    }));
+    
+    // Réinitialiser le formulaire du nouveau candidat
+    setNewCandidate({ candidate: "", party: "", percentage: 0, color: "#000000" });
+  };
+  
+  // Fonction pour supprimer un candidat du graphique
+  const removeCandidate = (index: number) => {
+    setElectionData(prev => ({
+      ...prev,
+      results: prev.results.filter((_, i) => i !== index)
+    }));
+  };
+  
+  // Fonction pour appliquer les données du graphique d'élection au formulaire
+  const applyElectionData = () => {
+    // Vérifier si les pourcentages totalisent approximativement 100%
+    const totalPercentage = electionData.results.reduce((sum, result) => sum + result.percentage, 0);
+    if (totalPercentage < 95 || totalPercentage > 105) {
+      toast({
+        title: "Pourcentages incorrects",
+        description: "La somme des pourcentages doit être proche de 100%",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Convertir les données en chaîne JSON et les ajouter au formulaire
+    form.setValue("electionResults", JSON.stringify(electionData));
+    
+    toast({
+      title: "Graphique appliqué",
+      description: "Les données du graphique ont été appliquées à la mise à jour",
+    });
+  };
+
   const onSubmit = (data: UpdateFormValues) => {
+    // Si c'est une mise à jour de type élection, vérifier que les données sont présentes
+    if (data.updateType === 'election' && !data.electionResults) {
+      toast({
+        title: "Données manquantes",
+        description: "Veuillez configurer et appliquer le graphique d'élections",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     addUpdateMutation.mutate(data);
   };
 
@@ -230,7 +327,7 @@ export default function DirectUpdatesPage() {
                   render={({ field }) => (
                     <FormItem className="mb-6">
                       <FormLabel>Type de mise à jour</FormLabel>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-4 gap-2">
                         <Button
                           type="button"
                           variant={field.value === "normal" ? "default" : "outline"}
@@ -239,6 +336,7 @@ export default function DirectUpdatesPage() {
                             field.onChange("normal");
                             form.setValue("youtubeUrl", "");
                             form.setValue("articleId", undefined);
+                            form.setValue("electionResults", undefined);
                           }}
                         >
                           <span className="text-sm">Texte/Image</span>
@@ -250,6 +348,7 @@ export default function DirectUpdatesPage() {
                           onClick={() => {
                             field.onChange("youtube");
                             form.setValue("articleId", undefined);
+                            form.setValue("electionResults", undefined);
                           }}
                         >
                           <span className="text-sm">Vidéo YouTube</span>
@@ -261,9 +360,23 @@ export default function DirectUpdatesPage() {
                           onClick={() => {
                             field.onChange("article");
                             form.setValue("youtubeUrl", "");
+                            form.setValue("electionResults", undefined);
                           }}
                         >
                           <span className="text-sm">Article Intégré</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={field.value === "election" ? "default" : "outline"}
+                          className="flex flex-col items-center justify-center h-20 w-full"
+                          onClick={() => {
+                            field.onChange("election");
+                            form.setValue("youtubeUrl", "");
+                            form.setValue("articleId", undefined);
+                          }}
+                        >
+                          <BarChartIcon className="h-4 w-4 mb-1" />
+                          <span className="text-sm">Graphique Élections</span>
                         </Button>
                       </div>
                       <FormDescription>
@@ -371,6 +484,215 @@ export default function DirectUpdatesPage() {
                       </FormItem>
                     )}
                   />
+                )}
+
+                {form.watch("updateType") === "election" && (
+                  <div className="space-y-6 border rounded-lg p-4">
+                    <FormField
+                      control={form.control}
+                      name="electionResults"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Graphique des résultats d'élections</FormLabel>
+                          <FormDescription className="mb-4">
+                            Configurez les données du graphique d'élections ci-dessous, puis cliquez sur "Appliquer le graphique".
+                          </FormDescription>
+                          
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm font-medium">Titre</label>
+                                <Input 
+                                  value={electionData.title}
+                                  onChange={(e) => setElectionData({...electionData, title: e.target.value})}
+                                  placeholder="Résultats des élections présidentielles"
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">Type</label>
+                                <Input 
+                                  value={electionData.type}
+                                  onChange={(e) => setElectionData({...electionData, type: e.target.value})}
+                                  placeholder="Présidentielle, Législative, etc."
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">Date</label>
+                                <Input 
+                                  value={electionData.date}
+                                  onChange={(e) => setElectionData({...electionData, date: e.target.value})}
+                                  placeholder="23 avril 2023"
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">Type d'affichage</label>
+                                <Select 
+                                  value={electionData.displayType}
+                                  onValueChange={(value) => setElectionData({
+                                    ...electionData, 
+                                    displayType: value as 'bar' | 'pie'
+                                  })}
+                                >
+                                  <SelectTrigger className="mt-1">
+                                    <SelectValue placeholder="Type d'affichage" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="bar">Barres horizontales</SelectItem>
+                                    <SelectItem value="pie">Camembert</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">Tour (optionnel)</label>
+                                <Input 
+                                  type="number"
+                                  value={electionData.round?.toString() || ""}
+                                  onChange={(e) => setElectionData({
+                                    ...electionData, 
+                                    round: e.target.value ? parseInt(e.target.value) : undefined
+                                  })}
+                                  placeholder="1, 2, etc."
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">Lieu (optionnel)</label>
+                                <Input 
+                                  value={electionData.location || ""}
+                                  onChange={(e) => setElectionData({
+                                    ...electionData, 
+                                    location: e.target.value || undefined
+                                  })}
+                                  placeholder="France, Paris, etc."
+                                  className="mt-1"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="mt-4">
+                              <div className="flex justify-between items-center mb-2">
+                                <h4 className="font-medium">Résultats par candidat</h4>
+                                <p className="text-xs text-muted-foreground">
+                                  Total: {electionData.results.reduce((sum, r) => sum + r.percentage, 0).toFixed(1)}%
+                                </p>
+                              </div>
+                              
+                              <div className="space-y-3">
+                                {electionData.results.map((result, index) => (
+                                  <div key={index} className="flex items-center gap-2 border rounded p-2">
+                                    <div className="w-4 h-4 rounded-full" style={{ background: result.color }}></div>
+                                    <div className="flex-grow grid grid-cols-3 gap-2">
+                                      <div>
+                                        <div className="text-xs text-muted-foreground">Candidat</div>
+                                        <div className="font-medium truncate">{result.candidate}</div>
+                                      </div>
+                                      <div>
+                                        <div className="text-xs text-muted-foreground">Parti</div>
+                                        <div className="truncate">{result.party}</div>
+                                      </div>
+                                      <div>
+                                        <div className="text-xs text-muted-foreground">Pourcentage</div>
+                                        <div>{result.percentage}%</div>
+                                      </div>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeCandidate(index)}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              <div className="mt-4 border rounded p-3">
+                                <h4 className="font-medium text-sm mb-2">Ajouter un candidat</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  <div>
+                                    <label className="text-xs text-muted-foreground">Nom du candidat</label>
+                                    <Input 
+                                      value={newCandidate.candidate}
+                                      onChange={(e) => setNewCandidate({...newCandidate, candidate: e.target.value})}
+                                      placeholder="Nom du candidat"
+                                      className="mt-1"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-muted-foreground">Parti politique</label>
+                                    <Input 
+                                      value={newCandidate.party}
+                                      onChange={(e) => setNewCandidate({...newCandidate, party: e.target.value})}
+                                      placeholder="Nom du parti"
+                                      className="mt-1"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-muted-foreground">Pourcentage (%)</label>
+                                    <Input 
+                                      type="number"
+                                      step="0.1"
+                                      value={newCandidate.percentage || ""}
+                                      onChange={(e) => setNewCandidate({
+                                        ...newCandidate, 
+                                        percentage: parseFloat(e.target.value) || 0
+                                      })}
+                                      placeholder="0.0"
+                                      className="mt-1"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-muted-foreground">Couleur</label>
+                                    <div className="flex mt-1 gap-2">
+                                      <Input 
+                                        type="color"
+                                        value={newCandidate.color}
+                                        onChange={(e) => setNewCandidate({...newCandidate, color: e.target.value})}
+                                        className="w-12 p-1 h-9"
+                                      />
+                                      <Input 
+                                        value={newCandidate.color}
+                                        onChange={(e) => setNewCandidate({...newCandidate, color: e.target.value})}
+                                        placeholder="#RRGGBB"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <Button
+                                  type="button"
+                                  className="mt-3 w-full"
+                                  onClick={addCandidate}
+                                >
+                                  Ajouter le candidat
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-6">
+                            <div className="mb-4">
+                              <h4 className="font-medium mb-2">Aperçu du graphique</h4>
+                              <ElectionResultsChart data={electionData} />
+                            </div>
+                            
+                            <Button
+                              type="button"
+                              className="w-full"
+                              onClick={applyElectionData}
+                            >
+                              Appliquer le graphique à la mise à jour
+                            </Button>
+                          </div>
+                          
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 )}
 
                 <FormField
