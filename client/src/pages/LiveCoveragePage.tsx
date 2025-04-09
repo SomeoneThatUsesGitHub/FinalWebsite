@@ -118,12 +118,17 @@ export default function LiveCoveragePage() {
     <div className="min-h-screen bg-muted/20">
       {/* Bannière principale avec fond sombre et dégradé */}
       <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-        <div className="absolute inset-0 opacity-40" style={{
-          backgroundImage: coverage.imageUrl ? `url(${coverage.imageUrl})` : 'none',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundBlendMode: 'overlay'
-        }}></div>
+        {coverage.imageUrl ? (
+          <div className="absolute inset-0 overflow-hidden">
+            <img 
+              src={coverage.imageUrl} 
+              alt={coverage.title} 
+              className="w-full h-full object-cover opacity-40"
+              style={{ objectPosition: '50% 25%' }} 
+            />
+            <div className="absolute inset-0 bg-gray-900/60 mix-blend-overlay"></div>
+          </div>
+        ) : null}
         
         {/* Bouton de retour positionné dans le coin gauche de l'image */}
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
@@ -382,89 +387,73 @@ export default function LiveCoveragePage() {
                 </CardContent>
               </Card>
             ) : updates && updates.length > 0 ? (
-              <div className="relative">
-                {/* Ligne de chronologie pour connecter les mises à jour */}
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary/20 to-transparent hidden md:block"></div>
-                
-                <div className="space-y-5">
-                  {updates.map((update, index) => {
-                    const updateTime = new Date(update.timestamp);
-                    const timeAgo = formatDistanceToNow(updateTime, { addSuffix: true, locale: fr });
-                    const formattedTime = format(updateTime, "HH:mm", { locale: fr });
-                    const isFirst = index === 0;
-                    
-                    return (
-                      <div 
-                        key={update.id} 
-                        id={`update-${update.id}`}
-                        className={`relative transition-all duration-300 group`}
-                      >
-                        {/* Point sur la chronologie */}
-                        <div className="absolute left-4 top-6 transform -translate-x-1/2 hidden md:block">
-                          <div className={`h-3 w-3 rounded-full ${update.important ? "bg-red-500" : "bg-primary/60"} group-hover:scale-125 transition-transform`}></div>
-                        </div>
-                        
-                        <Card className={`md:ml-10 overflow-hidden transition-all duration-300 ${update.important ? "border-l-4 border-l-red-500 dark:border-l-red-500 shadow-md" : "border-l-4 border-l-primary/30"} ${isFirst ? "relative before:absolute before:top-0 before:left-[-4px] before:w-1 before:h-10 before:bg-red-500 before:opacity-0" : ""}`}>
-                          <CardContent className="p-0">
-                            {/* En-tête de la mise à jour */}
-                            <div className={`p-3 md:p-4 flex flex-wrap md:flex-nowrap justify-between items-start gap-2 border-b ${update.important ? "bg-primary/5" : "bg-background"}`}>
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center text-sm">
-                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    {update.important && (
-                                      <Badge className="bg-red-500 md:hidden">Important</Badge>
-                                    )}
-                                    <div className="flex items-center gap-1 text-muted-foreground">
-                                      <Clock className="h-3 w-3" />
-                                      <span className="text-xs md:text-sm" title={formatDate(update.timestamp)}>
-                                        {formattedTime}
-                                      </span>
-                                      <span className="text-xs hidden md:inline">({timeAgo})</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {update.author && (
-                                <div className="flex items-center gap-2 ml-auto">
-                                  <div className="text-right text-xs md:text-sm">
-                                    <span className="font-medium">{update.author.displayName}</span>
-                                    {update.author.title && (
-                                      <div className="text-xs text-muted-foreground hidden md:block">
-                                        {update.author.title}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <Avatar className="h-6 w-6 md:h-8 md:w-8">
-                                    {update.author.avatarUrl ? (
-                                      <AvatarImage src={update.author.avatarUrl} alt={update.author.displayName} />
-                                    ) : (
-                                      <AvatarFallback>{update.author.displayName.charAt(0)}</AvatarFallback>
-                                    )}
-                                  </Avatar>
-                                </div>
+              <div className="space-y-5">
+                {updates.map((update, index) => {
+                  const updateTime = new Date(update.timestamp);
+                  const timeAgo = formatDistanceToNow(updateTime, { addSuffix: true, locale: fr });
+                  const formattedTime = format(updateTime, "HH:mm", { locale: fr });
+                  
+                  return (
+                    <div 
+                      key={update.id} 
+                      id={`update-${update.id}`}
+                      className="transition-all duration-300"
+                    >
+                      <Card className={`overflow-hidden ${update.important ? "border-red-500 shadow-md" : ""}`}>
+                        <CardContent className="p-0">
+                          {/* En-tête de la mise à jour */}
+                          <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b ${update.important ? "bg-red-50 dark:bg-red-900/10" : ""}`}>
+                            <div className="flex items-center gap-2">
+                              {update.important && (
+                                <Badge className="bg-red-500">Important</Badge>
                               )}
+                              <div className="flex items-center gap-1 text-muted-foreground">
+                                <Clock className="h-4 w-4" />
+                                <span title={formatDate(update.timestamp)}>
+                                  {formattedTime} <span className="hidden sm:inline">({timeAgo})</span>
+                                </span>
+                              </div>
                             </div>
                             
-                            {/* Contenu de la mise à jour */}
-                            <div className="p-3 md:p-5 prose prose-sm dark:prose-invert max-w-none">
-                              <p className="text-sm md:text-base whitespace-pre-line">{update.content}</p>
-                              {update.imageUrl && (
-                                <div className="mt-4">
-                                  <img 
-                                    src={update.imageUrl} 
-                                    alt="Mise à jour"
-                                    className="rounded-md max-h-60 md:max-h-80 object-contain w-full" 
-                                  />
+                            {update.author && (
+                              <div className="flex items-center gap-2">
+                                <div className="text-right text-sm">
+                                  <span className="font-medium">{update.author.displayName}</span>
+                                  {update.author.title && (
+                                    <div className="text-xs text-muted-foreground hidden sm:block">
+                                      {update.author.title}
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    );
-                  })}
-                </div>
+                                <Avatar className="h-6 w-6 md:h-8 md:w-8">
+                                  {update.author.avatarUrl ? (
+                                    <AvatarImage src={update.author.avatarUrl} alt={update.author.displayName} />
+                                  ) : (
+                                    <AvatarFallback>{update.author.displayName.charAt(0)}</AvatarFallback>
+                                  )}
+                                </Avatar>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Contenu de la mise à jour */}
+                          <div className="p-4 md:p-5 prose prose-sm dark:prose-invert max-w-none">
+                            <p className="text-sm md:text-base whitespace-pre-line">{update.content}</p>
+                            {update.imageUrl && (
+                              <div className="mt-4">
+                                <img 
+                                  src={update.imageUrl} 
+                                  alt="Mise à jour"
+                                  className="rounded-md w-full object-cover h-auto max-h-[300px]" 
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <Card>
