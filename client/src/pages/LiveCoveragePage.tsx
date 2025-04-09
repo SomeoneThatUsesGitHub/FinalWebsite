@@ -164,13 +164,20 @@ export default function LiveCoveragePage() {
               <div className="mt-4 pt-4 border-t border-white/20 text-sm">
                 <span className="text-white/70">
                   Live animé par{" "}
-                  {editors.map((editor, index) => (
-                    <React.Fragment key={editor.id}>
-                      {index > 0 && index === editors.length - 1 ? " et " : index > 0 ? ", " : ""}
-                      <span className="font-medium">{editor.editor?.displayName || "Éditeur"}</span>
-                      {editor.role && ` (${editor.role})`}
-                    </React.Fragment>
-                  ))}
+                  {editors.length === 1 ? (
+                    <span className="font-medium">
+                      {editors[0].editor?.displayName || "Éditeur"}
+                      {editors[0].role && ` (${editors[0].role})`}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="font-medium">
+                        {editors[0].editor?.displayName || "Éditeur"}
+                        {editors[0].role && ` (${editors[0].role})`}
+                      </span>
+                      <span> et d'autres personnes</span>
+                    </>
+                  )}
                 </span>
               </div>
             )}
@@ -201,7 +208,7 @@ export default function LiveCoveragePage() {
       <div className="container max-w-4xl mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Section de l'équipe éditoriale - toujours affichée même si vide */}
-          <div className="bg-muted/30 rounded-lg p-6">
+          <div className="bg-muted/20 rounded-lg p-6 border border-muted/30">
             <h2 className="text-lg font-semibold mb-4 flex items-center">
               <UserIcon className="h-5 w-5 mr-2 text-primary" />
               Équipe éditoriale
@@ -239,7 +246,7 @@ export default function LiveCoveragePage() {
           </div>
           
           {/* Section des questions des visiteurs */}
-          <div className="bg-primary/5 rounded-lg p-6 border border-primary/10">
+          <div className="bg-muted/20 rounded-lg p-6 border border-muted/30">
             <h2 className="text-lg font-semibold mb-4 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
