@@ -87,8 +87,20 @@ export default function LiveCoveragePage() {
       // Vérifier si cette mise à jour contient des données d'élection
       if (update.updateType === 'election' && update.electionResults) {
         try {
+          // Ajouter des logs pour debug
+          console.log("Type de electionResults:", typeof update.electionResults);
+          console.log("Contenu de electionResults:", update.electionResults);
+          
           // Convertir la chaîne JSON en objet ElectionResultsData
-          const electionData = JSON.parse(update.electionResults as string) as ElectionResultsData;
+          let electionData;
+          if (typeof update.electionResults === 'string') {
+            electionData = JSON.parse(update.electionResults) as ElectionResultsData;
+          } else {
+            electionData = update.electionResults as ElectionResultsData;
+          }
+          
+          console.log("Données parsées:", electionData);
+          
           return {
             ...update,
             electionResults: electionData
@@ -596,7 +608,7 @@ export default function LiveCoveragePage() {
                       id={`update-${update.id}`}
                       className="transition-all duration-300"
                     >
-                      <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"} bg-background`}>
+                      <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"} bg-white dark:bg-gray-950`}>
                         <CardContent className="p-0">
                           {/* En-tête de la mise à jour */}
                           <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b ${update.important ? "bg-red-50 dark:bg-red-900/10" : "bg-muted/30"}`}>
@@ -668,10 +680,26 @@ export default function LiveCoveragePage() {
                               </div>
                             )}
                             {update.updateType === 'election' && update.electionResults && (
-                              <div className="mt-4 w-full max-w-3xl">
-                                <ElectionResultsChart data={typeof update.electionResults === 'string' 
-                                  ? JSON.parse(update.electionResults) 
-                                  : update.electionResults as ElectionResultsData} />
+                              <div className="mt-4 w-full max-w-3xl bg-white dark:bg-gray-950 p-4 rounded-lg">
+                                {(() => {
+                                  try {
+                                    console.log("Rendering chart with data:", update.electionResults);
+                                    const parsedData = typeof update.electionResults === 'string' 
+                                      ? JSON.parse(update.electionResults) 
+                                      : update.electionResults;
+                                    return <ElectionResultsChart data={parsedData as ElectionResultsData} />;
+                                  } catch (error) {
+                                    console.error("Erreur lors du rendu du graphique:", error);
+                                    return (
+                                      <div className="p-4 border rounded-md bg-red-50 dark:bg-red-900/10 text-center">
+                                        <AlertTriangle className="h-6 w-6 text-red-500 mx-auto mb-2" />
+                                        <p className="text-sm text-red-600 dark:text-red-400">
+                                          Impossible d'afficher les résultats d'élection
+                                        </p>
+                                      </div>
+                                    );
+                                  }
+                                })()}
                               </div>
                             )}
                             {update.articleId && (
@@ -708,10 +736,15 @@ export default function LiveCoveragePage() {
                                         <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
                                           <div className="flex items-center">
                                             <Clock className="mr-1 h-3 w-3" />
-                                            <span>Publié le {articles.find(a => a.id === update.articleId)?.createdAt ? 
-                                              formatDate(typeof articles.find(a => a.id === update.articleId)?.createdAt === 'string' 
-                                              ? new Date(articles.find(a => a.id === update.articleId)?.createdAt as string) 
-                                              : articles.find(a => a.id === update.articleId)?.createdAt as Date) : ''}</span>
+                                            <span>Publié le {
+                                              (() => {
+                                                const article = articles?.find(a => a.id === update.articleId);
+                                                if (article?.createdAt) {
+                                                  return formatDate(new Date(article.createdAt.toString()));
+                                                }
+                                                return '';
+                                              })()
+                                            }</span>
                                           </div>
                                           <div className="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
