@@ -548,7 +548,7 @@ export default function LiveCoveragePage() {
                 </CardContent>
               </Card>
             ) : updates && updates.length > 0 ? (
-              <div className="space-y-5">
+              <div className="space-y-6">
                 {updates.map((update, index) => {
                   const updateTime = new Date(update.timestamp);
                   const timeAgo = formatDistanceToNow(updateTime, { addSuffix: true, locale: fr });
@@ -560,10 +560,10 @@ export default function LiveCoveragePage() {
                       id={`update-${update.id}`}
                       className="transition-all duration-300"
                     >
-                      <Card className={`overflow-hidden ${update.important ? "border-red-500 shadow-md" : ""}`}>
+                      <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"}`}>
                         <CardContent className="p-0">
                           {/* En-tête de la mise à jour */}
-                          <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b ${update.important ? "bg-red-50 dark:bg-red-900/10" : ""}`}>
+                          <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b ${update.important ? "bg-red-50 dark:bg-red-900/10" : "bg-muted/30"}`}>
                             <div className="flex items-center gap-2">
                               {update.important && (
                                 <Badge className="bg-red-500">Important</Badge>
@@ -630,25 +630,35 @@ export default function LiveCoveragePage() {
                               </div>
                             )}
                             {update.articleId && (
-                              <Card className="mt-4 overflow-hidden border border-primary/20">
-                                <CardHeader className="pb-2">
-                                  <CardTitle className="text-base">Article intégré</CardTitle>
-                                  <CardDescription className="text-xs">
-                                    Cliquez pour lire l'article complet
-                                  </CardDescription>
-                                </CardHeader>
-                                <CardContent className="pb-4">
-                                  <Button 
-                                    variant="link" 
-                                    className="p-0 h-auto font-semibold"
-                                    asChild
-                                  >
-                                    <a href={`/articles/${update.articleId}`} target="_blank" rel="noopener noreferrer">
-                                      Voir l'article complet
-                                    </a>
-                                  </Button>
-                                </CardContent>
-                              </Card>
+                              <a href={`/articles/${update.articleId}`} target="_blank" rel="noopener noreferrer" className="block">
+                                <Card className="mt-4 overflow-hidden border shadow-sm hover:shadow rounded-xl transition-shadow duration-200">
+                                  <div className="flex flex-col sm:flex-row">
+                                    <div className="sm:w-1/3 bg-muted">
+                                      <div className="h-32 sm:h-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
+                                        <UserIcon className="h-12 w-12 text-muted-foreground/40" />
+                                      </div>
+                                    </div>
+                                    <div className="sm:w-2/3 p-4">
+                                      <h3 className="text-lg font-semibold line-clamp-2">Jordan Bardella, Président en 2027 ?</h3>
+                                      <p className="text-sm text-muted-foreground mt-1 line-clamp-3">
+                                        Le 31 mars, le monde politique français est chamboulé par la décision clé du tribunal correctionnel de Paris : Marine Le Pen est reconnue coupable de détournements de...
+                                      </p>
+                                      <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+                                        <div className="flex items-center">
+                                          <Clock className="mr-1 h-3 w-3" />
+                                          <span>Publié le 08 avr. 2025</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                          </svg>
+                                          <span>Lecture 3 min.</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </Card>
+                              </a>
                             )}
                           </div>
                         </CardContent>

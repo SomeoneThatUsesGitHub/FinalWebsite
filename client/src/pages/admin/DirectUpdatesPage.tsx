@@ -16,7 +16,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { queryClient } from "@/lib/queryClient";
@@ -564,27 +564,40 @@ export default function DirectUpdatesPage() {
                         </div>
                       )}
                       {update.articleId && articles?.find(a => a.id === update.articleId) && (
-                        <Card className="mt-4 overflow-hidden">
-                          <CardHeader className="pb-2">
-                            <CardTitle className="text-base line-clamp-2">{articles.find(a => a.id === update.articleId)?.title}</CardTitle>
-                            <CardDescription className="text-xs">
-                              Article lié: {articles.find(a => a.id === update.articleId)?.slug}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="pb-4 pt-0">
-                            <p className="text-sm line-clamp-3">{articles.find(a => a.id === update.articleId)?.excerpt}</p>
-                            <Button 
-                              variant="link" 
-                              size="sm" 
-                              className="p-0 h-auto mt-1"
-                              asChild
-                            >
-                              <a href={`/articles/${articles.find(a => a.id === update.articleId)?.slug}`} target="_blank">
-                                Lire l'article complet
-                              </a>
-                            </Button>
-                          </CardContent>
-                        </Card>
+                        <a 
+                          href={`/articles/${articles.find(a => a.id === update.articleId)?.slug}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block"
+                        >
+                          <Card className="mt-4 overflow-hidden border shadow-sm hover:shadow rounded-xl transition-shadow duration-200">
+                            <div className="flex flex-col sm:flex-row">
+                              <div className="sm:w-1/3 bg-muted">
+                                <div className="h-32 sm:h-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
+                                  <UserIcon className="h-12 w-12 text-muted-foreground/40" />
+                                </div>
+                              </div>
+                              <div className="sm:w-2/3 p-4">
+                                <h3 className="text-lg font-semibold line-clamp-2">{articles.find(a => a.id === update.articleId)?.title}</h3>
+                                <p className="text-sm text-muted-foreground mt-1 line-clamp-3">
+                                  {articles.find(a => a.id === update.articleId)?.excerpt}
+                                </p>
+                                <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+                                  <div className="flex items-center">
+                                    <Clock className="mr-1 h-3 w-3" />
+                                    <span>Article lié</span>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                    <span>Voir l'article</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        </a>
                       )}
                     </div>
                     
