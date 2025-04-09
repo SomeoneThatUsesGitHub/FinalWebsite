@@ -271,12 +271,17 @@ export default function LiveCoveragePage() {
                     <div className="p-0">
                       {/* Filtrer les mises à jour importantes */}
                       {(() => {
-                        const importantUpdates = updates?.filter(u => u.important) || [];
+                        // Limiter à 3 faits essentiels, triés par date (les plus récents)
+                        const importantUpdates = updates
+                          ?.filter(u => u.important)
+                          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                          .slice(0, 3) || [];
+                          
                         return (
                           <>
                             <div className="bg-red-600 text-white p-2 flex justify-between items-center">
                               <h3 className="font-bold text-sm uppercase">
-                                Les faits essentiels ({importantUpdates.length})
+                                Les faits essentiels {importantUpdates.length > 0 && `(${importantUpdates.length})`}
                               </h3>
                               <button 
                                 className="text-white/80 hover:text-white text-xs"
@@ -287,34 +292,55 @@ export default function LiveCoveragePage() {
                             </div>
                             
                             {importantUpdates.length > 0 ? (
-                              <ul className="py-1 max-h-60 overflow-auto">
-                                {importantUpdates.map(update => (
-                                  <li key={update.id} className="hover:bg-muted/50 cursor-pointer">
-                                    <button 
-                                      className="w-full text-left px-3 py-2 text-sm flex items-start"
-                                      onClick={() => {
-                                        // Défiler jusqu'à la mise à jour
-                                        const element = document.getElementById(`update-${update.id}`);
-                                        if (element) {
-                                          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                          setTimeout(() => {
-                                            element.classList.add('highlight-pulse');
+                              <ul className="py-1 overflow-auto">
+                                {importantUpdates.map(update => {
+                                  // Extraire la première ligne ou les 60 premiers caractères
+                                  const firstLine = update.content.split('\n')[0];
+                                  const title = firstLine.length > 60 ? 
+                                    firstLine.slice(0, 60) + '...' : 
+                                    firstLine;
+                                    
+                                  return (
+                                    <li key={update.id} className="hover:bg-muted/50 cursor-pointer border-b border-muted/30 last:border-0">
+                                      <button 
+                                        className="w-full text-left px-3 py-3 text-sm flex items-start group"
+                                        onClick={() => {
+                                          // Défiler jusqu'à la mise à jour
+                                          const element = document.getElementById(`update-${update.id}`);
+                                          if (element) {
+                                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                             setTimeout(() => {
-                                              element.classList.remove('highlight-pulse');
-                                            }, 2000);
-                                          }, 500);
-                                        }
-                                        setIsMenuOpen(false);
-                                      }}
-                                    >
-                                      <span className="font-bold mr-2 text-black dark:text-white">•</span>
-                                      <span>{update.content.split('\n')[0].slice(0, 60)}{update.content.length > 60 ? '...' : ''}</span>
-                                    </button>
-                                  </li>
-                                ))}
+                                              // Utiliser l'animation adaptée selon que l'update est importante ou non
+                                              if (update.important) {
+                                                element.classList.add('important-pulse');
+                                                setTimeout(() => {
+                                                  element.classList.remove('important-pulse');
+                                                }, 2500);
+                                              } else {
+                                                element.classList.add('highlight-pulse');
+                                                setTimeout(() => {
+                                                  element.classList.remove('highlight-pulse');
+                                                }, 2000);
+                                              }
+                                            }, 500);
+                                          }
+                                          setIsMenuOpen(false);
+                                        }}
+                                      >
+                                        <span className="font-bold mr-2 text-red-600 dark:text-red-500 text-lg leading-none">•</span>
+                                        <div className="flex-1">
+                                          <span className="font-medium leading-tight block group-hover:text-primary transition-colors">{title}</span>
+                                          <span className="text-xs text-muted-foreground block mt-1">
+                                            {format(new Date(update.timestamp), "d MMMM à HH:mm", { locale: fr })}
+                                          </span>
+                                        </div>
+                                      </button>
+                                    </li>
+                                  );
+                                })}
                               </ul>
                             ) : (
-                              <div className="py-3 px-4 text-sm text-muted-foreground text-center">
+                              <div className="py-4 px-4 text-sm text-muted-foreground text-center">
                                 Aucun fait essentiel pour le moment
                               </div>
                             )}
@@ -356,67 +382,89 @@ export default function LiveCoveragePage() {
                 </CardContent>
               </Card>
             ) : updates && updates.length > 0 ? (
-              <div className="space-y-4">
-                {updates.map((update) => {
-                  const updateTime = new Date(update.timestamp);
-                  const timeAgo = formatDistanceToNow(updateTime, { addSuffix: true, locale: fr });
-                  const formattedTime = format(updateTime, "HH:mm", { locale: fr });
-                  
-                  return (
-                    <Card 
-                      key={update.id} 
-                      id={`update-${update.id}`}
-                      className={`transition-all duration-300 ${update.important ? "border-primary" : ""}`}
-                    >
-                      <CardContent className="py-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex items-center gap-2">
-                            {update.important && (
-                              <Badge className="bg-primary">Important</Badge>
-                            )}
-                            <div className="flex items-center text-sm text-muted-foreground">
-                              <Clock className="h-4 w-4 mr-1" />
-                              <span title={formatDate(update.timestamp)}>
-                                {formattedTime} ({timeAgo})
-                              </span>
-                            </div>
-                          </div>
-                          {update.author && (
-                            <div className="flex items-center gap-2">
-                              <div className="text-right text-sm">
-                                <span className="font-medium">{update.author.displayName}</span>
-                                {update.author.title && (
-                                  <div className="text-xs text-muted-foreground">
-                                    {update.author.title}
+              <div className="relative">
+                {/* Ligne de chronologie pour connecter les mises à jour */}
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary/20 to-transparent hidden md:block"></div>
+                
+                <div className="space-y-5">
+                  {updates.map((update, index) => {
+                    const updateTime = new Date(update.timestamp);
+                    const timeAgo = formatDistanceToNow(updateTime, { addSuffix: true, locale: fr });
+                    const formattedTime = format(updateTime, "HH:mm", { locale: fr });
+                    const isFirst = index === 0;
+                    
+                    return (
+                      <div 
+                        key={update.id} 
+                        id={`update-${update.id}`}
+                        className={`relative transition-all duration-300 group`}
+                      >
+                        {/* Point sur la chronologie */}
+                        <div className="absolute left-4 top-6 transform -translate-x-1/2 hidden md:block">
+                          <div className={`h-3 w-3 rounded-full ${update.important ? "bg-red-500" : "bg-primary/60"} group-hover:scale-125 transition-transform`}></div>
+                        </div>
+                        
+                        <Card className={`md:ml-10 overflow-hidden transition-all duration-300 ${update.important ? "border-l-4 border-l-red-500 dark:border-l-red-500 shadow-md" : "border-l-4 border-l-primary/30"} ${isFirst ? "relative before:absolute before:top-0 before:left-[-4px] before:w-1 before:h-10 before:bg-red-500 before:opacity-0" : ""}`}>
+                          <CardContent className="p-0">
+                            {/* En-tête de la mise à jour */}
+                            <div className={`p-3 md:p-4 flex flex-wrap md:flex-nowrap justify-between items-start gap-2 border-b ${update.important ? "bg-primary/5" : "bg-background"}`}>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center text-sm">
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    {update.important && (
+                                      <Badge className="bg-red-500 md:hidden">Important</Badge>
+                                    )}
+                                    <div className="flex items-center gap-1 text-muted-foreground">
+                                      <Clock className="h-3 w-3" />
+                                      <span className="text-xs md:text-sm" title={formatDate(update.timestamp)}>
+                                        {formattedTime}
+                                      </span>
+                                      <span className="text-xs hidden md:inline">({timeAgo})</span>
+                                    </div>
                                   </div>
-                                )}
+                                </div>
                               </div>
-                              <Avatar className="h-8 w-8">
-                                {update.author.avatarUrl ? (
-                                  <AvatarImage src={update.author.avatarUrl} alt={update.author.displayName} />
-                                ) : (
-                                  <AvatarFallback>{update.author.displayName.charAt(0)}</AvatarFallback>
-                                )}
-                              </Avatar>
+                              
+                              {update.author && (
+                                <div className="flex items-center gap-2 ml-auto">
+                                  <div className="text-right text-xs md:text-sm">
+                                    <span className="font-medium">{update.author.displayName}</span>
+                                    {update.author.title && (
+                                      <div className="text-xs text-muted-foreground hidden md:block">
+                                        {update.author.title}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <Avatar className="h-6 w-6 md:h-8 md:w-8">
+                                    {update.author.avatarUrl ? (
+                                      <AvatarImage src={update.author.avatarUrl} alt={update.author.displayName} />
+                                    ) : (
+                                      <AvatarFallback>{update.author.displayName.charAt(0)}</AvatarFallback>
+                                    )}
+                                  </Avatar>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                        <div className="prose prose-sm dark:prose-invert max-w-none">
-                          <p className="text-base whitespace-pre-line">{update.content}</p>
-                          {update.imageUrl && (
-                            <div className="mt-4">
-                              <img 
-                                src={update.imageUrl} 
-                                alt="Mise à jour"
-                                className="rounded-md max-h-80 object-contain" 
-                              />
+                            
+                            {/* Contenu de la mise à jour */}
+                            <div className="p-3 md:p-5 prose prose-sm dark:prose-invert max-w-none">
+                              <p className="text-sm md:text-base whitespace-pre-line">{update.content}</p>
+                              {update.imageUrl && (
+                                <div className="mt-4">
+                                  <img 
+                                    src={update.imageUrl} 
+                                    alt="Mise à jour"
+                                    className="rounded-md max-h-60 md:max-h-80 object-contain w-full" 
+                                  />
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ) : (
               <Card>
