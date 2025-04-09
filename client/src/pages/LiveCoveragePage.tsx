@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Radio, Clock, Star, AlertTriangle, User as UserIcon } from "lucide-react";
+import { ChevronLeft, Radio, Clock, AlertTriangle, User as UserIcon, Home, Share2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { fr } from "date-fns/locale";
 import { format, formatDistanceToNow } from "date-fns";
@@ -124,18 +124,19 @@ export default function LiveCoveragePage() {
           backgroundBlendMode: 'overlay'
         }}></div>
         
-        <div className="container max-w-4xl mx-auto px-4 py-6 sm:py-10 relative z-10">
-          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="bg-black/30 text-white border-white/30 hover:bg-black/50 hover:text-white" 
-              onClick={() => navigate("/")}
-            >
-              <ChevronLeft className="mr-2 h-4 w-4" /> Retour
-            </Button>
-          </div>
-          
+        {/* Bouton de retour positionné dans le coin gauche de l'image */}
+        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white shadow-md" 
+            onClick={() => navigate("/")}
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" /> Retour
+          </Button>
+        </div>
+        
+        <div className="container max-w-4xl mx-auto px-4 py-12 sm:py-16 md:py-20 relative z-10">
           <div className="space-y-3 pt-10 sm:pt-4">
             <div className="flex flex-wrap gap-2 items-center text-sm">
               <Badge variant="outline" className="bg-red-600/80 text-white border-0 flex items-center">
@@ -181,9 +182,7 @@ export default function LiveCoveragePage() {
                 className="rounded-full bg-white/10 hover:bg-white/20 border-white/30 text-white"
                 title="Partager"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                </svg>
+                <Share2 className="h-4 w-4" />
               </Button>
               <Button 
                 size="sm" 
@@ -192,9 +191,7 @@ export default function LiveCoveragePage() {
                 title="Accueil"
                 onClick={() => navigate("/")}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
+                <Home className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -203,13 +200,13 @@ export default function LiveCoveragePage() {
       
       <div className="container max-w-4xl mx-auto px-4 py-8">
         <div className="space-y-6">
-          {/* Section de l'équipe éditoriale */}
-          {editors && editors.length > 0 && (
-            <div className="bg-muted/30 rounded-lg p-6">
-              <h2 className="text-lg font-semibold mb-4 flex items-center">
-                <UserIcon className="h-5 w-5 mr-2 text-primary" />
-                Équipe éditoriale
-              </h2>
+          {/* Section de l'équipe éditoriale - toujours affichée même si vide */}
+          <div className="bg-muted/30 rounded-lg p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <UserIcon className="h-5 w-5 mr-2 text-primary" />
+              Équipe éditoriale
+            </h2>
+            {editors && editors.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {editors.map((editor) => (
                   <div key={editor.id} className="flex items-center gap-3 bg-background p-3 rounded-lg shadow-sm">
@@ -231,8 +228,15 @@ export default function LiveCoveragePage() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-6 bg-background/50 rounded-lg">
+                <UserIcon className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                <p className="text-muted-foreground">
+                  Ce direct est animé par les journalistes de Politiquensemble.
+                </p>
+              </div>
+            )}
+          </div>
           
           {/* Section des questions des visiteurs */}
           <div className="bg-primary/5 rounded-lg p-6 border border-primary/10">
