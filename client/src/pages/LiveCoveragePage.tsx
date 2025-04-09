@@ -611,7 +611,7 @@ export default function LiveCoveragePage() {
                       <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"} bg-white dark:bg-gray-950 update-card`}>
                         <CardContent className="p-0 update-card-content">
                           {/* En-tête de la mise à jour */}
-                          <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b update-card-content ${update.important ? "bg-red-50 dark:bg-red-900/10" : "bg-muted/30"}`}>
+                          <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b update-card-content update-card-header ${update.important ? "bg-red-50 dark:bg-red-900/10" : "bg-muted/30"}`}>
                             <div className="flex items-center gap-2">
                               {update.important && (
                                 <Badge className="bg-red-500">Important</Badge>
@@ -680,7 +680,7 @@ export default function LiveCoveragePage() {
                               </div>
                             )}
                             {update.updateType === 'election' && update.electionResults && (
-                              <div className="mt-4 w-full max-w-3xl bg-white dark:bg-gray-950 p-4 rounded-lg update-card-content">
+                              <div className="mt-4 w-full max-w-3xl bg-white dark:bg-gray-950 p-4 rounded-lg update-card-content election-chart-card">
                                 {(() => {
                                   try {
                                     console.log("Rendering chart with data:", update.electionResults);

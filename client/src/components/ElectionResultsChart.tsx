@@ -33,30 +33,31 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
 
   const renderBarChart = () => {
     // Définir différentes hauteurs en fonction du nombre de candidats
-    const dynamicHeight = Math.max(250, sortedResults.length * 40);
+    const dynamicHeight = Math.max(300, sortedResults.length * 50);
     
     return (
-      <div className="overflow-x-auto">
-        <div style={{ minWidth: '300px', width: '100%', height: dynamicHeight }}>
-          <ResponsiveContainer width="100%" height="100%">
+      <div className="overflow-x-auto overflow-y-visible">
+        <div style={{ minWidth: '350px', width: '100%', minHeight: dynamicHeight, height: 'auto' }}>
+          <ResponsiveContainer width="100%" height={dynamicHeight}>
             <BarChart 
               data={sortedResults} 
               layout="vertical"
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              margin={{ top: 10, right: 30, left: 25, bottom: 10 }}
             >
               <XAxis 
                 type="number" 
                 domain={[0, 100]} 
                 unit="%" 
                 tickFormatter={(value) => `${value}%`}
-                fontSize={11}
+                fontSize={12}
+                tick={{ fill: '#666' }}
               />
               <YAxis 
                 type="category" 
                 dataKey="candidate" 
-                width={100}
-                tick={{ fontSize: 11 }}
-                tickFormatter={(value) => value.length > 15 ? `${value.substring(0, 12)}...` : value}
+                width={120}
+                tick={{ fontSize: 13, fontWeight: 500, fill: '#333' }}
+                tickFormatter={(value) => value.length > 16 ? `${value.substring(0, 14)}...` : value}
               />
               <Tooltip 
                 formatter={(value: number) => [`${value.toFixed(2)}%`, 'Résultat']} 
@@ -64,12 +65,13 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
                   const candidate = sortedResults.find(r => r.candidate === label);
                   return `${label} (${candidate?.party || 'Indépendant'})`;
                 }}
+                contentStyle={{ fontSize: '14px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}
               />
               <Legend 
-                wrapperStyle={{ fontSize: '11px' }}
-                formatter={(value) => <span style={{ fontSize: '11px' }}>{value}</span>}
+                wrapperStyle={{ fontSize: '12px', padding: '10px 0' }}
+                formatter={(value) => <span style={{ fontSize: '12px' }}>{value}</span>}
               />
-              <Bar dataKey="percentage" name="Pourcentage des voix">
+              <Bar dataKey="percentage" name="Pourcentage des voix" barSize={24}>
                 {sortedResults.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
@@ -83,7 +85,7 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
 
   const renderPieChart = () => {
     // Fonction pour simplifier les noms trop longs dans les légendes
-    const simplifyName = (name: string) => name.length > 12 ? `${name.substring(0, 10)}...` : name;
+    const simplifyName = (name: string) => name.length > 14 ? `${name.substring(0, 12)}...` : name;
     
     // Fonction pour générer des étiquettes adaptées aux petits écrans
     const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, candidate }: any) => {
@@ -102,7 +104,7 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
           fill={sortedResults[index].color}
           textAnchor={x > cx ? 'start' : 'end'} 
           dominantBaseline="central"
-          fontSize={10}
+          fontSize={12}
           fontWeight="bold"
         >
           {`${(percent * 100).toFixed(1)}%`}
@@ -111,16 +113,16 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
     };
     
     return (
-      <div className="overflow-x-auto">
-        <div style={{ minWidth: '280px', minHeight: '280px' }}>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+      <div className="overflow-x-auto overflow-y-visible">
+        <div style={{ minWidth: '320px', minHeight: '350px' }}>
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
               <Pie
                 data={sortedResults}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                outerRadius={80}
+                outerRadius={110}
                 fill="#8884d8"
                 dataKey="percentage"
                 nameKey="candidate"
@@ -136,10 +138,11 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
                   const candidate = sortedResults.find(r => r.candidate === label);
                   return `${label} (${candidate?.party || 'Indépendant'})`;
                 }}
+                contentStyle={{ fontSize: '14px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}
               />
               <Legend 
-                formatter={(value) => <span style={{ fontSize: '11px' }}>{simplifyName(value)}</span>}
-                wrapperStyle={{ fontSize: '11px' }}
+                formatter={(value) => <span style={{ fontSize: '12px' }}>{simplifyName(value)}</span>}
+                wrapperStyle={{ fontSize: '12px', padding: '10px 0' }}
                 layout="horizontal"
                 verticalAlign="bottom"
               />
@@ -151,17 +154,17 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
   };
 
   return (
-    <Card className="shadow-md border overflow-hidden" style={{ backgroundColor: 'white' }}>
-      <CardHeader className="pb-2" style={{ backgroundColor: 'white' }}>
+    <Card className="shadow-md border overflow-hidden election-chart-card" style={{ backgroundColor: 'white' }}>
+      <CardHeader className="pb-2 update-card-header" style={{ backgroundColor: 'white' }}>
         <CardTitle className="text-lg font-bold">{title}</CardTitle>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
-          {type && <div>{type}</div>}
+          {type && <div className="font-medium">{type}</div>}
           {date && <div>{date}</div>}
           {location && <div>{location}</div>}
-          {round && <div>Tour {round}</div>}
+          {round && <div className="font-medium">Tour {round}</div>}
         </div>
       </CardHeader>
-      <CardContent className="pt-2" style={{ backgroundColor: 'white' }}>
+      <CardContent className="pt-2 update-card-content" style={{ backgroundColor: 'white' }}>
         {displayType === 'bar' ? renderBarChart() : renderPieChart()}
       </CardContent>
     </Card>

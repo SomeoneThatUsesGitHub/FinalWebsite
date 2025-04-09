@@ -99,7 +99,16 @@
   background-color: white !important;
   background-image: none !important;
   position: relative;
-  box-shadow: 0 0 0 9999px white inset !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.update-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15) !important;
 }
 
 .update-card::before {
@@ -118,6 +127,19 @@
   position: relative;
   z-index: 1;
   backdrop-filter: blur(8px) !important;
+}
+
+/* Style pour l'en-tête de carte */
+.update-card-header {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background: linear-gradient(to right, white, #f8fafc) !important;
+}
+
+/* Style pour la carte d'élection */
+.election-chart-card {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 10px !important;
 }
 
 /* Breakpoints responsifs supplémentaires */
