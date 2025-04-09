@@ -15,6 +15,12 @@ import { format, formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
+// Extension du type LiveCoverageUpdate pour inclure les données de la question associée
+interface LiveCoverageUpdateWithQuestion extends LiveCoverageUpdate {
+  questionContent?: string;
+  questionUsername?: string;
+}
+
 export default function LiveCoveragePage() {
   const params = useParams();
   const [, navigate] = useLocation();
@@ -52,7 +58,7 @@ export default function LiveCoveragePage() {
     data: updates,
     isLoading: isLoadingUpdates,
     error: updatesError,
-  } = useQuery<(LiveCoverageUpdate & {
+  } = useQuery<(LiveCoverageUpdateWithQuestion & {
     author?: { displayName: string, title: string | null, avatarUrl: string | null }
   })[]>({
     queryKey: [`/api/live-coverages/${coverage?.id}/updates`],
@@ -526,6 +532,9 @@ export default function LiveCoveragePage() {
                               {update.important && (
                                 <Badge className="bg-red-500">Important</Badge>
                               )}
+                              {update.isAnswer && (
+                                <Badge className="bg-blue-500">Réponse</Badge>
+                              )}
                               <div className="flex items-center gap-1 text-muted-foreground">
                                 <Clock className="h-4 w-4" />
                                 <span title={formatDate(update.timestamp)}>
@@ -557,6 +566,12 @@ export default function LiveCoveragePage() {
                           
                           {/* Contenu de la mise à jour */}
                           <div className="p-4 md:p-5 prose prose-sm dark:prose-invert max-w-none">
+                            {update.isAnswer && update.questionContent && (
+                              <div className="mb-4 bg-gray-100 dark:bg-gray-800 p-3 rounded-md border-l-4 border-blue-500">
+                                <p className="text-sm text-muted-foreground mb-1">Question de {update.questionUsername || "Visiteur"} :</p>
+                                <p className="text-sm font-medium">{update.questionContent}</p>
+                              </div>
+                            )}
                             <p className="text-sm md:text-base whitespace-pre-line">{update.content}</p>
                             {update.imageUrl && (
                               <div className="mt-4">

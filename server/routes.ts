@@ -1299,7 +1299,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updates = await storage.getLiveCoverageUpdates(Number(coverageId));
-      res.json(updates);
+      
+      // Pour chaque mise à jour qui est une réponse à une question, récupérer la question correspondante
+      const updatesWithQuestions = await Promise.all(updates.map(async (update) => {
+        if (update.isAnswer && update.questionId) {
+          try {
+            const questions = await storage.getLiveCoverageQuestions(Number(coverageId));
+            const question = questions.find(q => q.id === update.questionId);
+            
+            if (question) {
+              return {
+                ...update,
+                questionContent: question.content,
+                questionUsername: question.username
+              };
+            }
+          } catch (err) {
+            console.error("Error fetching question for update:", err);
+          }
+        }
+        return update;
+      }));
+      
+      res.json(updatesWithQuestions);
     } catch (error) {
       console.error("Error fetching live coverage updates:", error);
       res.status(500).json({ error: "Error fetching live coverage updates" });
