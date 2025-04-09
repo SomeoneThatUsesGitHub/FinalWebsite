@@ -115,69 +115,94 @@ export default function LiveCoveragePage() {
 
   return (
     <div className="min-h-screen bg-muted/20">
-      <div className="bg-primary text-primary-foreground py-2 px-4 text-sm text-center font-medium">
-        Suivi en direct - Mis à jour en temps réel
+      {/* Bannière fixe "LIVE EN COURS" */}
+      <div className="sticky top-0 z-50 bg-red-600 text-white py-2 px-4 text-sm font-medium flex items-center justify-center shadow-md">
+        <Radio className="h-4 w-4 mr-2 animate-pulse" />
+        <span>LIVE EN COURS</span>
+        <span className="ml-2 text-xs hidden sm:inline-block">
+          Mis à jour {formatDistanceToNow(new Date(), { addSuffix: true, locale: fr })}
+        </span>
+      </div>
+      
+      {/* Bannière principale avec fond sombre et dégradé */}
+      <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+        <div className="absolute inset-0 opacity-40" style={{
+          backgroundImage: coverage.imageUrl ? `url(${coverage.imageUrl})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundBlendMode: 'overlay'
+        }}></div>
+        
+        <div className="container max-w-4xl mx-auto px-4 py-6 sm:py-10 relative z-10">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="mb-4 bg-black/30 text-white border-white/30 hover:bg-black/50 hover:text-white" 
+            onClick={() => navigate("/")}
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" /> Retour à l'accueil
+          </Button>
+          
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2 items-center text-sm">
+              <Badge variant="outline" className="bg-red-600/80 text-white border-0 flex items-center">
+                <Radio className="h-3 w-3 mr-1 animate-pulse" /> LIVE EN COURS
+              </Badge>
+            </div>
+            
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-tight">
+              {coverage.title}
+            </h1>
+            
+            {coverage.subject && (
+              <p className="text-lg sm:text-xl mt-2 text-white/80 leading-snug">
+                {coverage.subject}
+              </p>
+            )}
+            
+            {coverage.context && (
+              <p className="text-sm sm:text-base mt-2 max-w-3xl leading-relaxed text-white/70">
+                {coverage.context}
+              </p>
+            )}
+            
+            {editors && editors.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-white/20 text-sm">
+                <span className="text-white/70">
+                  Live animé par{" "}
+                  {editors.map((editor, index) => (
+                    <React.Fragment key={editor.id}>
+                      {index > 0 && index === editors.length - 1 ? " et " : index > 0 ? ", " : ""}
+                      <span className="font-medium">{editor.editor?.displayName || "Éditeur"}</span>
+                      {editor.role && ` (${editor.role})`}
+                    </React.Fragment>
+                  ))}
+                </span>
+              </div>
+            )}
+            
+            <div className="mt-4 flex gap-2">
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="rounded-full bg-white/10 hover:bg-white/20 border-white/30 text-white"
+              >
+                <Star className="h-4 w-4" />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="rounded-full bg-white/10 hover:bg-white/20 border-white/30 text-white"
+              >
+                <Clock className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div className="container max-w-4xl mx-auto px-4 py-8">
-        <Button variant="outline" size="sm" className="mb-6" onClick={() => navigate("/")}>
-          <ChevronLeft className="mr-2 h-4 w-4" /> Retour à l'accueil
-        </Button>
-        
         <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{coverage.title}</h1>
-            <p className="text-xl mt-2 text-muted-foreground">{coverage.subject}</p>
-          </div>
-          
-          {coverage.imageUrl && (
-            <div className="aspect-[21/9] relative rounded-lg overflow-hidden border">
-              <img 
-                src={coverage.imageUrl} 
-                alt={coverage.title} 
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="prose prose-sm dark:prose-invert max-w-none">
-                <p className="text-base">{coverage.context}</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {editors && editors.length > 0 && (
-            <div className="space-y-3">
-              <h2 className="text-lg font-medium flex items-center">
-                <UserIcon className="h-5 w-5 mr-2" />
-                Équipe éditoriale
-              </h2>
-              <div className="flex flex-wrap gap-4">
-                {editors.map((editor) => (
-                  <div key={editor.id} className="flex items-center gap-2">
-                    <Avatar>
-                      {editor.editor?.avatarUrl ? (
-                        <AvatarImage src={editor.editor.avatarUrl} alt={editor.editor.displayName} />
-                      ) : (
-                        <AvatarFallback>
-                          {editor.editor?.displayName?.charAt(0) || "?"}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-sm">{editor.editor?.displayName || "Éditeur"}</div>
-                      {editor.role && (
-                        <div className="text-xs text-muted-foreground">{editor.role}</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
           <Separator className="my-8" />
           
           <div className="space-y-6">
