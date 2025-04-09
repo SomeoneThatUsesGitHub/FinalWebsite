@@ -33,6 +33,7 @@ const updateSchema = z.object({
   important: z.boolean().default(false),
   youtubeUrl: z.string().optional(),
   articleId: z.number().optional(),
+  updateType: z.enum(["normal", "youtube", "article"]).default("normal"),
 });
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
@@ -76,6 +77,7 @@ export default function DirectUpdatesPage() {
       important: false,
       youtubeUrl: "",
       articleId: undefined,
+      updateType: "normal",
     },
   });
 
@@ -109,6 +111,7 @@ export default function DirectUpdatesPage() {
         important: false,
         youtubeUrl: "",
         articleId: undefined,
+        updateType: "normal",
       });
     },
     onError: (error: Error) => {
@@ -223,6 +226,56 @@ export default function DirectUpdatesPage() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
+                  name="updateType"
+                  render={({ field }) => (
+                    <FormItem className="mb-6">
+                      <FormLabel>Type de mise à jour</FormLabel>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button
+                          type="button"
+                          variant={field.value === "normal" ? "default" : "outline"}
+                          className="flex flex-col items-center justify-center h-20 w-full"
+                          onClick={() => {
+                            field.onChange("normal");
+                            form.setValue("youtubeUrl", "");
+                            form.setValue("articleId", undefined);
+                          }}
+                        >
+                          <span className="text-sm">Texte/Image</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={field.value === "youtube" ? "default" : "outline"}
+                          className="flex flex-col items-center justify-center h-20 w-full"
+                          onClick={() => {
+                            field.onChange("youtube");
+                            form.setValue("articleId", undefined);
+                          }}
+                        >
+                          <span className="text-sm">Vidéo YouTube</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={field.value === "article" ? "default" : "outline"}
+                          className="flex flex-col items-center justify-center h-20 w-full"
+                          onClick={() => {
+                            field.onChange("article");
+                            form.setValue("youtubeUrl", "");
+                          }}
+                        >
+                          <span className="text-sm">Article Intégré</span>
+                        </Button>
+                      </div>
+                      <FormDescription>
+                        Choisissez le type de contenu principal pour cette mise à jour.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="content"
                   render={({ field }) => (
                     <FormItem>
@@ -242,77 +295,83 @@ export default function DirectUpdatesPage() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL de l'image (optionnel)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="https://exemple.com/image.jpg" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        URL d'une image à joindre à cette mise à jour.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="youtubeUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vidéo YouTube (optionnel)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXXX" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        URL d'une vidéo YouTube à intégrer dans cette mise à jour.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="articleId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Article à intégrer (optionnel)</FormLabel>
-                      <Select 
-                        onValueChange={(value) => field.onChange(parseInt(value) || undefined)} 
-                        value={field.value?.toString() || ""}
-                      >
+                {form.watch("updateType") === "normal" && (
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>URL de l'image (optionnel)</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sélectionnez un article à intégrer" />
-                          </SelectTrigger>
+                          <Input 
+                            placeholder="https://exemple.com/image.jpg" 
+                            {...field} 
+                          />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="0">Aucun article</SelectItem>
-                          {articles?.map(article => (
-                            <SelectItem key={article.id} value={article.id.toString()}>
-                              {article.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Intégrer un de nos articles dans cette mise à jour.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormDescription>
+                          URL d'une image à joindre à cette mise à jour.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {form.watch("updateType") === "youtube" && (
+                  <FormField
+                    control={form.control}
+                    name="youtubeUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vidéo YouTube *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXXX" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          URL complète de la vidéo YouTube à intégrer.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {form.watch("updateType") === "article" && (
+                  <FormField
+                    control={form.control}
+                    name="articleId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Article à intégrer *</FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(parseInt(value) || undefined)} 
+                          value={field.value?.toString() || ""}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Sélectionnez un article à intégrer" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="0">Aucun article</SelectItem>
+                            {articles?.map(article => (
+                              <SelectItem key={article.id} value={article.id.toString()}>
+                                {article.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Sélectionnez l'article à intégrer dans cette mise à jour.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <FormField
                   control={form.control}

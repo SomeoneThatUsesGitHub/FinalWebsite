@@ -5,7 +5,7 @@ import { LiveCoverage, LiveCoverageEditor, LiveCoverageUpdate, LiveCoverageQuest
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, Radio, Clock, AlertTriangle, User as UserIcon, Home, Share2, Send } from "lucide-react";
@@ -630,14 +630,17 @@ export default function LiveCoveragePage() {
                               </div>
                             )}
                             {update.articleId && (
-                              <Card className="mt-4 overflow-hidden border-primary/20">
-                                <CardContent className="p-4">
-                                  <div className="flex items-center gap-2 text-primary">
-                                    <span className="text-xs font-medium uppercase">Article lié</span>
-                                  </div>
+                              <Card className="mt-4 overflow-hidden border border-primary/20">
+                                <CardHeader className="pb-2">
+                                  <CardTitle className="text-base">Article intégré</CardTitle>
+                                  <CardDescription className="text-xs">
+                                    Cliquez pour lire l'article complet
+                                  </CardDescription>
+                                </CardHeader>
+                                <CardContent className="pb-4">
                                   <Button 
                                     variant="link" 
-                                    className="p-0 h-auto mt-1 font-semibold"
+                                    className="p-0 h-auto font-semibold"
                                     asChild
                                   >
                                     <a href={`/articles/${update.articleId}`} target="_blank" rel="noopener noreferrer">
