@@ -298,7 +298,7 @@ export default function DirectUpdatesPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Aucun article</SelectItem>
+                          <SelectItem value="0">Aucun article</SelectItem>
                           {articles?.map(article => (
                             <SelectItem key={article.id} value={article.id.toString()}>
                               {article.title}
