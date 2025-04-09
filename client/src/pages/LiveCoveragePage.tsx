@@ -27,6 +27,7 @@ export default function LiveCoveragePage() {
   const { slug } = params;
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 secondes par défaut
   const [isMenuOpen, setIsMenuOpen] = useState(false); // État pour contrôler l'ouverture/fermeture du menu
+  const [isEditorListOpen, setIsEditorListOpen] = useState(false); // État pour contrôler l'affichage de la liste des éditeurs
   const [questionText, setQuestionText] = useState("");
   const [username, setUsername] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -226,8 +227,8 @@ export default function LiveCoveragePage() {
           </Button>
         </div>
         
-        <div className="container max-w-4xl mx-auto px-4 py-12 sm:py-16 md:py-20 relative z-10">
-          <div className="space-y-3 pt-10 sm:pt-4">
+        <div className="container max-w-4xl mx-auto px-4 py-14 sm:py-20 md:py-24 relative z-10">
+          <div className="space-y-4 pt-10 sm:pt-4">
             <div className="flex flex-wrap gap-2 items-center text-sm">
               <Badge variant="outline" className="bg-red-600/80 text-white border-0 flex items-center">
                 <Radio className="h-3 w-3 mr-1 animate-pulse" /> LIVE EN COURS
@@ -239,7 +240,7 @@ export default function LiveCoveragePage() {
             </h1>
             
             {coverage.subject && (
-              <p className="text-lg sm:text-xl mt-2 text-white/80 leading-snug">
+              <p className="text-lg sm:text-xl mt-2 mb-2 text-white/80 leading-snug">
                 {coverage.subject}
               </p>
             )}
@@ -259,7 +260,38 @@ export default function LiveCoveragePage() {
                         {editors[0].editor?.displayName || "Éditeur"}
                         {editors[0].role && ` (${editors[0].role})`}
                       </span>
-                      <span> et d'autres personnes</span>
+                      <button 
+                        onClick={() => setIsEditorListOpen(!isEditorListOpen)}
+                        className="text-white/80 hover:text-white underline ml-1 focus:outline-none focus:ring-1 focus:ring-white/30 rounded-sm"
+                      >
+                        et d'autres personnes
+                      </button>
+                      
+                      {/* Liste déroulante des éditeurs */}
+                      {isEditorListOpen && (
+                        <div className="absolute mt-2 bg-gray-800/90 backdrop-blur-sm border border-white/20 rounded-md shadow-lg overflow-hidden z-50 p-2">
+                          <div className="py-1 text-sm text-white">
+                            <h4 className="font-semibold px-3 py-1 text-white/70">Équipe éditoriale</h4>
+                            <ul className="max-h-60 overflow-auto">
+                              {editors.map(editor => (
+                                <li key={editor.id} className="px-3 py-2 hover:bg-white/10 rounded flex items-center gap-2">
+                                  <Avatar className="h-6 w-6">
+                                    {editor.editor?.avatarUrl ? (
+                                      <AvatarImage src={editor.editor.avatarUrl} alt={editor.editor?.displayName || "Éditeur"} />
+                                    ) : (
+                                      <AvatarFallback>{(editor.editor?.displayName || "E")[0]}</AvatarFallback>
+                                    )}
+                                  </Avatar>
+                                  <div>
+                                    <span className="font-medium">{editor.editor?.displayName || "Éditeur"}</span>
+                                    {editor.role && <span className="text-white/60 text-xs block">{editor.role}</span>}
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
                 </span>
