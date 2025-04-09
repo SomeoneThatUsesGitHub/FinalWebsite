@@ -797,15 +797,18 @@ export class DatabaseStorage implements IStorage {
   
   // Live Coverage Questions operations
   async getLiveCoverageQuestions(coverageId: number, status?: string): Promise<LiveCoverageQuestion[]> {
-    let query = db.select().from(liveCoverageQuestions)
-      .where(eq(liveCoverageQuestions.coverageId, coverageId))
-      .orderBy(desc(liveCoverageQuestions.timestamp));
-    
     if (status) {
-      query = query.where(eq(liveCoverageQuestions.status, status));
+      return db.select().from(liveCoverageQuestions)
+        .where(and(
+          eq(liveCoverageQuestions.coverageId, coverageId),
+          eq(liveCoverageQuestions.status, status)
+        ))
+        .orderBy(desc(liveCoverageQuestions.timestamp));
+    } else {
+      return db.select().from(liveCoverageQuestions)
+        .where(eq(liveCoverageQuestions.coverageId, coverageId))
+        .orderBy(desc(liveCoverageQuestions.timestamp));
     }
-    
-    return query;
   }
   
   async createLiveCoverageQuestion(question: InsertLiveCoverageQuestion): Promise<LiveCoverageQuestion> {
