@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, Radio, Clock, AlertTriangle, User as UserIcon, Home, Share2, Send } from "lucide-react";
+import { BarChart, ResponsiveContainer, Bar, XAxis, YAxis, Tooltip, Cell, LabelList } from 'recharts';
 import { formatDate } from "@/lib/utils";
 import { fr } from "date-fns/locale";
 import { format, formatDistanceToNow } from "date-fns";
@@ -680,14 +681,67 @@ export default function LiveCoveragePage() {
                               </div>
                             )}
                             {update.updateType === 'election' && update.electionResults && (
-                              <div className="mt-4 w-full max-w-3xl bg-white dark:bg-gray-950 p-4 rounded-lg update-card-content election-chart-card">
+                              <div className="mt-6 w-full bg-white p-0 rounded-lg">
                                 {(() => {
                                   try {
-                                    console.log("Rendering chart with data:", update.electionResults);
                                     const parsedData = typeof update.electionResults === 'string' 
                                       ? JSON.parse(update.electionResults) 
                                       : update.electionResults;
-                                    return <ElectionResultsChart data={parsedData as ElectionResultsData} />;
+                                    
+                                    const { title, date, type, round, location, results } = parsedData as ElectionResultsData;
+                                    
+                                    // Trier les résultats par pourcentage (ordre décroissant)
+                                    const sortedResults = [...results].sort((a, b) => b.percentage - a.percentage);
+                                    
+                                    return (
+                                      <div className="bg-white dark:bg-gray-950 rounded-lg overflow-hidden p-4">
+                                        <div className="mb-3">
+                                          <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+                                          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mt-1">
+                                            {type && <div className="font-medium">{type}</div>}
+                                            {date && <div>{date}</div>}
+                                            {location && <div>{location}</div>}
+                                            {round && <div className="font-medium">Tour {round}</div>}
+                                          </div>
+                                        </div>
+                                        
+                                        <div className="w-full overflow-x-auto">
+                                          <div style={{ minHeight: Math.max(250, sortedResults.length * 50) + 'px', minWidth: '300px', width: '100%' }}>
+                                            <ResponsiveContainer width="100%" height="100%">
+                                              <BarChart 
+                                                data={sortedResults} 
+                                                layout="vertical"
+                                                margin={{ top: 10, right: 10, left: 20, bottom: 10 }}
+                                              >
+                                                <XAxis 
+                                                  type="number" 
+                                                  domain={[0, 100]} 
+                                                  unit="%" 
+                                                  fontSize={12}
+                                                />
+                                                <YAxis 
+                                                  type="category" 
+                                                  dataKey="candidate" 
+                                                  width={120}
+                                                  tick={{ fontSize: 13, fontWeight: 500 }}
+                                                  tickFormatter={(value) => value.length > 16 ? `${value.substring(0, 14)}...` : value}
+                                                />
+                                                <Tooltip 
+                                                  formatter={(value: number) => [`${value.toFixed(2)}%`, 'Résultat']}
+                                                  contentStyle={{ fontSize: '14px', padding: '8px', borderRadius: '4px' }}
+                                                />
+                                                <Bar dataKey="percentage" name="Pourcentage des voix" barSize={28} radius={[4, 4, 4, 4]}>
+                                                  {sortedResults.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                  ))}
+                                                  <LabelList dataKey="percentage" position="right" formatter={(value: number) => `${value.toFixed(1)}%`} />
+                                                </Bar>
+                                              </BarChart>
+                                            </ResponsiveContainer>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
                                   } catch (error) {
                                     console.error("Erreur lors du rendu du graphique:", error);
                                     return (
