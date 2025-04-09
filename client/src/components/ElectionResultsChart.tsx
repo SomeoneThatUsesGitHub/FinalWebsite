@@ -33,7 +33,7 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
 
   const renderBarChart = () => {
     // Définir différentes hauteurs en fonction du nombre de candidats
-    const dynamicHeight = Math.max(300, sortedResults.length * 50);
+    const dynamicHeight = Math.max(300, sortedResults.length * 60);
     
     return (
       <div className="overflow-x-auto overflow-y-visible">
@@ -42,7 +42,7 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
             <BarChart 
               data={sortedResults} 
               layout="vertical"
-              margin={{ top: 10, right: 30, left: 25, bottom: 10 }}
+              margin={{ top: 5, right: 30, left: 15, bottom: 5 }}
             >
               <XAxis 
                 type="number" 
@@ -67,14 +67,11 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
                 }}
                 contentStyle={{ fontSize: '14px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}
               />
-              <Legend 
-                wrapperStyle={{ fontSize: '12px', padding: '10px 0' }}
-                formatter={(value) => <span style={{ fontSize: '12px' }}>{value}</span>}
-              />
-              <Bar dataKey="percentage" name="Pourcentage des voix" barSize={24}>
+              <Bar dataKey="percentage" name="Pourcentage des voix" barSize={30} radius={[4, 4, 4, 4]}>
                 {sortedResults.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
+                <LabelList dataKey="percentage" position="right" formatter={(value: number) => `${value.toFixed(1)}%`} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -154,20 +151,20 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
   };
 
   return (
-    <Card className="shadow-md border overflow-hidden election-chart-card" style={{ backgroundColor: 'white' }}>
-      <CardHeader className="pb-2 update-card-header" style={{ backgroundColor: 'white' }}>
-        <CardTitle className="text-lg font-bold">{title}</CardTitle>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
+    <div className="mt-3 bg-white rounded-lg overflow-hidden border shadow-md p-4">
+      <div className="mb-3">
+        <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mt-1">
           {type && <div className="font-medium">{type}</div>}
           {date && <div>{date}</div>}
           {location && <div>{location}</div>}
           {round && <div className="font-medium">Tour {round}</div>}
         </div>
-      </CardHeader>
-      <CardContent className="pt-2 update-card-content" style={{ backgroundColor: 'white' }}>
+      </div>
+      <div className="mt-4">
         {displayType === 'bar' ? renderBarChart() : renderPieChart()}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
