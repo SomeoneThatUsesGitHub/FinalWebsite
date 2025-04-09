@@ -70,14 +70,28 @@ export default function LiveCoveragePage() {
   // Définir la mutation pour soumettre une question
   const submitQuestionMutation = useMutation({
     mutationFn: async ({ username, content }: { username: string, content: string }) => {
-      const res = await apiRequest("POST", `/api/live-coverages/${coverage?.id}/questions`, {
-        username,
-        content
-      });
-      return await res.json();
+      try {
+        const res = await apiRequest("POST", `/api/live-coverages/${coverage?.id}/questions`, {
+          username,
+          content
+        });
+        
+        // Vérifier si la réponse est OK
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Erreur lors de l'envoi de la question");
+        }
+        
+        return await res.json();
+      } catch (err) {
+        console.error("Erreur lors de la soumission de la question:", err);
+        throw err;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Question soumise avec succès:", data);
       setQuestionText("");
+      setUsername("");
       setShowSuccessMessage(true);
       
       // Masquer le message de succès après 5 secondes
@@ -92,6 +106,7 @@ export default function LiveCoveragePage() {
       });
     },
     onError: (error: Error) => {
+      console.error("Erreur dans la mutation:", error);
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer votre question. Veuillez réessayer plus tard.",
