@@ -210,7 +210,7 @@ const NewsWall: React.FC = () => {
                     )}
                     <div className="absolute top-4 left-4 z-20">
                       <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md animate-pulse">
-                        DIRECT
+                        EN DIRECT
                       </span>
                     </div>
                   </div>
@@ -218,7 +218,7 @@ const NewsWall: React.FC = () => {
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-red-600 text-white">
-                          Événement en direct
+                          {(featuredContent.data as LiveEvent).title.startsWith("DIRECT") ? "Événement en direct" : "EN DIRECT"} 
                         </span>
                         <span className="text-gray-500 text-xs">
                           {(featuredContent.data as LiveEvent).scheduledFor ? getTimeAgo((featuredContent.data as LiveEvent).scheduledFor || '') : "En cours"}
@@ -251,7 +251,7 @@ const NewsWall: React.FC = () => {
                         <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
                           <div className="flex items-center">
                             <div className="mr-2 w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                            Suivre le direct
+                            Suivre l'événement
                           </div>
                         </Button>
                       )}
