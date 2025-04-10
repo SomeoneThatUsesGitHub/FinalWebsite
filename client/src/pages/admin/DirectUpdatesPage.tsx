@@ -339,6 +339,7 @@ export default function DirectUpdatesPage() {
                             form.setValue("electionResults", undefined);
                           }}
                         >
+                          <MessageSquare className="h-5 w-5 mb-2" />
                           <span className="text-sm">Texte/Image</span>
                         </Button>
                         <Button
@@ -351,6 +352,7 @@ export default function DirectUpdatesPage() {
                             form.setValue("electionResults", undefined);
                           }}
                         >
+                          <Youtube className="h-5 w-5 mb-2" />
                           <span className="text-sm">Vidéo YouTube</span>
                         </Button>
                         <Button
@@ -363,6 +365,7 @@ export default function DirectUpdatesPage() {
                             form.setValue("electionResults", undefined);
                           }}
                         >
+                          <Newspaper className="h-5 w-5 mb-2" />
                           <span className="text-sm">Article Intégré</span>
                         </Button>
                         <Button
@@ -375,7 +378,7 @@ export default function DirectUpdatesPage() {
                             form.setValue("articleId", undefined);
                           }}
                         >
-                          <BarChartIcon className="h-4 w-4 mb-1" />
+                          <BarChartIcon className="h-5 w-5 mb-2" />
                           <span className="text-sm">Graphique Élections</span>
                         </Button>
                       </div>
@@ -529,21 +532,16 @@ export default function DirectUpdatesPage() {
                               </div>
                               <div>
                                 <label className="text-sm font-medium">Type d'affichage</label>
-                                <Select 
-                                  value={electionData.displayType}
-                                  onValueChange={(value) => setElectionData({
-                                    ...electionData, 
-                                    displayType: value as 'bar' | 'pie'
-                                  })}
-                                >
-                                  <SelectTrigger className="mt-1">
-                                    <SelectValue placeholder="Type d'affichage" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="bar">Barres horizontales</SelectItem>
-                                    <SelectItem value="pie">Camembert</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                                <div className="mt-1 bg-muted/50 p-2 rounded border text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <BarChartIcon className="h-4 w-4" />
+                                    <span>Barres horizontales (adaptatif)</span>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Le graphique s'adaptera automatiquement à la taille d'écran (barres sur grand écran, camembert sur mobile)
+                                  </p>
+                                </div>
+                                <input type="hidden" value="bar" />
                               </div>
                               <div>
                                 <label className="text-sm font-medium">Tour (optionnel)</label>
