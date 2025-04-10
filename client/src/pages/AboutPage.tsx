@@ -102,8 +102,8 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Notre histoire - Nouvelle mise en page asymétrique sans carnet de notes */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden" id="histoire">
+      {/* Notre histoire - Avec fond plus foncé et téléphone affichant Instagram */}
+      <section className="py-20 bg-gradient-to-b from-gray-100 to-gray-50 overflow-hidden" id="histoire">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row">
             {/* Titre et introduction à gauche */}
@@ -115,6 +115,22 @@ const AboutPage: React.FC = () => {
                   <p className="text-dark/80 mb-8 lg:text-left">
                     Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui transforme l'accès à l'information politique pour les jeunes.
                   </p>
+                  
+                  {/* Téléphone avec Instagram */}
+                  <div className="mt-12 relative mx-auto lg:mx-0 max-w-[280px]">
+                    <div className="phone-mockup">
+                      <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl">
+                        <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
+                        <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
+                        <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
+                        <div className="h-[64px] w-[3px] bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
+                        <div className="rounded-[2rem] overflow-hidden w-[272px] h-[572px] bg-white">
+                          <img src="/assets/instagram-politiquensemble.jpg" className="w-full h-full object-cover" alt="Compte Instagram Politiquensemble" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div className="hidden lg:block relative">
                     <div className="absolute -left-12 -bottom-12 w-24 h-24 bg-blue-100 rounded-full opacity-70"></div>
                     <div className="absolute -right-12 top-10 w-16 h-16 bg-blue-200 rounded-full opacity-50"></div>
@@ -134,8 +150,8 @@ const AboutPage: React.FC = () => {
                   delay={index * 0.1}
                 >
                   <div className="flex mb-16 relative lg:pl-24">
-                    <div className="hidden lg:flex absolute left-10 top-4 -translate-x-1/2 w-8 h-8 bg-white border-4 border-blue-500 rounded-full z-10"></div>
-                    <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all w-full lg:ml-4 transform hover:scale-[1.02]">
+                    <div className="hidden lg:flex absolute left-10 top-4 -translate-x-1/2 w-8 h-8 bg-gray-50 border-4 border-blue-500 rounded-full z-10"></div>
+                    <div className="bg-gray-50/80 backdrop-blur-sm shadow-lg rounded-lg p-6 hover:shadow-xl transition-all w-full lg:ml-4 transform hover:scale-[1.02]">
                       <div className="flex items-start mb-3">
                         <div className="mr-4 p-3 bg-blue-100 rounded-xl flex-shrink-0">
                           {milestone.icon}

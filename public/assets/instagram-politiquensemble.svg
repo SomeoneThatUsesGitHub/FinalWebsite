@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Instagram background -->
+  <rect width="1080" height="1920" fill="#FFFFFF"/>
+  
+  <!-- Instagram header -->
+  <rect width="1080" height="100" fill="#FFFFFF"/>
+  <text x="30" y="65" font-family="Arial, sans-serif" font-weight="700" font-size="28" fill="#000000">politiquensemble</text>
+  <circle cx="990" cy="50" r="25" stroke="#000000" stroke-width="2" fill="none"/>
+  <path d="M975 50 L1005 50 M990 35 L990 65" stroke="#000000" stroke-width="2"/>
+  
+  <!-- Post image with Politiquensemble logo -->
+  <rect x="0" y="100" width="1080" height="1080" fill="#001F5A"/>
+  
+  <!-- Politiquensemble logo (White Capitol on blue background) -->
+  <g transform="translate(280, 320) scale(2)">
+    <!-- Capitol dome -->
+    <path d="M260 100 Q260 50 210 50 Q160 50 160 100 L260 100 Z" fill="#FFFFFF"/>
+    <!-- Capitol building -->
+    <rect x="150" y="100" width="120" height="30" fill="#FFFFFF"/>
+    <rect x="145" y="130" width="130" height="70" fill="#FFFFFF"/>
+    <!-- Columns -->
+    <rect x="150" y="130" width="10" height="70" fill="#001F5A"/>
+    <rect x="170" y="130" width="10" height="70" fill="#001F5A"/>
+    <rect x="190" y="130" width="10" height="70" fill="#001F5A"/>
+    <rect x="210" y="130" width="10" height="70" fill="#001F5A"/>
+    <rect x="230" y="130" width="10" height="70" fill="#001F5A"/>
+    <rect x="250" y="130" width="10" height="70" fill="#001F5A"/>
+    <!-- Spire -->
+    <rect x="208" y="10" width="4" height="40" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- Instagram post interaction bar -->
+  <rect x="0" y="1180" width="1080" height="50" fill="#FFFFFF"/>
+  <circle cx="50" cy="1205" r="25" fill="none" stroke="#000000" stroke-width="2"/>
+  <path d="M40 1210 L50 1220 L70 1195" stroke="#000000" stroke-width="2"/>
+  
+  <path d="M140 1190 L120 1220 L160 1220 Z" fill="none" stroke="#000000" stroke-width="2"/>
+  <path d="M220 1205 L260 1205 M240 1185 L240 1225" stroke="#000000" stroke-width="2"/>
+  <path d="M330 1205 C330 1195 320 1185 310 1185 C300 1185 290 1195 290 1205 C290 1215 300 1225 310 1225 C320 1225 330 1215 330 1205 Z" fill="none" stroke="#000000" stroke-width="2"/>
+  
+  <!-- Likes count -->
+  <text x="30" y="1280" font-family="Arial, sans-serif" font-weight="700" font-size="24" fill="#000000">3,456 likes</text>
+  
+  <!-- Caption -->
+  <text x="30" y="1330" font-family="Arial, sans-serif" font-weight="700" font-size="24" fill="#000000">politiquensemble</text>
+  <text x="30" y="1370" font-family="Arial, sans-serif" font-size="24" fill="#000000" width="1020">Décryptage de l'actualité politique de cette semaine. Retrouvez notre analyse complète sur notre site web. #politique #actualité #jeunesse</text>
+  
+  <!-- View comments -->
+  <text x="30" y="1450" font-family="Arial, sans-serif" font-size="24" fill="#888888">View all 142 comments</text>
+  
+  <!-- Time ago -->
+  <text x="30" y="1500" font-family="Arial, sans-serif" font-size="20" fill="#888888">2 hours ago</text>
+</svg>
