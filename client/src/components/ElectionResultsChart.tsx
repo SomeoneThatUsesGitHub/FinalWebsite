@@ -26,7 +26,24 @@ interface ElectionResultsChartProps {
 }
 
 export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data }) => {
-  const { title, date, type, round, location, results, displayType = 'bar' } = data;
+  const { title, date, type, round, location, results } = data;
+  
+  // État pour détecter la taille de l'écran
+  const [isMobile, setIsMobile] = React.useState(false);
+  
+  // Détecter la taille de l'écran au chargement et lors du redimensionnement
+  React.useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    // Vérifier immédiatement
+    checkScreenSize();
+    
+    // Mettre à jour lors du redimensionnement
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
   
   // Trier les résultats par pourcentage (ordre décroissant)
   const sortedResults = [...results].sort((a, b) => b.percentage - a.percentage);
@@ -162,7 +179,7 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
         </div>
       </div>
       <div className="mt-3 sm:mt-4">
-        {displayType === 'bar' ? renderBarChart() : renderPieChart()}
+        {isMobile ? renderPieChart() : renderBarChart()}
       </div>
     </div>
   );
