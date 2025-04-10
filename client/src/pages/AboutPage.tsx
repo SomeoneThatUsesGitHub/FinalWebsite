@@ -4,25 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import ScrollAnimation from "@/components/animations/ScrollAnimation";
-import TeamMemberCard from "@/components/about/TeamMemberCard";
 import ValueCard from "@/components/about/ValueCard";
-import Loader from "@/components/ui/custom/Loader";
-
-type TeamMember = {
-  id: number;
-  displayName: string;
-  title: string | null;
-  bio: string | null;
-  avatarUrl: string | null;
-  role: string;
-};
+import { MapPin, Calendar, Award, Users, Bookmark, TrendingUp } from "lucide-react";
 
 const AboutPage: React.FC = () => {
-  // Récupération des membres de l'équipe depuis l'API
-  const { data: teamMembers, isLoading: isLoadingTeam } = useQuery<TeamMember[]>({
-    queryKey: ['/api/team'],
-  });
-
   const values = [
     {
       icon: "objective",
@@ -56,39 +41,43 @@ const AboutPage: React.FC = () => {
     },
   ];
 
-  const milestones = [
+  const keyMilestones = [
     {
+      icon: <Calendar className="h-10 w-10 text-blue-600" />,
       year: "2022",
       title: "Naissance du concept",
-      description: "Politiquensemble est né de la volonté de rendre l'actualité politique accessible aux 16-30 ans, souvent éloignés des médias traditionnels.",
+      description: "Politiquensemble est né de la volonté de rendre l'actualité politique accessible aux 16-30 ans, souvent éloignés des médias traditionnels."
     },
     {
+      icon: <Users className="h-10 w-10 text-blue-600" />,
       year: "2023",
       title: "Lancement sur les réseaux sociaux",
-      description: "Nous avons commencé à publier du contenu sur les principales plateformes sociales, touchant rapidement plusieurs milliers d'abonnés.",
+      description: "Nous avons commencé à publier du contenu sur les principales plateformes sociales, touchant rapidement plusieurs milliers d'abonnés."
     },
     {
+      icon: <MapPin className="h-10 w-10 text-blue-600" />,
       year: "2024",
       title: "Développement de notre plateforme",
-      description: "Le lancement de notre site web marque une nouvelle étape, offrant un espace dédié à notre contenu et à nos formats innovants.",
+      description: "Le lancement de notre site web marque une nouvelle étape, offrant un espace dédié à notre contenu et à nos formats innovants."
     },
     {
+      icon: <TrendingUp className="h-10 w-10 text-blue-600" />,
       year: "2025",
       title: "Expansion de nos formats",
-      description: "Développement de nouvelles façons d'informer: directs pour les grands événements, données électorales interactives, et contenus éducatifs.",
-    },
+      description: "Développement de nouvelles façons d'informer: directs pour les grands événements, données électorales interactives, et contenus éducatifs."
+    }
   ];
 
   return (
     <>
       <Helmet>
         <title>À propos de Politiquensemble - Notre mission et notre équipe</title>
-        <meta name="description" content="Découvrez l'équipe et la mission de Politiquensemble, média indépendant qui rend l'actualité politique, économique et historique accessible aux 16-30 ans." />
+        <meta name="description" content="Découvrez la mission de Politiquensemble, média indépendant qui rend l'actualité politique, économique et historique accessible aux 16-30 ans." />
       </Helmet>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-blue-50 to-white pt-16 pb-12 md:pt-24 md:pb-16">
-        <div className="container mx-auto px-4">
+      {/* Hero Section avec effet carnet quadrillé qui s'estompe */}
+      <section className="pattern-grid-fade pt-16 pb-12 md:pt-24 md:pb-16 min-h-[50vh] flex items-center">
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <ScrollAnimation threshold={0.1}>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-dark mb-6">
@@ -98,23 +87,23 @@ const AboutPage: React.FC = () => {
                 Politiquensemble est un média indépendant qui démocratise l'information politique, économique et historique pour les 16-30 ans, avec une approche pédagogique et innovante.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Link href="/team">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    Découvrir notre équipe
-                  </Button>
-                </Link>
                 <Link href="/contact">
-                  <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                     Nous contacter
                   </Button>
                 </Link>
+                <a href="https://twitter.com/politiquensemble" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                    Nous suivre
+                  </Button>
+                </a>
               </div>
             </ScrollAnimation>
           </div>
         </div>
       </section>
 
-      {/* Notre histoire */}
+      {/* Notre histoire - Nouveau format sans timeline */}
       <section className="py-16 bg-white" id="histoire">
         <div className="container mx-auto px-4">
           <ScrollAnimation threshold={0.1}>
@@ -127,33 +116,27 @@ const AboutPage: React.FC = () => {
             </div>
           </ScrollAnimation>
 
-          <div className="relative">
-            {/* Ligne verticale de timeline */}
-            <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gray-200"></div>
-            
-            <div className="space-y-12 md:space-y-0 relative">
-              {milestones.map((milestone, index) => (
-                <ScrollAnimation 
-                  key={index} 
-                  threshold={0.1}
-                  delay={index * 0.1}
-                  className="md:grid md:grid-cols-2 md:gap-8 relative"
-                >
-                  <div className={`md:flex ${index % 2 === 0 ? 'md:justify-end' : 'md:order-2'}`}>
-                    <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 md:max-w-md mb-4 md:mb-0 hover:shadow-xl transition-shadow duration-300">
-                      <div className="text-blue-600 font-bold text-xl mb-2">{milestone.year}</div>
-                      <h3 className="text-xl font-bold text-dark mb-3">{milestone.title}</h3>
-                      <p className="text-dark/70">{milestone.description}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {keyMilestones.map((milestone, index) => (
+              <ScrollAnimation 
+                key={index} 
+                threshold={0.1}
+                delay={index * 0.1}
+              >
+                <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
+                  <div className="flex items-center mb-4">
+                    <div className="mr-4 p-3 bg-blue-50 rounded-full flex items-center justify-center">
+                      {milestone.icon}
+                    </div>
+                    <div>
+                      <div className="text-blue-600 font-bold text-xl">{milestone.year}</div>
+                      <h3 className="text-xl font-bold text-dark">{milestone.title}</h3>
                     </div>
                   </div>
-                  
-                  {/* Point de timeline */}
-                  <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow"></div>
-                  
-                  <div className={`hidden md:block ${index % 2 === 0 ? 'md:order-2' : ''}`}></div>
-                </ScrollAnimation>
-              ))}
-            </div>
+                  <p className="text-dark/70 flex-grow">{milestone.description}</p>
+                </div>
+              </ScrollAnimation>
+            ))}
           </div>
         </div>
       </section>
@@ -181,49 +164,6 @@ const AboutPage: React.FC = () => {
                 />
               </ScrollAnimation>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Notre équipe - Aperçu */}
-      <section className="py-16 bg-white" id="equipe">
-        <div className="container mx-auto px-4">
-          <ScrollAnimation threshold={0.1}>
-            <div className="mb-12 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Notre équipe</h2>
-              <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full mb-6"></div>
-              <p className="text-dark/70 max-w-3xl mx-auto">
-                Découvrez les personnes passionnées qui contribuent à rendre l'information politique accessible à tous.
-              </p>
-            </div>
-          </ScrollAnimation>
-
-          {isLoadingTeam ? (
-            <div className="flex justify-center py-12">
-              <Loader size="lg" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {teamMembers && teamMembers.map((member, index) => (
-                <ScrollAnimation key={member.id} threshold={0.1} delay={index * 0.1}>
-                  <TeamMemberCard
-                    name={member.displayName}
-                    title={member.title || ""}
-                    bio={member.bio || ""}
-                    avatar={member.avatarUrl}
-                    isAdmin={member.role === "admin"}
-                  />
-                </ScrollAnimation>
-              ))}
-            </div>
-          )}
-
-          <div className="text-center mt-12">
-            <Link href="/team">
-              <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
-                Voir toute l'équipe
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
