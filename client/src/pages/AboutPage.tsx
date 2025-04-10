@@ -119,9 +119,9 @@ const AboutPage: React.FC = () => {
                   </p>
                   
                   {/* Téléphone avec Instagram (incliné sur desktop, animation popup sur mobile) */}
-                  <div className="mt-16 relative mx-auto lg:mx-0 max-w-[280px]">
+                  <div className="mt-16 relative flex justify-center lg:justify-start max-w-full lg:max-w-[280px]">
                     <div className="phone-mockup">
-                      <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform lg:-rotate-3 animate-in fade-in-50 zoom-in-95 duration-1000">
+                      <div className="relative border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform lg:-rotate-3 animate-in fade-in-50 zoom-in-95 duration-1000">
                         <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
@@ -226,7 +226,7 @@ const AboutPage: React.FC = () => {
       <section className="py-2 bg-blue-800"></section>
       
       {/* Politiquensemble en chiffres - Style décalé et dynamique avec animation de comptage */}
-      <section className="py-20 mb-20 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
+      <section className="py-20 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
         {/* Élément décoratif */}
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500 opacity-30 rounded-full"></div>
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-blue-400 opacity-20 rounded-full"></div>
