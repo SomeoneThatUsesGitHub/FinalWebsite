@@ -1767,6 +1767,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Erreur lors de la suppression d'un abonné" });
     }
   });
+  
+  // Routes pour les candidatures d'équipe
+  // Route publique pour soumettre une candidature
+  app.post("/api/team/applications", async (req: Request, res: Response) => {
+    try {
+      // Validation des données
+      const validatedData = insertTeamApplicationSchema.safeParse(req.body);
+      if (!validatedData.success) {
+        return res.status(400).json({
+          success: false,
+          message: "Données de candidature invalides",
+          errors: validatedData.error.errors
+        });
+      }
+      
+      // Créer la candidature
+      const application = await storage.createTeamApplication(validatedData.data);
+      
+      res.status(201).json({
+        success: true,
+        message: "Candidature envoyée avec succès",
+        application
+      });
+    } catch (error) {
+      console.error("Erreur lors de la soumission de candidature:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erreur lors de la soumission de votre candidature"
+      });
+    }
+  });
+  
+  // Routes admin pour gérer les candidatures
+  app.get("/api/admin/team/applications", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const applications = await storage.getAllTeamApplications();
+      res.json(applications);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des candidatures:", error);
+      res.status(500).json({
+        message: "Erreur lors de la récupération des candidatures"
+      });
+    }
+  });
+  
+  app.get("/api/admin/team/applications/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de candidature invalide" });
+      }
+      
+      const application = await storage.getTeamApplicationById(Number(id));
+      
+      if (!application) {
+        return res.status(404).json({ message: "Candidature non trouvée" });
+      }
+      
+      res.json(application);
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la candidature:", error);
+      res.status(500).json({
+        message: "Erreur lors de la récupération de la candidature"
+      });
+    }
+  });
+  
+  app.patch("/api/admin/team/applications/:id/status", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status, notes } = req.body;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de candidature invalide" });
+      }
+      
+      if (!status || !["pending", "approved", "rejected"].includes(status)) {
+        return res.status(400).json({ message: "Statut de candidature invalide" });
+      }
+      
+      const user = req.user as any;
+      const updatedApplication = await storage.updateTeamApplicationStatus(
+        Number(id),
+        status,
+        user.id,
+        notes
+      );
+      
+      if (!updatedApplication) {
+        return res.status(404).json({ message: "Candidature non trouvée" });
+      }
+      
+      res.json({
+        message: "Statut de candidature mis à jour avec succès",
+        application: updatedApplication
+      });
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du statut de candidature:", error);
+      res.status(500).json({
+        message: "Erreur lors de la mise à jour du statut de candidature"
+      });
+    }
+  });
+  
+  app.delete("/api/admin/team/applications/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de candidature invalide" });
+      }
+      
+      const result = await storage.deleteTeamApplication(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Candidature non trouvée" });
+      }
+      
+      res.json({ message: "Candidature supprimée avec succès" });
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la candidature:", error);
+      res.status(500).json({
+        message: "Erreur lors de la suppression de la candidature"
+      });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

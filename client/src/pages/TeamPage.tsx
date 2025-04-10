@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loader2 } from 'lucide-react';
+import TeamApplicationForm from '@/components/TeamApplicationForm';
 // Layout
 // Header et Footer sont fournis par App.tsx
 
@@ -206,8 +207,30 @@ export default function TeamPage() {
         )}
       </div>
       
-      {/* Ajout de beaucoup plus d'espace avant le footer */}
-      <div className="pb-40"></div>
+      {/* Section de candidature à l'équipe */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.7 }}
+        className="bg-blue-50 py-16 mt-16 mb-8"
+      >
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-primary mb-4">Rejoignez Notre Équipe</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Vous souhaitez contribuer à notre mission de rendre la politique, l'économie et l'histoire accessibles 
+                aux jeunes de 16 à 30 ans ? Nous recherchons des personnes passionnées et motivées pour rejoindre notre équipe.
+              </p>
+            </div>
+            
+            <TeamApplicationForm />
+          </div>
+        </div>
+      </motion.div>
+      
+      {/* Espace avant le footer */}
+      <div className="pb-20"></div>
     </>
   );
 }
