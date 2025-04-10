@@ -118,11 +118,11 @@ export class DatabaseStorage implements IStorage {
   // Instagram cache operations
   async getCachedPosts(): Promise<InstagramCacheData | null> {
     try {
-      const [result] = await db.execute(sql`SELECT * FROM instagram_cache LIMIT 1`);
-      if (result && result.rows && result.rows.length > 0) {
+      const result = await db.select().from(instagramCache).limit(1);
+      if (result && result.length > 0) {
         return {
-          timestamp: new Date(result.rows[0].timestamp).getTime(),
-          data: result.rows[0].data
+          timestamp: new Date(result[0].timestamp).getTime(),
+          data: result[0].data
         };
       }
       return null;
@@ -134,27 +134,14 @@ export class DatabaseStorage implements IStorage {
 
   async cachePosts(posts: any[]): Promise<void> {
     try {
-      // Vérifier si la table existe
-      try {
-        await db.execute(sql`
-          CREATE TABLE IF NOT EXISTS instagram_cache (
-            id SERIAL PRIMARY KEY,
-            timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
-            data JSONB NOT NULL
-          )
-        `);
-      } catch (error) {
-        console.error("Erreur lors de la création de la table de cache:", error);
-      }
-
       // Supprimer les anciennes entrées
-      await db.execute(sql`DELETE FROM instagram_cache`);
+      await db.delete(instagramCache);
       
       // Insérer les nouvelles données
-      await db.execute(sql`
-        INSERT INTO instagram_cache (timestamp, data)
-        VALUES (NOW(), ${JSON.stringify(posts)}::jsonb)
-      `);
+      await db.insert(instagramCache).values({
+        timestamp: new Date(),
+        data: posts
+      });
     } catch (error) {
       console.error("Erreur lors de la mise en cache des posts Instagram:", error);
     }
