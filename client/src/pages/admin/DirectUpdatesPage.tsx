@@ -16,7 +16,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon, BarChart3 as BarChartIcon, MessageSquare, FileText as Newspaper, Video as Youtube, ListChecks, PlusCircle, MinusCircle } from "lucide-react";
+import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon, BarChart3 as BarChartIcon, MessageSquare, FileText as Newspaper, Video as Youtube, ListChecks, PlusCircle, MinusCircle, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { queryClient } from "@/lib/queryClient";
@@ -577,6 +577,110 @@ export default function DirectUpdatesPage() {
                   />
                 )}
 
+                {form.watch("updateType") === "recap" && (
+                  <div className="space-y-6 border rounded-lg p-4">
+                    <FormField
+                      control={form.control}
+                      name="recapItems"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Éléments du récapitulatif</FormLabel>
+                          <FormDescription className="mb-4">
+                            Ajoutez les différents points à inclure dans le récapitulatif, puis cliquez sur "Appliquer le récap".
+                          </FormDescription>
+                          
+                          <div className="space-y-4">
+                            {/* Liste des éléments existants */}
+                            <div className="space-y-2">
+                              {recapItems.length === 0 ? (
+                                <div className="text-sm text-muted-foreground italic text-center p-4 border rounded-lg">
+                                  Aucun élément ajouté au récapitulatif
+                                </div>
+                              ) : (
+                                recapItems.map((item, index) => (
+                                  <div 
+                                    key={index} 
+                                    className="flex items-center gap-2 border rounded p-2 bg-muted/20"
+                                  >
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 shrink-0"
+                                      onClick={() => toggleRecapItemDone(index)}
+                                    >
+                                      {item.done ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <div className="h-4 w-4 border-2 rounded-sm border-muted-foreground" />
+                                      )}
+                                    </Button>
+                                    <div className={cn(
+                                      "flex-grow text-sm",
+                                      item.done && "line-through text-muted-foreground"
+                                    )}>
+                                      {item.text}
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => removeRecapItem(index)}
+                                    >
+                                      <MinusCircle className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                            
+                            {/* Formulaire d'ajout d'élément */}
+                            <div className="flex gap-2">
+                              <Input
+                                value={newRecapItem}
+                                onChange={(e) => setNewRecapItem(e.target.value)}
+                                placeholder="Ajouter un nouvel élément..."
+                                className="flex-grow"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && newRecapItem.trim()) {
+                                    e.preventDefault();
+                                    addRecapItem();
+                                  }
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                onClick={addRecapItem}
+                                disabled={!newRecapItem.trim()}
+                              >
+                                <PlusCircle className="h-4 w-4 mr-2" />
+                                Ajouter
+                              </Button>
+                            </div>
+                            
+                            <div className="pt-4">
+                              <Button
+                                type="button"
+                                onClick={applyRecapItems}
+                                disabled={recapItems.length === 0}
+                                className="w-full"
+                              >
+                                <ListChecks className="h-4 w-4 mr-2" />
+                                Appliquer le récap
+                              </Button>
+                              <p className="text-xs text-muted-foreground mt-2 text-center">
+                                {field.value ? `${JSON.parse(field.value).length} élément(s) appliqué(s)` : "Aucun élément appliqué"}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <input type="hidden" {...field} />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+                
                 {form.watch("updateType") === "election" && (
                   <div className="space-y-6 border rounded-lg p-4">
                     <FormField
