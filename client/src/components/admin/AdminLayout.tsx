@@ -108,6 +108,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
+      name: "Candidatures",
+      href: "/admin/applications",
+      icon: ClipboardList,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+    },
+    {
       name: "Notes Éditoriales",
       href: "/admin/notes",
       icon: Clipboard,

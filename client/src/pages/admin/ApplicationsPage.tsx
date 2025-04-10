@@ -21,7 +21,7 @@ import {
   Loader2 
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { AdminLayout } from "@/components/admin/AdminLayout";
+import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
