@@ -296,9 +296,6 @@ export default function TeamPage() {
           </div>
         </div>
       </motion.div>
-      
-      {/* Espace avant le footer */}
-      <div className="pb-20"></div>
     </>
   );
 }

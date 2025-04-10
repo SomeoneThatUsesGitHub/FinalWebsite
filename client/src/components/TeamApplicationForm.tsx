@@ -25,10 +25,10 @@ const applicationFormSchema = insertTeamApplicationSchema.extend({
   position: z.string().min(1, {
     message: "Veuillez sélectionner un poste",
   }),
-  motivation: z.string().min(20, {
+  message: z.string().min(20, {
     message: "Veuillez décrire votre motivation (minimum 20 caractères)",
   }),
-  phoneNumber: z.string().optional(),
+  phone: z.string().optional(),
 });
 
 type ApplicationFormData = z.infer<typeof applicationFormSchema>;
