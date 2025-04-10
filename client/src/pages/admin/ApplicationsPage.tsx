@@ -65,10 +65,8 @@ type TeamApplication = {
   fullName: string;
   email: string;
   position: string;
-  experience: string;
-  motivation: string;
-  availability: string;
-  phoneNumber?: string;
+  message: string;
+  phone?: string;
   portfolio?: string;
   additionalInfo?: string;
   status: "pending" | "approved" | "rejected";
@@ -376,12 +374,12 @@ export default function ApplicationsPage() {
                           </a>
                         </p>
                       </div>
-                      {viewApplication.phoneNumber && (
+                      {viewApplication.phone && (
                         <div>
                           <span className="font-medium">Téléphone:</span>
                           <p className="flex items-center">
                             <Phone className="h-4 w-4 mr-1" />
-                            {viewApplication.phoneNumber}
+                            {viewApplication.phone}
                           </p>
                         </div>
                       )}
@@ -400,18 +398,7 @@ export default function ApplicationsPage() {
                         <span className="font-medium">Poste souhaité:</span>
                         <p>{getPositionText(viewApplication.position)}</p>
                       </div>
-                      <div>
-                        <span className="font-medium">Disponibilité:</span>
-                        <p className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          {viewApplication.availability === "temps-plein" ? "Temps plein" :
-                           viewApplication.availability === "temps-partiel" ? "Temps partiel" :
-                           viewApplication.availability === "week-end" ? "Week-ends uniquement" :
-                           viewApplication.availability === "quelques-heures" ? "Quelques heures par semaine" :
-                           viewApplication.availability === "flexible" ? "Horaires flexibles" :
-                           viewApplication.availability}
-                        </p>
-                      </div>
+
                       {viewApplication.portfolio && (
                         <div>
                           <span className="font-medium">Portfolio:</span>
@@ -435,24 +422,12 @@ export default function ApplicationsPage() {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center">
-                      <Award className="h-4 w-4 mr-2" />
-                      Expérience
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="whitespace-pre-wrap">{viewApplication.experience}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center">
                       <MessageSquareQuote className="h-4 w-4 mr-2" />
                       Motivation
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="whitespace-pre-wrap">{viewApplication.motivation}</p>
+                    <p className="whitespace-pre-wrap">{viewApplication.message}</p>
                   </CardContent>
                 </Card>
                 
