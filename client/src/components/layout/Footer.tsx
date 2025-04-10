@@ -1,7 +1,70 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { toast } from "@/hooks/use-toast";
 
 export const Footer: React.FC = () => {
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer votre adresse e-mail",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Vérification simple du format email avec regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Format invalide",
+        description: "Veuillez entrer une adresse e-mail valide",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const response = await apiRequest("POST", "/api/newsletter/subscribe", { email });
+      const data = await response.json();
+      
+      if (data.success) {
+        toast({
+          title: "Succès !",
+          description: "Merci pour votre inscription à notre newsletter",
+          variant: "default"
+        });
+        setEmail(""); // Réinitialiser le champ après succès
+      } else {
+        toast({
+          title: "Erreur",
+          description: data.message || "Une erreur est survenue lors de l'inscription",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'inscription à la newsletter:", error);
+      toast({
+        title: "Erreur de connexion",
+        description: "Impossible de s'inscrire à la newsletter pour le moment",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <footer className="bg-gray-900 text-white py-8">
       <div className="container mx-auto px-4 md:px-6">
@@ -45,17 +108,29 @@ export const Footer: React.FC = () => {
           <div className="col-span-1">
             <h3 className="text-lg font-bold mb-3">Newsletter</h3>
             <p className="text-gray-400 mb-3 text-sm">Inscrivez-vous pour recevoir nos derniers articles.</p>
-            <form className="flex">
+            <form className="flex" onSubmit={handleSubmit}>
               <input
                 type="email"
                 className="bg-gray-800 text-white px-3 py-2 text-sm rounded-l-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Votre email"
+                value={email}
+                onChange={handleEmailChange}
+                disabled={isSubmitting}
               />
               <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r-md transition-colors duration-300"
+                className={`text-white px-3 py-2 rounded-r-md transition-colors duration-300 ${
+                  isSubmitting 
+                    ? "bg-blue-500 cursor-not-allowed" 
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
+                disabled={isSubmitting}
               >
-                →
+                {isSubmitting ? (
+                  <span className="inline-block animate-spin">⟳</span>
+                ) : (
+                  "→"
+                )}
               </button>
             </form>
             <p className="text-gray-500 mt-2 text-xs">contact@politiquensemble.fr</p>

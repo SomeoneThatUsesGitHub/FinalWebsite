@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Menu,
   Radio,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -97,6 +98,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       name: "Équipe",
       href: "/admin/team",
       icon: Users,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+    },
+    {
+      name: "Newsletter",
+      href: "/admin/newsletter",
+      icon: Mail,
       disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
