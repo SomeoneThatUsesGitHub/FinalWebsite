@@ -326,3 +326,19 @@ export type InsertLiveCoverageQuestion = z.infer<typeof insertLiveCoverageQuesti
 
 export type LiveCoverageUpdate = typeof liveCoverageUpdates.$inferSelect;
 export type InsertLiveCoverageUpdate = z.infer<typeof insertLiveCoverageUpdateSchema>;
+
+// Schéma pour les abonnés à la newsletter
+export const newsletterSubscribers = pgTable("newsletter_subscribers", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  subscriptionDate: timestamp("subscription_date").defaultNow().notNull(),
+  active: boolean("active").default(true).notNull(),
+});
+
+export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSubscribers).pick({
+  email: true,
+  active: true,
+});
+
+export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+export type InsertNewsletterSubscriber = z.infer<typeof insertNewsletterSubscriberSchema>;
