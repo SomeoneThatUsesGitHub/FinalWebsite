@@ -1747,7 +1747,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Route admin pour supprimer un abonné à la newsletter
-  app.delete("/api/admin/newsletter/subscribers/:id", isAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/admin/newsletter/subscribers/:id", isAdminOnly, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       
@@ -1800,7 +1800,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Routes admin pour gérer les candidatures
-  app.get("/api/admin/team/applications", isAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/team/applications", isAdminOnly, async (req: Request, res: Response) => {
     try {
       const applications = await storage.getAllTeamApplications();
       res.json(applications);
@@ -1812,7 +1812,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/admin/team/applications/:id", isAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/team/applications/:id", isAdminOnly, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       
@@ -1835,7 +1835,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.patch("/api/admin/team/applications/:id/status", isAdmin, async (req: Request, res: Response) => {
+  app.patch("/api/admin/team/applications/:id/status", isAdminOnly, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       const { status, notes } = req.body;
@@ -1872,7 +1872,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.delete("/api/admin/team/applications/:id", isAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/admin/team/applications/:id", isAdminOnly, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       
