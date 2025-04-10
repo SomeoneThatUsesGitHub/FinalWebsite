@@ -149,6 +149,55 @@ export class DatabaseStorage implements IStorage {
     const result = await db.delete(newsletterSubscribers).where(eq(newsletterSubscribers.id, id));
     return result.rowCount > 0;
   }
+  
+  // Team Applications operations
+  async getAllTeamApplications(): Promise<TeamApplication[]> {
+    return db.select().from(teamApplications).orderBy(desc(teamApplications.submissionDate));
+  }
+  
+  async getTeamApplicationById(id: number): Promise<TeamApplication | undefined> {
+    const [application] = await db.select().from(teamApplications).where(eq(teamApplications.id, id));
+    return application;
+  }
+  
+  async createTeamApplication(application: InsertTeamApplication): Promise<TeamApplication> {
+    const [newApplication] = await db
+      .insert(teamApplications)
+      .values({
+        ...application,
+        status: "pending"
+      })
+      .returning();
+    return newApplication;
+  }
+  
+  async updateTeamApplicationStatus(id: number, status: string, reviewedBy?: number, notes?: string): Promise<TeamApplication | undefined> {
+    const updateData: any = { 
+      status, 
+      reviewedAt: new Date()
+    };
+    
+    if (reviewedBy) {
+      updateData.reviewedBy = reviewedBy;
+    }
+    
+    if (notes !== undefined) {
+      updateData.notes = notes;
+    }
+    
+    const [updatedApplication] = await db
+      .update(teamApplications)
+      .set(updateData)
+      .where(eq(teamApplications.id, id))
+      .returning();
+      
+    return updatedApplication;
+  }
+  
+  async deleteTeamApplication(id: number): Promise<boolean> {
+    const result = await db.delete(teamApplications).where(eq(teamApplications.id, id));
+    return result.rowCount > 0;
+  }
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
