@@ -501,38 +501,43 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getActiveLiveEvent(): Promise<LiveEvent | undefined> {
-    // D'abord chercher un direct actif dans live_coverages
-    const activeCoverages = await this.getActiveLiveCoverages();
-    
-    if (activeCoverages && activeCoverages.length > 0) {
-      // Convertir le premier direct actif en format LiveEvent
-      const coverage = activeCoverages[0];
+    try {
+      // D'abord chercher un direct actif dans live_coverages
+      const activeCoverages = await this.getActiveLiveCoverages();
       
-      // Créer un objet LiveEvent à partir des données du LiveCoverage
-      const liveEvent: LiveEvent = {
-        id: coverage.id,
-        title: coverage.title,
-        description: coverage.description || "",
-        imageUrl: coverage.imageUrl,
-        liveUrl: `/direct/${coverage.slug}`, // URL relative pour le direct
-        active: coverage.active,
-        scheduledFor: coverage.startDate ? new Date(coverage.startDate).toISOString() : null,
-        categoryId: coverage.categoryId,
-        createdAt: coverage.createdAt,
-        updatedAt: coverage.updatedAt
-      };
+      if (activeCoverages && activeCoverages.length > 0) {
+        // Convertir le premier direct actif en format LiveEvent
+        const coverage = activeCoverages[0];
+        
+        // Créer un objet LiveEvent à partir des données du LiveCoverage
+        const liveEvent: LiveEvent = {
+          id: coverage.id,
+          title: coverage.title,
+          description: coverage.subject || "",  // Utiliser subject comme description
+          imageUrl: coverage.imageUrl,
+          liveUrl: `/direct/${coverage.slug}`, // URL relative pour le direct
+          active: coverage.active,
+          scheduledFor: null, // Pas d'équivalent dans LiveCoverage
+          categoryId: null,   // Pas d'équivalent dans LiveCoverage
+          createdAt: coverage.createdAt,
+          updatedAt: coverage.updatedAt
+        };
+        
+        return liveEvent;
+      }
+      
+      // Si aucun direct actif dans live_coverages, chercher dans live_events
+      const [liveEvent] = await db.select()
+        .from(liveEvents)
+        .where(eq(liveEvents.active, true))
+        .orderBy(desc(liveEvents.createdAt))
+        .limit(1);
       
       return liveEvent;
+    } catch (error) {
+      console.error("Erreur dans getActiveLiveEvent:", error);
+      return undefined;
     }
-    
-    // Si aucun direct actif dans live_coverages, chercher dans live_events
-    const [liveEvent] = await db.select()
-      .from(liveEvents)
-      .where(eq(liveEvents.active, true))
-      .orderBy(desc(liveEvents.createdAt))
-      .limit(1);
-    
-    return liveEvent;
   }
 
   async getLiveEventById(id: number): Promise<LiveEvent | undefined> {
@@ -667,15 +672,7 @@ export class DatabaseStorage implements IStorage {
   async getActiveLiveCoverages(): Promise<LiveCoverage[]> {
     return db.select()
       .from(liveCoverages)
-      .where(
-        and(
-          eq(liveCoverages.active, true),
-          or(
-            isNull(liveCoverages.endDate),
-            gte(liveCoverages.endDate, new Date())
-          )
-        )
-      )
+      .where(eq(liveCoverages.active, true))
       .orderBy(desc(liveCoverages.createdAt));
   }
 
