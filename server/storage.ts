@@ -500,7 +500,7 @@ export class DatabaseStorage implements IStorage {
     return flashInfo;
   }
 
-  async getActiveLiveEvent(): Promise<LiveEvent | undefined> {
+  async getActiveLiveEvent(): Promise<(LiveEvent & { editors?: any[] }) | undefined> {
     try {
       // D'abord chercher un direct actif dans live_coverages
       const activeCoverages = await this.getActiveLiveCoverages();
@@ -509,8 +509,11 @@ export class DatabaseStorage implements IStorage {
         // Convertir le premier direct actif en format LiveEvent
         const coverage = activeCoverages[0];
         
+        // Récupérer les éditeurs du direct
+        const editors = await this.getLiveCoverageEditors(coverage.id);
+        
         // Créer un objet LiveEvent à partir des données du LiveCoverage
-        const liveEvent: LiveEvent = {
+        const liveEvent: LiveEvent & { editors?: any[] } = {
           id: coverage.id,
           title: coverage.title,
           description: coverage.subject || "",  // Utiliser subject comme description
@@ -520,7 +523,8 @@ export class DatabaseStorage implements IStorage {
           scheduledFor: null, // Pas d'équivalent dans LiveCoverage
           categoryId: null,   // Pas d'équivalent dans LiveCoverage
           createdAt: coverage.createdAt,
-          updatedAt: coverage.updatedAt
+          updatedAt: coverage.updatedAt,
+          editors: editors
         };
         
         return liveEvent;
