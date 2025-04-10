@@ -16,7 +16,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon, BarChart3 as BarChartIcon, MessageSquare, FileText as Newspaper, Video as Youtube } from "lucide-react";
+import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon, BarChart3 as BarChartIcon, MessageSquare, FileText as Newspaper, Video as Youtube, ListChecks, PlusCircle, MinusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { queryClient } from "@/lib/queryClient";
@@ -45,6 +45,12 @@ const electionResultSchema = z.object({
   displayType: z.enum(["bar", "pie"]).default("bar")
 });
 
+// Schéma pour les éléments du récapitulatif
+const recapItemSchema = z.object({
+  text: z.string(),
+  done: z.boolean().default(false)
+});
+
 // Schéma de validation pour les mises à jour
 const updateSchema = z.object({
   content: z.string().min(3, "Le contenu est requis (minimum 3 caractères)"),
@@ -52,8 +58,9 @@ const updateSchema = z.object({
   important: z.boolean().default(false),
   youtubeUrl: z.string().optional(),
   articleId: z.number().optional(),
-  updateType: z.enum(["normal", "youtube", "article", "election"]).default("normal"),
+  updateType: z.enum(["normal", "youtube", "article", "election", "recap"]).default("normal"),
   electionResults: z.string().optional(), // On stocke les données JSON sous forme de chaîne
+  recapItems: z.string().optional(), // On stocke les éléments du récap sous forme de chaîne JSON
 });
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
