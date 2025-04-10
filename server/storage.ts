@@ -501,6 +501,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getActiveLiveEvent(): Promise<LiveEvent | undefined> {
+    // D'abord chercher un direct actif dans live_coverages
+    const activeCoverages = await this.getActiveLiveCoverages();
+    
+    if (activeCoverages && activeCoverages.length > 0) {
+      // Convertir le premier direct actif en format LiveEvent
+      const coverage = activeCoverages[0];
+      
+      // Créer un objet LiveEvent à partir des données du LiveCoverage
+      const liveEvent: LiveEvent = {
+        id: coverage.id,
+        title: coverage.title,
+        description: coverage.description || "",
+        imageUrl: coverage.imageUrl,
+        liveUrl: `/direct/${coverage.slug}`, // URL relative pour le direct
+        active: coverage.active,
+        scheduledFor: coverage.startDate ? new Date(coverage.startDate).toISOString() : null,
+        categoryId: coverage.categoryId,
+        createdAt: coverage.createdAt,
+        updatedAt: coverage.updatedAt
+      };
+      
+      return liveEvent;
+    }
+    
+    // Si aucun direct actif dans live_coverages, chercher dans live_events
     const [liveEvent] = await db.select()
       .from(liveEvents)
       .where(eq(liveEvents.active, true))
