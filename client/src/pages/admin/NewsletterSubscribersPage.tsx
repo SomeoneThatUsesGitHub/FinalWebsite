@@ -89,8 +89,9 @@ export default function NewsletterSubscribersPage() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader size="lg" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mb-3" />
+          <p className="text-muted-foreground">Chargement des abonnés...</p>
         </div>
       </AdminLayout>
     );

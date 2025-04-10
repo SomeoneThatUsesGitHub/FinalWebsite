@@ -33,6 +33,8 @@ import DirectQuestionsPage from "@/pages/admin/DirectQuestionsPage";
 
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
+// Newsletter subscribers page
+import NewsletterSubscribersPage from "@/pages/admin/NewsletterSubscribersPage";
 
 // Layout
 import Header from "@/components/layout/Header";
@@ -92,6 +94,7 @@ function App() {
               <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
               <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
               <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
+              <ProtectedRoute path="/admin/newsletter" component={NewsletterSubscribersPage} adminOnly />
               
               {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
               <ProtectedRoute path="/admin/directs" component={DirectsPage} />
