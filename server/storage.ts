@@ -504,7 +504,8 @@ export class DatabaseStorage implements IStorage {
     const [liveEvent] = await db.select()
       .from(liveEvents)
       .where(eq(liveEvents.active, true))
-      .orderBy(liveEvents.startDate);
+      .orderBy(desc(liveEvents.createdAt))
+      .limit(1);
     
     return liveEvent;
   }
