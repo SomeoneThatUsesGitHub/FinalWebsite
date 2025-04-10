@@ -1111,6 +1111,42 @@ export default function DirectUpdatesPage() {
                           </Card>
                         </a>
                       )}
+                      
+                      {update.updateType === "election" && update.electionResults && (
+                        <div className="mt-4 border rounded-xl p-4 bg-white">
+                          <ElectionResultsChart data={JSON.parse(update.electionResults)} />
+                        </div>
+                      )}
+                      
+                      {update.updateType === "recap" && update.recapItems && (
+                        <div className="mt-4 border rounded-xl p-4 bg-white">
+                          <div className="flex items-center gap-2 mb-3">
+                            <ListChecks className="h-5 w-5 text-primary" />
+                            <h4 className="font-medium">Le Récap</h4>
+                          </div>
+                          <ul className="space-y-2">
+                            {JSON.parse(update.recapItems).map((item: { text: string; done: boolean }, index: number) => (
+                              <li 
+                                key={index} 
+                                className="flex items-center gap-2"
+                              >
+                                <div className={cn(
+                                  "h-5 w-5 flex items-center justify-center rounded-full border",
+                                  item.done ? "bg-green-100 border-green-500" : "border-muted-foreground/30"
+                                )}>
+                                  {item.done && <Check className="h-3 w-3 text-green-600" />}
+                                </div>
+                                <span className={cn(
+                                  "text-sm",
+                                  item.done && "text-muted-foreground"
+                                )}>
+                                  {item.text}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="mt-4 flex justify-end">

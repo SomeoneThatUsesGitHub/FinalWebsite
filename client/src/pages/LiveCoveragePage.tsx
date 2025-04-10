@@ -25,7 +25,8 @@ interface LiveCoverageUpdateWithQuestion extends Omit<LiveCoverageUpdate, 'updat
   questionContent?: string;
   questionUsername?: string;
   electionResults?: ElectionResultsData | string;
-  updateType?: 'normal' | 'youtube' | 'article' | 'election';
+  recapItems?: string; // Ajout pour le récap
+  updateType?: 'normal' | 'youtube' | 'article' | 'election' | 'recap';
 }
 
 export default function LiveCoveragePage() {
