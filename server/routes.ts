@@ -280,7 +280,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const liveEvent = await storage.getActiveLiveEvent();
       
       if (!liveEvent) {
-        return res.status(404).json({ message: "No active live event" });
+        // Renvoyer un objet vide plutôt qu'une erreur 404
+        // Cela permet au frontend de savoir qu'il n'y a pas de direct actif
+        // sans avoir à gérer une erreur
+        return res.json({ id: 0, title: "", description: "", active: false });
       }
       
       res.json(liveEvent);
