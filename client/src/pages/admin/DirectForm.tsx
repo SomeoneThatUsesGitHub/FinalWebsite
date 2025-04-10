@@ -21,7 +21,6 @@ import { slugify } from "@/lib/utils";
 const formSchema = insertLiveCoverageSchema.extend({
   title: z.string().min(5, "Le titre doit contenir au moins 5 caractères"),
   subject: z.string().min(5, "Le sujet doit contenir au moins 5 caractères"),
-  context: z.string().min(10, "Le contexte doit contenir au moins 10 caractères"),
 });
 
 export default function DirectForm() {
@@ -51,7 +50,6 @@ export default function DirectForm() {
       title: "",
       slug: "",
       subject: "",
-      context: "",
       imageUrl: "",
       active: true,
     },
@@ -145,7 +143,6 @@ export default function DirectForm() {
         title: direct.title,
         slug: direct.slug,
         subject: direct.subject,
-        context: direct.context,
         imageUrl: direct.imageUrl || "",
         active: direct.active,
       });
@@ -282,26 +279,7 @@ export default function DirectForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="context"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contexte *</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder="Suivez en direct le premier tour de l'élection présidentielle 2027 avec nos analyses, résultats et réactions..." 
-                    {...field} 
-                    rows={5}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Description détaillée du suivi en direct, présentée en haut de la page.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
 
           <FormField
             control={form.control}

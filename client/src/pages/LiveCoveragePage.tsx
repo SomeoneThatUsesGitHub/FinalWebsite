@@ -277,7 +277,7 @@ export default function LiveCoveragePage() {
           </Button>
         </div>
         
-        <div className="container max-w-4xl mx-auto px-4 py-16 sm:py-24 md:py-28 relative z-10">
+        <div className="container max-w-4xl mx-auto px-4 py-16 sm:py-28 md:py-36 relative z-10">
           <div className="space-y-4 pt-10 sm:pt-4">
             <div className="flex flex-wrap gap-2 items-center text-sm">
               <Badge variant="outline" className="bg-red-600/80 text-white border-0 flex items-center">
