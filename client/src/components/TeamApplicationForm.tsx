@@ -25,20 +25,13 @@ const applicationFormSchema = insertTeamApplicationSchema.extend({
   position: z.string().min(1, {
     message: "Veuillez sélectionner un poste",
   }),
-  experience: z.string().min(10, {
-    message: "Veuillez décrire votre expérience (minimum 10 caractères)",
-  }),
   motivation: z.string().min(20, {
     message: "Veuillez décrire votre motivation (minimum 20 caractères)",
-  }),
-  availability: z.string().min(1, {
-    message: "Veuillez sélectionner votre disponibilité",
   }),
   phoneNumber: z.string().optional(),
   portfolio: z.string().url({
     message: "Veuillez entrer une URL valide pour votre portfolio/profil",
   }).optional().or(z.literal("")),
-  additionalInfo: z.string().optional(),
 });
 
 type ApplicationFormData = z.infer<typeof applicationFormSchema>;
@@ -53,12 +46,9 @@ export default function TeamApplicationForm() {
       fullName: "",
       email: "",
       position: "",
-      experience: "",
       motivation: "",
-      availability: "",
       phoneNumber: "",
       portfolio: "",
-      additionalInfo: "",
     },
   });
 
@@ -96,13 +86,15 @@ export default function TeamApplicationForm() {
 
   if (submitSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center bg-white rounded-lg shadow-md">
-        <CheckCircle2 className="w-16 h-16 mb-4 text-green-500" />
-        <h3 className="text-2xl font-bold">Candidature envoyée avec succès !</h3>
-        <p className="mt-2 mb-6 text-gray-600">
-          Merci pour votre intérêt à rejoindre notre équipe. Nous examinerons votre candidature et vous contacterons prochainement.
+      <div className="w-full bg-white shadow-lg rounded-xl p-8 flex flex-col items-center justify-center">
+        <div className="mb-6 bg-green-50 p-4 rounded-full">
+          <CheckCircle2 className="w-16 h-16 text-green-500" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Candidature envoyée avec succès</h3>
+        <p className="text-gray-600 text-center mb-8 max-w-md">
+          Merci pour votre intérêt ! Nous examinerons votre candidature et vous recontacterons prochainement.
         </p>
-        <Button onClick={() => setSubmitSuccess(false)} variant="outline">
+        <Button onClick={() => setSubmitSuccess(false)} variant="outline" className="px-6">
           Soumettre une autre candidature
         </Button>
       </div>
@@ -110,99 +102,25 @@ export default function TeamApplicationForm() {
   }
 
   return (
-    <div className="w-full bg-white rounded-md shadow-md mt-12">
-      <div className="w-full px-2">
-        <h2 className="text-3xl font-bold py-6 text-primary border-b border-gray-200">Rejoindre l'équipe</h2>
+    <div className="w-full bg-white shadow-lg rounded-xl overflow-hidden">
+      <div className="border-b border-gray-100">
+        <h2 className="text-2xl font-bold px-8 py-6 text-gray-800">Rejoindre l'équipe</h2>
+      </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-6 px-2">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 md:grid-cols-2">
-              {/* Nom complet */}
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom Prénom *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Jean Dupont" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Email */}
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Adresse e-mail *</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="jean.dupont@exemple.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Téléphone */}
-              <FormField
-                control={form.control}
-                name="phoneNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Numéro de téléphone *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+33 6 12 34 56 78" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Poste */}
-              <FormField
-                control={form.control}
-                name="position"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Poste souhaité *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionnez un poste" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="journaliste">Journaliste</SelectItem>
-                        <SelectItem value="monteur-video">Monteur vidéo</SelectItem>
-                        <SelectItem value="graphiste-designer">Graphiste et designer</SelectItem>
-                        <SelectItem value="veilleur-actualite">Veilleur d'actualité</SelectItem>
-                        <SelectItem value="ambassadeur">Ambassadeur</SelectItem>
-                        <SelectItem value="photographe">Photographe</SelectItem>
-                        <SelectItem value="spontanee">Candidature spontanée</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Motivation */}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <FormField
               control={form.control}
-              name="motivation"
+              name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Motivation *</FormLabel>
+                  <FormLabel className="text-gray-700 font-medium">Nom complet *</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Pourquoi souhaitez-vous rejoindre Politiquensemble ?" 
-                      className="min-h-[200px] text-base" 
+                    <Input 
+                      placeholder="Jean Dupont" 
                       {...field} 
+                      className="bg-gray-50 border-0 focus-visible:ring-1 focus-visible:ring-primary py-6" 
                     />
                   </FormControl>
                   <FormMessage />
@@ -210,25 +128,127 @@ export default function TeamApplicationForm() {
               )}
             />
 
-            <div className="pt-8">
-              <Button 
-                type="submit" 
-                className="w-full py-7 text-xl font-semibold" 
-                disabled={submitMutation.isPending}
-              >
-                {submitMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                    Envoi en cours...
-                  </>
-                ) : (
-                  "Envoyer ma candidature"
-                )}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 font-medium">Email *</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="email" 
+                      placeholder="jean.dupont@exemple.com" 
+                      {...field} 
+                      className="bg-gray-50 border-0 focus-visible:ring-1 focus-visible:ring-primary py-6" 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 font-medium">Téléphone</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="+33 6 12 34 56 78" 
+                      {...field} 
+                      className="bg-gray-50 border-0 focus-visible:ring-1 focus-visible:ring-primary py-6" 
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs text-gray-500">Optionnel</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="position"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 font-medium">Poste souhaité *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-gray-50 border-0 focus-visible:ring-1 focus-visible:ring-primary h-[54px]">
+                        <SelectValue placeholder="Sélectionnez un poste" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="journaliste">Journaliste</SelectItem>
+                      <SelectItem value="monteur-video">Monteur vidéo</SelectItem>
+                      <SelectItem value="graphiste-designer">Graphiste et designer</SelectItem>
+                      <SelectItem value="veilleur-actualite">Veilleur d'actualité</SelectItem>
+                      <SelectItem value="ambassadeur">Ambassadeur</SelectItem>
+                      <SelectItem value="photographe">Photographe</SelectItem>
+                      <SelectItem value="spontanee">Candidature spontanée</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="portfolio"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel className="text-gray-700 font-medium">Portfolio ou profil professionnel</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="https://..." 
+                      {...field} 
+                      className="bg-gray-50 border-0 focus-visible:ring-1 focus-visible:ring-primary py-6" 
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs text-gray-500">Lien vers vos travaux ou profil LinkedIn/Twitter (optionnel)</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="motivation"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel className="text-gray-700 font-medium">Motivation *</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Pourquoi souhaitez-vous rejoindre Politiquensemble ?" 
+                      className="bg-gray-50 border-0 focus-visible:ring-1 focus-visible:ring-primary min-h-[200px] resize-none" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="mt-10">
+            <Button 
+              type="submit" 
+              className="w-full py-7 text-lg font-medium shadow-md transition-all hover:shadow-lg" 
+              disabled={submitMutation.isPending}
+            >
+              {submitMutation.isPending ? (
+                <div className="flex items-center justify-center">
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  <span>Envoi en cours...</span>
+                </div>
+              ) : (
+                "Envoyer ma candidature"
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }
