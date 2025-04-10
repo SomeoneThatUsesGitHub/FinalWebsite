@@ -102,135 +102,184 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Notre histoire - Format de notes collées */}
-      <section className="py-16 bg-white" id="histoire">
+      {/* Notre histoire - Nouvelle mise en page asymétrique */}
+      <section className="py-20 bg-white pattern-grid-fade overflow-hidden" id="histoire">
         <div className="container mx-auto px-4">
-          <ScrollAnimation threshold={0.1}>
-            <div className="mb-12 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Notre histoire</h2>
-              <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full mb-6"></div>
-              <p className="text-dark/70 max-w-3xl mx-auto">
-                Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant.
-              </p>
+          <div className="flex flex-col lg:flex-row">
+            {/* Titre et introduction à gauche */}
+            <div className="lg:w-1/3 lg:pr-16 mb-12 lg:mb-0 relative z-10">
+              <ScrollAnimation threshold={0.1}>
+                <div className="sticky top-10">
+                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 lg:text-left">Notre histoire</h2>
+                  <div className="w-24 h-1 bg-blue-600 mb-6 lg:mx-0"></div>
+                  <p className="text-dark/80 mb-8 lg:text-left">
+                    Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui transforme l'accès à l'information politique pour les jeunes.
+                  </p>
+                  <div className="hidden lg:block relative">
+                    <div className="absolute -left-12 -bottom-12 w-24 h-24 bg-blue-100 rounded-full opacity-70"></div>
+                    <div className="absolute -right-12 top-10 w-16 h-16 bg-blue-200 rounded-full opacity-50"></div>
+                  </div>
+                </div>
+              </ScrollAnimation>
             </div>
-          </ScrollAnimation>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {keyMilestones.map((milestone, index) => (
-              <ScrollAnimation 
-                key={index} 
-                threshold={0.1}
-                delay={index * 0.1}
-                className="flex justify-center"
-              >
-                <div className={`milestone-card w-full md:w-11/12 md:max-w-md`}>
-                  <div className="milestone-content">
-                    <div className="flex items-start mb-3">
-                      <div className="mr-3 flex-shrink-0">
-                        {milestone.icon}
-                      </div>
-                      <div>
-                        <div className="text-blue-600 font-bold text-lg">{milestone.year}</div>
-                        <h3 className="text-xl font-bold text-dark">{milestone.title}</h3>
+            
+            {/* Timeline à droite */}
+            <div className="lg:w-2/3 relative">
+              <div className="hidden lg:block absolute top-0 bottom-0 left-12 w-1 bg-blue-200"></div>
+              
+              {keyMilestones.map((milestone, index) => (
+                <ScrollAnimation 
+                  key={index} 
+                  threshold={0.1}
+                  delay={index * 0.1}
+                >
+                  <div className="flex mb-16 relative lg:pl-24">
+                    <div className="hidden lg:flex absolute left-10 top-4 -translate-x-1/2 w-8 h-8 bg-white border-4 border-blue-500 rounded-full z-10"></div>
+                    <div className="milestone-card w-full lg:ml-4">
+                      <div className="milestone-content">
+                        <div className="flex items-start mb-3">
+                          <div className="mr-4 p-3 bg-blue-100 rounded-xl flex-shrink-0">
+                            {milestone.icon}
+                          </div>
+                          <div>
+                            <div className="text-blue-600 font-bold text-lg">{milestone.year}</div>
+                            <h3 className="text-xl font-bold text-dark">{milestone.title}</h3>
+                          </div>
+                        </div>
+                        <p className="text-dark/70 lg:pl-16">{milestone.description}</p>
                       </div>
                     </div>
-                    <p className="text-dark/70">{milestone.description}</p>
                   </div>
-                </div>
-              </ScrollAnimation>
-            ))}
+                </ScrollAnimation>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Nos valeurs - Nouveau style horizontal simplifié */}
-      <section className="py-16 bg-blue-50" id="valeurs">
+      {/* Nos valeurs - Style asymétrique */}
+      <section className="py-20 bg-gradient-to-r from-blue-50 to-white" id="valeurs">
         <div className="container mx-auto px-4">
-          <ScrollAnimation threshold={0.1}>
-            <div className="mb-12 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Nos valeurs</h2>
-              <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full mb-6"></div>
-              <p className="text-dark/70 max-w-3xl mx-auto">
-                Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information.
-              </p>
+          <div className="flex flex-col lg:flex-row items-center">
+            {/* Cards à gauche */}
+            <div className="lg:w-3/5 order-2 lg:order-1">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative">
+                {/* Élément décoratif */}
+                <div className="hidden lg:block absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full opacity-50 z-0"></div>
+                
+                {values.slice(0, 3).map((value, index) => (
+                  <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15}>
+                    <div className={`bg-white rounded-lg p-6 shadow-lg h-full border-l-4 border-blue-600 hover:shadow-xl transition-shadow relative z-10 transform ${index % 2 === 1 ? 'lg:translate-y-8' : ''}`}>
+                      <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                        <ValueCard 
+                          icon={value.icon} 
+                          title=""
+                          description=""
+                          index={index}
+                          iconOnly={true}
+                        />
+                      </div>
+                      <h3 className="text-xl font-bold text-blue-800 mb-3">{value.title}</h3>
+                      <p className="text-gray-600">{value.description}</p>
+                    </div>
+                  </ScrollAnimation>
+                ))}
+              </div>
             </div>
-          </ScrollAnimation>
-
-          <div className="flex flex-col md:flex-row justify-center gap-8 max-w-5xl mx-auto">
-            {values.slice(0, 3).map((value, index) => (
-              <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15} className="flex-1">
-                <div className="bg-white rounded-lg p-6 shadow-lg h-full border-t-4 border-blue-600 hover:shadow-xl transition-shadow">
-                  <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ValueCard 
-                      icon={value.icon} 
-                      title=""
-                      description=""
-                      index={index}
-                      iconOnly={true}
-                    />
-                  </div>
-                  <h3 className="text-xl font-bold text-center text-blue-800 mb-3">{value.title}</h3>
-                  <p className="text-gray-600 text-center">{value.description}</p>
+            
+            {/* Texte à droite */}
+            <div className="lg:w-2/5 mb-12 lg:mb-0 order-1 lg:order-2 lg:pl-16">
+              <ScrollAnimation threshold={0.1}>
+                <div className="lg:text-right">
+                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Nos valeurs</h2>
+                  <div className="w-24 h-1 bg-blue-600 mb-6 lg:ml-auto"></div>
+                  <p className="text-dark/80 mb-6">
+                    Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information quotidienne.
+                  </p>
+                  <p className="text-dark/70">
+                    Notre objectif est de rendre l'information politique compréhensible, objective et accessible, quelle que soit votre connaissance préalable du sujet.
+                  </p>
                 </div>
               </ScrollAnimation>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Politiquensemble en chiffres */}
-      <section className="py-16 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section" id="chiffres">
-        <div className="container mx-auto px-4">
-          <ScrollAnimation threshold={0.1}>
-            <div className="mb-12 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">Politiquensemble en chiffres</h2>
-              <div className="w-24 h-1 bg-white mx-auto rounded-full mb-6"></div>
-              <p className="text-white/80 max-w-3xl mx-auto">
-                Notre impact en quelques données clés
-              </p>
+      {/* Politiquensemble en chiffres - Style décalé et dynamique */}
+      <section className="py-20 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
+        {/* Élément décoratif */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500 opacity-30 rounded-full"></div>
+        <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-blue-400 opacity-20 rounded-full"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center">
+            {/* Stats à droite */}
+            <div className="lg:w-3/5 order-2 lg:order-2">
+              <div className="grid grid-cols-2 gap-6 relative">
+                <ScrollAnimation threshold={0.1} delay={0.1}>
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
+                    <div className="flex items-center mb-3">
+                      <div className="bg-white/15 p-3 rounded-lg mr-4">
+                        <Users className="w-7 h-7 text-blue-100" />
+                      </div>
+                      <div className="text-3xl md:text-5xl font-bold">10K+</div>
+                    </div>
+                    <div className="text-lg text-white/80">Abonnés sur nos réseaux sociaux</div>
+                  </div>
+                </ScrollAnimation>
+                
+                <ScrollAnimation threshold={0.1} delay={0.2}>
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform lg:translate-y-6 hover:translate-y-1 transition-transform">
+                    <div className="flex items-center mb-3">
+                      <div className="bg-white/15 p-3 rounded-lg mr-4">
+                        <Newspaper className="w-7 h-7 text-blue-100" />
+                      </div>
+                      <div className="text-3xl md:text-5xl font-bold">250+</div>
+                    </div>
+                    <div className="text-lg text-white/80">Articles et analyses publiés</div>
+                  </div>
+                </ScrollAnimation>
+                
+                <ScrollAnimation threshold={0.1} delay={0.3}>
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform lg:translate-y-[-24px] hover:translate-y-[-29px] transition-transform">
+                    <div className="flex items-center mb-3">
+                      <div className="bg-white/15 p-3 rounded-lg mr-4">
+                        <Share2 className="w-7 h-7 text-blue-100" />
+                      </div>
+                      <div className="text-3xl md:text-5xl font-bold">50+</div>
+                    </div>
+                    <div className="text-lg text-white/80">Événements couverts en direct</div>
+                  </div>
+                </ScrollAnimation>
+                
+                <ScrollAnimation threshold={0.1} delay={0.4}>
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
+                    <div className="flex items-center mb-3">
+                      <div className="bg-white/15 p-3 rounded-lg mr-4">
+                        <BookOpen className="w-7 h-7 text-blue-100" />
+                      </div>
+                      <div className="text-3xl md:text-5xl font-bold">15+</div>
+                    </div>
+                    <div className="text-lg text-white/80">Dossiers pédagogiques</div>
+                  </div>
+                </ScrollAnimation>
+              </div>
             </div>
-          </ScrollAnimation>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-4xl mx-auto">
-            <ScrollAnimation threshold={0.1} delay={0.1}>
-              <div className="text-center">
-                <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                  <Users className="w-6 h-6 text-blue-100" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">10K+</div>
-                <div className="text-white/80">Abonnés</div>
-              </div>
-            </ScrollAnimation>
             
-            <ScrollAnimation threshold={0.1} delay={0.2}>
-              <div className="text-center">
-                <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                  <Newspaper className="w-6 h-6 text-blue-100" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">250+</div>
-                <div className="text-white/80">Articles publiés</div>
-              </div>
-            </ScrollAnimation>
-            
-            <ScrollAnimation threshold={0.1} delay={0.3}>
-              <div className="text-center">
-                <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                  <Share2 className="w-6 h-6 text-blue-100" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">50+</div>
-                <div className="text-white/80">Directs couverts</div>
-              </div>
-            </ScrollAnimation>
-            
-            <ScrollAnimation threshold={0.1} delay={0.4}>
-              <div className="text-center">
-                <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                  <BookOpen className="w-6 h-6 text-blue-100" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">15+</div>
-                <div className="text-white/80">Dossiers pédagogiques</div>
-              </div>
-            </ScrollAnimation>
+            {/* Texte à gauche */}
+            <div className="lg:w-2/5 mb-12 lg:mb-0 order-1 lg:order-1 lg:pr-16">
+              <ScrollAnimation threshold={0.1}>
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">Notre impact en chiffres</h2>
+                <div className="w-24 h-1 bg-white mb-6"></div>
+                <p className="text-white/90 text-lg mb-6">
+                  Depuis notre création, nous nous efforçons de rendre l'information politique accessible au plus grand nombre.
+                </p>
+                <p className="text-white/80">
+                  Ces chiffres témoignent de notre engagement à produire un contenu de qualité qui aide à comprendre les enjeux politiques contemporains.
+                </p>
+              </ScrollAnimation>
+            </div>
           </div>
         </div>
       </section>
