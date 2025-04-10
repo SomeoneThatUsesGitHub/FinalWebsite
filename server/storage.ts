@@ -12,7 +12,8 @@ import {
   liveCoverageEditors, type LiveCoverageEditor, type InsertLiveCoverageEditor,
   liveCoverageUpdates, type LiveCoverageUpdate, type InsertLiveCoverageUpdate,
   liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion,
-  newsletterSubscribers, type NewsletterSubscriber, type InsertNewsletterSubscriber
+  newsletterSubscribers, type NewsletterSubscriber, type InsertNewsletterSubscriber,
+  teamApplications, type TeamApplication, type InsertTeamApplication
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte, sql, lt } from "drizzle-orm";
@@ -33,6 +34,13 @@ export interface IStorage {
   getNewsletterSubscribers(): Promise<NewsletterSubscriber[]>;
   createNewsletterSubscriber(email: string): Promise<NewsletterSubscriber>;
   deleteNewsletterSubscriber(id: number): Promise<boolean>;
+  
+  // Team Applications operations
+  getAllTeamApplications(): Promise<TeamApplication[]>;
+  getTeamApplicationById(id: number): Promise<TeamApplication | undefined>;
+  createTeamApplication(application: InsertTeamApplication): Promise<TeamApplication>;
+  updateTeamApplicationStatus(id: number, status: string, reviewedBy?: number, notes?: string): Promise<TeamApplication | undefined>;
+  deleteTeamApplication(id: number): Promise<boolean>;
   
   // Article operations
   getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number, showUnpublished?: boolean, authorId?: number}): Promise<Article[]>;

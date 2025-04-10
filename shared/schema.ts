@@ -342,3 +342,31 @@ export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSub
 
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
 export type InsertNewsletterSubscriber = z.infer<typeof insertNewsletterSubscriberSchema>;
+
+// Schéma pour les candidatures d'équipe
+export const teamApplications = pgTable("team_applications", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  position: text("position").notNull(), // Poste souhaité
+  message: text("message").notNull(),
+  cvUrl: text("cv_url"), // Lien vers CV (optionnel)
+  status: text("status").notNull().default("pending"), // pending, reviewed, accepted, rejected
+  submissionDate: timestamp("submission_date").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewedBy: integer("reviewed_by").references(() => users.id),
+  notes: text("notes"), // Notes internes pour les administrateurs
+});
+
+export const insertTeamApplicationSchema = createInsertSchema(teamApplications).pick({
+  fullName: true,
+  email: true,
+  phone: true,
+  position: true,
+  message: true,
+  cvUrl: true,
+});
+
+export type TeamApplication = typeof teamApplications.$inferSelect;
+export type InsertTeamApplication = z.infer<typeof insertTeamApplicationSchema>;
