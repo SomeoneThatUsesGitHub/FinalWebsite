@@ -92,8 +92,9 @@ const AboutPage: React.FC = () => {
                     Nous contacter
                   </Button>
                 </Link>
-                <a href="https://twitter.com/politiquensemble" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.instagram.com/politiquensemble/" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                    <Instagram className="h-4 w-4 mr-2" />
                     Nous suivre
                   </Button>
                 </a>
@@ -117,10 +118,10 @@ const AboutPage: React.FC = () => {
                     Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui transforme l'accès à l'information politique pour les jeunes.
                   </p>
                   
-                  {/* Téléphone avec Instagram (légèrement incliné) */}
-                  <div className="mt-12 relative mx-auto lg:mx-0 max-w-[280px]">
+                  {/* Téléphone avec Instagram (incliné sur desktop, animation popup sur mobile) */}
+                  <div className="mt-16 relative mx-auto lg:mx-0 max-w-[280px]">
                     <div className="phone-mockup">
-                      <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform -rotate-3">
+                      <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform lg:-rotate-3 animate-in fade-in-50 zoom-in-95 duration-1000">
                         <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
@@ -221,6 +222,9 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Bande bleue pour transition */}
+      <section className="py-2 bg-blue-800"></section>
+      
       {/* Politiquensemble en chiffres - Style décalé et dynamique avec animation de comptage */}
       <section className="py-20 mb-20 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
         {/* Élément décoratif */}
