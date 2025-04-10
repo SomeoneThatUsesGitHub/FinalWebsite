@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import ScrollAnimation from "@/components/animations/ScrollAnimation";
 import ValueCard from "@/components/about/ValueCard";
-import { MapPin, Calendar, Award, Users, Bookmark, TrendingUp, Newspaper, Share2, BookOpen } from "lucide-react";
+import { MapPin, Calendar, Award, Users, Bookmark, TrendingUp, Newspaper, Share2, BookOpen, Instagram } from "lucide-react";
+import CountUp from "react-countup";
 
 const AboutPage: React.FC = () => {
   const values = [
@@ -116,10 +117,10 @@ const AboutPage: React.FC = () => {
                     Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui transforme l'accès à l'information politique pour les jeunes.
                   </p>
                   
-                  {/* Téléphone avec Instagram */}
+                  {/* Téléphone avec Instagram (légèrement incliné) */}
                   <div className="mt-12 relative mx-auto lg:mx-0 max-w-[280px]">
                     <div className="phone-mockup">
-                      <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl">
+                      <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform -rotate-3">
                         <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
@@ -220,8 +221,8 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Politiquensemble en chiffres - Style décalé et dynamique */}
-      <section className="py-20 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
+      {/* Politiquensemble en chiffres - Style décalé et dynamique avec animation de comptage */}
+      <section className="py-20 mb-20 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
         {/* Élément décoratif */}
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500 opacity-30 rounded-full"></div>
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-blue-400 opacity-20 rounded-full"></div>
@@ -237,7 +238,9 @@ const AboutPage: React.FC = () => {
                       <div className="bg-white/15 p-3 rounded-lg mr-4">
                         <Users className="w-7 h-7 text-blue-100" />
                       </div>
-                      <div className="text-3xl md:text-5xl font-bold">10K+</div>
+                      <div className="text-3xl md:text-5xl font-bold">
+                        <CountUp end={10} suffix="K+" duration={2.5} />
+                      </div>
                     </div>
                     <div className="text-lg text-white/80">Abonnés sur nos réseaux sociaux</div>
                   </div>
@@ -249,7 +252,9 @@ const AboutPage: React.FC = () => {
                       <div className="bg-white/15 p-3 rounded-lg mr-4">
                         <Newspaper className="w-7 h-7 text-blue-100" />
                       </div>
-                      <div className="text-3xl md:text-5xl font-bold">250+</div>
+                      <div className="text-3xl md:text-5xl font-bold">
+                        <CountUp end={250} suffix="+" duration={2.5} />
+                      </div>
                     </div>
                     <div className="text-lg text-white/80">Articles et analyses publiés</div>
                   </div>
@@ -261,7 +266,9 @@ const AboutPage: React.FC = () => {
                       <div className="bg-white/15 p-3 rounded-lg mr-4">
                         <Share2 className="w-7 h-7 text-blue-100" />
                       </div>
-                      <div className="text-3xl md:text-5xl font-bold">50+</div>
+                      <div className="text-3xl md:text-5xl font-bold">
+                        <CountUp end={50} suffix="+" duration={2.5} />
+                      </div>
                     </div>
                     <div className="text-lg text-white/80">Événements couverts en direct</div>
                   </div>
@@ -273,7 +280,9 @@ const AboutPage: React.FC = () => {
                       <div className="bg-white/15 p-3 rounded-lg mr-4">
                         <BookOpen className="w-7 h-7 text-blue-100" />
                       </div>
-                      <div className="text-3xl md:text-5xl font-bold">15+</div>
+                      <div className="text-3xl md:text-5xl font-bold">
+                        <CountUp end={15} suffix="+" duration={2.5} />
+                      </div>
                     </div>
                     <div className="text-lg text-white/80">Dossiers pédagogiques</div>
                   </div>
@@ -292,6 +301,17 @@ const AboutPage: React.FC = () => {
                 <p className="text-white/80">
                   Ces chiffres témoignent de notre engagement à produire un contenu de qualité qui aide à comprendre les enjeux politiques contemporains.
                 </p>
+                <div className="mt-8">
+                  <a 
+                    href="https://www.instagram.com/politiquensemble/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="inline-flex items-center px-6 py-3 bg-white text-blue-800 rounded-full font-medium hover:bg-blue-50 transition-all"
+                  >
+                    <Instagram className="mr-2 h-5 w-5" />
+                    Nous suivre
+                  </a>
+                </div>
               </ScrollAnimation>
             </div>
           </div>
