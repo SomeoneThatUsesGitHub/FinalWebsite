@@ -31,7 +31,8 @@ import { toast } from "@/hooks/use-toast";
 interface NewsletterSubscriber {
   id: number;
   email: string;
-  createdAt: string;
+  subscriptionDate: string;
+  active: boolean;
 }
 
 export default function NewsletterSubscribersPage() {
@@ -146,7 +147,7 @@ export default function NewsletterSubscribersPage() {
                   <TableRow key={subscriber.id}>
                     <TableCell className="font-medium">{subscriber.email}</TableCell>
                     <TableCell>
-                      {format(new Date(subscriber.createdAt), 'PPP à HH:mm', { locale: fr })}
+                      {format(new Date(subscriber.subscriptionDate), 'PPP à HH:mm', { locale: fr })}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
