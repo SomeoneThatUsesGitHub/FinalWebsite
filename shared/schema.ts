@@ -326,18 +326,3 @@ export type InsertLiveCoverageQuestion = z.infer<typeof insertLiveCoverageQuesti
 
 export type LiveCoverageUpdate = typeof liveCoverageUpdates.$inferSelect;
 export type InsertLiveCoverageUpdate = z.infer<typeof insertLiveCoverageUpdateSchema>;
-
-// Instagram cache table pour stocker les données récupérées de l'API Instagram
-export const instagramCache = pgTable("instagram_cache", {
-  id: serial("id").primaryKey(),
-  data: json("data").notNull(), // Les données des posts Instagram en JSON
-  timestamp: timestamp("timestamp").notNull().defaultNow(), // Quand le cache a été mis à jour
-});
-
-export const insertInstagramCacheSchema = createInsertSchema(instagramCache).pick({
-  data: true,
-  timestamp: true,
-});
-
-export type InstagramCache = typeof instagramCache.$inferSelect;
-export type InsertInstagramCache = z.infer<typeof insertInstagramCacheSchema>;

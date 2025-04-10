@@ -10,7 +10,6 @@ import {
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
   insertLiveCoverageUpdateSchema 
 } from "@shared/schema";
-import { fetchInstagramPosts, refreshInstagramCache } from "./instagram";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { createUser, updateUserPassword, listUsers, deleteUser, updateUserProfile, getTeamMembers } from "./userManagement";
@@ -1690,27 +1689,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error answering question:", error);
       res.status(500).json({ error: "Error answering question" });
-    }
-  });
-
-  // Instagram API routes
-  app.get("/api/instagram", async (req: Request, res: Response) => {
-    try {
-      const result = await fetchInstagramPosts();
-      res.json(result);
-    } catch (error) {
-      console.error("Error fetching Instagram posts:", error);
-      res.status(500).json({ error: "Error fetching Instagram posts" });
-    }
-  });
-  
-  app.post("/api/instagram/refresh", isAdmin, async (req: Request, res: Response) => {
-    try {
-      const result = await refreshInstagramCache();
-      res.json(result);
-    } catch (error) {
-      console.error("Error refreshing Instagram cache:", error);
-      res.status(500).json({ error: "Error refreshing Instagram cache" });
     }
   });
 
