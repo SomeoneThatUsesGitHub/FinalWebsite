@@ -51,6 +51,7 @@ export default function DirectForm() {
       slug: "",
       subject: "",
       imageUrl: "",
+      context: "", // Ajout du champ context par défaut
       active: true,
     },
   });
@@ -144,6 +145,7 @@ export default function DirectForm() {
         slug: direct.slug,
         subject: direct.subject,
         imageUrl: direct.imageUrl || "",
+        context: direct.context || "", // Ajout du champ context
         active: direct.active,
       });
     }
