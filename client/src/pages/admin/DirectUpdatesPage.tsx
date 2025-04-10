@@ -16,7 +16,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon, BarChart3 as BarChartIcon, MessageSquare, FileText as Newspaper, Video as Youtube, ListChecks, PlusCircle, MinusCircle, Check } from "lucide-react";
+import { ChevronLeft, Loader2, Radio, Clock, Trash2, AlertTriangle, User as UserIcon, BarChart3 as BarChartIcon, MessageSquare, FileText as Newspaper, Video as Youtube } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { queryClient } from "@/lib/queryClient";
@@ -45,12 +45,6 @@ const electionResultSchema = z.object({
   displayType: z.enum(["bar", "pie"]).default("bar")
 });
 
-// Schéma pour les éléments du récapitulatif
-const recapItemSchema = z.object({
-  text: z.string(),
-  done: z.boolean().default(false)
-});
-
 // Schéma de validation pour les mises à jour
 const updateSchema = z.object({
   content: z.string().min(3, "Le contenu est requis (minimum 3 caractères)"),
@@ -58,9 +52,8 @@ const updateSchema = z.object({
   important: z.boolean().default(false),
   youtubeUrl: z.string().optional(),
   articleId: z.number().optional(),
-  updateType: z.enum(["normal", "youtube", "article", "election", "recap"]).default("normal"),
+  updateType: z.enum(["normal", "youtube", "article", "election"]).default("normal"),
   electionResults: z.string().optional(), // On stocke les données JSON sous forme de chaîne
-  recapItems: z.string().optional(), // On stocke les éléments du récap sous forme de chaîne JSON
 });
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
@@ -90,10 +83,6 @@ export default function DirectUpdatesPage() {
   
   // État pour gérer l'ajout/suppression de candidats
   const [newCandidate, setNewCandidate] = useState({ candidate: "", party: "", percentage: 0, color: "#000000" });
-  
-  // État pour gérer les éléments du récapitulatif
-  const [recapItems, setRecapItems] = useState<{ text: string, done: boolean }[]>([]);
-  const [newRecapItem, setNewRecapItem] = useState("");
 
   // Récupérer les détails du suivi en direct
   const { data: coverage, isLoading: isLoadingCoverage } = useQuery<LiveCoverage>({
@@ -252,71 +241,12 @@ export default function DirectUpdatesPage() {
     });
   };
 
-  // Fonction pour ajouter un élément au récapitulatif
-  const addRecapItem = () => {
-    if (!newRecapItem.trim()) {
-      toast({
-        title: "Élément vide",
-        description: "Veuillez saisir du texte pour l'élément du récap",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setRecapItems(prev => [...prev, { text: newRecapItem, done: false }]);
-    setNewRecapItem("");
-  };
-  
-  // Fonction pour supprimer un élément du récapitulatif
-  const removeRecapItem = (index: number) => {
-    setRecapItems(prev => prev.filter((_, i) => i !== index));
-  };
-  
-  // Fonction pour basculer l'état "fait" d'un élément du récapitulatif
-  const toggleRecapItemDone = (index: number) => {
-    setRecapItems(prev => 
-      prev.map((item, i) => 
-        i === index ? { ...item, done: !item.done } : item
-      )
-    );
-  };
-  
-  // Fonction pour appliquer les éléments du récapitulatif au formulaire
-  const applyRecapItems = () => {
-    if (recapItems.length === 0) {
-      toast({
-        title: "Aucun élément",
-        description: "Veuillez ajouter au moins un élément au récapitulatif",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Convertir les données en chaîne JSON et les ajouter au formulaire
-    form.setValue("recapItems", JSON.stringify(recapItems));
-    
-    toast({
-      title: "Récap appliqué",
-      description: `${recapItems.length} élément(s) ajouté(s) au récapitulatif`,
-    });
-  };
-
   const onSubmit = (data: UpdateFormValues) => {
     // Si c'est une mise à jour de type élection, vérifier que les données sont présentes
     if (data.updateType === 'election' && !data.electionResults) {
       toast({
         title: "Données manquantes",
         description: "Veuillez configurer et appliquer le graphique d'élections",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Si c'est une mise à jour de type récap, vérifier que les éléments sont présents
-    if (data.updateType === 'recap' && !data.recapItems) {
-      toast({
-        title: "Éléments manquants",
-        description: "Veuillez ajouter et appliquer les éléments du récapitulatif",
         variant: "destructive"
       });
       return;
@@ -397,7 +327,7 @@ export default function DirectUpdatesPage() {
                   render={({ field }) => (
                     <FormItem className="mb-6">
                       <FormLabel>Type de mise à jour</FormLabel>
-                      <div className="grid grid-cols-5 gap-2">
+                      <div className="grid grid-cols-4 gap-2">
                         <Button
                           type="button"
                           variant={field.value === "normal" ? "default" : "outline"}
@@ -407,7 +337,6 @@ export default function DirectUpdatesPage() {
                             form.setValue("youtubeUrl", "");
                             form.setValue("articleId", undefined);
                             form.setValue("electionResults", undefined);
-                            form.setValue("recapItems", undefined);
                           }}
                         >
                           <MessageSquare className="h-5 w-5 mb-2" />
@@ -421,7 +350,6 @@ export default function DirectUpdatesPage() {
                             field.onChange("youtube");
                             form.setValue("articleId", undefined);
                             form.setValue("electionResults", undefined);
-                            form.setValue("recapItems", undefined);
                           }}
                         >
                           <Youtube className="h-5 w-5 mb-2" />
@@ -435,7 +363,6 @@ export default function DirectUpdatesPage() {
                             field.onChange("article");
                             form.setValue("youtubeUrl", "");
                             form.setValue("electionResults", undefined);
-                            form.setValue("recapItems", undefined);
                           }}
                         >
                           <Newspaper className="h-5 w-5 mb-2" />
@@ -449,25 +376,10 @@ export default function DirectUpdatesPage() {
                             field.onChange("election");
                             form.setValue("youtubeUrl", "");
                             form.setValue("articleId", undefined);
-                            form.setValue("recapItems", undefined);
                           }}
                         >
                           <BarChartIcon className="h-5 w-5 mb-2" />
                           <span className="text-sm">Graphique Élections</span>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={field.value === "recap" ? "default" : "outline"}
-                          className="flex flex-col items-center justify-center h-20 w-full"
-                          onClick={() => {
-                            field.onChange("recap");
-                            form.setValue("youtubeUrl", "");
-                            form.setValue("articleId", undefined);
-                            form.setValue("electionResults", undefined);
-                          }}
-                        >
-                          <ListChecks className="h-5 w-5 mb-2" />
-                          <span className="text-sm">Le Récap</span>
                         </Button>
                       </div>
                       <FormDescription>
@@ -577,110 +489,6 @@ export default function DirectUpdatesPage() {
                   />
                 )}
 
-                {form.watch("updateType") === "recap" && (
-                  <div className="space-y-6 border rounded-lg p-4">
-                    <FormField
-                      control={form.control}
-                      name="recapItems"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Éléments du récapitulatif</FormLabel>
-                          <FormDescription className="mb-4">
-                            Ajoutez les différents points à inclure dans le récapitulatif, puis cliquez sur "Appliquer le récap".
-                          </FormDescription>
-                          
-                          <div className="space-y-4">
-                            {/* Liste des éléments existants */}
-                            <div className="space-y-2">
-                              {recapItems.length === 0 ? (
-                                <div className="text-sm text-muted-foreground italic text-center p-4 border rounded-lg">
-                                  Aucun élément ajouté au récapitulatif
-                                </div>
-                              ) : (
-                                recapItems.map((item, index) => (
-                                  <div 
-                                    key={index} 
-                                    className="flex items-center gap-2 border rounded p-2 bg-muted/20"
-                                  >
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 shrink-0"
-                                      onClick={() => toggleRecapItemDone(index)}
-                                    >
-                                      {item.done ? (
-                                        <Check className="h-4 w-4 text-green-500" />
-                                      ) : (
-                                        <div className="h-4 w-4 border-2 rounded-sm border-muted-foreground" />
-                                      )}
-                                    </Button>
-                                    <div className={cn(
-                                      "flex-grow text-sm",
-                                      item.done && "line-through text-muted-foreground"
-                                    )}>
-                                      {item.text}
-                                    </div>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => removeRecapItem(index)}
-                                    >
-                                      <MinusCircle className="h-4 w-4 text-destructive" />
-                                    </Button>
-                                  </div>
-                                ))
-                              )}
-                            </div>
-                            
-                            {/* Formulaire d'ajout d'élément */}
-                            <div className="flex gap-2">
-                              <Input
-                                value={newRecapItem}
-                                onChange={(e) => setNewRecapItem(e.target.value)}
-                                placeholder="Ajouter un nouvel élément..."
-                                className="flex-grow"
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' && newRecapItem.trim()) {
-                                    e.preventDefault();
-                                    addRecapItem();
-                                  }
-                                }}
-                              />
-                              <Button
-                                type="button"
-                                onClick={addRecapItem}
-                                disabled={!newRecapItem.trim()}
-                              >
-                                <PlusCircle className="h-4 w-4 mr-2" />
-                                Ajouter
-                              </Button>
-                            </div>
-                            
-                            <div className="pt-4">
-                              <Button
-                                type="button"
-                                onClick={applyRecapItems}
-                                disabled={recapItems.length === 0}
-                                className="w-full"
-                              >
-                                <ListChecks className="h-4 w-4 mr-2" />
-                                Appliquer le récap
-                              </Button>
-                              <p className="text-xs text-muted-foreground mt-2 text-center">
-                                {field.value ? `${JSON.parse(field.value).length} élément(s) appliqué(s)` : "Aucun élément appliqué"}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <input type="hidden" {...field} />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
-                
                 {form.watch("updateType") === "election" && (
                   <div className="space-y-6 border rounded-lg p-4">
                     <FormField
@@ -1110,42 +918,6 @@ export default function DirectUpdatesPage() {
                             </div>
                           </Card>
                         </a>
-                      )}
-                      
-                      {update.updateType === "election" && update.electionResults && (
-                        <div className="mt-4 border rounded-xl p-4 bg-white">
-                          <ElectionResultsChart data={JSON.parse(update.electionResults)} />
-                        </div>
-                      )}
-                      
-                      {update.updateType === "recap" && update.recapItems && (
-                        <div className="mt-4 border rounded-xl p-4 bg-white">
-                          <div className="flex items-center gap-2 mb-3">
-                            <ListChecks className="h-5 w-5 text-primary" />
-                            <h4 className="font-medium">Le Récap</h4>
-                          </div>
-                          <ul className="space-y-2">
-                            {JSON.parse(update.recapItems).map((item: { text: string; done: boolean }, index: number) => (
-                              <li 
-                                key={index} 
-                                className="flex items-center gap-2"
-                              >
-                                <div className={cn(
-                                  "h-5 w-5 flex items-center justify-center rounded-full border",
-                                  item.done ? "bg-green-100 border-green-500" : "border-muted-foreground/30"
-                                )}>
-                                  {item.done && <Check className="h-3 w-3 text-green-600" />}
-                                </div>
-                                <span className={cn(
-                                  "text-sm",
-                                  item.done && "text-muted-foreground"
-                                )}>
-                                  {item.text}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
                       )}
                     </div>
                     

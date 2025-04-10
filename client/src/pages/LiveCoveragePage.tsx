@@ -21,15 +21,11 @@ import ElectionResultsChart, { ElectionResultsData } from "@/components/Election
 
 // Extension du type LiveCoverageUpdate pour inclure les données de la question associée
 // et les résultats d'élection
-// Pour éviter les erreurs de typage
-type BaseUpdate = Omit<LiveCoverageUpdate, 'updateType' | 'electionResults' | 'recapItems'>;
-
-interface LiveCoverageUpdateWithQuestion extends BaseUpdate {
+interface LiveCoverageUpdateWithQuestion extends Omit<LiveCoverageUpdate, 'updateType' | 'electionResults'> {
   questionContent?: string;
   questionUsername?: string;
   electionResults?: ElectionResultsData | string;
-  recapItems?: any; // Utiliser any pour éviter les problèmes de typage
-  updateType?: 'normal' | 'youtube' | 'article' | 'election' | 'recap';
+  updateType?: 'normal' | 'youtube' | 'article' | 'election';
 }
 
 export default function LiveCoveragePage() {
@@ -85,7 +81,7 @@ export default function LiveCoveragePage() {
     refetchInterval: refreshInterval,
   });
 
-  // Traiter les mises à jour pour intégrer les graphiques d'élection et les récapitulatifs
+  // Traiter les mises à jour pour intégrer les graphiques d'élection
   const updates = React.useMemo(() => {
     if (!rawUpdates) return undefined;
     
@@ -93,6 +89,10 @@ export default function LiveCoveragePage() {
       // Vérifier si cette mise à jour contient des données d'élection
       if (update.updateType === 'election' && update.electionResults) {
         try {
+          // Ajouter des logs pour debug
+          console.log("Type de electionResults:", typeof update.electionResults);
+          console.log("Contenu de electionResults:", update.electionResults);
+          
           // Convertir la chaîne JSON en objet ElectionResultsData
           let electionData;
           if (typeof update.electionResults === 'string') {
@@ -100,6 +100,8 @@ export default function LiveCoveragePage() {
           } else {
             electionData = update.electionResults as ElectionResultsData;
           }
+          
+          console.log("Données parsées:", electionData);
           
           return {
             ...update,
@@ -110,24 +112,6 @@ export default function LiveCoveragePage() {
           return update;
         }
       }
-      
-      // Vérifier si cette mise à jour contient des éléments de récapitulatif
-      if (update.updateType === 'recap' && update.recapItems) {
-        try {
-          // Convertir la chaîne JSON en tableau d'objets RecapItem
-          if (typeof update.recapItems === 'string') {
-            const recapItemsParsed = JSON.parse(update.recapItems);
-            return {
-              ...update,
-              recapItems: recapItemsParsed
-            };
-          }
-        } catch (e) {
-          console.error("Erreur lors du parsing des données du récapitulatif:", e);
-          return update;
-        }
-      }
-      
       return update;
     });
   }, [rawUpdates]);
@@ -752,81 +736,6 @@ export default function LiveCoveragePage() {
                                     );
                                   }
                                 })()}
-                              </div>
-                            )}
-                            {update.updateType === 'recap' && update.recapItems && (
-                              <div className="mt-4 border rounded-xl p-4 bg-white dark:bg-gray-800">
-                                <div className="flex items-center gap-2 mb-3">
-                                  <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    width="20" 
-                                    height="20" 
-                                    viewBox="0 0 24 24" 
-                                    fill="none" 
-                                    stroke="currentColor" 
-                                    className="text-primary"
-                                    strokeWidth="2" 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round"
-                                  >
-                                    <rect width="8" height="8" x="3" y="3" rx="2" />
-                                    <path d="m15 9-6 6" />
-                                    <path d="M9 15v4a2 2 0 0 0 2 2h4" />
-                                    <path d="M19 15V9a2 2 0 0 0-2-2h-4" />
-                                  </svg>
-                                  <h4 className="font-medium">Le Récap</h4>
-                                </div>
-                                <ul className="space-y-3">
-                                  {(() => {
-                                    try {
-                                      const recapItems = typeof update.recapItems === 'string'
-                                        ? JSON.parse(update.recapItems)
-                                        : update.recapItems;
-                                      
-                                      return recapItems.map((item: { text: string; done: boolean }, index: number) => (
-                                        <li 
-                                          key={index} 
-                                          className="flex items-center gap-2"
-                                        >
-                                          <div className={`h-5 w-5 flex items-center justify-center rounded-full border ${
-                                            item.done 
-                                              ? "bg-green-100 border-green-500 dark:bg-green-900/30 dark:border-green-600" 
-                                              : "border-muted-foreground/30"
-                                          }`}>
-                                            {item.done && (
-                                              <svg 
-                                                xmlns="http://www.w3.org/2000/svg" 
-                                                width="12" 
-                                                height="12" 
-                                                viewBox="0 0 24 24" 
-                                                fill="none" 
-                                                stroke="currentColor" 
-                                                strokeWidth="2" 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round" 
-                                                className="text-green-600 dark:text-green-400"
-                                              >
-                                                <path d="M20 6 9 17l-5-5" />
-                                              </svg>
-                                            )}
-                                          </div>
-                                          <span className={`text-sm ${
-                                            item.done ? "text-muted-foreground" : ""
-                                          }`}>
-                                            {item.text}
-                                          </span>
-                                        </li>
-                                      ));
-                                    } catch (error) {
-                                      console.error("Erreur lors du parsing des éléments du récap:", error);
-                                      return (
-                                        <li className="text-sm text-muted-foreground">
-                                          Impossible d'afficher les éléments du récapitulatif
-                                        </li>
-                                      );
-                                    }
-                                  })()}
-                                </ul>
                               </div>
                             )}
                             {update.articleId && (
