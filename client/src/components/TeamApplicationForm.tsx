@@ -110,17 +110,13 @@ export default function TeamApplicationForm() {
   }
 
   return (
-    <div className="w-full px-4 py-10 bg-white rounded-lg shadow-md">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold mb-6 text-center text-primary">Rejoignez l'équipe Politiquensemble</h2>
-        <p className="mb-8 text-lg text-gray-600 text-center max-w-3xl mx-auto">
-          Vous souhaitez contribuer à notre mission de rendre la politique accessible aux jeunes ? 
-          Complétez ce formulaire pour rejoindre notre équipe dynamique.
-        </p>
+    <div className="w-full bg-white rounded-md shadow-md mt-12">
+      <div className="w-full px-2">
+        <h2 className="text-3xl font-bold py-6 text-primary border-b border-gray-200">Rejoindre l'équipe</h2>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-6 px-2">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 md:grid-cols-2">
               {/* Nom complet */}
               <FormField
                 control={form.control}
@@ -205,7 +201,7 @@ export default function TeamApplicationForm() {
                   <FormControl>
                     <Textarea 
                       placeholder="Pourquoi souhaitez-vous rejoindre Politiquensemble ?" 
-                      className="min-h-[150px]" 
+                      className="min-h-[200px] text-base" 
                       {...field} 
                     />
                   </FormControl>
@@ -214,15 +210,15 @@ export default function TeamApplicationForm() {
               )}
             />
 
-            <div className="pt-4">
+            <div className="pt-8">
               <Button 
                 type="submit" 
-                className="w-full py-6 text-lg" 
+                className="w-full py-7 text-xl font-semibold" 
                 disabled={submitMutation.isPending}
               >
                 {submitMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-3 h-6 w-6 animate-spin" />
                     Envoi en cours...
                   </>
                 ) : (
