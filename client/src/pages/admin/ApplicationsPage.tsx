@@ -73,6 +73,7 @@ type TeamApplication = {
   submissionDate: string;
   reviewedAt?: string;
   reviewedBy?: number;
+  reviewerName?: string;
   notes?: string;
 };
 
@@ -458,6 +459,9 @@ export default function ApplicationsPage() {
                       {viewApplication.reviewedAt && (
                         <CardDescription>
                           Revue le {formatDate(viewApplication.reviewedAt)}
+                          {viewApplication.reviewerName && (
+                            <> par <span className="font-medium">{viewApplication.reviewerName}</span></>
+                          )}
                         </CardDescription>
                       )}
                     </CardHeader>

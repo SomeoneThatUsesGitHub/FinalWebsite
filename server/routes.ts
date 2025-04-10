@@ -1803,7 +1803,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/team/applications", isAdminOnly, async (req: Request, res: Response) => {
     try {
       const applications = await storage.getAllTeamApplications();
-      res.json(applications);
+      
+      // Enrichir les candidatures avec les noms des réviseurs
+      const enrichedApplications = await Promise.all(applications.map(async (app) => {
+        if (app.reviewedBy) {
+          const reviewer = await storage.getUserById(app.reviewedBy);
+          return {
+            ...app,
+            reviewerName: reviewer ? reviewer.displayName : undefined
+          };
+        }
+        return app;
+      }));
+      
+      res.json(enrichedApplications);
     } catch (error) {
       console.error("Erreur lors de la récupération des candidatures:", error);
       res.status(500).json({
@@ -1826,7 +1839,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Candidature non trouvée" });
       }
       
-      res.json(application);
+      // Enrichir avec le nom du réviseur si la candidature a été révisée
+      let enrichedApplication = application;
+      if (application.reviewedBy) {
+        const reviewer = await storage.getUser(application.reviewedBy);
+        enrichedApplication = {
+          ...application,
+          reviewerName: reviewer ? reviewer.displayName : undefined
+        };
+      }
+      
+      res.json(enrichedApplication);
     } catch (error) {
       console.error("Erreur lors de la récupération de la candidature:", error);
       res.status(500).json({
