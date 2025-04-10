@@ -13,10 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2 } from 'lucide-react';
+import { Loader2, Users, Send, BriefcaseBusiness, Newspaper, Camera, Video, Award } from 'lucide-react';
 import TeamApplicationForm from '@/components/TeamApplicationForm';
-// Layout
-// Header et Footer sont fournis par App.tsx
 
 type TeamMember = {
   id: number;
@@ -31,16 +29,41 @@ type TeamMember = {
   email?: string | null;
 };
 
+// Données pour les postes disponibles avec icônes et descriptions
+const availablePositions = [
+  {
+    title: "Journaliste",
+    icon: <Newspaper className="h-8 w-8 text-blue-600" />,
+    description: "Rédiger des articles sur l'actualité politique et économique."
+  },
+  {
+    title: "Monteur vidéo",
+    icon: <Video className="h-8 w-8 text-blue-600" />,
+    description: "Créer et éditer des contenus vidéo pour nos plateformes."
+  },
+  {
+    title: "Graphiste",
+    icon: <BriefcaseBusiness className="h-8 w-8 text-blue-600" />,
+    description: "Concevoir des visuels pour nos publications."
+  },
+  {
+    title: "Photographe",
+    icon: <Camera className="h-8 w-8 text-blue-600" />,
+    description: "Couvrir des événements et créer des reportages photo."
+  },
+  {
+    title: "Ambassadeur",
+    icon: <Award className="h-8 w-8 text-blue-600" />,
+    description: "Représenter Politiquensemble lors d'événements."
+  }
+];
+
 export default function TeamPage() {
-  // Ajoutons un log avant tout pour voir ce qui est chargé
   console.log("TeamPage se charge à:", new Date().toISOString());
   
-  // Fonction pour afficher les données dans la console et vérifier les champs sociaux
   const showTeamMembers = (members: TeamMember[]) => {
-    // Pour le débogage détaillé
     console.log("Membres reçus pour traitement:", JSON.stringify(members, null, 2));
     
-    // Si Guest_1 a été mis à jour via l'admin, afficher ses détails
     const guest = members.find(m => m.username === 'Guest_1');
     if (guest) {
       console.log("Données sociales de Guest_1:", {
@@ -50,7 +73,6 @@ export default function TeamPage() {
       });
     }
     
-    // Si Noah a été mis à jour via l'admin, afficher ses détails  
     const noah = members.find(m => m.username === 'Noah');
     if (noah) {
       console.log("Données sociales de Noah:", {
@@ -68,7 +90,6 @@ export default function TeamPage() {
     queryFn: async () => {
       console.log("Requête API /team lancée");
       
-      // Utiliser une URL avec cache-busting
       const response = await fetch(`/api/team?t=${Date.now()}`);
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des membres de l\'équipe');
@@ -83,7 +104,6 @@ export default function TeamPage() {
     refetchOnWindowFocus: false,
   });
   
-  // Afficher les détails et journaliser les problèmes potentiels
   const members = showTeamMembers(membersRaw);
 
   if (isLoading) {
@@ -136,7 +156,6 @@ export default function TeamPage() {
         </div>
       </motion.div>
       <div className="container mx-auto py-6 px-4">
-
         {members.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <h3 className="text-xl font-medium">Aucun membre d'équipe à afficher</h3>
@@ -197,9 +216,7 @@ export default function TeamPage() {
                         Membre de l'équipe Politiquensemble
                       </p>
                     )}
-
                   </CardContent>
-                  {/* Carte sans fonctionnalité de réseaux sociaux */}
                 </Card>
               </motion.div>
             ))}
@@ -207,16 +224,75 @@ export default function TeamPage() {
         )}
       </div>
       
-      {/* Section de candidature à l'équipe */}
+      {/* Section de candidature à l'équipe avec design amélioré */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.7 }}
-        className="bg-gray-50 py-10 mt-16 mb-8"
+        className="bg-gradient-to-br from-blue-50 to-blue-100 py-16 mt-16 mb-8 relative overflow-hidden"
       >
+        {/* Formes décoratives */}
+        <div className="absolute -top-10 -left-20 w-40 h-40 bg-blue-200 rounded-full opacity-30"></div>
+        <div className="absolute bottom-20 right-10 w-60 h-60 bg-blue-300 rounded-full opacity-20"></div>
+        <div className="absolute top-1/3 right-0 w-20 h-80 bg-blue-200 rounded-l-full opacity-30"></div>
+        
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <TeamApplicationForm />
+          <div className="flex flex-col md:flex-row items-start gap-12 relative z-10">
+            
+            {/* Colonne de gauche: informations sur les postes */}
+            <div className="w-full md:w-5/12 lg:w-4/12 space-y-8">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                  <Users className="h-8 w-8 mr-3 text-blue-600" />
+                  Rejoignez-nous
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Nous recherchons des personnes motivées et passionnées pour contribuer au développement de notre média.
+                </p>
+              </div>
+              
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-700">Postes disponibles</h3>
+                
+                <div className="space-y-4">
+                  {availablePositions.map((position, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ 
+                        opacity: 1, 
+                        x: 0,
+                        transition: { delay: 0.3 + (index * 0.1), duration: 0.5 }
+                      }}
+                      className="flex items-start p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-all"
+                    >
+                      <div className="mr-3">{position.icon}</div>
+                      <div>
+                        <h4 className="font-medium text-gray-800">{position.title}</h4>
+                        <p className="text-sm text-gray-600">{position.description}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  className="p-4 bg-blue-600 bg-opacity-10 border border-blue-600 border-opacity-20 rounded-lg"
+                >
+                  <p className="text-blue-800 text-sm flex items-start">
+                    <Send className="h-5 w-5 mr-2 shrink-0 mt-0.5" />
+                    <span>Remplissez le formulaire pour postuler à l'un de ces postes ou proposer une candidature spontanée.</span>
+                  </p>
+                </motion.div>
+              </div>
+            </div>
+            
+            {/* Colonne de droite: formulaire de candidature */}
+            <div className="w-full md:w-7/12 lg:w-8/12">
+              <TeamApplicationForm />
+            </div>
           </div>
         </div>
       </motion.div>
