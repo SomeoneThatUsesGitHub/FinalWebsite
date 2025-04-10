@@ -2,7 +2,6 @@ import React from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import ScrollAnimation from "@/components/animations/ScrollAnimation";
 import ValueCard from "@/components/about/ValueCard";
 import { MapPin, Calendar, Award, Users, Bookmark, TrendingUp } from "lucide-react";
@@ -43,25 +42,25 @@ const AboutPage: React.FC = () => {
 
   const keyMilestones = [
     {
-      icon: <Calendar className="h-10 w-10 text-blue-600" />,
+      icon: <Calendar className="h-8 w-8 text-blue-600" />,
       year: "2022",
       title: "Naissance du concept",
       description: "Politiquensemble est né de la volonté de rendre l'actualité politique accessible aux 16-30 ans, souvent éloignés des médias traditionnels."
     },
     {
-      icon: <Users className="h-10 w-10 text-blue-600" />,
+      icon: <Users className="h-8 w-8 text-blue-600" />,
       year: "2023",
       title: "Lancement sur les réseaux sociaux",
       description: "Nous avons commencé à publier du contenu sur les principales plateformes sociales, touchant rapidement plusieurs milliers d'abonnés."
     },
     {
-      icon: <MapPin className="h-10 w-10 text-blue-600" />,
+      icon: <MapPin className="h-8 w-8 text-blue-600" />,
       year: "2024",
       title: "Développement de notre plateforme",
       description: "Le lancement de notre site web marque une nouvelle étape, offrant un espace dédié à notre contenu et à nos formats innovants."
     },
     {
-      icon: <TrendingUp className="h-10 w-10 text-blue-600" />,
+      icon: <TrendingUp className="h-8 w-8 text-blue-600" />,
       year: "2025",
       title: "Expansion de nos formats",
       description: "Développement de nouvelles façons d'informer: directs pour les grands événements, données électorales interactives, et contenus éducatifs."
@@ -71,11 +70,11 @@ const AboutPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>À propos de Politiquensemble - Notre mission et notre équipe</title>
+        <title>À propos de Politiquensemble - Notre mission</title>
         <meta name="description" content="Découvrez la mission de Politiquensemble, média indépendant qui rend l'actualité politique, économique et historique accessible aux 16-30 ans." />
       </Helmet>
 
-      {/* Hero Section avec effet carnet quadrillé qui s'estompe */}
+      {/* Hero Section avec effet carnet quadrillé qui s'estompe et collages politiques */}
       <section className="pattern-grid-fade pt-16 pb-12 md:pt-24 md:pb-16 min-h-[50vh] flex items-center">
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
@@ -103,7 +102,7 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Notre histoire - Nouveau format sans timeline */}
+      {/* Notre histoire - Format de notes collées */}
       <section className="py-16 bg-white" id="histoire">
         <div className="container mx-auto px-4">
           <ScrollAnimation threshold={0.1}>
@@ -122,18 +121,21 @@ const AboutPage: React.FC = () => {
                 key={index} 
                 threshold={0.1}
                 delay={index * 0.1}
+                className="flex justify-center"
               >
-                <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
-                  <div className="flex items-center mb-4">
-                    <div className="mr-4 p-3 bg-blue-50 rounded-full flex items-center justify-center">
-                      {milestone.icon}
+                <div className={`milestone-card w-full md:w-11/12 md:max-w-md`}>
+                  <div className="milestone-content">
+                    <div className="flex items-start mb-3">
+                      <div className="mr-3 flex-shrink-0">
+                        {milestone.icon}
+                      </div>
+                      <div>
+                        <div className="text-blue-600 font-bold text-lg">{milestone.year}</div>
+                        <h3 className="text-xl font-bold text-dark">{milestone.title}</h3>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-blue-600 font-bold text-xl">{milestone.year}</div>
-                      <h3 className="text-xl font-bold text-dark">{milestone.title}</h3>
-                    </div>
+                    <p className="text-dark/70">{milestone.description}</p>
                   </div>
-                  <p className="text-dark/70 flex-grow">{milestone.description}</p>
                 </div>
               </ScrollAnimation>
             ))}
@@ -165,34 +167,6 @@ const AboutPage: React.FC = () => {
               </ScrollAnimation>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-16 bg-blue-600 text-white">
-        <div className="container mx-auto px-4">
-          <ScrollAnimation threshold={0.1}>
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6">
-                Rejoignez notre communauté
-              </h2>
-              <p className="text-lg mb-8 text-white/90 max-w-3xl mx-auto">
-                Suivez-nous sur les réseaux sociaux et inscrivez-vous à notre newsletter pour ne manquer aucune actualité politique expliquée simplement.
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Link href="/contact">
-                  <Button className="bg-white text-blue-600 hover:bg-gray-100">
-                    Contactez-nous
-                  </Button>
-                </Link>
-                <a href="https://twitter.com/politiquensemble" target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" className="border-white text-white hover:bg-blue-700">
-                    Suivez-nous
-                  </Button>
-                </a>
-              </div>
-            </div>
-          </ScrollAnimation>
         </div>
       </section>
     </>
