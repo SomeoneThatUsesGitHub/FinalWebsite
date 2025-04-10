@@ -238,10 +238,7 @@ const AboutPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-6 relative">
                 <ScrollAnimation threshold={0.1} delay={0.1}>
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
-                    <div className="flex items-center mb-3">
-                      <div className="bg-white/15 p-3 rounded-lg mr-4">
-                        <Users className="w-7 h-7 text-blue-100" />
-                      </div>
+                    <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
                         <CountUp end={10} suffix="K+" duration={2.5} />
                       </div>
@@ -252,10 +249,7 @@ const AboutPage: React.FC = () => {
                 
                 <ScrollAnimation threshold={0.1} delay={0.2}>
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-6 hover:translate-y-1 transition-transform">
-                    <div className="flex items-center mb-3">
-                      <div className="bg-white/15 p-3 rounded-lg mr-4">
-                        <Newspaper className="w-7 h-7 text-blue-100" />
-                      </div>
+                    <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
                         <CountUp end={250} suffix="+" duration={2.5} />
                       </div>
@@ -266,10 +260,7 @@ const AboutPage: React.FC = () => {
                 
                 <ScrollAnimation threshold={0.1} delay={0.3}>
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-[-24px] hover:translate-y-[-29px] transition-transform">
-                    <div className="flex items-center mb-3">
-                      <div className="bg-white/15 p-3 rounded-lg mr-4">
-                        <Share2 className="w-7 h-7 text-blue-100" />
-                      </div>
+                    <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
                         <CountUp end={50} suffix="+" duration={2.5} />
                       </div>
@@ -280,10 +271,7 @@ const AboutPage: React.FC = () => {
                 
                 <ScrollAnimation threshold={0.1} delay={0.4}>
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
-                    <div className="flex items-center mb-3">
-                      <div className="bg-white/15 p-3 rounded-lg mr-4">
-                        <BookOpen className="w-7 h-7 text-blue-100" />
-                      </div>
+                    <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
                         <CountUp end={15} suffix="+" duration={2.5} />
                       </div>
