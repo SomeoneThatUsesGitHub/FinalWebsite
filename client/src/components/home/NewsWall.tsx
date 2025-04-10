@@ -54,6 +54,7 @@ type LiveEvent = {
   categoryId: number | null;
   createdAt: string;
   updatedAt: string;
+  slug?: string;  // Ajout de la propriété slug
   editors?: Array<{
     editor?: {
       displayName: string;
@@ -250,7 +251,7 @@ const NewsWall: React.FC = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                             <span>
                               Animé par {(featuredContent.data as LiveEvent).editors && (featuredContent.data as LiveEvent).editors.length > 0 
-                                ? (featuredContent.data as LiveEvent).editors.map(e => e.editor?.displayName).filter(Boolean).join(', ')
+                                ? (featuredContent.data as LiveEvent).editors.map(e => e?.editor?.displayName).filter(Boolean).join(', ')
                                 : "l'équipe éditoriale"}
                             </span>
                           </li>
@@ -259,7 +260,7 @@ const NewsWall: React.FC = () => {
                     </div>
                     <div className="mt-2">
                       {(featuredContent.data as LiveEvent).liveUrl && (
-                        <Link href={`/suivis-en-direct/${(featuredContent.data as LiveEvent).slug || ''}`}>
+                        <Link href={(featuredContent.data as LiveEvent).liveUrl || '/suivis-en-direct'}>
                           <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
                             <div className="flex items-center">
                               <div className="mr-2 w-2 h-2 rounded-full bg-white animate-pulse"></div>
