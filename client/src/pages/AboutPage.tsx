@@ -107,21 +107,21 @@ const AboutPage: React.FC = () => {
       {/* Notre histoire - Avec fond plus foncé et téléphone affichant Instagram */}
       <section className="py-20 bg-gradient-to-b from-gray-100 to-gray-50 overflow-hidden" id="histoire">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row">
+          <div className="flex flex-col md:flex-row">
             {/* Titre et introduction à gauche */}
-            <div className="lg:w-1/3 lg:pr-16 mb-12 lg:mb-0 relative z-10">
+            <div className="md:w-2/5 lg:w-1/3 md:pr-8 lg:pr-16 mb-12 md:mb-0 relative z-10">
               <ScrollAnimation threshold={0.1}>
-                <div className="sticky top-10">
-                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 lg:text-left">Notre histoire</h2>
-                  <div className="w-24 h-1 bg-blue-600 mb-6 lg:mx-0"></div>
-                  <p className="text-dark/80 mb-8 lg:text-left">
+                <div className="md:sticky md:top-10">
+                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 md:text-left">Notre histoire</h2>
+                  <div className="w-24 h-1 bg-blue-600 mb-6 md:mx-0"></div>
+                  <p className="text-dark/80 mb-8 md:text-left">
                     Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui transforme l'accès à l'information politique pour les jeunes.
                   </p>
                   
                   {/* Téléphone avec Instagram (incliné sur desktop, animation popup sur mobile) */}
-                  <div className="mt-16 relative flex justify-center lg:justify-start max-w-full lg:max-w-[280px]">
+                  <div className="mt-16 relative flex justify-center md:justify-start max-w-full lg:max-w-[280px]">
                     <div className="phone-mockup">
-                      <div className="relative border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform lg:-rotate-3 animate-in fade-in-50 zoom-in-95 duration-1000">
+                      <div className="relative border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform md:-rotate-3 animate-in fade-in-50 zoom-in-95 duration-1000">
                         <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
@@ -133,7 +133,7 @@ const AboutPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="hidden lg:block relative">
+                  <div className="hidden md:block relative">
                     <div className="absolute -left-12 -bottom-12 w-24 h-24 bg-blue-100 rounded-full opacity-70"></div>
                     <div className="absolute -right-12 top-10 w-16 h-16 bg-blue-200 rounded-full opacity-50"></div>
                   </div>
@@ -142,8 +142,8 @@ const AboutPage: React.FC = () => {
             </div>
             
             {/* Timeline à droite avec nouveau design sans effet carnet */}
-            <div className="lg:w-2/3 relative">
-              <div className="hidden lg:block absolute top-0 bottom-0 left-12 w-1 bg-blue-200"></div>
+            <div className="md:w-3/5 lg:w-2/3 relative">
+              <div className="hidden md:block absolute top-0 bottom-0 left-12 w-1 bg-blue-200"></div>
               
               {keyMilestones.map((milestone, index) => (
                 <ScrollAnimation 
@@ -151,9 +151,9 @@ const AboutPage: React.FC = () => {
                   threshold={0.1}
                   delay={index * 0.1}
                 >
-                  <div className="flex mb-16 relative lg:pl-24">
-                    <div className="hidden lg:flex absolute left-10 top-4 -translate-x-1/2 w-8 h-8 bg-gray-50 border-4 border-blue-500 rounded-full z-10"></div>
-                    <div className="bg-gray-50/80 backdrop-blur-sm shadow-lg rounded-lg p-6 hover:shadow-xl transition-all w-full lg:ml-4 transform hover:scale-[1.02]">
+                  <div className="flex mb-16 relative md:pl-24">
+                    <div className="hidden md:flex absolute left-10 top-4 -translate-x-1/2 w-8 h-8 bg-gray-50 border-4 border-blue-500 rounded-full z-10"></div>
+                    <div className="bg-gray-50/80 backdrop-blur-sm shadow-lg rounded-lg p-6 hover:shadow-xl transition-all w-full md:ml-4 transform hover:scale-[1.02]">
                       <div className="flex items-start mb-3">
                         <div className="mr-4 p-3 bg-blue-100 rounded-xl flex-shrink-0">
                           {milestone.icon}
@@ -163,7 +163,7 @@ const AboutPage: React.FC = () => {
                           <h3 className="text-xl font-bold text-dark">{milestone.title}</h3>
                         </div>
                       </div>
-                      <p className="text-dark/70 lg:pl-16">{milestone.description}</p>
+                      <p className="text-dark/70 md:pl-16">{milestone.description}</p>
                     </div>
                   </div>
                 </ScrollAnimation>
@@ -176,16 +176,16 @@ const AboutPage: React.FC = () => {
       {/* Nos valeurs - Style asymétrique */}
       <section className="py-20 bg-gradient-to-r from-blue-50 to-white" id="valeurs">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center">
+          <div className="flex flex-col md:flex-row items-center">
             {/* Cards à gauche */}
-            <div className="lg:w-3/5 order-2 lg:order-1">
+            <div className="md:w-3/5 lg:w-3/5 order-2 md:order-1">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative">
                 {/* Élément décoratif */}
-                <div className="hidden lg:block absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full opacity-50 z-0"></div>
+                <div className="hidden md:block absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full opacity-50 z-0"></div>
                 
                 {values.slice(0, 3).map((value, index) => (
                   <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15}>
-                    <div className={`bg-white rounded-lg p-6 shadow-lg h-full border-l-4 border-blue-600 hover:shadow-xl transition-shadow relative z-10 transform ${index % 2 === 1 ? 'lg:translate-y-8' : ''}`}>
+                    <div className={`bg-white rounded-lg p-6 shadow-lg h-full border-l-4 border-blue-600 hover:shadow-xl transition-shadow relative z-10 transform ${index % 2 === 1 ? 'md:translate-y-8' : ''}`}>
                       <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
                         <ValueCard 
                           icon={value.icon} 
@@ -204,11 +204,11 @@ const AboutPage: React.FC = () => {
             </div>
             
             {/* Texte à droite */}
-            <div className="lg:w-2/5 mb-12 lg:mb-0 order-1 lg:order-2 lg:pl-16">
+            <div className="md:w-2/5 lg:w-2/5 mb-12 md:mb-0 order-1 md:order-2 md:pl-16">
               <ScrollAnimation threshold={0.1}>
-                <div className="lg:text-right">
+                <div className="md:text-right">
                   <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Nos valeurs</h2>
-                  <div className="w-24 h-1 bg-blue-600 mb-6 lg:ml-auto"></div>
+                  <div className="w-24 h-1 bg-blue-600 mb-6 md:ml-auto"></div>
                   <p className="text-dark/80 mb-6">
                     Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information quotidienne.
                   </p>
@@ -232,9 +232,9 @@ const AboutPage: React.FC = () => {
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-blue-400 opacity-20 rounded-full"></div>
         
         <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center">
+          <div className="flex flex-col md:flex-row items-center">
             {/* Stats à droite */}
-            <div className="lg:w-3/5 order-2 lg:order-2">
+            <div className="md:w-3/5 order-2 md:order-2">
               <div className="grid grid-cols-2 gap-6 relative">
                 <ScrollAnimation threshold={0.1} delay={0.1}>
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
@@ -251,7 +251,7 @@ const AboutPage: React.FC = () => {
                 </ScrollAnimation>
                 
                 <ScrollAnimation threshold={0.1} delay={0.2}>
-                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform lg:translate-y-6 hover:translate-y-1 transition-transform">
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-6 hover:translate-y-1 transition-transform">
                     <div className="flex items-center mb-3">
                       <div className="bg-white/15 p-3 rounded-lg mr-4">
                         <Newspaper className="w-7 h-7 text-blue-100" />
@@ -265,7 +265,7 @@ const AboutPage: React.FC = () => {
                 </ScrollAnimation>
                 
                 <ScrollAnimation threshold={0.1} delay={0.3}>
-                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform lg:translate-y-[-24px] hover:translate-y-[-29px] transition-transform">
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-[-24px] hover:translate-y-[-29px] transition-transform">
                     <div className="flex items-center mb-3">
                       <div className="bg-white/15 p-3 rounded-lg mr-4">
                         <Share2 className="w-7 h-7 text-blue-100" />
@@ -295,7 +295,7 @@ const AboutPage: React.FC = () => {
             </div>
             
             {/* Texte à gauche */}
-            <div className="lg:w-2/5 mb-12 lg:mb-0 order-1 lg:order-1 lg:pr-16">
+            <div className="md:w-2/5 mb-12 md:mb-0 order-1 md:order-1 md:pr-16">
               <ScrollAnimation threshold={0.1}>
                 <h2 className="text-2xl md:text-3xl font-bold mb-4">Notre impact en chiffres</h2>
                 <div className="w-24 h-1 bg-white mb-6"></div>
