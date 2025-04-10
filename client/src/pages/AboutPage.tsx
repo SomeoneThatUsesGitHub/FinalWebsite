@@ -143,7 +143,7 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Nos valeurs - Style pill unique */}
+      {/* Nos valeurs - Style de timeline interactive */}
       <section className="py-16 values-container" id="valeurs">
         <div className="container mx-auto px-4">
           <ScrollAnimation threshold={0.1}>
@@ -156,16 +156,32 @@ const AboutPage: React.FC = () => {
             </div>
           </ScrollAnimation>
 
-          <div className="flex flex-wrap justify-center max-w-4xl mx-auto">
-            {values.map((value, index) => (
-              <ScrollAnimation key={index} threshold={0.1} delay={index * 0.1} className="w-full md:w-1/2 lg:w-1/2 px-2">
-                <ValueCard 
-                  icon={value.icon} 
-                  title={value.title} 
-                  description={value.description} 
-                />
-              </ScrollAnimation>
-            ))}
+          <div className="max-w-6xl mx-auto">
+            <div className="values-row mb-8">
+              {values.slice(0, 3).map((value, index) => (
+                <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15} className="flex-1">
+                  <ValueCard 
+                    icon={value.icon} 
+                    title={value.title} 
+                    description={value.description}
+                    index={index}
+                  />
+                </ScrollAnimation>
+              ))}
+            </div>
+            
+            <div className="values-row">
+              {values.slice(3, 6).map((value, index) => (
+                <ScrollAnimation key={index + 3} threshold={0.1} delay={(index + 3) * 0.15} className="flex-1">
+                  <ValueCard 
+                    icon={value.icon} 
+                    title={value.title} 
+                    description={value.description}
+                    index={index + 3}
+                  />
+                </ScrollAnimation>
+              ))}
+            </div>
           </div>
         </div>
       </section>
