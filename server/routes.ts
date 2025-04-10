@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import passport from "passport";
-import { isAuthenticated, isAdmin, loginSchema, hashPassword } from "./auth";
+import { isAuthenticated, isAdmin, isAdminOnly, loginSchema, hashPassword } from "./auth";
 import * as schema from "@shared/schema";
 import { 
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
@@ -1734,7 +1734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Route admin pour récupérer tous les abonnés à la newsletter
-  app.get("/api/admin/newsletter/subscribers", isAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/newsletter/subscribers", isAdminOnly, async (req: Request, res: Response) => {
     try {
       const subscribers = await storage.getNewsletterSubscribers();
       res.json(subscribers);

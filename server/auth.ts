@@ -86,6 +86,17 @@ export function isAdmin(req: any, res: any, next: any) {
   res.status(403).json({ message: "Accès refusé" });
 }
 
+// Middleware pour vérifier si l'utilisateur est uniquement admin (pas éditeur)
+export function isAdminOnly(req: any, res: any, next: any) {
+  console.log("Vérification admin uniquement - User:", req.user);
+  if (req.isAuthenticated() && (req.user.role === "admin" || Boolean(req.user.isAdmin))) {
+    console.log("Utilisateur authentifié comme admin");
+    return next();
+  }
+  console.log("Accès admin uniquement refusé");
+  res.status(403).json({ message: "Accès refusé - Réservé aux administrateurs" });
+}
+
 // Fonction pour hacher un mot de passe
 export async function hashPassword(password: string): Promise<string> {
   return hash(password, 10);
