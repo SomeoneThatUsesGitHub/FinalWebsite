@@ -25,49 +25,22 @@ const InstagramPage: React.FC = () => {
     fetchInstagramPosts();
   }, []);
 
-  // Cette fonction récupère les posts Instagram
-  // Note: Vous aurez besoin d'une API réelle et d'un token
+  // Cette fonction récupère les posts Instagram depuis notre API
   const fetchInstagramPosts = async () => {
     try {
       setLoading(true);
+      setError(null);
       
-      // À ce stade, nous utilisons des données statiques pour la démo
-      // En production, cette partie serait remplacée par un appel API réel
-      const samplePosts: InstagramPost[] = [
-        {
-          id: '1',
-          media_url: '/assets/instagram-politiquensemble.jpg',
-          permalink: 'https://www.instagram.com/p/sample1/',
-          caption: 'Publication récente de Politiquensemble',
-          media_type: 'IMAGE',
-          timestamp: '2023-05-01T12:00:00Z'
-        },
-        // Nous simulons une collection pour la démonstration
-        {
-          id: '2',
-          media_url: '/assets/instagram-politiquensemble.jpg',
-          permalink: 'https://www.instagram.com/p/sample2/',
-          caption: 'Une autre publication de Politiquensemble',
-          media_type: 'CAROUSEL_ALBUM',
-          timestamp: '2023-04-28T10:30:00Z',
-          children: {
-            data: [
-              {
-                id: '2.1',
-                media_url: '/assets/instagram-politiquensemble.jpg',
-                media_type: 'IMAGE'
-              },
-              {
-                id: '2.2',
-                media_url: '/assets/instagram-politiquensemble.jpg',
-                media_type: 'IMAGE'
-              }
-            ]
-          }
-        }
-      ];
+      const response = await fetch('/api/instagram');
+      const data = await response.json();
       
-      setPosts(samplePosts);
+      if (data.error) {
+        setError(data.error);
+        setPosts(data.posts || []);
+      } else {
+        setPosts(data.posts || []);
+      }
+      
       setLoading(false);
     } catch (err) {
       console.error('Erreur lors de la récupération des posts Instagram:', err);

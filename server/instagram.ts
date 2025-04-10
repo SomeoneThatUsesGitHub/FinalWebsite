@@ -48,7 +48,7 @@ export async function fetchInstagramPosts() {
     console.error('Erreur lors de la récupération des posts Instagram:', error.response?.data || error.message);
     
     // Si le cache existe mais est expiré, on le renvoie quand même en cas d'erreur
-    const cachedPosts = await instaCache.getCachedPosts();
+    const cachedPosts = await storage.getCachedPosts();
     if (cachedPosts) {
       return { posts: cachedPosts.data || [], error: 'Données en cache (actualisation impossible)' };
     }
