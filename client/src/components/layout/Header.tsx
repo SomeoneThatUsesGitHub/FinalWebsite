@@ -37,6 +37,7 @@ const Header: React.FC = () => {
     { href: "/elections", label: "Elections", active: location === "/elections" },
     { href: "/articles", label: "Articles", active: location === "/articles" },
     { href: "/apprendre", label: "Apprendre", active: location === "/apprendre" },
+    { href: "/instagram", label: "Instagram", active: location === "/instagram" },
   ];
   
   return (

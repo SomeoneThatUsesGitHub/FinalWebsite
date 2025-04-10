@@ -16,6 +16,7 @@ import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/AuthPage";
 import TestEditor from "@/pages/test-editor";
 import LiveCoveragePage from "@/pages/LiveCoveragePage";
+import InstagramPage from "@/pages/InstagramPage";
 
 // Pages admin
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -78,6 +79,7 @@ function App() {
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
               <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
+              <Route path="/instagram" component={InstagramPage} />
               
               {/* Routes admin protégées - accessibles aux admins et éditeurs */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
