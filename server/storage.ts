@@ -17,7 +17,16 @@ import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte, sql, lt } from "drizzle-orm";
 import { hashPassword } from "./auth";
 
+// Type pour le stockage des posts Instagram dans le cache
+export type InstagramCacheData = {
+  timestamp: number;
+  data: any[];
+};
+
 export interface IStorage {
+  // Instagram cache operations
+  getCachedPosts(): Promise<InstagramCacheData | null>;
+  cachePosts(posts: any[]): Promise<void>;
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -105,6 +114,50 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Instagram cache operations
+  async getCachedPosts(): Promise<InstagramCacheData | null> {
+    try {
+      const [result] = await db.execute(sql`SELECT * FROM instagram_cache LIMIT 1`);
+      if (result && result.rows && result.rows.length > 0) {
+        return {
+          timestamp: new Date(result.rows[0].timestamp).getTime(),
+          data: result.rows[0].data
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error("Erreur lors de la récupération du cache Instagram:", error);
+      return null;
+    }
+  }
+
+  async cachePosts(posts: any[]): Promise<void> {
+    try {
+      // Vérifier si la table existe
+      try {
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS instagram_cache (
+            id SERIAL PRIMARY KEY,
+            timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
+            data JSONB NOT NULL
+          )
+        `);
+      } catch (error) {
+        console.error("Erreur lors de la création de la table de cache:", error);
+      }
+
+      // Supprimer les anciennes entrées
+      await db.execute(sql`DELETE FROM instagram_cache`);
+      
+      // Insérer les nouvelles données
+      await db.execute(sql`
+        INSERT INTO instagram_cache (timestamp, data)
+        VALUES (NOW(), ${JSON.stringify(posts)}::jsonb)
+      `);
+    } catch (error) {
+      console.error("Erreur lors de la mise en cache des posts Instagram:", error);
+    }
+  }
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
