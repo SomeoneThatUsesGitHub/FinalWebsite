@@ -11,6 +11,7 @@ import Home from "@/pages/Home";
 import ArticlesList from "@/pages/ArticlesList";
 import Article from "@/pages/Article";
 import TeamPage from "@/pages/TeamPage";
+import AboutPage from "@/pages/AboutPage";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/AuthPage";
 import TestEditor from "@/pages/test-editor";
@@ -73,6 +74,7 @@ function App() {
               <Route path="/articles" component={ArticlesList} />
               <Route path="/articles/:slug" component={Article} />
               <Route path="/team" component={TeamPage} />
+              <Route path="/a-propos" component={AboutPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
               <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
