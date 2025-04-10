@@ -518,7 +518,7 @@ export class DatabaseStorage implements IStorage {
         const editors = await this.getLiveCoverageEditors(coverage.id);
         
         // Créer un objet LiveEvent à partir des données du LiveCoverage
-        const liveEvent: LiveEvent & { editors?: any[] } = {
+        const liveEvent: LiveEvent & { editors?: any[], slug?: string } = {
           id: coverage.id,
           title: coverage.title,
           description: coverage.subject || "",  // Utiliser subject comme description
@@ -529,7 +529,8 @@ export class DatabaseStorage implements IStorage {
           categoryId: null,   // Pas d'équivalent dans LiveCoverage
           createdAt: coverage.createdAt,
           updatedAt: coverage.updatedAt,
-          editors: editors
+          editors: editors,
+          slug: coverage.slug  // Ajout de la propriété slug pour pouvoir l'utiliser dans le lien
         };
         
         return liveEvent;
@@ -704,6 +705,7 @@ export class DatabaseStorage implements IStorage {
       .values({
         ...coverage,
         imageUrl: coverage.imageUrl || null,
+        context: coverage.context || "",  // Fournir une valeur par défaut pour le contexte
       })
       .returning();
     return result;
