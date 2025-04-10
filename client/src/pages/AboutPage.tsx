@@ -127,7 +127,7 @@ const AboutPage: React.FC = () => {
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
                         <div className="h-[64px] w-[3px] bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
                         <div className="rounded-[2rem] overflow-hidden w-[272px] h-[572px] bg-white">
-                          <img src="/assets/instagram-politiquensemble.jpg" className="w-full h-full object-cover" alt="Compte Instagram Politiquensemble" />
+                          <img src="/assets/instagram-politiquensemble-new.jpg" className="w-full h-full object-cover" alt="Compte Instagram Politiquensemble" />
                         </div>
                       </div>
                     </div>
@@ -173,58 +173,6 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Nos valeurs - Style asymétrique */}
-      <section className="py-20 bg-gradient-to-r from-blue-50 to-white" id="valeurs">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center">
-            {/* Cards à gauche */}
-            <div className="md:w-3/5 lg:w-3/5 order-2 md:order-1">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative">
-                {/* Élément décoratif */}
-                <div className="hidden md:block absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full opacity-50 z-0"></div>
-                
-                {values.slice(0, 3).map((value, index) => (
-                  <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15}>
-                    <div className={`bg-white rounded-lg p-6 shadow-lg h-full border-l-4 border-blue-600 hover:shadow-xl transition-shadow relative z-10 transform ${index % 2 === 1 ? 'md:translate-y-8' : ''}`}>
-                      <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
-                        <ValueCard 
-                          icon={value.icon} 
-                          title=""
-                          description=""
-                          index={index}
-                          iconOnly={true}
-                        />
-                      </div>
-                      <h3 className="text-xl font-bold text-blue-800 mb-3">{value.title}</h3>
-                      <p className="text-gray-600">{value.description}</p>
-                    </div>
-                  </ScrollAnimation>
-                ))}
-              </div>
-            </div>
-            
-            {/* Texte à droite */}
-            <div className="md:w-2/5 lg:w-2/5 mb-12 md:mb-0 order-1 md:order-2 md:pl-16">
-              <ScrollAnimation threshold={0.1}>
-                <div className="md:text-right">
-                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Nos valeurs</h2>
-                  <div className="w-24 h-1 bg-blue-600 mb-6 md:ml-auto"></div>
-                  <p className="text-dark/80 mb-6">
-                    Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information quotidienne.
-                  </p>
-                  <p className="text-dark/70">
-                    Notre objectif est de rendre l'information politique compréhensible, objective et accessible, quelle que soit votre connaissance préalable du sujet.
-                  </p>
-                </div>
-              </ScrollAnimation>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Bande bleue pour transition */}
-      <section className="py-2 bg-blue-800"></section>
-      
       {/* Politiquensemble en chiffres - Style décalé et dynamique avec animation de comptage */}
       <section className="pt-20 pb-32 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
         {/* Élément décoratif */}
@@ -303,6 +251,58 @@ const AboutPage: React.FC = () => {
                     <Instagram className="mr-2 h-5 w-5" />
                     Nous suivre
                   </a>
+                </div>
+              </ScrollAnimation>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Bande bleue pour transition */}
+      <section className="py-2 bg-blue-800"></section>
+
+      {/* Nos valeurs - Style asymétrique */}
+      <section className="py-20 bg-gradient-to-r from-blue-50 to-white" id="valeurs">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center">
+            {/* Cards à gauche */}
+            <div className="md:w-3/5 lg:w-3/5 order-2 md:order-1">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative">
+                {/* Élément décoratif */}
+                <div className="hidden md:block absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full opacity-50 z-0"></div>
+                
+                {values.slice(0, 3).map((value, index) => (
+                  <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15}>
+                    <div className={`bg-white rounded-lg p-6 shadow-lg h-full border-l-4 border-blue-600 hover:shadow-xl transition-shadow relative z-10 transform ${index % 2 === 1 ? 'md:translate-y-8' : ''}`}>
+                      <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                        <ValueCard 
+                          icon={value.icon} 
+                          title=""
+                          description=""
+                          index={index}
+                          iconOnly={true}
+                        />
+                      </div>
+                      <h3 className="text-xl font-bold text-blue-800 mb-3">{value.title}</h3>
+                      <p className="text-gray-600">{value.description}</p>
+                    </div>
+                  </ScrollAnimation>
+                ))}
+              </div>
+            </div>
+            
+            {/* Texte à droite */}
+            <div className="md:w-2/5 lg:w-2/5 mb-12 md:mb-0 order-1 md:order-2 md:pl-16">
+              <ScrollAnimation threshold={0.1}>
+                <div className="md:text-right">
+                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Nos valeurs</h2>
+                  <div className="w-24 h-1 bg-blue-600 mb-6 md:ml-auto"></div>
+                  <p className="text-dark/80 mb-6">
+                    Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information quotidienne.
+                  </p>
+                  <p className="text-dark/70">
+                    Notre objectif est de rendre l'information politique compréhensible, objective et accessible, quelle que soit votre connaissance préalable du sujet.
+                  </p>
                 </div>
               </ScrollAnimation>
             </div>
