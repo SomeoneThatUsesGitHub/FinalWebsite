@@ -327,7 +327,7 @@ export default function DirectUpdatesPage() {
                   render={({ field }) => (
                     <FormItem className="mb-6">
                       <FormLabel>Type de mise à jour</FormLabel>
-                      <div className="grid grid-cols-4 gap-2">
+                      <div className="grid grid-cols-5 gap-2">
                         <Button
                           type="button"
                           variant={field.value === "normal" ? "default" : "outline"}
@@ -337,6 +337,7 @@ export default function DirectUpdatesPage() {
                             form.setValue("youtubeUrl", "");
                             form.setValue("articleId", undefined);
                             form.setValue("electionResults", undefined);
+                            form.setValue("recapItems", undefined);
                           }}
                         >
                           <MessageSquare className="h-5 w-5 mb-2" />
@@ -350,6 +351,7 @@ export default function DirectUpdatesPage() {
                             field.onChange("youtube");
                             form.setValue("articleId", undefined);
                             form.setValue("electionResults", undefined);
+                            form.setValue("recapItems", undefined);
                           }}
                         >
                           <Youtube className="h-5 w-5 mb-2" />
@@ -363,6 +365,7 @@ export default function DirectUpdatesPage() {
                             field.onChange("article");
                             form.setValue("youtubeUrl", "");
                             form.setValue("electionResults", undefined);
+                            form.setValue("recapItems", undefined);
                           }}
                         >
                           <Newspaper className="h-5 w-5 mb-2" />
@@ -376,10 +379,25 @@ export default function DirectUpdatesPage() {
                             field.onChange("election");
                             form.setValue("youtubeUrl", "");
                             form.setValue("articleId", undefined);
+                            form.setValue("recapItems", undefined);
                           }}
                         >
                           <BarChartIcon className="h-5 w-5 mb-2" />
                           <span className="text-sm">Graphique Élections</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={field.value === "recap" ? "default" : "outline"}
+                          className="flex flex-col items-center justify-center h-20 w-full"
+                          onClick={() => {
+                            field.onChange("recap");
+                            form.setValue("youtubeUrl", "");
+                            form.setValue("articleId", undefined);
+                            form.setValue("electionResults", undefined);
+                          }}
+                        >
+                          <ListChecks className="h-5 w-5 mb-2" />
+                          <span className="text-sm">Le Récap</span>
                         </Button>
                       </div>
                       <FormDescription>
