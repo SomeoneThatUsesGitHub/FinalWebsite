@@ -641,7 +641,7 @@ export default function LiveCoveragePage() {
                           <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b update-card-content update-card-header ${update.important ? "bg-red-50 dark:bg-red-900/20 border-b-red-200" : "bg-muted/30"}`}>
                             <div className="flex items-center gap-2">
                               {update.important && (
-                                <Badge className="bg-red-500">Important</Badge>
+                                <Badge className="!bg-red-500 hover:!bg-red-600">Important</Badge>
                               )}
                               {update.isAnswer && (
                                 <Badge className="bg-blue-500">Réponse</Badge>

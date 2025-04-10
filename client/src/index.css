@@ -106,6 +106,17 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
+/* Style pour les badges "Important" */
+.badge-important {
+  background-color: rgb(239, 68, 68) !important;
+  color: white !important;
+}
+
+.badge-important:hover {
+  background-color: rgb(220, 38, 38) !important;
+  color: white !important;
+}
+
 .update-card:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15) !important;
