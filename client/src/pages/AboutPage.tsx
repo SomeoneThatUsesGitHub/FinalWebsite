@@ -102,8 +102,8 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Notre histoire - Nouvelle mise en page asymétrique */}
-      <section className="py-20 bg-white pattern-grid-fade overflow-hidden" id="histoire">
+      {/* Notre histoire - Nouvelle mise en page asymétrique sans carnet de notes */}
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden" id="histoire">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row">
             {/* Titre et introduction à gauche */}
@@ -123,7 +123,7 @@ const AboutPage: React.FC = () => {
               </ScrollAnimation>
             </div>
             
-            {/* Timeline à droite */}
+            {/* Timeline à droite avec nouveau design sans effet carnet */}
             <div className="lg:w-2/3 relative">
               <div className="hidden lg:block absolute top-0 bottom-0 left-12 w-1 bg-blue-200"></div>
               
@@ -135,19 +135,17 @@ const AboutPage: React.FC = () => {
                 >
                   <div className="flex mb-16 relative lg:pl-24">
                     <div className="hidden lg:flex absolute left-10 top-4 -translate-x-1/2 w-8 h-8 bg-white border-4 border-blue-500 rounded-full z-10"></div>
-                    <div className="milestone-card w-full lg:ml-4">
-                      <div className="milestone-content">
-                        <div className="flex items-start mb-3">
-                          <div className="mr-4 p-3 bg-blue-100 rounded-xl flex-shrink-0">
-                            {milestone.icon}
-                          </div>
-                          <div>
-                            <div className="text-blue-600 font-bold text-lg">{milestone.year}</div>
-                            <h3 className="text-xl font-bold text-dark">{milestone.title}</h3>
-                          </div>
+                    <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all w-full lg:ml-4 transform hover:scale-[1.02]">
+                      <div className="flex items-start mb-3">
+                        <div className="mr-4 p-3 bg-blue-100 rounded-xl flex-shrink-0">
+                          {milestone.icon}
                         </div>
-                        <p className="text-dark/70 lg:pl-16">{milestone.description}</p>
+                        <div>
+                          <div className="text-blue-600 font-bold text-lg">{milestone.year}</div>
+                          <h3 className="text-xl font-bold text-dark">{milestone.title}</h3>
+                        </div>
                       </div>
+                      <p className="text-dark/70 lg:pl-16">{milestone.description}</p>
                     </div>
                   </div>
                 </ScrollAnimation>
