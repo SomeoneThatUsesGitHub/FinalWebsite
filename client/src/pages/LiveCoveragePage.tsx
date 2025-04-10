@@ -461,7 +461,8 @@ export default function LiveCoveragePage() {
             <div className="flex justify-between items-start">
               <h2 className="text-xl font-bold flex items-center">
                 <Radio className="h-5 w-5 mr-2 text-primary" />
-                Dernières mises à jour
+                <span className="hidden xs:inline">Dernières mises à jour</span>
+                <span className="xs:hidden">En direct</span>
               </h2>
               
               <div className="relative">
