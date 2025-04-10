@@ -1807,7 +1807,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enrichir les candidatures avec les noms des réviseurs
       const enrichedApplications = await Promise.all(applications.map(async (app) => {
         if (app.reviewedBy) {
-          const reviewer = await storage.getUserById(app.reviewedBy);
+          const reviewer = await storage.getUser(app.reviewedBy);
           return {
             ...app,
             reviewerName: reviewer ? reviewer.displayName : undefined
