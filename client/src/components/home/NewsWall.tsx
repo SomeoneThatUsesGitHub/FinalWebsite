@@ -259,7 +259,7 @@ const NewsWall: React.FC = () => {
                     </div>
                     <div className="mt-2">
                       {(featuredContent.data as LiveEvent).liveUrl && (
-                        <Link href={(featuredContent.data as LiveEvent).liveUrl || ''}>
+                        <Link href={`/suivis-en-direct/${(featuredContent.data as LiveEvent).slug || ''}`}>
                           <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
                             <div className="flex items-center">
                               <div className="mr-2 w-2 h-2 rounded-full bg-white animate-pulse"></div>

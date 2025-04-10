@@ -233,7 +233,7 @@ export const liveCoverages = pgTable("live_coverages", {
   title: text("title").notNull(),
   slug: text("slug").notNull().unique(),
   subject: text("subject").notNull(),
-  context: text("context").notNull(),
+  context: text("context").default(""), // Rendu optionnel
   imageUrl: text("image_url"),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
