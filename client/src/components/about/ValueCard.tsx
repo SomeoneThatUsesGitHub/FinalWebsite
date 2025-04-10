@@ -5,9 +5,10 @@ interface ValueCardProps {
   title: string;
   description: string;
   index: number;
+  iconOnly?: boolean;
 }
 
-const ValueCard: React.FC<ValueCardProps> = ({ icon, title, description, index }) => {
+const ValueCard: React.FC<ValueCardProps> = ({ icon, title, description, index, iconOnly = false }) => {
   // Fonction pour choisir l'icône appropriée basée sur la valeur
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -69,6 +70,11 @@ const ValueCard: React.FC<ValueCardProps> = ({ icon, title, description, index }
         );
     }
   };
+
+  // Si on ne veut que l'icône
+  if (iconOnly) {
+    return getIcon(icon);
+  }
 
   // Déterminer si c'est le dernier élément de la ligne
   const isLastInRow = index === 2 || index === 5;

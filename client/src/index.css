@@ -79,98 +79,24 @@
 }
 
 /* Style pour la section des valeurs */
-.values-container {
+.stats-section {
   position: relative;
-  background-color: #ecf6ff;
-  padding: 3rem 0;
-  border-radius: 0;
   overflow: hidden;
 }
 
-.values-container::before {
+.stats-section::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: linear-gradient(135deg, 
-    rgba(59, 130, 246, 0.05) 25%, 
-    rgba(0, 0, 0, 0) 25%, 
-    rgba(0, 0, 0, 0) 50%, 
-    rgba(59, 130, 246, 0.05) 50%, 
-    rgba(59, 130, 246, 0.05) 75%, 
-    rgba(0, 0, 0, 0) 75%, 
-    rgba(0, 0, 0, 0) 100%
-  );
-  background-size: 120px 120px;
-  opacity: 0.5;
-}
-
-.values-row {
-  display: flex;
-  align-items: stretch;
-  margin-bottom: 2rem;
-  position: relative;
-}
-
-.value-item {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding-bottom: 2rem;
-}
-
-.value-line {
-  position: absolute;
-  top: 20px;
-  left: 40px;
-  width: calc(100% - 40px);
-  height: 3px;
-  background: linear-gradient(to right, #3b82f6, rgba(59, 130, 246, 0.1));
-  z-index: 0;
-}
-
-.value-icon-wrapper {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: white;
-  border-radius: 50%;
-  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
-  margin-bottom: 1.5rem;
-  position: relative;
-  z-index: 1;
-  border: 3px solid #3b82f6;
-  background: linear-gradient(45deg, white, #f8faff);
-}
-
-.value-icon {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.value-content {
-  padding: 0 1rem;
-  text-align: center;
-  max-width: 300px;
-}
-
-.value-title {
-  font-weight: 700;
-  color: #1e40af;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-}
-
-.value-description {
-  font-size: 0.95rem;
-  color: #4b5563;
+  background-image: url('/assets/politics-collage.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  filter: grayscale(100%) contrast(120%);
+  mix-blend-mode: overlay;
 }
 
 @keyframes highlight-pulse {

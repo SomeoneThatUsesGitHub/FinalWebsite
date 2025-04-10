@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import ScrollAnimation from "@/components/animations/ScrollAnimation";
 import ValueCard from "@/components/about/ValueCard";
-import { MapPin, Calendar, Award, Users, Bookmark, TrendingUp } from "lucide-react";
+import { MapPin, Calendar, Award, Users, Bookmark, TrendingUp, Newspaper, Share2, BookOpen } from "lucide-react";
 
 const AboutPage: React.FC = () => {
   const values = [
@@ -143,45 +143,94 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Nos valeurs - Style de timeline interactive */}
-      <section className="py-16 values-container" id="valeurs">
+      {/* Nos valeurs - Nouveau style horizontal simplifié */}
+      <section className="py-16 bg-blue-50" id="valeurs">
         <div className="container mx-auto px-4">
           <ScrollAnimation threshold={0.1}>
             <div className="mb-12 text-center">
               <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Nos valeurs</h2>
               <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full mb-6"></div>
               <p className="text-dark/70 max-w-3xl mx-auto">
-                Ces principes guident chacune de nos décisions éditoriales et notre approche de l'information.
+                Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information.
               </p>
             </div>
           </ScrollAnimation>
 
-          <div className="max-w-6xl mx-auto">
-            <div className="values-row mb-8">
-              {values.slice(0, 3).map((value, index) => (
-                <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15} className="flex-1">
-                  <ValueCard 
-                    icon={value.icon} 
-                    title={value.title} 
-                    description={value.description}
-                    index={index}
-                  />
-                </ScrollAnimation>
-              ))}
+          <div className="flex flex-col md:flex-row justify-center gap-8 max-w-5xl mx-auto">
+            {values.slice(0, 3).map((value, index) => (
+              <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15} className="flex-1">
+                <div className="bg-white rounded-lg p-6 shadow-lg h-full border-t-4 border-blue-600 hover:shadow-xl transition-shadow">
+                  <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <ValueCard 
+                      icon={value.icon} 
+                      title=""
+                      description=""
+                      index={index}
+                      iconOnly={true}
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-center text-blue-800 mb-3">{value.title}</h3>
+                  <p className="text-gray-600 text-center">{value.description}</p>
+                </div>
+              </ScrollAnimation>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Politiquensemble en chiffres */}
+      <section className="py-16 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section" id="chiffres">
+        <div className="container mx-auto px-4">
+          <ScrollAnimation threshold={0.1}>
+            <div className="mb-12 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">Politiquensemble en chiffres</h2>
+              <div className="w-24 h-1 bg-white mx-auto rounded-full mb-6"></div>
+              <p className="text-white/80 max-w-3xl mx-auto">
+                Notre impact en quelques données clés
+              </p>
             </div>
+          </ScrollAnimation>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-4xl mx-auto">
+            <ScrollAnimation threshold={0.1} delay={0.1}>
+              <div className="text-center">
+                <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                  <Users className="w-6 h-6 text-blue-100" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-1">10K+</div>
+                <div className="text-white/80">Abonnés</div>
+              </div>
+            </ScrollAnimation>
             
-            <div className="values-row">
-              {values.slice(3, 6).map((value, index) => (
-                <ScrollAnimation key={index + 3} threshold={0.1} delay={(index + 3) * 0.15} className="flex-1">
-                  <ValueCard 
-                    icon={value.icon} 
-                    title={value.title} 
-                    description={value.description}
-                    index={index + 3}
-                  />
-                </ScrollAnimation>
-              ))}
-            </div>
+            <ScrollAnimation threshold={0.1} delay={0.2}>
+              <div className="text-center">
+                <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                  <Newspaper className="w-6 h-6 text-blue-100" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-1">250+</div>
+                <div className="text-white/80">Articles publiés</div>
+              </div>
+            </ScrollAnimation>
+            
+            <ScrollAnimation threshold={0.1} delay={0.3}>
+              <div className="text-center">
+                <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                  <Share2 className="w-6 h-6 text-blue-100" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-1">50+</div>
+                <div className="text-white/80">Directs couverts</div>
+              </div>
+            </ScrollAnimation>
+            
+            <ScrollAnimation threshold={0.1} delay={0.4}>
+              <div className="text-center">
+                <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                  <BookOpen className="w-6 h-6 text-blue-100" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-1">15+</div>
+                <div className="text-white/80">Dossiers pédagogiques</div>
+              </div>
+            </ScrollAnimation>
           </div>
         </div>
       </section>
