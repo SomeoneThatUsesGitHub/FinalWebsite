@@ -127,7 +127,7 @@ const AboutPage: React.FC = () => {
                         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
                         <div className="h-[64px] w-[3px] bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
                         <div className="rounded-[2rem] overflow-hidden w-[272px] h-[572px] bg-white">
-                          <img src="/assets/instagram-profile.png" className="w-full h-full object-cover" alt="Compte Instagram Politiquensemble" />
+                          <img src="/assets/insta.jpg" className="w-full h-full object-cover" alt="Compte Instagram Politiquensemble" />
                         </div>
                       </div>
                     </div>
