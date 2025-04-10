@@ -724,17 +724,17 @@ export class DatabaseStorage implements IStorage {
 
   async deleteLiveCoverage(id: number): Promise<boolean> {
     try {
-      // Supprimer les questions associées d'abord
+      // D'abord supprimer les mises à jour associées (incluant celles liées aux questions)
+      await db.delete(liveCoverageUpdates)
+        .where(eq(liveCoverageUpdates.coverageId, id));
+      
+      // Ensuite supprimer les questions associées
       await db.delete(liveCoverageQuestions)
         .where(eq(liveCoverageQuestions.coverageId, id));
         
-      // Ensuite supprimer les éditeurs associés
+      // Puis supprimer les éditeurs associés
       await db.delete(liveCoverageEditors)
         .where(eq(liveCoverageEditors.coverageId, id));
-      
-      // Puis supprimer les mises à jour associées
-      await db.delete(liveCoverageUpdates)
-        .where(eq(liveCoverageUpdates.coverageId, id));
       
       // Enfin supprimer le direct lui-même
       const result = await db.delete(liveCoverages)
