@@ -90,6 +90,10 @@ export default function DirectUpdatesPage() {
   
   // État pour gérer l'ajout/suppression de candidats
   const [newCandidate, setNewCandidate] = useState({ candidate: "", party: "", percentage: 0, color: "#000000" });
+  
+  // État pour gérer les éléments du récapitulatif
+  const [recapItems, setRecapItems] = useState<{ text: string, done: boolean }[]>([]);
+  const [newRecapItem, setNewRecapItem] = useState("");
 
   // Récupérer les détails du suivi en direct
   const { data: coverage, isLoading: isLoadingCoverage } = useQuery<LiveCoverage>({
@@ -248,12 +252,71 @@ export default function DirectUpdatesPage() {
     });
   };
 
+  // Fonction pour ajouter un élément au récapitulatif
+  const addRecapItem = () => {
+    if (!newRecapItem.trim()) {
+      toast({
+        title: "Élément vide",
+        description: "Veuillez saisir du texte pour l'élément du récap",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setRecapItems(prev => [...prev, { text: newRecapItem, done: false }]);
+    setNewRecapItem("");
+  };
+  
+  // Fonction pour supprimer un élément du récapitulatif
+  const removeRecapItem = (index: number) => {
+    setRecapItems(prev => prev.filter((_, i) => i !== index));
+  };
+  
+  // Fonction pour basculer l'état "fait" d'un élément du récapitulatif
+  const toggleRecapItemDone = (index: number) => {
+    setRecapItems(prev => 
+      prev.map((item, i) => 
+        i === index ? { ...item, done: !item.done } : item
+      )
+    );
+  };
+  
+  // Fonction pour appliquer les éléments du récapitulatif au formulaire
+  const applyRecapItems = () => {
+    if (recapItems.length === 0) {
+      toast({
+        title: "Aucun élément",
+        description: "Veuillez ajouter au moins un élément au récapitulatif",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Convertir les données en chaîne JSON et les ajouter au formulaire
+    form.setValue("recapItems", JSON.stringify(recapItems));
+    
+    toast({
+      title: "Récap appliqué",
+      description: `${recapItems.length} élément(s) ajouté(s) au récapitulatif`,
+    });
+  };
+
   const onSubmit = (data: UpdateFormValues) => {
     // Si c'est une mise à jour de type élection, vérifier que les données sont présentes
     if (data.updateType === 'election' && !data.electionResults) {
       toast({
         title: "Données manquantes",
         description: "Veuillez configurer et appliquer le graphique d'élections",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Si c'est une mise à jour de type récap, vérifier que les éléments sont présents
+    if (data.updateType === 'recap' && !data.recapItems) {
+      toast({
+        title: "Éléments manquants",
+        description: "Veuillez ajouter et appliquer les éléments du récapitulatif",
         variant: "destructive"
       });
       return;
