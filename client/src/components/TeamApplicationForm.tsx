@@ -110,209 +110,129 @@ export default function TeamApplicationForm() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Rejoignez l'équipe Politiquensemble</h2>
-      <p className="mb-6 text-gray-600 text-center">
-        Vous souhaitez contribuer à notre mission de rendre la politique accessible aux jeunes ? 
-        Complétez ce formulaire pour rejoindre notre équipe dynamique.
-      </p>
+    <div className="w-full px-4 py-10 bg-white rounded-lg shadow-md">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-3xl font-bold mb-6 text-center text-primary">Rejoignez l'équipe Politiquensemble</h2>
+        <p className="mb-8 text-lg text-gray-600 text-center max-w-3xl mx-auto">
+          Vous souhaitez contribuer à notre mission de rendre la politique accessible aux jeunes ? 
+          Complétez ce formulaire pour rejoindre notre équipe dynamique.
+        </p>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Nom complet */}
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom complet *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Jean Dupont" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Adresse e-mail *</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="jean.dupont@exemple.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Téléphone */}
-            <FormField
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Numéro de téléphone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+33 6 12 34 56 78" {...field} />
-                  </FormControl>
-                  <FormDescription>Optionnel</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Poste */}
-            <FormField
-              control={form.control}
-              name="position"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Poste souhaité *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* Nom complet */}
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom Prénom *</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez un poste" />
-                      </SelectTrigger>
+                      <Input placeholder="Jean Dupont" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="rédacteur">Rédacteur</SelectItem>
-                      <SelectItem value="graphiste">Graphiste</SelectItem>
-                      <SelectItem value="community-manager">Community Manager</SelectItem>
-                      <SelectItem value="vidéaste">Vidéaste</SelectItem>
-                      <SelectItem value="analyste-politique">Analyste politique</SelectItem>
-                      <SelectItem value="développeur">Développeur</SelectItem>
-                      <SelectItem value="autre">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Email */}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Adresse e-mail *</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="jean.dupont@exemple.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Téléphone */}
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Numéro de téléphone *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+33 6 12 34 56 78" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Poste */}
+              <FormField
+                control={form.control}
+                name="position"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Poste souhaité *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez un poste" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="journaliste">Journaliste</SelectItem>
+                        <SelectItem value="monteur-video">Monteur vidéo</SelectItem>
+                        <SelectItem value="graphiste-designer">Graphiste et designer</SelectItem>
+                        <SelectItem value="veilleur-actualite">Veilleur d'actualité</SelectItem>
+                        <SelectItem value="ambassadeur">Ambassadeur</SelectItem>
+                        <SelectItem value="photographe">Photographe</SelectItem>
+                        <SelectItem value="spontanee">Candidature spontanée</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Motivation */}
+            <FormField
+              control={form.control}
+              name="motivation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Motivation *</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Pourquoi souhaitez-vous rejoindre Politiquensemble ?" 
+                      className="min-h-[150px]" 
+                      {...field} 
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
 
-          {/* Portfolio/Profil */}
-          <FormField
-            control={form.control}
-            name="portfolio"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Lien vers votre portfolio ou profil LinkedIn/Twitter</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://..." {...field} />
-                </FormControl>
-                <FormDescription>Optionnel - Un lien vers vos travaux ou votre profil</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Disponibilité */}
-          <FormField
-            control={form.control}
-            name="availability"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Disponibilité *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionnez votre disponibilité" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="temps-plein">Temps plein</SelectItem>
-                    <SelectItem value="temps-partiel">Temps partiel</SelectItem>
-                    <SelectItem value="week-end">Week-ends uniquement</SelectItem>
-                    <SelectItem value="quelques-heures">Quelques heures par semaine</SelectItem>
-                    <SelectItem value="flexible">Horaires flexibles</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Expérience */}
-          <FormField
-            control={form.control}
-            name="experience"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Expérience *</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder="Décrivez votre expérience pertinente pour ce poste..." 
-                    className="min-h-[100px]" 
-                    {...field} 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Motivation */}
-          <FormField
-            control={form.control}
-            name="motivation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Motivation *</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder="Pourquoi souhaitez-vous rejoindre Politiquensemble ?" 
-                    className="min-h-[100px]" 
-                    {...field} 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Informations supplémentaires */}
-          <FormField
-            control={form.control}
-            name="additionalInfo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Informations supplémentaires</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder="Partagez toute information complémentaire que vous jugez utile..." 
-                    className="min-h-[100px]" 
-                    {...field} 
-                  />
-                </FormControl>
-                <FormDescription>Optionnel</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="pt-4">
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={submitMutation.isPending}
-            >
-              {submitMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Envoi en cours...
-                </>
-              ) : (
-                "Envoyer ma candidature"
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
+            <div className="pt-4">
+              <Button 
+                type="submit" 
+                className="w-full py-6 text-lg" 
+                disabled={submitMutation.isPending}
+              >
+                {submitMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  "Envoyer ma candidature"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }
