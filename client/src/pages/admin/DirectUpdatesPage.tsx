@@ -390,26 +390,28 @@ export default function DirectUpdatesPage() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Contenu de la mise à jour *</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Saisissez votre mise à jour ici..." 
-                          {...field} 
-                          rows={5}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Texte de la mise à jour. Soyez concis et factuel.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {form.watch("updateType") !== "election" && (
+                  <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contenu de la mise à jour *</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Saisissez votre mise à jour ici..." 
+                            {...field} 
+                            rows={5}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Texte de la mise à jour. Soyez concis et factuel.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 {form.watch("updateType") === "normal" && (
                   <FormField

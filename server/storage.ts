@@ -506,8 +506,13 @@ export class DatabaseStorage implements IStorage {
       const activeCoverages = await this.getActiveLiveCoverages();
       
       if (activeCoverages && activeCoverages.length > 0) {
-        // Convertir le premier direct actif en format LiveEvent
-        const coverage = activeCoverages[0];
+        // Trier les directs actifs par date de création (le plus récent en premier)
+        const sortedCoverages = [...activeCoverages].sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
+        // Convertir le direct le plus récent en format LiveEvent
+        const coverage = sortedCoverages[0];
         
         // Récupérer les éditeurs du direct
         const editors = await this.getLiveCoverageEditors(coverage.id);
@@ -518,7 +523,7 @@ export class DatabaseStorage implements IStorage {
           title: coverage.title,
           description: coverage.subject || "",  // Utiliser subject comme description
           imageUrl: coverage.imageUrl,
-          liveUrl: `/direct/${coverage.slug}`, // URL relative pour le direct
+          liveUrl: `/suivis-en-direct/${coverage.slug}`, // URL relative pour le direct
           active: coverage.active,
           scheduledFor: null, // Pas d'équivalent dans LiveCoverage
           categoryId: null,   // Pas d'équivalent dans LiveCoverage
