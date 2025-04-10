@@ -122,8 +122,8 @@ const NewsWall: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isReallyMobile = typeof window !== 'undefined' ? window.innerWidth <= 768 : false;
   
-  // Check if we have an active live event
-  const hasLiveEvent = !!liveEvent;
+  // Check if we have an active live event with a valid ID
+  const hasLiveEvent = !!liveEvent && !!liveEvent.id && liveEvent.id > 0;
   
   // Prepare featured content - Live Event takes precedence, then featured article
   const featuredContent = useMemo(() => {
@@ -250,9 +250,14 @@ const NewsWall: React.FC = () => {
                           <li className="flex items-start">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                             <span>
-                              Animé par {(featuredContent.data as LiveEvent).editors && (featuredContent.data as LiveEvent).editors.length > 0 
-                                ? (featuredContent.data as LiveEvent).editors.map(e => e?.editor?.displayName).filter(Boolean).join(', ')
-                                : "l'équipe éditoriale"}
+                              Animé par {(featuredContent.data as LiveEvent).editors && 
+                                Array.isArray((featuredContent.data as LiveEvent).editors) && 
+                                (featuredContent.data as LiveEvent).editors.length > 0 
+                                  ? (featuredContent.data as LiveEvent).editors
+                                      .map(e => e?.editor?.displayName)
+                                      .filter(Boolean)
+                                      .join(', ')
+                                  : "l'équipe éditoriale"}
                             </span>
                           </li>
                         </ul>
