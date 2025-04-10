@@ -82,7 +82,7 @@ export default function LiveCoveragePage() {
     refetchInterval: refreshInterval,
   });
 
-  // Traiter les mises à jour pour intégrer les graphiques d'élection
+  // Traiter les mises à jour pour intégrer les graphiques d'élection et les récapitulatifs
   const updates = React.useMemo(() => {
     if (!rawUpdates) return undefined;
     
@@ -90,10 +90,6 @@ export default function LiveCoveragePage() {
       // Vérifier si cette mise à jour contient des données d'élection
       if (update.updateType === 'election' && update.electionResults) {
         try {
-          // Ajouter des logs pour debug
-          console.log("Type de electionResults:", typeof update.electionResults);
-          console.log("Contenu de electionResults:", update.electionResults);
-          
           // Convertir la chaîne JSON en objet ElectionResultsData
           let electionData;
           if (typeof update.electionResults === 'string') {
@@ -101,8 +97,6 @@ export default function LiveCoveragePage() {
           } else {
             electionData = update.electionResults as ElectionResultsData;
           }
-          
-          console.log("Données parsées:", electionData);
           
           return {
             ...update,
@@ -113,6 +107,24 @@ export default function LiveCoveragePage() {
           return update;
         }
       }
+      
+      // Vérifier si cette mise à jour contient des éléments de récapitulatif
+      if (update.updateType === 'recap' && update.recapItems) {
+        try {
+          // Convertir la chaîne JSON en tableau d'objets RecapItem
+          if (typeof update.recapItems === 'string') {
+            const recapItemsParsed = JSON.parse(update.recapItems);
+            return {
+              ...update,
+              recapItems: recapItemsParsed
+            };
+          }
+        } catch (e) {
+          console.error("Erreur lors du parsing des données du récapitulatif:", e);
+          return update;
+        }
+      }
+      
       return update;
     });
   }, [rawUpdates]);
