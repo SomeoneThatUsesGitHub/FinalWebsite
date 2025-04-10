@@ -8,7 +8,7 @@ import * as schema from "@shared/schema";
 import { 
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
-  insertLiveCoverageUpdateSchema 
+  insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema 
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -1689,6 +1689,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error answering question:", error);
       res.status(500).json({ error: "Error answering question" });
+    }
+  });
+
+  // Routes pour la newsletter
+  app.post("/api/newsletter/subscribe", async (req: Request, res: Response) => {
+    try {
+      // Vérifier si l'email est fourni
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ 
+          success: false,
+          message: "Adresse e-mail requise" 
+        });
+      }
+      
+      // Valider le format de l'email
+      const emailSchema = z.string().email();
+      const result = emailSchema.safeParse(email);
+      
+      if (!result.success) {
+        return res.status(400).json({ 
+          success: false,
+          message: "Adresse e-mail invalide" 
+        });
+      }
+      
+      // Créer ou récupérer l'abonné
+      const subscriber = await storage.createNewsletterSubscriber(email);
+      
+      res.status(201).json({ 
+        success: true,
+        message: "Inscription à la newsletter réussie", 
+        subscriber 
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'inscription à la newsletter:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Erreur lors de l'inscription à la newsletter" 
+      });
+    }
+  });
+  
+  // Route admin pour récupérer tous les abonnés à la newsletter
+  app.get("/api/admin/newsletter/subscribers", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const subscribers = await storage.getNewsletterSubscribers();
+      res.json(subscribers);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des abonnés à la newsletter:", error);
+      res.status(500).json({ 
+        message: "Erreur lors de la récupération des abonnés à la newsletter" 
+      });
+    }
+  });
+  
+  // Route admin pour supprimer un abonné à la newsletter
+  app.delete("/api/admin/newsletter/subscribers/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'abonné invalide" });
+      }
+      
+      const result = await storage.deleteNewsletterSubscriber(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Abonné non trouvé" });
+      }
+      
+      res.json({ message: "Abonné supprimé avec succès" });
+    } catch (error) {
+      console.error("Erreur lors de la suppression d'un abonné:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression d'un abonné" });
     }
   });
 

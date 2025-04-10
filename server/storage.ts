@@ -111,6 +111,36 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Newsletter Subscribers operations
+  async getNewsletterSubscribers(): Promise<NewsletterSubscriber[]> {
+    return db.select().from(newsletterSubscribers).orderBy(desc(newsletterSubscribers.subscriptionDate));
+  }
+  
+  async createNewsletterSubscriber(email: string): Promise<NewsletterSubscriber> {
+    try {
+      const [subscriber] = await db
+        .insert(newsletterSubscribers)
+        .values({ email, active: true })
+        .returning();
+      return subscriber;
+    } catch (error) {
+      // Gérer le cas où l'email existe déjà (contrainte unique)
+      if (error.code === '23505') { // Code PostgreSQL pour violation de contrainte unique
+        // Récupérer l'abonné existant
+        const [existingSubscriber] = await db
+          .select()
+          .from(newsletterSubscribers)
+          .where(eq(newsletterSubscribers.email, email));
+        return existingSubscriber;
+      }
+      throw error;
+    }
+  }
+  
+  async deleteNewsletterSubscriber(id: number): Promise<boolean> {
+    const result = await db.delete(newsletterSubscribers).where(eq(newsletterSubscribers.id, id));
+    return result.rowCount > 0;
+  }
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
