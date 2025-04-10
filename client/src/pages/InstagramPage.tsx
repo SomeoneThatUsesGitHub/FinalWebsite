@@ -1,240 +1,330 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Loader2, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+// Cette page n'utilise pas de Layout car App.tsx ajoute déjà le Header et Footer
+import { Card } from "@/components/ui/card";
+import { Loader2, Instagram, AlertCircle, ExternalLink, X } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
-// Type pour les publications Instagram
+// Type pour les posts Instagram
 type InstagramPost = {
   id: string;
+  media_type: string;
   media_url: string;
   permalink: string;
+  thumbnail_url?: string;
   caption?: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
   timestamp: string;
-  children?: { data: { id: string; media_url: string; media_type: string }[] };
+  children?: {
+    media_url: string;
+    media_type: string;
+  }[];
 };
 
-const InstagramPage: React.FC = () => {
-  const [posts, setPosts] = useState<InstagramPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const InstagramPage = () => {
   const [selectedPost, setSelectedPost] = useState<InstagramPost | null>(null);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    fetchInstagramPosts();
-  }, []);
+  // Récupérer les posts Instagram via l'API
+  const { data, isLoading, error } = useQuery<{ posts: InstagramPost[], error?: string }>({
+    queryKey: ["/api/instagram"],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
-  // Cette fonction récupère les posts Instagram depuis notre API
-  const fetchInstagramPosts = async () => {
+  // Actualiser le cache Instagram
+  const refreshCache = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      const response = await fetch("/api/instagram/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
       
-      const response = await fetch('/api/instagram');
-      const data = await response.json();
+      const result = await response.json();
       
-      if (data.error) {
-        setError(data.error);
-        setPosts(data.posts || []);
+      if (result.success) {
+        toast({
+          title: "Cache actualisé",
+          description: "Les publications Instagram ont été actualisées.",
+        });
+        
+        // Recharger la page pour afficher les nouvelles données
+        window.location.reload();
       } else {
-        setPosts(data.posts || []);
+        toast({
+          title: "Erreur d'actualisation",
+          description: result.message || "Une erreur est survenue lors de l'actualisation du cache.",
+          variant: "destructive",
+        });
       }
-      
-      setLoading(false);
-    } catch (err) {
-      console.error('Erreur lors de la récupération des posts Instagram:', err);
-      setError('Impossible de charger les publications Instagram. Veuillez réessayer plus tard.');
-      setLoading(false);
+    } catch (error) {
+      toast({
+        title: "Erreur d'actualisation",
+        description: "Une erreur est survenue lors de l'actualisation du cache.",
+        variant: "destructive",
+      });
     }
   };
 
-  const openPost = (post: InstagramPost) => {
-    setSelectedPost(post);
-    setCurrentSlideIndex(0);
-  };
-
-  const closePost = () => {
+  // Ferme la visionneuse d'image en grande taille
+  const closeViewer = () => {
     setSelectedPost(null);
+    setCurrentImageIndex(0);
   };
 
-  const nextSlide = () => {
-    if (!selectedPost?.children?.data) return;
-    setCurrentSlideIndex((prev) => 
-      prev < selectedPost.children.data.length - 1 ? prev + 1 : prev
-    );
-  };
-
-  const prevSlide = () => {
-    if (!selectedPost?.children?.data) return;
-    setCurrentSlideIndex((prev) => (prev > 0 ? prev - 1 : prev));
-  };
-
-  // Obtenir la bonne URL d'image pour l'affichage actuel
-  const getCurrentMediaUrl = () => {
-    if (!selectedPost) return '';
+  // Naviguer entre les images d'un post carrousel
+  const navigateCarousel = (direction: "next" | "prev") => {
+    if (!selectedPost || !selectedPost.children) return;
     
-    if (selectedPost.media_type === 'CAROUSEL_ALBUM' && selectedPost.children?.data) {
-      return selectedPost.children.data[currentSlideIndex].media_url;
+    if (direction === "next") {
+      setCurrentImageIndex(prev => 
+        prev < selectedPost.children!.length - 1 ? prev + 1 : 0
+      );
+    } else {
+      setCurrentImageIndex(prev => 
+        prev > 0 ? prev - 1 : selectedPost.children!.length - 1
+      );
     }
-    
-    return selectedPost.media_url;
   };
 
-  // Vérifier si le post actuel est un carrousel
-  const isCarousel = () => {
-    return selectedPost?.media_type === 'CAROUSEL_ALBUM' && 
-           selectedPost.children?.data && 
-           selectedPost.children.data.length > 1;
+  // Fermer la visionneuse quand on appuie sur Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeViewer();
+      } else if (e.key === "ArrowRight" && selectedPost?.children) {
+        navigateCarousel("next");
+      } else if (e.key === "ArrowLeft" && selectedPost?.children) {
+        navigateCarousel("prev");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedPost]);
+
+  // Formater la date de publication relative
+  const formatDate = (dateString: string) => {
+    try {
+      return formatDistanceToNow(new Date(dateString), {
+        addSuffix: true,
+        locale: fr
+      });
+    } catch (e) {
+      return "Date inconnue";
+    }
   };
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Notre Instagram</h1>
-      
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-        </div>
-      ) : error ? (
-        <div className="text-center py-10 text-red-500">{error}</div>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {posts.map((post) => (
-              <div 
-                key={post.id} 
-                className="aspect-square overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer relative group"
-                onClick={() => openPost(post)}
-              >
-                <img 
-                  src={post.media_url} 
-                  alt={post.caption || 'Publication Instagram Politiquensemble'} 
-                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
-                
-                {/* Indicateur de carrousel */}
-                {post.media_type === 'CAROUSEL_ALBUM' && (
-                  <div className="absolute top-2 right-2 bg-white/80 rounded-full p-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+    <>
+      <Helmet>
+        <title>Instagram | Politiquensemble</title>
+        <meta name="description" content="Suivez-nous sur Instagram pour des actualités politiques en temps réel." />
+      </Helmet>
 
-          {/* Modal pour afficher la publication sélectionnée */}
-          <Dialog open={!!selectedPost} onOpenChange={(open) => !open && closePost()}>
-            <DialogContent className="max-w-4xl p-0 overflow-hidden bg-transparent border-none shadow-none">
-              <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
-                {/* Zone d'image/carousel */}
-                <div className="relative w-full md:w-2/3 aspect-square md:aspect-auto bg-black">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 flex items-center">
+              <Instagram className="mr-3 h-8 w-8 text-[#E1306C]" />
+              Notre Instagram
+            </h1>
+            <p className="text-lg text-gray-600">
+              Suivez nos publications Instagram pour des actualités et annonces exclusives
+            </p>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="flex items-center space-x-2"
+            onClick={() => refreshCache()}
+          >
+            <span>Actualiser</span>
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
+            <p className="text-lg text-gray-600">Chargement des publications Instagram...</p>
+          </div>
+        ) : error || data?.error ? (
+          <Card className="p-8 text-center">
+            <div className="flex flex-col items-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+              <h2 className="text-2xl font-semibold mb-2">Erreur de connexion</h2>
+              <p className="text-gray-600 mb-6">
+                {data?.error || "Impossible de récupérer les publications Instagram. Veuillez réessayer plus tard."}
+              </p>
+              <Button variant="default" onClick={() => refreshCache()}>
+                Réessayer
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          <>
+            {data?.posts && data.posts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {data.posts.map((post) => (
+                  <div 
+                    key={post.id}
+                    className="relative aspect-square overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => setSelectedPost(post)}
+                  >
+                    <img
+                      src={post.media_type === "VIDEO" ? post.thumbnail_url || post.media_url : post.media_url}
+                      alt={post.caption || "Publication Instagram"}
+                      className="w-full h-full object-cover"
+                    />
+                    {post.children && (
+                      <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                          <path d="M9 2v20" />
+                        </svg>
+                      </div>
+                    )}
+                    {post.media_type === "VIDEO" && (
+                      <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="6 3 18 12 6 21 6 3"></polygon>
+                        </svg>
+                      </div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                      <p className="text-white text-sm font-medium line-clamp-1">
+                        {formatDate(post.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <p className="text-lg text-gray-600">Aucune publication Instagram disponible pour le moment.</p>
+              </Card>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Visionneuse de post en grand */}
+      <AnimatePresence>
+        {selectedPost && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+            onClick={closeViewer}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="relative bg-black flex-1 aspect-square md:max-w-[60%]">
+                {selectedPost.media_type === "VIDEO" ? (
+                  <video 
+                    controls 
+                    autoPlay 
+                    className="w-full h-full object-contain"
+                    src={selectedPost.media_url}
+                  />
+                ) : (
                   <img 
-                    src={getCurrentMediaUrl()} 
-                    alt={selectedPost?.caption || 'Publication Instagram'} 
+                    src={selectedPost.children 
+                      ? selectedPost.children[currentImageIndex].media_url 
+                      : selectedPost.media_url
+                    }
+                    alt={selectedPost.caption || "Publication Instagram"}
                     className="w-full h-full object-contain"
                   />
-                  
-                  {/* Boutons de navigation du carrousel */}
-                  {isCarousel() && (
-                    <>
-                      <button 
-                        onClick={prevSlide} 
-                        disabled={currentSlideIndex === 0}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-2 disabled:opacity-50"
-                        aria-label="Image précédente"
-                      >
-                        <ChevronLeft className="h-6 w-6" />
-                      </button>
-                      <button 
-                        onClick={nextSlide} 
-                        disabled={currentSlideIndex === (selectedPost?.children?.data.length || 1) - 1}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-2 disabled:opacity-50"
-                        aria-label="Image suivante"
-                      >
-                        <ChevronRight className="h-6 w-6" />
-                      </button>
-                      
-                      {/* Indicateurs de position */}
-                      <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-                        {selectedPost?.children?.data.map((_, idx) => (
-                          <div 
-                            key={idx} 
-                            className={`h-2 w-2 rounded-full ${
-                              idx === currentSlideIndex ? 'bg-white' : 'bg-white/50'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </>
-                  )}
-                  
-                  {/* Bouton fermer */}
-                  <button 
-                    onClick={closePost}
-                    className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2"
-                    aria-label="Fermer"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                )}
+
+                {/* Boutons navigation carrousel */}
+                {selectedPost.children && selectedPost.children.length > 1 && (
+                  <>
+                    <button 
+                      className="absolute top-1/2 -translate-y-1/2 left-2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigateCarousel("prev");
+                      }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                      </svg>
+                    </button>
+                    <button 
+                      className="absolute top-1/2 -translate-y-1/2 right-2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigateCarousel("next");
+                      }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                      </svg>
+                    </button>
+                    
+                    {/* Indicateur de position */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-1">
+                      {selectedPost.children.map((_, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`w-2 h-2 rounded-full ${idx === currentImageIndex ? 'bg-white' : 'bg-white/40'}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              
+              <div className="p-5 flex flex-col flex-1 max-h-[40vh] md:max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">Publication Instagram</h3>
+                  <div className="flex space-x-2">
+                    <a 
+                      href={selectedPost.permalink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <ExternalLink size={20} />
+                    </a>
+                    <button onClick={closeViewer} className="text-gray-600 hover:text-gray-800">
+                      <X size={20} />
+                    </button>
+                  </div>
                 </div>
                 
-                {/* Zone de texte et détails */}
-                <div className="w-full md:w-1/3 p-4">
-                  <ScrollArea className="h-full max-h-[300px] md:max-h-none">
-                    <h3 className="font-bold text-lg mb-2">Politiquensemble</h3>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-                      {selectedPost?.caption || 'Aucune description disponible.'}
-                    </p>
-                    <div className="text-xs text-gray-500">
-                      {selectedPost?.timestamp && new Date(selectedPost.timestamp).toLocaleDateString('fr-FR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </div>
-                    <a 
-                      href={selectedPost?.permalink} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="block mt-4 text-blue-600 hover:underline text-sm"
-                    >
-                      Voir sur Instagram
-                    </a>
-                  </ScrollArea>
+                <div className="text-sm text-gray-500 mb-2">
+                  {formatDate(selectedPost.timestamp)}
                 </div>
+                
+                {selectedPost.caption && (
+                  <p className="text-gray-800 whitespace-pre-line mb-4">
+                    {selectedPost.caption}
+                  </p>
+                )}
               </div>
-            </DialogContent>
-          </Dialog>
-        </>
-      )}
-      
-      <div className="mt-12 text-center">
-        <a 
-          href="https://www.instagram.com/politiquensemble/" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-medium hover:from-purple-600 hover:to-pink-600 transition-all"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" className="mr-2">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-          </svg>
-          Nous suivre sur Instagram
-        </a>
-      </div>
-      
-      <div className="mt-8 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg">
-        <h2 className="text-xl font-bold mb-4">À propos de notre Instagram</h2>
-        <p className="text-gray-700 dark:text-gray-300">
-          Suivez Politiquensemble sur Instagram pour découvrir nos dernières publications, 
-          actualités et partager notre contenu pédagogique. Nous utilisons cette plateforme 
-          pour rendre l'information politique accessible à tous.
-        </p>
-      </div>
-    </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
+
+// Note: Cette page fonctionne sans <Layout> car App.tsx ajoute déjà le Header et Footer
 
 export default InstagramPage;

@@ -11,7 +11,8 @@ import {
   liveCoverages, type LiveCoverage, type InsertLiveCoverage,
   liveCoverageEditors, type LiveCoverageEditor, type InsertLiveCoverageEditor,
   liveCoverageUpdates, type LiveCoverageUpdate, type InsertLiveCoverageUpdate,
-  liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion
+  liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion,
+  instagramCache, type InstagramCache, type InsertInstagramCache
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte, sql, lt } from "drizzle-orm";
