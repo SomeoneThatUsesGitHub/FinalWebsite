@@ -36,13 +36,13 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
     const dynamicHeight = Math.max(300, sortedResults.length * 60);
     
     return (
-      <div className="overflow-x-auto overflow-y-visible">
-        <div style={{ minWidth: '350px', width: '100%', minHeight: dynamicHeight, height: 'auto' }}>
+      <div className="overflow-x-auto overflow-y-visible -mx-2 sm:mx-0">
+        <div style={{ minWidth: '300px', width: '100%', minHeight: dynamicHeight, height: 'auto' }} className="pl-0">
           <ResponsiveContainer width="100%" height={dynamicHeight}>
             <BarChart 
               data={sortedResults} 
               layout="vertical"
-              margin={{ top: 5, right: 30, left: 15, bottom: 5 }}
+              margin={{ top: 5, right: 30, left: 5, bottom: 5 }}
             >
               <XAxis 
                 type="number" 
@@ -55,9 +55,9 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
               <YAxis 
                 type="category" 
                 dataKey="candidate" 
-                width={120}
-                tick={{ fontSize: 13, fontWeight: 500, fill: '#333' }}
-                tickFormatter={(value) => value.length > 16 ? `${value.substring(0, 14)}...` : value}
+                width={100}
+                tick={{ fontSize: 12, fontWeight: 500, fill: '#333' }}
+                tickFormatter={(value) => value.length > 14 ? `${value.substring(0, 12)}...` : value}
               />
               <Tooltip 
                 formatter={(value: number) => [`${value.toFixed(2)}%`, 'Résultat']} 
@@ -67,7 +67,7 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
                 }}
                 contentStyle={{ fontSize: '14px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}
               />
-              <Bar dataKey="percentage" name="Pourcentage des voix" barSize={30} radius={[4, 4, 4, 4]}>
+              <Bar dataKey="percentage" name="Pourcentage des voix" barSize={28} radius={[4, 4, 4, 4]}>
                 {sortedResults.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
@@ -110,16 +110,16 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
     };
     
     return (
-      <div className="overflow-x-auto overflow-y-visible">
-        <div style={{ minWidth: '320px', minHeight: '350px' }}>
-          <ResponsiveContainer width="100%" height={350}>
-            <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+      <div className="overflow-x-auto overflow-y-visible -mx-2 sm:mx-0">
+        <div style={{ minWidth: '300px', minHeight: '300px' }} className="pl-0">
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
               <Pie
                 data={sortedResults}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                outerRadius={110}
+                outerRadius={90}
                 fill="#8884d8"
                 dataKey="percentage"
                 nameKey="candidate"
@@ -138,8 +138,8 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
                 contentStyle={{ fontSize: '14px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}
               />
               <Legend 
-                formatter={(value) => <span style={{ fontSize: '12px' }}>{simplifyName(value)}</span>}
-                wrapperStyle={{ fontSize: '12px', padding: '10px 0' }}
+                formatter={(value) => <span style={{ fontSize: '11px' }}>{simplifyName(value)}</span>}
+                wrapperStyle={{ fontSize: '11px', padding: '8px 0' }}
                 layout="horizontal"
                 verticalAlign="bottom"
               />
@@ -151,17 +151,17 @@ export const ElectionResultsChart: React.FC<ElectionResultsChartProps> = ({ data
   };
 
   return (
-    <div className="mt-3 bg-white rounded-lg overflow-hidden border shadow-md p-4">
-      <div className="mb-3">
-        <h3 className="text-xl font-bold text-gray-900">{title}</h3>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mt-1">
+    <div className="mt-3 bg-white rounded-lg overflow-hidden border shadow-md p-2 sm:p-4">
+      <div className="mb-2 sm:mb-3">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900">{title}</h3>
+        <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground mt-1">
           {type && <div className="font-medium">{type}</div>}
           {date && <div>{date}</div>}
           {location && <div>{location}</div>}
           {round && <div className="font-medium">Tour {round}</div>}
         </div>
       </div>
-      <div className="mt-4">
+      <div className="mt-3 sm:mt-4">
         {displayType === 'bar' ? renderBarChart() : renderPieChart()}
       </div>
     </div>

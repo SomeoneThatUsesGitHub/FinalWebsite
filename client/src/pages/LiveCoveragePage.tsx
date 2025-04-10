@@ -38,6 +38,7 @@ export default function LiveCoveragePage() {
   const [questionText, setQuestionText] = useState("");
   const [username, setUsername] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false); // Toast pour le partage
   const { toast } = useToast();
 
   // Récupérer les détails du suivi en direct
@@ -363,6 +364,31 @@ export default function LiveCoveragePage() {
                 variant="outline"
                 className="rounded-full bg-white/10 hover:bg-white/20 border-white/30 text-white"
                 title="Partager"
+                onClick={() => {
+                  // Créer l'URL actuelle pour le partage
+                  const shareUrl = window.location.href;
+                  
+                  // Copier dans le presse-papier
+                  navigator.clipboard.writeText(shareUrl)
+                    .then(() => {
+                      // Afficher un toast de confirmation
+                      toast({
+                        title: "Lien copié",
+                        description: "L'URL de ce direct a été copiée dans le presse-papier",
+                        variant: "default",
+                      });
+                      setShowShareToast(true);
+                      setTimeout(() => setShowShareToast(false), 3000);
+                    })
+                    .catch(err => {
+                      console.error("Erreur lors de la copie:", err);
+                      toast({
+                        title: "Erreur",
+                        description: "Impossible de copier le lien. Essayez à nouveau.",
+                        variant: "destructive",
+                      });
+                    });
+                }}
               >
                 <Share2 className="h-4 w-4" />
               </Button>
@@ -610,7 +636,7 @@ export default function LiveCoveragePage() {
                       id={`update-${update.id}`}
                       className="transition-all duration-300"
                     >
-                      <Card className={`overflow-hidden shadow-md hover:shadow-lg border-border ${update.important ? "border-red-500 border-l-4" : "border-l-4 border-l-border"} bg-white dark:bg-gray-950 update-card`}>
+                      <Card className={`overflow-hidden shadow-md hover:shadow-lg ${update.important ? "border-red-500 border" : "border-border border border-l-4 border-l-border"} bg-white dark:bg-gray-950 update-card`}>
                         <CardContent className="p-0 update-card-content">
                           {/* En-tête de la mise à jour */}
                           <div className={`p-3 md:p-4 flex justify-between items-start gap-2 border-b update-card-content update-card-header ${update.important ? "bg-red-50 dark:bg-red-900/10" : "bg-muted/30"}`}>
