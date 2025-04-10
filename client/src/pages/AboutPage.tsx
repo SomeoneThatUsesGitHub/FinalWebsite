@@ -143,8 +143,8 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Nos valeurs */}
-      <section className="py-16 bg-gray-50" id="valeurs">
+      {/* Nos valeurs - Style pill unique */}
+      <section className="py-16 values-container" id="valeurs">
         <div className="container mx-auto px-4">
           <ScrollAnimation threshold={0.1}>
             <div className="mb-12 text-center">
@@ -156,9 +156,9 @@ const AboutPage: React.FC = () => {
             </div>
           </ScrollAnimation>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="flex flex-wrap justify-center max-w-4xl mx-auto">
             {values.map((value, index) => (
-              <ScrollAnimation key={index} threshold={0.1} delay={index * 0.1}>
+              <ScrollAnimation key={index} threshold={0.1} delay={index * 0.1} className="w-full md:w-1/2 lg:w-1/2 px-2">
                 <ValueCard 
                   icon={value.icon} 
                   title={value.title} 
