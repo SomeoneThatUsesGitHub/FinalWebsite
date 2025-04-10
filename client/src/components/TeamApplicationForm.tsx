@@ -43,8 +43,8 @@ export default function TeamApplicationForm() {
       fullName: "",
       email: "",
       position: "",
-      motivation: "",
-      phoneNumber: "",
+      message: "",
+      phone: "",
     },
   });
 
@@ -149,7 +149,7 @@ export default function TeamApplicationForm() {
 
               <FormField
                 control={form.control}
-                name="phoneNumber"
+                name="phone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-medium text-gray-700">Téléphone</FormLabel>
@@ -196,7 +196,7 @@ export default function TeamApplicationForm() {
             <div className="mt-8">
               <FormField
                 control={form.control}
-                name="motivation"
+                name="message"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-medium text-gray-700">Votre motivation</FormLabel>
