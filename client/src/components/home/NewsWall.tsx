@@ -458,19 +458,7 @@ const NewsWall: React.FC = () => {
 
         {/* Bouton "Voir tous nos articles" - uniquement sur mobile */}
         {isMobile && recent && recent.length > 0 && (
-          <div className="mt-8 flex justify-center relative">
-            {/* Mascotte Pipo plus grande */}
-            <div className="absolute -top-24 right-0 z-10 transform rotate-6 transition-transform duration-300 hover:rotate-0 hover:scale-110">
-              <div className="w-28 h-28">
-                <img 
-                  src={mascotteImg} 
-                  alt="Pipo, la mascotte de Politiquensemble" 
-                  className="w-full h-full object-contain drop-shadow-xl"
-                  title="Bonjour, je suis Pipo !"
-                />
-              </div>
-            </div>
-            
+          <div className="mt-8 flex justify-center">            
             <Link href="/articles">
               <Button
                 variant="outline"
