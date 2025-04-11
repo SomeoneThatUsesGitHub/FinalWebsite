@@ -381,6 +381,7 @@ export const contactMessages = pgTable("contact_messages", {
   message: text("message").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   isRead: boolean("is_read").notNull().default(false),
+  assignedTo: integer("assigned_to").references(() => users.id),
 });
 
 export const insertContactMessageSchema = createInsertSchema(contactMessages).pick({
