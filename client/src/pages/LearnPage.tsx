@@ -172,7 +172,7 @@ export default function LearnPage() {
   };
 
   return (
-    <div className="container py-8">
+    <div className="container py-8 max-w-screen-xl mx-auto px-4 md:px-6">
       <PageHeader
         title="Espace d'apprentissage"
         description="Découvrez nos parcours d'apprentissage pour comprendre les institutions, les élections et les concepts politiques."
@@ -334,14 +334,10 @@ function TopicsList({
               <CardDescription className="line-clamp-2 h-10">{topic.description}</CardDescription>
             </CardContent>
             <CardFooter className="flex flex-col p-4 pt-0 gap-2">
-              <div className="flex items-center justify-between w-full text-sm text-muted-foreground">
+              <div className="flex items-center w-full text-sm text-muted-foreground">
                 <span className="flex items-center">
                   <BookOpen className="h-4 w-4 mr-1" />
                   {topic.estimatedTime} minutes
-                </span>
-                <span className="flex items-center">
-                  <TrendingUp className="h-4 w-4 mr-1" />
-                  {topic.popularity} vues
                 </span>
               </div>
               
