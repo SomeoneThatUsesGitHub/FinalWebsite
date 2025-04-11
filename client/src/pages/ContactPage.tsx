@@ -102,28 +102,42 @@ const ContactPage: React.FC = () => {
       </Helmet>
 
       {/* En-tête de la page */}
-      <section className="bg-gradient-to-b from-blue-50 to-white py-16 md:py-24">
+      <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8">
         <div className="container mx-auto px-4 md:px-6">
-          <motion.div 
-            className="max-w-4xl mx-auto text-center"
-            initial="initial"
-            animate="animate"
-            variants={pageTransition}
-          >
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-dark font-heading mb-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <motion.h1 
+              variants={fadeInWithDelay}
+              initial="hidden"
+              animate="visible"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative"
+            >
               Contactez-nous
-            </h1>
-            <div className="w-24 h-1 bg-blue-600 mx-auto mb-6"></div>
-            <p className="text-dark/70 max-w-2xl mx-auto">
+            </motion.h1>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1,
+                transition: { delay: 0.3, duration: 0.5 } 
+              }}
+              className="h-1 w-20 bg-blue-500 mx-auto rounded-full mb-6"
+            ></motion.div>
+            <motion.p 
+              variants={fadeInWithDelay}
+              initial="hidden"
+              animate="visible"
+              custom={0.4}
+              className="text-dark/70 max-w-2xl mx-auto"
+            >
               Vous avez une question, une suggestion ou souhaitez collaborer avec nous ? 
               N'hésitez pas à nous contacter, notre équipe vous répondra dans les plus brefs délais.
-            </p>
-          </motion.div>
+            </motion.p>
+          </div>
         </div>
-      </section>
+      </div>
 
       {/* Contenu principal - Informations de contact et formulaire */}
-      <section className="py-12 md:py-16">
+      <section className="py-12 md:py-16 mb-16 md:mb-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
             
