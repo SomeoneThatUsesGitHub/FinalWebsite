@@ -1,239 +1,331 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { pageTransition } from "@/lib/animations";
+import { pageTransition, fadeInWithDelay } from "@/lib/animations";
+import { Helmet } from "react-helmet";
+import { 
+  Mail, 
+  Phone, 
+  MapPin, 
+  MessageSquare, 
+  Send,
+  CheckCircle2
+} from "lucide-react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { toast } from "@/hooks/use-toast";
+
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { Helmet } from "react-helmet";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+
+// Schéma de validation pour le formulaire de contact
+const contactFormSchema = z.object({
+  name: z.string().min(2, {
+    message: "Le nom doit comporter au moins 2 caractères",
+  }),
+  email: z.string().email({
+    message: "Veuillez entrer une adresse e-mail valide",
+  }),
+  subject: z.string().min(5, {
+    message: "Le sujet doit comporter au moins 5 caractères",
+  }),
+  message: z.string().min(20, {
+    message: "Votre message doit comporter au moins 20 caractères",
+  }),
+  phone: z.string().optional(),
+});
+
+type ContactFormData = z.infer<typeof contactFormSchema>;
 
 const ContactPage: React.FC = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const { toast } = useToast();
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!name || !email || !subject || !message) {
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Configuration du formulaire avec validation
+  const form = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+      phone: "",
+    },
+  });
+
+  // Mutation pour envoyer le formulaire
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: ContactFormData) => {
+      // Simulation d'envoi - En production, remplacer par un appel API réel
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Message envoyé",
+        description: "Nous avons bien reçu votre message. Nous vous répondrons dans les plus brefs délais.",
+        variant: "default",
+      });
+      form.reset();
+      setSubmitSuccess(true);
+      
+      // Réinitialiser l'état de succès après 5 secondes
+      setTimeout(() => {
+        setSubmitSuccess(false);
+      }, 5000);
+    },
+    onError: () => {
       toast({
         title: "Erreur",
-        description: "Veuillez remplir tous les champs du formulaire.",
-        variant: "destructive"
+        description: "Une erreur s'est produite lors de l'envoi du message. Veuillez réessayer.",
+        variant: "destructive",
       });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    // This would connect to a backend service in production
-    setTimeout(() => {
-      toast({
-        title: "Message envoyé !",
-        description: "Nous avons bien reçu votre message et vous répondrons dans les plus brefs délais.",
-      });
-      setName("");
-      setEmail("");
-      setSubject("");
-      setMessage("");
-      setIsSubmitting(false);
-    }, 1000);
+    },
+  });
+
+  // Gérer la soumission du formulaire
+  const onSubmit = (data: ContactFormData) => {
+    mutate(data);
   };
-  
+
   return (
-    <motion.div
-      variants={pageTransition}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
+    <>
       <Helmet>
-        <title>Contact | Politique Jeune</title>
-        <meta name="description" content="Contactez l'équipe de Politique Jeune pour toute question, suggestion ou proposition de collaboration." />
+        <title>Contactez-nous | Politiquensemble</title>
+        <meta 
+          name="description" 
+          content="Contactez l'équipe de Politiquensemble pour toute question, suggestion ou collaboration." 
+        />
       </Helmet>
-      
-      <div className="bg-background py-6 md:py-10">
+
+      {/* En-tête de la page */}
+      <section className="bg-gradient-to-b from-blue-50 to-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-3xl mx-auto mb-10 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold font-heading text-dark mb-4">
+          <motion.div 
+            className="max-w-4xl mx-auto text-center"
+            initial="initial"
+            animate="animate"
+            variants={pageTransition}
+          >
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-dark font-heading mb-4">
               Contactez-nous
             </h1>
-            <p className="text-dark/70">
-              Une question, une suggestion ou une proposition de collaboration ?
-              N'hésitez pas à nous contacter, nous vous répondrons dans les plus brefs délais.
+            <div className="w-24 h-1 bg-blue-600 mx-auto mb-6"></div>
+            <p className="text-dark/70 max-w-2xl mx-auto">
+              Vous avez une question, une suggestion ou souhaitez collaborer avec nous ? 
+              N'hésitez pas à nous contacter, notre équipe vous répondra dans les plus brefs délais.
             </p>
-          </div>
+          </motion.div>
         </div>
-      </div>
-      
-      <section className="py-12 bg-white">
+      </section>
+
+      {/* Contenu principal - Informations de contact et formulaire */}
+      <section className="py-12 md:py-16">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Envoyez-nous un message</h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nom</Label>
-                  <Input
-                    id="name"
-                    placeholder="Votre nom"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="votre.email@exemple.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Sujet</Label>
-                  <Select value={subject} onValueChange={setSubject} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionnez un sujet" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="question">Question générale</SelectItem>
-                      <SelectItem value="suggestion">Suggestion</SelectItem>
-                      <SelectItem value="collaboration">Proposition de collaboration</SelectItem>
-                      <SelectItem value="press">Presse</SelectItem>
-                      <SelectItem value="other">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    placeholder="Votre message"
-                    rows={6}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Envoi en cours..." : (
-                    <>
-                      <Send className="mr-2 h-4 w-4" /> Envoyer
-                    </>
-                  )}
-                </Button>
-              </form>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
             
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Informations de contact</h2>
-              
-              <div className="bg-light rounded-xl p-6 mb-6">
-                <ul className="space-y-6">
-                  <li className="flex items-start">
-                    <MapPin className="h-6 w-6 text-primary mr-3 flex-shrink-0 mt-1" />
+            {/* Informations de contact */}
+            <motion.div 
+              className="lg:col-span-4"
+              variants={fadeInWithDelay}
+              initial="hidden"
+              animate="visible"
+              custom={0.1}
+            >
+              <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl p-8 shadow-xl h-full">
+                <h2 className="text-2xl font-bold mb-6">Nos coordonnées</h2>
+                
+                <div className="space-y-6">
+                  <div className="flex items-start space-x-4">
+                    <Mail className="h-6 w-6 flex-shrink-0 text-blue-200" />
                     <div>
-                      <h3 className="font-medium">Adresse</h3>
-                      <p className="text-dark/70">
-                        123 Avenue de la République <br />
-                        75011 Paris, France
+                      <h3 className="font-semibold mb-1">Email</h3>
+                      <p className="text-blue-100">contact@politiquensemble.fr</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <Phone className="h-6 w-6 flex-shrink-0 text-blue-200" />
+                    <div>
+                      <h3 className="font-semibold mb-1">Téléphone</h3>
+                      <p className="text-blue-100">+33 (0)1 23 45 67 89</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <MapPin className="h-6 w-6 flex-shrink-0 text-blue-200" />
+                    <div>
+                      <h3 className="font-semibold mb-1">Adresse</h3>
+                      <p className="text-blue-100">
+                        15 rue de la République<br />
+                        75001 Paris<br />
+                        France
                       </p>
                     </div>
-                  </li>
-                  <li className="flex items-start">
-                    <Mail className="h-6 w-6 text-primary mr-3 flex-shrink-0 mt-1" />
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <MessageSquare className="h-6 w-6 flex-shrink-0 text-blue-200" />
                     <div>
-                      <h3 className="font-medium">Email</h3>
-                      <p className="text-dark/70">
-                        contact@politiquejeune.fr
+                      <h3 className="font-semibold mb-1">Réseaux sociaux</h3>
+                      <p className="text-blue-100">
+                        Suivez-nous sur Instagram pour rester informé de nos dernières actualités.
                       </p>
+                      <div className="mt-3">
+                        <a 
+                          href="https://www.instagram.com/politiquensemble/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 bg-white text-blue-600 rounded-full font-medium text-sm inline-flex items-center hover:bg-blue-50 transition-colors"
+                        >
+                          Nous suivre
+                        </a>
+                      </div>
                     </div>
-                  </li>
-                  <li className="flex items-start">
-                    <Phone className="h-6 w-6 text-primary mr-3 flex-shrink-0 mt-1" />
-                    <div>
-                      <h3 className="font-medium">Téléphone</h3>
-                      <p className="text-dark/70">
-                        +33 (0)1 23 45 67 89
-                      </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+            
+            {/* Formulaire de contact */}
+            <motion.div 
+              className="lg:col-span-8"
+              variants={fadeInWithDelay}
+              initial="hidden"
+              animate="visible"
+              custom={0.3}
+            >
+              <div className="bg-white rounded-xl shadow-xl p-8 border border-gray-100">
+                <h2 className="text-2xl font-bold text-dark mb-6">Envoyez-nous un message</h2>
+                
+                {submitSuccess ? (
+                  <div className="bg-green-50 border border-green-100 rounded-lg p-6 text-center">
+                    <div className="flex justify-center mb-4">
+                      <CheckCircle2 className="h-16 w-16 text-green-500" />
                     </div>
-                  </li>
-                </ul>
+                    <h3 className="text-xl font-bold text-green-800 mb-2">Message envoyé avec succès !</h3>
+                    <p className="text-green-700">
+                      Merci de nous avoir contactés. Notre équipe vous répondra dans les plus brefs délais.
+                    </p>
+                  </div>
+                ) : (
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nom complet</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Votre nom" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input type="email" placeholder="votre.email@exemple.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Téléphone (optionnel)</FormLabel>
+                              <FormControl>
+                                <Input placeholder="+33 6 12 34 56 78" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="subject"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Sujet</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Objet de votre message" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="message"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Message</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Détaillez votre demande ici..." 
+                                className="min-h-[150px]" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                        disabled={isPending}
+                      >
+                        {isPending ? (
+                          <>
+                            <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            Envoi en cours...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="mr-2 h-4 w-4" />
+                            Envoyer le message
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </Form>
+                )}
               </div>
               
-              <h3 className="text-xl font-medium mb-4">Suivez-nous</h3>
-              
-              <div className="flex space-x-4 mb-8">
-                <a 
-                  href="#" 
-                  className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                  aria-label="Instagram"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                </a>
-                <a 
-                  href="#" 
-                  className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                  aria-label="Twitter"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-                </a>
-                <a 
-                  href="#" 
-                  className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                  aria-label="TikTok"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 448 512" fill="currentColor">
-                    <path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3V278.2a74.6 74.6 0 1 0 52.2 71.2V0l88 0a121.2 121.2 0 0 0 1.9 22.2h0A122.2 122.2 0 0 0 381 102.4a121.4 121.4 0 0 0 67 20.1z"/>
-                  </svg>
-                </a>
-                <a 
-                  href="#" 
-                  className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                  aria-label="YouTube"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
-                </a>
+              {/* Texte d'information supplémentaire */}
+              <div className="mt-6 text-dark/60 text-sm">
+                <p>
+                  Tous les champs marqués sont obligatoires. Nous respectons votre vie privée et ne partagerons jamais vos informations avec des tiers.
+                  Consultez notre politique de confidentialité pour plus d'informations.
+                </p>
               </div>
-              
-              <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden">
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9914406081473!2d2.377020876888535!3d48.85837017133292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66d0ff95dc61f%3A0x608bb0a0d42396fa!2s123%20Rue%20de%20la%20Republique%2C%2075011%20Paris%2C%20France!5e0!3m2!1sen!2sus!4v1684838723171!5m2!1sen!2sus" 
-                  width="600" 
-                  height="450" 
-                  style={{ border: 0 }} 
-                  allowFullScreen 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Google Maps"
-                  className="w-full h-full rounded-xl"
-                ></iframe>
-              </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
-    </motion.div>
+    </>
   );
 };
 

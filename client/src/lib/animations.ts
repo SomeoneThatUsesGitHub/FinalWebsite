@@ -129,3 +129,16 @@ export const ticker: Variants = {
     }
   }
 };
+
+// Fade in with delay animation - useful for staggered elements
+export const fadeInWithDelay: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (custom: number = 0) => ({ 
+    opacity: 1, 
+    y: 0,
+    transition: { 
+      duration: 0.5, 
+      delay: custom 
+    }
+  })
+};
