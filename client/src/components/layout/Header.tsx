@@ -37,6 +37,7 @@ const Header: React.FC = () => {
     { href: "/elections", label: "Elections", active: location === "/elections" },
     { href: "/articles", label: "Articles", active: location === "/articles" },
     { href: "/apprendre", label: "Apprendre", active: location === "/apprendre" },
+    { href: "/contact", label: "Contact", active: location === "/contact", highlighted: true },
   ];
   
   return (
@@ -65,15 +66,9 @@ const Header: React.FC = () => {
                 href={item.href}
                 label={item.label}
                 active={item.active}
+                highlighted={item.highlighted}
               />
             ))}
-            
-            <NavItem 
-              href="/contact"
-              label="Contact"
-              active={location === "/contact"}
-              highlighted={true}
-            />
           </nav>
           
           {/* Mobile Menu Button */}
@@ -109,15 +104,7 @@ const Header: React.FC = () => {
                 </Link>
               ))}
               
-              <Link href="/contact">
-                <div 
-                  className="py-2 px-4 rounded-md cursor-pointer bg-blue-600 text-white flex items-center justify-center space-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <MessageCircle size={16} />
-                  <span>Contact</span>
-                </div>
-              </Link>
+
             </nav>
           </motion.div>
         )}
