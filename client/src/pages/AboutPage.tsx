@@ -336,10 +336,10 @@ const AboutPage: React.FC = () => {
             {/* Texte à droite avec mascotte */}
             <div className="md:w-2/5 lg:w-2/5 mb-12 md:mb-0 order-1 md:order-2 md:pl-16">
               <ScrollAnimation threshold={0.1}>
-                <div className="md:text-right relative">
-                  {/* Mascotte Politiquensemble sans animation */}
-                  <div className="absolute right-0 -top-36 md:-right-20 md:-top-20 group cursor-pointer z-20">
-                    <div className="transform rotate-3 transition-all hover:rotate-0 hover:scale-105 duration-300 w-36 h-36 md:w-48 md:h-48">
+                <div className="relative text-left md:text-left lg:text-right">
+                  {/* Mascotte Politiquensemble sans animation - seulement affichée sur desktop */}
+                  <div className="hidden md:block absolute right-0 -top-36 lg:-right-20 lg:-top-20 group cursor-pointer z-20">
+                    <div className="transform rotate-3 transition-all hover:rotate-0 hover:scale-105 duration-300 w-36 h-36 md:w-40 lg:w-48 lg:h-48">
                       <img 
                         src={mascotteImg} 
                         alt="Mascotte Politiquensemble" 
@@ -351,12 +351,12 @@ const AboutPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 pt-24 md:pt-40">Nos valeurs</h2>
-                  <div className="w-24 h-1 bg-blue-600 mb-6 md:ml-auto"></div>
-                  <p className="text-dark/80 mb-6">
+                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 md:pt-0 lg:pt-40">Nos valeurs</h2>
+                  <div className="w-24 h-1 bg-blue-600 mb-6 lg:ml-auto"></div>
+                  <p className="text-dark/80 mb-4 max-w-md lg:ml-auto">
                     Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information quotidienne.
                   </p>
-                  <p className="text-dark/70 mb-6">
+                  <p className="text-dark/70 mb-6 max-w-md lg:ml-auto">
                     Notre objectif est de rendre l'information politique compréhensible, objective et accessible, quelle que soit votre connaissance préalable du sujet.
                   </p>
                 </div>

@@ -191,8 +191,8 @@ const NewsWall: React.FC = () => {
               <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Notre sélection</h2>
               <div className="absolute -bottom-2 left-0 w-24 h-1 bg-blue-600 rounded-full"></div>
             </div>
-            <div className="hidden md:block relative">
-              <div className="w-16 h-16 transform transition-transform hover:scale-110 duration-300 cursor-pointer">
+            <div className="relative">
+              <div className="w-14 h-14 md:w-16 md:h-16 transform transition-transform hover:scale-110 duration-300 cursor-pointer">
                 <img 
                   src={mascotteImg} 
                   alt="Pipo, la mascotte de Politiquensemble" 
@@ -265,7 +265,7 @@ const NewsWall: React.FC = () => {
                                 Array.isArray((featuredContent.data as LiveEvent).editors) && 
                                 (featuredContent.data as LiveEvent).editors.length > 0 
                                   ? (featuredContent.data as LiveEvent).editors
-                                      .map(e => e?.editor?.displayName)
+                                      .map(e => e?.editor?.displayName || '')
                                       .filter(Boolean)
                                       .join(', ')
                                   : "l'équipe éditoriale"}
@@ -458,7 +458,19 @@ const NewsWall: React.FC = () => {
 
         {/* Bouton "Voir tous nos articles" - uniquement sur mobile */}
         {isMobile && recent && recent.length > 0 && (
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex justify-center relative">
+            {/* Mascotte Pipo plus grande */}
+            <div className="absolute -top-24 right-0 z-10 transform rotate-6 transition-transform duration-300 hover:rotate-0 hover:scale-110">
+              <div className="w-28 h-28">
+                <img 
+                  src={mascotteImg} 
+                  alt="Pipo, la mascotte de Politiquensemble" 
+                  className="w-full h-full object-contain drop-shadow-xl"
+                  title="Bonjour, je suis Pipo !"
+                />
+              </div>
+            </div>
+            
             <Link href="/articles">
               <Button
                 variant="outline"
