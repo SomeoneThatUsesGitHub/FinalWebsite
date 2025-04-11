@@ -69,6 +69,10 @@ type ContactMessage = {
   isRead: boolean;
   createdAt: string;
   assignedTo: number | null;
+  assignedToAdmin?: {
+    username: string;
+    displayName: string;
+  };
 };
 
 export default function ContactMessagesPage() {
@@ -287,7 +291,7 @@ export default function ContactMessagesPage() {
                             {message.assignedTo ? (
                               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
                                 <UserCheck className="h-3 w-3" />
-                                Assigné
+                                {message.assignedToAdmin ? message.assignedToAdmin.displayName : "Assigné"}
                               </Badge>
                             ) : (
                               <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200 flex items-center gap-1">

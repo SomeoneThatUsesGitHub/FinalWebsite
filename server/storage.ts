@@ -777,12 +777,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Contact Messages operations
-  async getAllContactMessages(): Promise<ContactMessage[]> {
-    return db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));
+  async getAllContactMessages(): Promise<(ContactMessage & { assignedToAdmin?: { username: string, displayName: string } })[]> {
+    const messagesWithAdmins = await db.select({
+      ...contactMessages,
+      assignedToAdmin: {
+        username: users.username,
+        displayName: users.displayName
+      },
+    })
+    .from(contactMessages)
+    .leftJoin(users, eq(contactMessages.assignedTo, users.id))
+    .orderBy(desc(contactMessages.createdAt));
+    
+    return messagesWithAdmins;
   }
   
-  async getContactMessageById(id: number): Promise<ContactMessage | undefined> {
-    const [message] = await db.select().from(contactMessages).where(eq(contactMessages.id, id));
+  async getContactMessageById(id: number): Promise<(ContactMessage & { assignedToAdmin?: { username: string, displayName: string } }) | undefined> {
+    const [message] = await db.select({
+      ...contactMessages,
+      assignedToAdmin: {
+        username: users.username,
+        displayName: users.displayName
+      },
+    })
+    .from(contactMessages)
+    .leftJoin(users, eq(contactMessages.assignedTo, users.id))
+    .where(eq(contactMessages.id, id));
+    
     return message;
   }
   
