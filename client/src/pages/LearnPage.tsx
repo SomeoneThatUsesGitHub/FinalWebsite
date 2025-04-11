@@ -5,13 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Search, BookOpen, Award, TrendingUp, BarChart2, Trophy } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
+import { Loader2, Search, BookOpen, Award, TrendingUp, BarChart2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 // Types pour notre module d'apprentissage
@@ -172,109 +169,120 @@ export default function LearnPage() {
   };
 
   return (
-    <div className="container py-8 max-w-screen-xl mx-auto px-4 md:px-6">
-      <PageHeader
-        title="Espace d'apprentissage"
-        description="Découvrez nos parcours d'apprentissage pour comprendre les institutions, les élections et les concepts politiques."
-      />
-
-      {/* Filtres et recherche */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6 mt-8">
-        <div className="relative flex-grow">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            placeholder="Rechercher un sujet..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button 
-            variant={selectedCategory === null ? "default" : "outline"} 
-            size="sm"
-            onClick={() => setSelectedCategory(null)}
-          >
-            Tous
-          </Button>
-          {categories.map(category => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category}
-            </Button>
-          ))}
+    <div>
+      <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative">
+              Espace d'apprentissage
+            </h1>
+            <div className="h-1 w-20 bg-blue-500 mx-auto rounded-full"></div>
+            <p className="mt-4 text-lg text-gray-600">
+              Découvrez nos parcours d'apprentissage pour comprendre les institutions, les élections et les concepts politiques.
+            </p>
+          </div>
         </div>
       </div>
+      
+      <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
+        {/* Filtres et recherche */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6 mt-8">
+          <div className="relative flex-grow">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Rechercher un sujet..."
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant={selectedCategory === null ? "default" : "outline"} 
+              size="sm"
+              onClick={() => setSelectedCategory(null)}
+            >
+              Tous
+            </Button>
+            {categories.map(category => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        </div>
 
-      {/* Tabs pour filtrer les sujets */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-        <TabsList className="mb-6">
-          <TabsTrigger value="popular" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            <span>Populaires</span>
-          </TabsTrigger>
-          <TabsTrigger value="newest" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            <span>Récents</span>
-          </TabsTrigger>
-          {user && (
-            <TabsTrigger value="inProgress" className="flex items-center gap-2">
-              <BarChart2 className="h-4 w-4" />
-              <span>En cours</span>
+        {/* Tabs pour filtrer les sujets */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+          <TabsList className="mb-6">
+            <TabsTrigger value="popular" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              <span>Populaires</span>
             </TabsTrigger>
-          )}
-        </TabsList>
+            <TabsTrigger value="newest" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              <span>Récents</span>
+            </TabsTrigger>
+            {user && (
+              <TabsTrigger value="inProgress" className="flex items-center gap-2">
+                <BarChart2 className="h-4 w-4" />
+                <span>En cours</span>
+              </TabsTrigger>
+            )}
+          </TabsList>
 
-        <TabsContent value="popular" className="mt-0">
-          <TopicsList 
-            topics={filteredTopics()} 
-            isLoading={isLoadingTopics}
-            getTopicProgress={getTopicProgress}
-            getDifficultyLabel={getDifficultyLabel}
-            userProgress={userProgress}
-            user={user}
-          />
-        </TabsContent>
-
-        <TabsContent value="newest" className="mt-0">
-          <TopicsList 
-            topics={filteredTopics()} 
-            isLoading={isLoadingTopics}
-            getTopicProgress={getTopicProgress}
-            getDifficultyLabel={getDifficultyLabel}
-            userProgress={userProgress}
-            user={user}
-          />
-        </TabsContent>
-
-        <TabsContent value="inProgress" className="mt-0">
-          {user ? (
+          <TabsContent value="popular" className="mt-0">
             <TopicsList 
               topics={filteredTopics()} 
-              isLoading={isLoadingTopics || isLoadingProgress}
+              isLoading={isLoadingTopics}
               getTopicProgress={getTopicProgress}
               getDifficultyLabel={getDifficultyLabel}
               userProgress={userProgress}
               user={user}
-              emptyMessage="Vous n'avez pas encore commencé de parcours d'apprentissage."
             />
-          ) : (
-            <div className="text-center py-8">
-              <h3 className="text-lg font-medium mb-2">Connectez-vous pour suivre votre progression</h3>
-              <p className="text-muted-foreground mb-4">
-                La connexion vous permet de suivre votre progression et de reprendre où vous en étiez.
-              </p>
-              <Link href="/auth">
-                <Button>Se connecter</Button>
-              </Link>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+
+          <TabsContent value="newest" className="mt-0">
+            <TopicsList 
+              topics={filteredTopics()} 
+              isLoading={isLoadingTopics}
+              getTopicProgress={getTopicProgress}
+              getDifficultyLabel={getDifficultyLabel}
+              userProgress={userProgress}
+              user={user}
+            />
+          </TabsContent>
+
+          <TabsContent value="inProgress" className="mt-0">
+            {user ? (
+              <TopicsList 
+                topics={filteredTopics()} 
+                isLoading={isLoadingTopics || isLoadingProgress}
+                getTopicProgress={getTopicProgress}
+                getDifficultyLabel={getDifficultyLabel}
+                userProgress={userProgress}
+                user={user}
+                emptyMessage="Vous n'avez pas encore commencé de parcours d'apprentissage."
+              />
+            ) : (
+              <div className="text-center py-8">
+                <h3 className="text-lg font-medium mb-2">Connectez-vous pour suivre votre progression</h3>
+                <p className="text-muted-foreground mb-4">
+                  La connexion vous permet de suivre votre progression et de reprendre où vous en étiez.
+                </p>
+                <Link href="/auth">
+                  <Button>Se connecter</Button>
+                </Link>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

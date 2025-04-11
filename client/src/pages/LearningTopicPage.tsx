@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { BookOpen, CheckCircle, Clock, Award, ArrowLeft, MoveLeft, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { PageHeader } from "@/components/page-header";
 import { Loader2 } from "lucide-react";
 
 // Type pour les données de cette page
@@ -306,121 +305,122 @@ export default function LearningTopicPage() {
   }
 
   const { topic, modules } = topicData;
-  const activeModule = modules.find(m => m.id === activeModuleId) || modules[0];
+  const activeModule = modules.find((m: any) => m.id === activeModuleId) || modules[0];
   const activeContent = contents.find(c => c.id === activeContentId);
 
   return (
-    <div className="container py-8">
-      {/* Header avec image de couverture */}
-      <div 
-        className="w-full h-40 md:h-60 rounded-lg bg-cover bg-center mb-6 relative"
-        style={{ backgroundImage: `url(${topic.imageUrl})` }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg">
-          <div className="absolute bottom-4 left-4 right-4 text-white">
+    <div>
+      <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-3xl mx-auto text-center">
             <Button 
               variant="outline" 
-              size="sm" 
-              className="bg-black bg-opacity-50 text-white border-white mb-2"
+              size="sm"
+              className="mb-4"
               onClick={() => setLocation("/apprendre")}
             >
               <MoveLeft className="mr-1 h-4 w-4" />
-              Retour
+              Retour aux sujets
             </Button>
-            <h1 className="text-2xl md:text-3xl font-bold">{topic.title}</h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative">
+              {topic.title}
+            </h1>
+            <div className="h-1 w-20 bg-blue-500 mx-auto rounded-full"></div>
+            <p className="mt-4 text-lg text-gray-600">
+              {topic.description}
+            </p>
+            <div className="flex justify-center items-center mt-4 gap-2">
+              {getDifficultyLabel(topic.difficulty)}
+              <Badge variant="secondary">{topic.category}</Badge>
+              <div className="flex items-center text-sm text-muted-foreground ml-2">
+                <Clock className="h-4 w-4 mr-1" />
+                {topic.estimatedTime} minutes
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar gauche - Liste des modules */}
-        <div className="w-full lg:w-1/4">
-          <div className="sticky top-4">
-            <div className="flex flex-col md:flex-row lg:flex-col gap-4 mb-4">
-              <div className="flex items-center gap-2">
-                {getDifficultyLabel(topic.difficulty)}
-                <Badge variant="secondary">{topic.category}</Badge>
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Sidebar gauche - Liste des modules */}
+          <div className="w-full lg:w-1/4">
+            <div className="sticky top-4">
+              <h3 className="text-lg font-medium mb-3">Modules</h3>
+              <div className="space-y-3">
+                {modules.map((module: any) => (
+                  <Card 
+                    key={module.id} 
+                    className={`hover:border-primary transition-colors cursor-pointer ${
+                      activeModuleId === module.id ? "border-primary" : ""
+                    }`}
+                    onClick={() => setActiveModuleId(module.id)}
+                  >
+                    <CardHeader className="p-3">
+                      <CardTitle className="text-base">{module.title}</CardTitle>
+                    </CardHeader>
+                    {user && (
+                      <CardFooter className="p-3 pt-0 flex-col items-start">
+                        <div className="w-full flex justify-between text-xs mb-1">
+                          <span>Progression</span>
+                          <span>{getModuleProgress(module.id)}%</span>
+                        </div>
+                        <Progress value={getModuleProgress(module.id)} className="h-2 w-full" />
+                      </CardFooter>
+                    )}
+                  </Card>
+                ))}
               </div>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Clock className="h-4 w-4 mr-1" />
-                {topic.estimatedTime} minutes au total
-              </div>
-            </div>
-
-            <h3 className="text-lg font-medium mb-3">Modules</h3>
-            <div className="space-y-3">
-              {modules.map((module) => (
-                <Card 
-                  key={module.id} 
-                  className={`hover:border-primary transition-colors cursor-pointer ${
-                    activeModuleId === module.id ? "border-primary" : ""
-                  }`}
-                  onClick={() => setActiveModuleId(module.id)}
-                >
-                  <CardHeader className="p-3">
-                    <CardTitle className="text-base">{module.title}</CardTitle>
-                  </CardHeader>
-                  {user && (
-                    <CardFooter className="p-3 pt-0 flex-col items-start">
-                      <div className="w-full flex justify-between text-xs mb-1">
-                        <span>Progression</span>
-                        <span>{getModuleProgress(module.id)}%</span>
-                      </div>
-                      <Progress value={getModuleProgress(module.id)} className="h-2 w-full" />
-                    </CardFooter>
-                  )}
-                </Card>
-              ))}
             </div>
           </div>
-        </div>
 
-        {/* Contenu principal */}
-        <div className="w-full lg:w-3/4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{activeModule?.title}</CardTitle>
-              <CardDescription>{activeModule?.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoadingContents ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : contents.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">
-                    Aucun contenu disponible pour ce module.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  {/* Liste des contenus du module */}
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {contents.map((content) => (
-                      <Button
-                        key={content.id}
-                        variant={activeContentId === content.id ? "default" : "outline"}
-                        size="sm"
-                        className={`${
-                          isContentCompleted(content.id) ? "border-green-500" : ""
-                        }`}
-                        onClick={() => setActiveContentId(content.id)}
-                      >
-                        {isContentCompleted(content.id) && (
-                          <CheckCircle className="mr-1 h-3 w-3 text-green-500" />
-                        )}
-                        {content.title}
-                      </Button>
-                    ))}
+          {/* Contenu principal */}
+          <div className="w-full lg:w-3/4">
+            <Card>
+              <CardHeader>
+                <CardTitle>{activeModule?.title}</CardTitle>
+                <CardDescription>{activeModule?.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingContents ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
+                ) : contents.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">
+                      Aucun contenu disponible pour ce module.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Liste des contenus du module */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {contents.map((content) => (
+                        <Button
+                          key={content.id}
+                          variant={activeContentId === content.id ? "default" : "outline"}
+                          size="sm"
+                          className={`${
+                            isContentCompleted(content.id) ? "border-green-500" : ""
+                          }`}
+                          onClick={() => setActiveContentId(content.id)}
+                        >
+                          {isContentCompleted(content.id) && (
+                            <CheckCircle className="mr-1 h-3 w-3 text-green-500" />
+                          )}
+                          {content.title}
+                        </Button>
+                      ))}
+                    </div>
 
-                  {/* Affichage du contenu actif */}
-                  {activeContent && <ContentDisplay content={activeContent} />}
-                </>
-              )}
-            </CardContent>
-          </Card>
+                    {/* Affichage du contenu actif */}
+                    {activeContent && <ContentDisplay content={activeContent} />}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
