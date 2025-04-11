@@ -229,7 +229,7 @@ export default function TeamPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.7 }}
-        className="bg-gradient-to-br from-blue-50 to-blue-100 py-16 mt-16 mb-8 relative overflow-hidden"
+        className="bg-gradient-to-br from-blue-50 to-blue-100 py-16 mt-16 mb-0 relative overflow-hidden"
       >
         {/* Formes décoratives */}
         <div className="absolute -top-10 -left-20 w-40 h-40 bg-blue-200 rounded-full opacity-30"></div>

@@ -5,6 +5,7 @@ import { Link } from "wouter";
 import ScrollAnimation from "@/components/animations/ScrollAnimation";
 import ValueCard from "@/components/about/ValueCard";
 import { MapPin, Calendar, Award, Users, Bookmark, TrendingUp, Newspaper, Share2, BookOpen, Instagram } from "lucide-react";
+import mascotteImg from "@assets/78e62718-3c1b-4e4e-aa2f-e8dee12b5e24.png";
 import CountUp from "react-countup";
 
 const AboutPage: React.FC = () => {
@@ -332,18 +333,40 @@ const AboutPage: React.FC = () => {
               </div>
             </div>
             
-            {/* Texte à droite */}
+            {/* Texte à droite avec mascotte */}
             <div className="md:w-2/5 lg:w-2/5 mb-12 md:mb-0 order-1 md:order-2 md:pl-16">
               <ScrollAnimation threshold={0.1}>
-                <div className="md:text-right">
-                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4">Nos valeurs</h2>
+                <div className="md:text-right relative">
+                  {/* Mascotte Politiquensemble avec animation */}
+                  <div className="absolute right-0 -top-36 md:-right-20 md:-top-20 group cursor-pointer z-20">
+                    <div className="transform rotate-6 transition-all hover:rotate-0 hover:scale-105 duration-300 w-36 h-36 md:w-48 md:h-48 animate-mascot-float">
+                      <img 
+                        src={mascotteImg} 
+                        alt="Mascotte Politiquensemble" 
+                        className="w-full h-full object-contain drop-shadow-xl"
+                      />
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs md:text-sm px-3 py-1 rounded-full mt-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      Je suis Pipo, votre guide !
+                    </div>
+                  </div>
+                  
+                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 pt-24 md:pt-40">Nos valeurs</h2>
                   <div className="w-24 h-1 bg-blue-600 mb-6 md:ml-auto"></div>
                   <p className="text-dark/80 mb-6">
                     Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information quotidienne.
                   </p>
-                  <p className="text-dark/70">
+                  <p className="text-dark/70 mb-6">
                     Notre objectif est de rendre l'information politique compréhensible, objective et accessible, quelle que soit votre connaissance préalable du sujet.
                   </p>
+                  <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg mt-6 text-left relative overflow-hidden md:ml-auto md:max-w-sm">
+                    <div className="relative z-10">
+                      <p className="text-sm text-blue-800 font-medium">
+                        "Notre mascotte Pipo incarne notre mission : rendre l'actualité politique accessible, sympathique et facile à comprendre, même pour ceux qui s'y intéressent pour la première fois."
+                      </p>
+                    </div>
+                    <div className="absolute -bottom-12 -right-8 w-16 h-16 bg-blue-100 rounded-full opacity-50"></div>
+                  </div>
                 </div>
               </ScrollAnimation>
             </div>
