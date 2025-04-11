@@ -9,7 +9,8 @@ import {
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
   insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema, insertTeamApplicationSchema,
-  insertContactMessageSchema
+  insertContactMessageSchema,
+  insertLearningTopicSchema, insertLearningModuleSchema, insertLearningContentSchema, insertUserLearningProgressSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -2053,6 +2054,386 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         message: "Une erreur est survenue lors de la suppression du message"
       });
+    }
+  });
+
+  // Routes d'apprentissage (Learning)
+  
+  /* ROUTES PUBLIQUES */
+  // Récupérer tous les sujets d'apprentissage (uniquement publiés)
+  app.get("/api/learning/topics", async (req: Request, res: Response) => {
+    try {
+      const category = req.query.category ? String(req.query.category) : undefined;
+      const search = req.query.search ? String(req.query.search) : undefined;
+      
+      const topics = await storage.getAllLearningTopics({
+        category,
+        search
+      });
+      
+      res.json(topics);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des sujets d'apprentissage:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des sujets d'apprentissage" });
+    }
+  });
+  
+  // Récupérer un sujet d'apprentissage par son slug
+  app.get("/api/learning/topics/:slug", async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const topic = await storage.getLearningTopicBySlug(slug);
+      
+      if (!topic) {
+        return res.status(404).json({ message: "Sujet d'apprentissage non trouvé" });
+      }
+      
+      // Incrémenter la popularité du sujet
+      await storage.incrementTopicPopularity(topic.id);
+      
+      // Récupérer les modules associés au sujet
+      const modules = await storage.getLearningModulesByTopicId(topic.id);
+      
+      res.json({ topic, modules });
+    } catch (error) {
+      console.error("Erreur lors de la récupération du sujet d'apprentissage:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération du sujet d'apprentissage" });
+    }
+  });
+  
+  // Récupérer les contenus d'un module
+  app.get("/api/learning/modules/:moduleId/contents", async (req: Request, res: Response) => {
+    try {
+      const moduleId = parseInt(req.params.moduleId);
+      
+      if (isNaN(moduleId)) {
+        return res.status(400).json({ message: "ID de module invalide" });
+      }
+      
+      const module = await storage.getLearningModuleById(moduleId);
+      
+      if (!module) {
+        return res.status(404).json({ message: "Module non trouvé" });
+      }
+      
+      const contents = await storage.getLearningContentsByModuleId(moduleId);
+      
+      res.json(contents);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des contenus du module:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des contenus du module" });
+    }
+  });
+  
+  /* ROUTES AUTHENTIFIÉES */
+  // Récupérer la progression de l'utilisateur
+  app.get("/api/learning/user/progress", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req.user as any).id;
+      const topicId = req.query.topicId ? parseInt(String(req.query.topicId)) : undefined;
+      
+      const progress = await storage.getUserLearningProgress(userId, topicId);
+      
+      res.json(progress);
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la progression de l'utilisateur:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération de la progression de l'utilisateur" });
+    }
+  });
+  
+  // Marquer un contenu comme complété
+  app.post("/api/learning/user/progress", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req.user as any).id;
+      
+      const schema = z.object({
+        contentId: z.number(),
+        score: z.number().optional()
+      });
+      
+      const validationResult = schema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Données invalides", errors: validationResult.error.format() });
+      }
+      
+      const { contentId, score } = validationResult.data;
+      
+      const progress = await storage.markContentAsCompleted(userId, contentId, score);
+      
+      res.json(progress);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la progression:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour de la progression" });
+    }
+  });
+  
+  /* ROUTES ADMIN */
+  // Récupérer tous les sujets d'apprentissage (y compris non publiés)
+  app.get("/api/admin/learning/topics", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const category = req.query.category ? String(req.query.category) : undefined;
+      const search = req.query.search ? String(req.query.search) : undefined;
+      
+      const topics = await storage.getAllLearningTopics({
+        category,
+        search,
+        showUnpublished: true
+      });
+      
+      res.json(topics);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des sujets d'apprentissage (admin):", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des sujets d'apprentissage" });
+    }
+  });
+  
+  // Créer un nouveau sujet d'apprentissage
+  app.post("/api/admin/learning/topics", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const validationResult = insertLearningTopicSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Données invalides", errors: validationResult.error.format() });
+      }
+      
+      const topic = await storage.createLearningTopic({
+        ...validationResult.data,
+        authorId: (req.user as any).id
+      });
+      
+      res.status(201).json(topic);
+    } catch (error) {
+      console.error("Erreur lors de la création du sujet d'apprentissage:", error);
+      res.status(500).json({ message: "Erreur lors de la création du sujet d'apprentissage" });
+    }
+  });
+  
+  // Mettre à jour un sujet d'apprentissage
+  app.patch("/api/admin/learning/topics/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID de sujet invalide" });
+      }
+      
+      const topic = await storage.getLearningTopicById(id);
+      
+      if (!topic) {
+        return res.status(404).json({ message: "Sujet d'apprentissage non trouvé" });
+      }
+      
+      const validationResult = insertLearningTopicSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Données invalides", errors: validationResult.error.format() });
+      }
+      
+      const updatedTopic = await storage.updateLearningTopic(id, validationResult.data);
+      
+      res.json(updatedTopic);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du sujet d'apprentissage:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du sujet d'apprentissage" });
+    }
+  });
+  
+  // Supprimer un sujet d'apprentissage
+  app.delete("/api/admin/learning/topics/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID de sujet invalide" });
+      }
+      
+      const topic = await storage.getLearningTopicById(id);
+      
+      if (!topic) {
+        return res.status(404).json({ message: "Sujet d'apprentissage non trouvé" });
+      }
+      
+      await storage.deleteLearningTopic(id);
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Erreur lors de la suppression du sujet d'apprentissage:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression du sujet d'apprentissage" });
+    }
+  });
+  
+  // Créer un nouveau module pour un sujet
+  app.post("/api/admin/learning/topics/:topicId/modules", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const topicId = parseInt(req.params.topicId);
+      
+      if (isNaN(topicId)) {
+        return res.status(400).json({ message: "ID de sujet invalide" });
+      }
+      
+      const topic = await storage.getLearningTopicById(topicId);
+      
+      if (!topic) {
+        return res.status(404).json({ message: "Sujet d'apprentissage non trouvé" });
+      }
+      
+      const validationResult = insertLearningModuleSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Données invalides", errors: validationResult.error.format() });
+      }
+      
+      const module = await storage.createLearningModule({
+        ...validationResult.data,
+        topicId
+      });
+      
+      res.status(201).json(module);
+    } catch (error) {
+      console.error("Erreur lors de la création du module:", error);
+      res.status(500).json({ message: "Erreur lors de la création du module" });
+    }
+  });
+  
+  // Mettre à jour un module
+  app.patch("/api/admin/learning/modules/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID de module invalide" });
+      }
+      
+      const module = await storage.getLearningModuleById(id);
+      
+      if (!module) {
+        return res.status(404).json({ message: "Module non trouvé" });
+      }
+      
+      const validationResult = insertLearningModuleSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Données invalides", errors: validationResult.error.format() });
+      }
+      
+      const updatedModule = await storage.updateLearningModule(id, validationResult.data);
+      
+      res.json(updatedModule);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du module:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du module" });
+    }
+  });
+  
+  // Supprimer un module
+  app.delete("/api/admin/learning/modules/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID de module invalide" });
+      }
+      
+      const module = await storage.getLearningModuleById(id);
+      
+      if (!module) {
+        return res.status(404).json({ message: "Module non trouvé" });
+      }
+      
+      await storage.deleteLearningModule(id);
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Erreur lors de la suppression du module:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression du module" });
+    }
+  });
+  
+  // Créer un nouveau contenu pour un module
+  app.post("/api/admin/learning/modules/:moduleId/contents", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const moduleId = parseInt(req.params.moduleId);
+      
+      if (isNaN(moduleId)) {
+        return res.status(400).json({ message: "ID de module invalide" });
+      }
+      
+      const module = await storage.getLearningModuleById(moduleId);
+      
+      if (!module) {
+        return res.status(404).json({ message: "Module non trouvé" });
+      }
+      
+      const validationResult = insertLearningContentSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Données invalides", errors: validationResult.error.format() });
+      }
+      
+      const content = await storage.createLearningContent({
+        ...validationResult.data,
+        moduleId
+      });
+      
+      res.status(201).json(content);
+    } catch (error) {
+      console.error("Erreur lors de la création du contenu:", error);
+      res.status(500).json({ message: "Erreur lors de la création du contenu" });
+    }
+  });
+  
+  // Mettre à jour un contenu
+  app.patch("/api/admin/learning/contents/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID de contenu invalide" });
+      }
+      
+      const content = await storage.getLearningContentById(id);
+      
+      if (!content) {
+        return res.status(404).json({ message: "Contenu non trouvé" });
+      }
+      
+      const validationResult = insertLearningContentSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Données invalides", errors: validationResult.error.format() });
+      }
+      
+      const updatedContent = await storage.updateLearningContent(id, validationResult.data);
+      
+      res.json(updatedContent);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du contenu:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du contenu" });
+    }
+  });
+  
+  // Supprimer un contenu
+  app.delete("/api/admin/learning/contents/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "ID de contenu invalide" });
+      }
+      
+      const content = await storage.getLearningContentById(id);
+      
+      if (!content) {
+        return res.status(404).json({ message: "Contenu non trouvé" });
+      }
+      
+      await storage.deleteLearningContent(id);
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Erreur lors de la suppression du contenu:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression du contenu" });
     }
   });
 
