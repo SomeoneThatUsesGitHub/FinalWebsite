@@ -8,7 +8,8 @@ import * as schema from "@shared/schema";
 import { 
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
-  insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema, insertTeamApplicationSchema 
+  insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema, insertTeamApplicationSchema,
+  insertContactMessageSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -1914,6 +1915,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Erreur lors de la suppression de la candidature:", error);
       res.status(500).json({
         message: "Erreur lors de la suppression de la candidature"
+      });
+    }
+  });
+
+  // Routes pour les messages de contact
+  // Route publique pour soumettre un message de contact
+  app.post("/api/contact", async (req: Request, res: Response) => {
+    try {
+      // Validation des données
+      const validatedData = insertContactMessageSchema.safeParse(req.body);
+      if (!validatedData.success) {
+        return res.status(400).json({
+          message: "Données du message invalides",
+          errors: validatedData.error.errors
+        });
+      }
+      
+      // Créer le message
+      const message = await storage.createContactMessage(validatedData.data);
+      
+      res.status(201).json({
+        message: "Message envoyé avec succès"
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message de contact:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de l'envoi de votre message"
+      });
+    }
+  });
+  
+  // Route admin pour récupérer tous les messages de contact
+  app.get("/api/admin/contact-messages", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const messages = await storage.getAllContactMessages();
+      res.json(messages);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des messages de contact:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la récupération des messages de contact"
+      });
+    }
+  });
+  
+  // Route admin pour récupérer un message spécifique
+  app.get("/api/admin/contact-messages/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de message invalide" });
+      }
+      
+      const message = await storage.getContactMessageById(Number(id));
+      if (!message) {
+        return res.status(404).json({ message: "Message non trouvé" });
+      }
+      
+      res.json(message);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du message de contact:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la récupération du message"
+      });
+    }
+  });
+  
+  // Route admin pour marquer un message comme lu
+  app.patch("/api/admin/contact-messages/:id/read", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de message invalide" });
+      }
+      
+      const message = await storage.markContactMessageAsRead(Number(id));
+      if (!message) {
+        return res.status(404).json({ message: "Message non trouvé" });
+      }
+      
+      res.json(message);
+    } catch (error) {
+      console.error("Erreur lors du marquage du message comme lu:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors du marquage du message comme lu"
+      });
+    }
+  });
+  
+  // Route admin pour supprimer un message
+  app.delete("/api/admin/contact-messages/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de message invalide" });
+      }
+      
+      const result = await storage.deleteContactMessage(Number(id));
+      if (!result) {
+        return res.status(404).json({ message: "Message non trouvé" });
+      }
+      
+      res.json({ message: "Message supprimé avec succès" });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du message:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la suppression du message"
       });
     }
   });

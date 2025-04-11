@@ -59,9 +59,12 @@ const ContactPage: React.FC = () => {
   // Mutation pour envoyer le formulaire
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: ContactFormData) => {
-      // Simulation d'envoi - En production, remplacer par un appel API réel
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      return data;
+      const response = await apiRequest("POST", "/api/contact", data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Une erreur s'est produite");
+      }
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -77,10 +80,13 @@ const ContactPage: React.FC = () => {
         setSubmitSuccess(false);
       }, 5000);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Erreur lors de l'envoi du message:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur s'est produite lors de l'envoi du message. Veuillez réessayer.",
+        description: error instanceof Error 
+          ? error.message 
+          : "Une erreur s'est produite lors de l'envoi du message. Veuillez réessayer.",
         variant: "destructive",
       });
     },
