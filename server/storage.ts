@@ -775,6 +775,41 @@ export class DatabaseStorage implements IStorage {
       .where(eq(videos.id, id));
   }
 
+  // Contact Messages operations
+  async getAllContactMessages(): Promise<ContactMessage[]> {
+    return db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));
+  }
+  
+  async getContactMessageById(id: number): Promise<ContactMessage | undefined> {
+    const [message] = await db.select().from(contactMessages).where(eq(contactMessages.id, id));
+    return message;
+  }
+  
+  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    const [newMessage] = await db
+      .insert(contactMessages)
+      .values({
+        ...message,
+        isRead: false
+      })
+      .returning();
+    return newMessage;
+  }
+  
+  async markContactMessageAsRead(id: number): Promise<ContactMessage | undefined> {
+    const [updatedMessage] = await db
+      .update(contactMessages)
+      .set({ isRead: true })
+      .where(eq(contactMessages.id, id))
+      .returning();
+    return updatedMessage;
+  }
+  
+  async deleteContactMessage(id: number): Promise<boolean> {
+    const result = await db.delete(contactMessages).where(eq(contactMessages.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
   // LiveCoverage operations (Suivis en direct)
   async getAllLiveCoverages(): Promise<LiveCoverage[]> {
     return db.select().from(liveCoverages).orderBy(desc(liveCoverages.createdAt));
