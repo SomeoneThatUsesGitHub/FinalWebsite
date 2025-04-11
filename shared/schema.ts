@@ -370,3 +370,26 @@ export const insertTeamApplicationSchema = createInsertSchema(teamApplications).
 
 export type TeamApplication = typeof teamApplications.$inferSelect;
 export type InsertTeamApplication = z.infer<typeof insertTeamApplicationSchema>;
+
+// Schéma pour les messages de contact
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  isRead: boolean("is_read").notNull().default(false),
+});
+
+export const insertContactMessageSchema = createInsertSchema(contactMessages).pick({
+  name: true,
+  email: true,
+  phone: true,
+  subject: true,
+  message: true,
+});
+
+export type ContactMessage = typeof contactMessages.$inferSelect;
+export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
