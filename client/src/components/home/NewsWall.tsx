@@ -5,6 +5,7 @@ import { staggerChildren, staggerItem } from "@/lib/animations";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { getTimeAgo } from "@/lib/utils";
+import mascotteImg from "@assets/78e62718-3c1b-4e4e-aa2f-e8dee12b5e24.png";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -185,10 +186,20 @@ const NewsWall: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
 
         <ScrollAnimation className="mb-10" threshold={0.1}>
-          <div className="mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold font-heading text-dark inline-block">Notre sélection</h2>
               <div className="absolute -bottom-2 left-0 w-24 h-1 bg-blue-600 rounded-full"></div>
+            </div>
+            <div className="hidden md:block relative">
+              <div className="w-16 h-16 transform transition-transform hover:scale-110 duration-300 cursor-pointer">
+                <img 
+                  src={mascotteImg} 
+                  alt="Pipo, la mascotte de Politiquensemble" 
+                  className="w-full h-full object-contain drop-shadow-lg"
+                  title="Bonjour, je suis Pipo !"
+                />
+              </div>
             </div>
           </div>
           <p className="text-gray-500 mb-6">Restez informé des dernières informations politiques en France et à l'international</p>

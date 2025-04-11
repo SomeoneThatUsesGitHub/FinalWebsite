@@ -337,9 +337,9 @@ const AboutPage: React.FC = () => {
             <div className="md:w-2/5 lg:w-2/5 mb-12 md:mb-0 order-1 md:order-2 md:pl-16">
               <ScrollAnimation threshold={0.1}>
                 <div className="md:text-right relative">
-                  {/* Mascotte Politiquensemble avec animation */}
+                  {/* Mascotte Politiquensemble sans animation */}
                   <div className="absolute right-0 -top-36 md:-right-20 md:-top-20 group cursor-pointer z-20">
-                    <div className="transform rotate-6 transition-all hover:rotate-0 hover:scale-105 duration-300 w-36 h-36 md:w-48 md:h-48 animate-mascot-float">
+                    <div className="transform rotate-3 transition-all hover:rotate-0 hover:scale-105 duration-300 w-36 h-36 md:w-48 md:h-48">
                       <img 
                         src={mascotteImg} 
                         alt="Mascotte Politiquensemble" 
@@ -359,14 +359,6 @@ const AboutPage: React.FC = () => {
                   <p className="text-dark/70 mb-6">
                     Notre objectif est de rendre l'information politique compréhensible, objective et accessible, quelle que soit votre connaissance préalable du sujet.
                   </p>
-                  <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg mt-6 text-left relative overflow-hidden md:ml-auto md:max-w-sm">
-                    <div className="relative z-10">
-                      <p className="text-sm text-blue-800 font-medium">
-                        "Notre mascotte Pipo incarne notre mission : rendre l'actualité politique accessible, sympathique et facile à comprendre, même pour ceux qui s'y intéressent pour la première fois."
-                      </p>
-                    </div>
-                    <div className="absolute -bottom-12 -right-8 w-16 h-16 bg-blue-100 rounded-full opacity-50"></div>
-                  </div>
                 </div>
               </ScrollAnimation>
             </div>
