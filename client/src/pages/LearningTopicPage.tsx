@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { BookOpen, CheckCircle, Clock, Award, ArrowLeft, MoveLeft, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 // Type pour les données de cette page
 interface LearningTopic {
@@ -208,16 +209,16 @@ export default function LearningTopicPage() {
             <Clock className="h-4 w-4 mr-1" />
             <span className="text-sm text-muted-foreground">{content.duration} minutes</span>
           </div>
-          {user ? (
-            isContentCompleted(content.id) ? (
-              <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
-                <span className="text-sm text-muted-foreground">Complété</span>
-                {content.type === "quiz" && getContentScore(content.id) > 0 && (
-                  <span className="ml-2 text-sm">Score: {getContentScore(content.id)}%</span>
-                )}
-              </div>
-            ) : (
+          {user && isContentCompleted(content.id) ? (
+            <div className="flex items-center">
+              <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
+              <span className="text-sm text-muted-foreground">Complété</span>
+              {content.type === "quiz" && getContentScore(content.id) > 0 && (
+                <span className="ml-2 text-sm">Score: {getContentScore(content.id)}%</span>
+              )}
+            </div>
+          ) : (
+            user ? (
               <Button
                 onClick={() => markContentCompleted(content.id)}
                 variant="outline"
@@ -225,15 +226,15 @@ export default function LearningTopicPage() {
               >
                 Marquer comme terminé
               </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setLocation("/auth")}
+              >
+                Se connecter pour suivre
+              </Button>
             )
-          ) : (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setLocation("/auth")}
-            >
-              Se connecter pour suivre
-            </Button>
           )}
         </CardFooter>
       </Card>
@@ -341,7 +342,7 @@ export default function LearningTopicPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="container mx-auto px-4 md:px-6 mb-24">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar gauche - Liste des modules */}
           <div className="w-full lg:w-1/4">
