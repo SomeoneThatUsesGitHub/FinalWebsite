@@ -81,17 +81,17 @@ export default {
         },
         "mascot-float": {
           "0%, 100%": {
-            transform: "translateY(0) rotate(6deg)",
+            transform: "translateY(0) rotate(3deg)",
           },
           "50%": {
-            transform: "translateY(-10px) rotate(3deg)",
+            transform: "translateY(-5px) rotate(2deg)",
           },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "mascot-float": "mascot-float 3s ease-in-out infinite",
+        "mascot-float": "mascot-float 5s ease-in-out infinite",
       },
     },
   },
