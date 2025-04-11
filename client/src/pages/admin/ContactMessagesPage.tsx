@@ -1,41 +1,61 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { 
+  Trash2, 
+  FileText, 
+  User, 
+  Calendar, 
+  Mail, 
+  Phone, 
+  MessageSquare, 
+  Tag,
+  Check,
+  Eye,
+  EyeOff,
+  Loader2,
+  Filter
+} from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Helmet } from "react-helmet";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import {
-  MessageSquareText,
-  Trash2,
-  Check,
-  Mail,
-  Phone,
-  Clock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  CalendarDays
-} from "lucide-react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Skeleton } from "@/components/ui/skeleton";
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-// Type pour les messages
+// Type pour les messages de contact
 type ContactMessage = {
   id: number;
   name: string;
@@ -48,284 +68,341 @@ type ContactMessage = {
 };
 
 export default function ContactMessagesPage() {
-  const { toast } = useToast();
-  const [messageToDelete, setMessageToDelete] = useState<number | null>(null);
-  
+  const [viewMessage, setViewMessage] = useState<ContactMessage | null>(null);
+  const [deleteMessage, setDeleteMessage] = useState<ContactMessage | null>(null);
+  const [statusTab, setStatusTab] = useState<"all" | "unread" | "read">("all");
+
   // Récupérer tous les messages de contact
-  const { data: messages, isLoading, isError } = useQuery<ContactMessage[]>({
-    queryKey: ["/api/admin/contact-messages"],
-    retry: false
+  const { data: messages = [], isLoading, isError } = useQuery<ContactMessage[]>({
+    queryKey: ['/api/admin/contact-messages'],
+    refetchOnWindowFocus: false,
   });
-  
-  // Mutation pour marquer un message comme lu
+
+  // Mutation pour marquer comme lu
   const markAsReadMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("PATCH", `/api/admin/contact-messages/${id}/read`);
+      const res = await apiRequest("PATCH", `/api/admin/contact-messages/${id}/read`, {});
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Erreur lors du marquage comme lu");
+      }
+      return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/contact-messages"] });
       toast({
         title: "Message marqué comme lu",
-        description: "Le message a été marqué comme lu avec succès.",
+        description: "Le message a été marqué comme lu avec succès",
       });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/contact-messages'] });
+      // Ne pas fermer la boîte de dialogue pour permettre de continuer à lire
     },
-    onError: (error) => {
-      console.error("Erreur lors du marquage du message comme lu:", error);
+    onError: (error: Error) => {
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors du marquage du message comme lu.",
+        description: error.message,
         variant: "destructive",
       });
     },
   });
-  
+
   // Mutation pour supprimer un message
   const deleteMessageMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/admin/contact-messages/${id}`);
+      const res = await apiRequest("DELETE", `/api/admin/contact-messages/${id}`);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Erreur lors de la suppression");
+      }
+      return res.json();
     },
     onSuccess: () => {
-      setMessageToDelete(null);
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/contact-messages"] });
       toast({
         title: "Message supprimé",
-        description: "Le message a été supprimé avec succès.",
+        description: "Le message a été supprimé avec succès",
       });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/contact-messages'] });
+      setDeleteMessage(null);
     },
-    onError: (error) => {
-      setMessageToDelete(null);
-      console.error("Erreur lors de la suppression du message:", error);
+    onError: (error: Error) => {
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la suppression du message.",
+        description: error.message,
         variant: "destructive",
       });
     },
   });
-  
-  const handleMarkAsRead = (id: number) => {
-    markAsReadMutation.mutate(id);
-  };
-  
-  const handleDelete = (id: number) => {
-    setMessageToDelete(id);
-  };
-  
-  const confirmDelete = () => {
-    if (messageToDelete) {
-      deleteMessageMutation.mutate(messageToDelete);
-    }
-  };
-  
-  const cancelDelete = () => {
-    setMessageToDelete(null);
-  };
-  
-  // Affichage de l'état de chargement
-  if (isLoading) {
-    return (
-      <AdminLayout>
-        <Helmet>
-          <title>Messages de contact | Administration</title>
-        </Helmet>
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Messages de contact</h1>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="overflow-hidden">
-              <CardHeader className="bg-gray-50 border-b">
-                <Skeleton className="h-6 w-4/5 mb-2" />
-                <Skeleton className="h-4 w-2/3" />
-              </CardHeader>
-              <CardContent className="p-4">
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-3/4" />
-              </CardContent>
-              <CardFooter className="bg-gray-50 border-t p-4 flex justify-between">
-                <Skeleton className="h-8 w-20" />
-                <Skeleton className="h-8 w-20" />
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </AdminLayout>
-    );
-  }
-  
-  // Affichage des erreurs
-  if (isError) {
-    return (
-      <AdminLayout>
-        <Helmet>
-          <title>Messages de contact | Administration</title>
-        </Helmet>
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Messages de contact</h1>
-        </div>
-        <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-6 flex flex-col items-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-          <h2 className="text-xl font-bold mb-2">Erreur lors du chargement des messages</h2>
-          <p className="text-center">
-            Une erreur est survenue lors de la récupération des messages de contact. Veuillez réessayer ultérieurement ou contacter le support technique.
-          </p>
-          <Button 
-            variant="outline"
-            className="mt-4"
-            onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/admin/contact-messages"] })}
-          >
-            Réessayer
-          </Button>
-        </div>
-      </AdminLayout>
-    );
-  }
-  
-  // Tri des messages: non lus en premier, puis par date (les plus récents en premier)
-  const sortedMessages = [...(messages || [])].sort((a, b) => {
-    // D'abord, trier par statut (non lu -> lu)
-    if (a.read !== b.read) {
-      return a.read ? 1 : -1;
-    }
-    // Ensuite, trier par date (du plus récent au plus ancien)
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+  // Filtrer les messages selon l'onglet actif
+  const filteredMessages = messages.filter(msg => {
+    if (statusTab === "all") return true;
+    if (statusTab === "read") return msg.read;
+    if (statusTab === "unread") return !msg.read;
+    return true;
   });
-  
+
+  // Formater la date
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), "dd MMMM yyyy 'à' HH'h'mm", { locale: fr });
+  };
+
+  // Gérer la visualisation et marquer comme lu
+  const handleViewMessage = (message: ContactMessage) => {
+    setViewMessage(message);
+    
+    // Si le message n'est pas encore lu, le marquer comme lu
+    if (!message.read) {
+      markAsReadMutation.mutate(message.id);
+    }
+  };
+
+  // Gérer la suppression d'un message
+  const handleDelete = () => {
+    if (!deleteMessage) return;
+    deleteMessageMutation.mutate(deleteMessage.id);
+  };
+
+  // Obtenir le nombre de messages par statut
+  const unreadCount = messages.filter(msg => !msg.read).length;
+  const readCount = messages.filter(msg => msg.read).length;
+
   return (
-    <AdminLayout>
-      <Helmet>
-        <title>Messages de contact | Administration</title>
-      </Helmet>
-      
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Messages de contact</h1>
-        <div className="flex items-center space-x-2">
-          <Badge variant="outline" className={`px-3 py-1 ${!sortedMessages.length ? 'bg-gray-100' : sortedMessages.some(m => !m.read) ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'}`}>
-            {!sortedMessages.length 
-              ? 'Aucun message' 
-              : sortedMessages.some(m => !m.read)
-                ? `${sortedMessages.filter(m => !m.read).length} non lu${sortedMessages.filter(m => !m.read).length > 1 ? 's' : ''}`
-                : 'Tous lus'}
-          </Badge>
-          <Badge variant="outline" className="px-3 py-1 bg-gray-50">
-            {sortedMessages.length} message{sortedMessages.length > 1 ? 's' : ''} au total
-          </Badge>
-        </div>
-      </div>
-      
-      {sortedMessages.length === 0 ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-          <MessageSquareText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-700 mb-2">Aucun message de contact</h2>
-          <p className="text-gray-600 max-w-md mx-auto">
-            Vous n'avez reçu aucun message de contact pour le moment. Les messages envoyés via le formulaire de contact apparaîtront ici.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedMessages.map((message) => (
-            <Card 
-              key={message.id} 
-              className={`overflow-hidden border ${!message.read ? 'border-blue-300 shadow-md' : 'border-gray-200'}`}
-            >
-              <CardHeader className={`${!message.read ? 'bg-blue-50' : 'bg-gray-50'} border-b p-4`}>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{message.name}</CardTitle>
-                  {!message.read && (
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      Nouveau
-                    </Badge>
-                  )}
-                </div>
-                <CardDescription className="flex items-center mt-1">
-                  <CalendarDays className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
-                  {format(new Date(message.createdAt), "dd MMMM yyyy 'à' HH'h'mm", { locale: fr })}
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="p-4 space-y-3">
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-2">{message.subject}</h3>
-                  <p className="text-gray-600 line-clamp-4 text-sm">{message.message}</p>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                    <a href={`mailto:${message.email}`} className="text-blue-600 hover:underline">
-                      {message.email}
-                    </a>
+    <AdminLayout title="Messages de contact">
+      <div className="flex flex-col">
+        <p className="text-muted-foreground mb-6">
+          Gérez les messages envoyés via le formulaire de contact
+        </p>
+
+        <Tabs 
+          value={statusTab} 
+          onValueChange={(value) => setStatusTab(value as "all" | "unread" | "read")}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="all" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Tous ({messages.length})
+            </TabsTrigger>
+            <TabsTrigger value="unread" className="flex items-center gap-2">
+              <EyeOff className="h-4 w-4" />
+              Non lus ({unreadCount})
+            </TabsTrigger>
+            <TabsTrigger value="read" className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Lus ({readCount})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value={statusTab}>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : isError ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center text-destructive">
+                    Erreur lors du chargement des messages
                   </div>
-                  
-                  {message.phone && (
-                    <div className="flex items-center">
-                      <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                      <a href={`tel:${message.phone}`} className="text-blue-600 hover:underline">
-                        {message.phone}
-                      </a>
+                </CardContent>
+              </Card>
+            ) : filteredMessages.length === 0 ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center text-muted-foreground">
+                    Aucun message {statusTab !== "all" ? `avec le statut "${statusTab === "read" ? "lu" : "non lu"}"` : ""} à afficher
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Expéditeur</TableHead>
+                        <TableHead>Sujet</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Statut</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredMessages.map((message) => (
+                        <TableRow key={message.id} className={!message.read ? "bg-blue-50/50" : ""}>
+                          <TableCell className="font-medium">{message.name}</TableCell>
+                          <TableCell>{message.subject}</TableCell>
+                          <TableCell>{formatDate(message.createdAt)}</TableCell>
+                          <TableCell>
+                            {message.read ? (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+                                <Eye className="h-3 w-3" />
+                                Lu
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                                <EyeOff className="h-3 w-3" />
+                                Non lu
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleViewMessage(message)}
+                              >
+                                <FileText className="h-4 w-4 mr-1" />
+                                Voir
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => setDeleteMessage(message)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Dialog de visualisation d'un message */}
+      <Dialog open={!!viewMessage} onOpenChange={(open) => !open && setViewMessage(null)}>
+        {viewMessage && (
+          <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-hidden flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="text-2xl">{viewMessage.subject}</DialogTitle>
+              <DialogDescription>
+                Envoyé par {viewMessage.name} le {formatDate(viewMessage.createdAt)}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <ScrollArea className="flex-grow mt-4 pr-4">
+              <div className="space-y-6">
+                {/* Informations de contact */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Informations de contact
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <span className="font-medium">Nom:</span>
+                      <p>{viewMessage.name}</p>
                     </div>
-                  )}
-                </div>
-              </CardContent>
-              
-              <CardFooter className={`${!message.read ? 'bg-blue-50' : 'bg-gray-50'} border-t p-4 flex justify-between`}>
-                {!message.read ? (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-blue-600 border-blue-300 hover:bg-blue-50" 
-                    onClick={() => handleMarkAsRead(message.id)}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Marquer comme lu
-                  </Button>
-                ) : (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-gray-600" 
-                    disabled
-                  >
-                    <EyeOff className="h-4 w-4 mr-2" />
-                    Déjà lu
-                  </Button>
-                )}
+                    <div>
+                      <span className="font-medium">Email:</span>
+                      <p className="flex items-center">
+                        <Mail className="h-4 w-4 mr-1" />
+                        <a href={`mailto:${viewMessage.email}`} className="text-blue-600 hover:underline">
+                          {viewMessage.email}
+                        </a>
+                      </p>
+                    </div>
+                    {viewMessage.phone && (
+                      <div>
+                        <span className="font-medium">Téléphone:</span>
+                        <p className="flex items-center">
+                          <Phone className="h-4 w-4 mr-1" />
+                          {viewMessage.phone}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
                 
-                <AlertDialog open={messageToDelete === message.id} onOpenChange={() => messageToDelete === message.id && setMessageToDelete(null)}>
-                  <AlertDialogTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="text-red-600 border-red-200 hover:bg-red-50" 
-                      onClick={() => handleDelete(message.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Supprimer
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Êtes-vous sûr de vouloir supprimer ce message ? Cette action est irréversible.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel onClick={cancelDelete}>Annuler</AlertDialogCancel>
-                      <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-                        Supprimer
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+                {/* Message */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center">
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Message
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="whitespace-pre-wrap bg-muted/30 p-4 rounded-md border">
+                      {viewMessage.message}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </ScrollArea>
+            
+            <DialogFooter className="flex items-center justify-between mt-4 gap-4">
+              <div>
+                {!viewMessage.read && (
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                    Message non lu
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setDeleteMessage(viewMessage)}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Supprimer
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        )}
+      </Dialog>
+
+      {/* Dialog de confirmation de suppression */}
+      <Dialog open={!!deleteMessage} onOpenChange={(open) => !open && setDeleteMessage(null)}>
+        {deleteMessage && (
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Confirmer la suppression</DialogTitle>
+              <DialogDescription>
+                Êtes-vous sûr de vouloir supprimer définitivement ce message de {deleteMessage.name} ?
+                Cette action ne peut pas être annulée.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-4 gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setDeleteMessage(null)}
+                disabled={deleteMessageMutation.isPending}
+              >
+                Annuler
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={handleDelete}
+                disabled={deleteMessageMutation.isPending}
+              >
+                {deleteMessageMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Suppression...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
+      </Dialog>
     </AdminLayout>
   );
 }
