@@ -2005,6 +2005,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Route admin pour assigner un message à un administrateur
+  app.patch("/api/admin/contact-messages/:id/assign", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { adminId } = req.body;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de message invalide" });
+      }
+      
+      if (!adminId || isNaN(Number(adminId))) {
+        return res.status(400).json({ message: "ID d'administrateur invalide" });
+      }
+      
+      const message = await storage.assignMessageToAdmin(Number(id), Number(adminId));
+      if (!message) {
+        return res.status(404).json({ message: "Message non trouvé" });
+      }
+      
+      res.json(message);
+    } catch (error) {
+      console.error("Erreur lors de l'assignation du message:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de l'assignation du message"
+      });
+    }
+  });
+  
   // Route admin pour supprimer un message
   app.delete("/api/admin/contact-messages/:id", isAdminOnly, async (req: Request, res: Response) => {
     try {

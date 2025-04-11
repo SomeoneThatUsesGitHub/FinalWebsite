@@ -63,8 +63,9 @@ type ContactMessage = {
   phone: string | null;
   subject: string;
   message: string;
-  read: boolean;
+  isRead: boolean;
   createdAt: string;
+  assignedTo: number | null;
 };
 
 export default function ContactMessagesPage() {

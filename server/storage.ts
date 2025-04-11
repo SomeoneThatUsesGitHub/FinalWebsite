@@ -48,6 +48,7 @@ export interface IStorage {
   getContactMessageById(id: number): Promise<ContactMessage | undefined>;
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   markContactMessageAsRead(id: number): Promise<ContactMessage | undefined>;
+  assignMessageToAdmin(id: number, adminId: number): Promise<ContactMessage | undefined>;
   deleteContactMessage(id: number): Promise<boolean>;
   
   // Article operations
@@ -800,6 +801,15 @@ export class DatabaseStorage implements IStorage {
     const [updatedMessage] = await db
       .update(contactMessages)
       .set({ isRead: true })
+      .where(eq(contactMessages.id, id))
+      .returning();
+    return updatedMessage;
+  }
+  
+  async assignMessageToAdmin(id: number, adminId: number): Promise<ContactMessage | undefined> {
+    const [updatedMessage] = await db
+      .update(contactMessages)
+      .set({ assignedTo: adminId })
       .where(eq(contactMessages.id, id))
       .returning();
     return updatedMessage;
