@@ -13,7 +13,8 @@ import {
   liveCoverageUpdates, type LiveCoverageUpdate, type InsertLiveCoverageUpdate,
   liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion,
   newsletterSubscribers, type NewsletterSubscriber, type InsertNewsletterSubscriber,
-  teamApplications, type TeamApplication, type InsertTeamApplication
+  teamApplications, type TeamApplication, type InsertTeamApplication,
+  contactMessages, type ContactMessage, type InsertContactMessage
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte, sql, lt } from "drizzle-orm";
@@ -41,6 +42,13 @@ export interface IStorage {
   createTeamApplication(application: InsertTeamApplication): Promise<TeamApplication>;
   updateTeamApplicationStatus(id: number, status: string, reviewedBy?: number, notes?: string): Promise<TeamApplication | undefined>;
   deleteTeamApplication(id: number): Promise<boolean>;
+  
+  // Contact Messages operations
+  getAllContactMessages(): Promise<ContactMessage[]>;
+  getContactMessageById(id: number): Promise<ContactMessage | undefined>;
+  createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
+  markContactMessageAsRead(id: number): Promise<ContactMessage | undefined>;
+  deleteContactMessage(id: number): Promise<boolean>;
   
   // Article operations
   getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number, showUnpublished?: boolean, authorId?: number}): Promise<Article[]>;
