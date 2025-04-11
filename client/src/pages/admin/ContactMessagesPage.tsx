@@ -398,9 +398,11 @@ export default function ContactMessagesPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="whitespace-pre-wrap bg-muted/30 p-4 rounded-md border overflow-x-auto break-words max-w-full word-break">
-                      {viewMessage.message}
-                    </div>
+                    <ScrollArea className="h-[200px]">
+                      <div className="whitespace-pre-wrap bg-muted/30 p-4 rounded-md border overflow-x-auto break-words max-w-full word-break pr-4">
+                        {viewMessage.message}
+                      </div>
+                    </ScrollArea>
                   </CardContent>
                 </Card>
               </div>

@@ -428,7 +428,9 @@ export default function ApplicationsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="whitespace-pre-wrap">{viewApplication.message}</p>
+                    <ScrollArea className="h-[150px]">
+                      <p className="whitespace-pre-wrap pr-4">{viewApplication.message}</p>
+                    </ScrollArea>
                   </CardContent>
                 </Card>
                 
@@ -438,7 +440,9 @@ export default function ApplicationsPage() {
                       <CardTitle className="text-base">Informations supplémentaires</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="whitespace-pre-wrap">{viewApplication.additionalInfo}</p>
+                      <ScrollArea className="h-[150px]">
+                        <p className="whitespace-pre-wrap pr-4">{viewApplication.additionalInfo}</p>
+                      </ScrollArea>
                     </CardContent>
                   </Card>
                 )}
@@ -467,7 +471,9 @@ export default function ApplicationsPage() {
                     </CardHeader>
                     {viewApplication.notes && (
                       <CardContent>
-                        <p className="whitespace-pre-wrap">{viewApplication.notes}</p>
+                        <ScrollArea className="h-[100px]">
+                          <p className="whitespace-pre-wrap pr-4">{viewApplication.notes}</p>
+                        </ScrollArea>
                       </CardContent>
                     )}
                   </Card>
