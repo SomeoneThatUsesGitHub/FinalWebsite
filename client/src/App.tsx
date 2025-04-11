@@ -17,8 +17,6 @@ import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/AuthPage";
 import TestEditor from "@/pages/test-editor";
 import LiveCoveragePage from "@/pages/LiveCoveragePage";
-import LearnPage from "@/pages/LearnPage";
-import LearningTopicPage from "@/pages/LearningTopicPage";
 
 // Pages admin
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -88,8 +86,6 @@ function App() {
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
               <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
-              <Route path="/apprendre" component={LearnPage} />
-              <Route path="/apprendre/:slug" component={LearningTopicPage} />
               
               {/* Routes admin protégées - accessibles aux admins et éditeurs */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
