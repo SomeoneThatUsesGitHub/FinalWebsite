@@ -42,8 +42,15 @@ const cardAnimation = {
   }
 };
 
+// Interface pour les catégories
+interface CourseCategory {
+  id: number;
+  name: string;
+  icon: string;
+}
+
 // Catégories de cours
-const courseCategories = [
+const courseCategories: CourseCategory[] = [
   { id: 1, name: "Institutions", icon: "🏛️" },
   { id: 2, name: "Personnalités", icon: "👥" },
   { id: 3, name: "Événements", icon: "📅" },
@@ -112,7 +119,7 @@ const sampleCourses: Course[] = [
   }
 ];
 
-const CourseCard = ({ course, index }) => {
+const CourseCard: React.FC<{ course: Course; index: number }> = ({ course, index }) => {
   return (
     <motion.div
       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
@@ -151,7 +158,7 @@ const CourseCard = ({ course, index }) => {
 };
 
 const LearnPage: React.FC = () => {
-  const [activeCategory, setActiveCategory] = React.useState(null);
+  const [activeCategory, setActiveCategory] = React.useState<number | null>(null);
   
   const filteredCourses = activeCategory 
     ? sampleCourses.filter(course => course.category === courseCategories.find(cat => cat.id === activeCategory)?.name)
