@@ -398,7 +398,7 @@ export default function ContactMessagesPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="whitespace-pre-wrap bg-muted/30 p-4 rounded-md border">
+                    <div className="whitespace-pre-wrap bg-muted/30 p-4 rounded-md border overflow-x-auto break-words max-w-full word-break">
                       {viewMessage.message}
                     </div>
                   </CardContent>
@@ -416,7 +416,7 @@ export default function ContactMessagesPage() {
                 {viewMessage.assignedTo ? (
                   <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
                     <UserCheck className="h-3 w-3" />
-                    Assigné
+                    Assigné à {viewMessage.assignedToAdmin ? viewMessage.assignedToAdmin.displayName : "un administrateur"}
                   </Badge>
                 ) : (
                   <Button
