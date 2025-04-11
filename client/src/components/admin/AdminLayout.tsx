@@ -15,6 +15,7 @@ import {
   Radio,
   Mail,
   ClipboardList,
+  MessageSquareText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -111,6 +112,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       name: "Candidatures",
       href: "/admin/applications",
       icon: ClipboardList,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+    },
+    {
+      name: "Messages de contact",
+      href: "/admin/messages",
+      icon: MessageSquareText,
       disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {

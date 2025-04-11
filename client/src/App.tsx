@@ -38,6 +38,8 @@ import AdminTeamPage from "@/pages/admin/TeamPage";
 import NewsletterSubscribersPage from "@/pages/admin/NewsletterSubscribersPage";
 // Applications page
 import ApplicationsPage from "@/pages/admin/ApplicationsPage";
+// Contact messages page
+import ContactMessagesPage from "@/pages/admin/ContactMessagesPage";
 
 // Layout
 import Header from "@/components/layout/Header";
@@ -100,6 +102,7 @@ function App() {
               <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
               <ProtectedRoute path="/admin/newsletter" component={NewsletterSubscribersPage} adminOnly />
               <ProtectedRoute path="/admin/applications" component={ApplicationsPage} adminOnly />
+              <ProtectedRoute path="/admin/messages" component={ContactMessagesPage} adminOnly />
               
               {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
               <ProtectedRoute path="/admin/directs" component={DirectsPage} />
