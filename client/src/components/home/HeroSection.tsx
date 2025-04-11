@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import mascotteImg from "@assets/Logos Politiquensemble.png";
 
 // Animations améliorées avec effet de rebond plus accentué
 const fadeInWithBounce = {
@@ -62,18 +61,6 @@ const HeroSection: React.FC = () => {
 
       {/* Contenu */}
       <div className="container mx-auto px-4 py-40 md:py-[calc(50vh-10rem)] lg:py-[calc(50vh-8rem)] relative z-10">
-        {/* Mascotte Pipo grande sur la bannière */}
-        <div className="absolute top-4 right-4 md:top-6 md:right-8 lg:top-12 lg:right-24 transform rotate-2 transition-transform duration-500 hover:rotate-0 hover:scale-105 z-20">
-          <div className="w-28 h-28 md:w-40 md:h-40 lg:w-48 lg:h-48">
-            <img 
-              src={mascotteImg} 
-              alt="Pipo, la mascotte de Politiquensemble" 
-              className="w-full h-full object-contain drop-shadow-2xl"
-              title="Bonjour, je suis Pipo !"
-            />
-          </div>
-        </div>
-        
         <div className={`max-w-4xl ${isMobile ? 'text-left mx-0 pt-16' : 'mx-auto text-center md:text-left md:mx-0'}`}>
           <motion.h1
             variants={fadeInWithBounce}
