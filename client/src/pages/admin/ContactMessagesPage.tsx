@@ -15,8 +15,11 @@ import {
   Eye,
   EyeOff,
   Loader2,
-  Filter
+  Filter,
+  UserCheck,
+  UserPlus
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -69,6 +72,7 @@ type ContactMessage = {
 };
 
 export default function ContactMessagesPage() {
+  const { user } = useAuth();
   const [viewMessage, setViewMessage] = useState<ContactMessage | null>(null);
   const [deleteMessage, setDeleteMessage] = useState<ContactMessage | null>(null);
   const [statusTab, setStatusTab] = useState<"all" | "unread" | "read">("all");
@@ -96,6 +100,32 @@ export default function ContactMessagesPage() {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/contact-messages'] });
       // Ne pas fermer la boîte de dialogue pour permettre de continuer à lire
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Mutation pour assigner un message à un administrateur
+  const assignMessageMutation = useMutation({
+    mutationFn: async ({ messageId, adminId }: { messageId: number, adminId: number }) => {
+      const res = await apiRequest("PATCH", `/api/admin/contact-messages/${messageId}/assign`, { adminId });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Erreur lors de l'assignation du message");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Message assigné",
+        description: "Le message a été assigné avec succès",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/contact-messages'] });
     },
     onError: (error: Error) => {
       toast({
@@ -136,8 +166,8 @@ export default function ContactMessagesPage() {
   // Filtrer les messages selon l'onglet actif
   const filteredMessages = messages.filter(msg => {
     if (statusTab === "all") return true;
-    if (statusTab === "read") return msg.read;
-    if (statusTab === "unread") return !msg.read;
+    if (statusTab === "read") return msg.isRead;
+    if (statusTab === "unread") return !msg.isRead;
     return true;
   });
 
@@ -151,9 +181,15 @@ export default function ContactMessagesPage() {
     setViewMessage(message);
     
     // Si le message n'est pas encore lu, le marquer comme lu
-    if (!message.read) {
+    if (!message.isRead) {
       markAsReadMutation.mutate(message.id);
     }
+  };
+
+  // Gérer l'assignation d'un message
+  const handleAssignMessage = (messageId: number) => {
+    if (!user) return;
+    assignMessageMutation.mutate({ messageId, adminId: user.id });
   };
 
   // Gérer la suppression d'un message
@@ -163,8 +199,8 @@ export default function ContactMessagesPage() {
   };
 
   // Obtenir le nombre de messages par statut
-  const unreadCount = messages.filter(msg => !msg.read).length;
-  const readCount = messages.filter(msg => msg.read).length;
+  const unreadCount = messages.filter(msg => !msg.isRead).length;
+  const readCount = messages.filter(msg => msg.isRead).length;
 
   return (
     <AdminLayout title="Messages de contact">
@@ -224,17 +260,18 @@ export default function ContactMessagesPage() {
                         <TableHead>Sujet</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Statut</TableHead>
+                        <TableHead>Assigné</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredMessages.map((message) => (
-                        <TableRow key={message.id} className={!message.read ? "bg-blue-50/50" : ""}>
+                        <TableRow key={message.id} className={!message.isRead ? "bg-blue-50/50" : ""}>
                           <TableCell className="font-medium">{message.name}</TableCell>
                           <TableCell>{message.subject}</TableCell>
                           <TableCell>{formatDate(message.createdAt)}</TableCell>
                           <TableCell>
-                            {message.read ? (
+                            {message.isRead ? (
                               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
                                 <Eye className="h-3 w-3" />
                                 Lu
@@ -243,6 +280,19 @@ export default function ContactMessagesPage() {
                               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
                                 <EyeOff className="h-3 w-3" />
                                 Non lu
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {message.assignedTo ? (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+                                <UserCheck className="h-3 w-3" />
+                                Assigné
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200 flex items-center gap-1">
+                                <UserPlus className="h-3 w-3" />
+                                Non assigné
                               </Badge>
                             )}
                           </TableCell>
@@ -256,6 +306,17 @@ export default function ContactMessagesPage() {
                                 <FileText className="h-4 w-4 mr-1" />
                                 Voir
                               </Button>
+                              {!message.assignedTo && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-primary hover:text-primary-foreground hover:bg-primary"
+                                  onClick={() => handleAssignMessage(message.id)}
+                                  disabled={assignMessageMutation.isPending}
+                                >
+                                  <UserPlus className="h-4 w-4" />
+                                </Button>
+                              )}
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -342,11 +403,37 @@ export default function ContactMessagesPage() {
             </ScrollArea>
             
             <DialogFooter className="flex items-center justify-between mt-4 gap-4">
-              <div>
-                {!viewMessage.read && (
+              <div className="flex items-center gap-2">
+                {!viewMessage.isRead && (
                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                     Message non lu
                   </Badge>
+                )}
+                {viewMessage.assignedTo ? (
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+                    <UserCheck className="h-3 w-3" />
+                    Assigné
+                  </Badge>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-primary hover:text-primary-foreground hover:bg-primary"
+                    onClick={() => handleAssignMessage(viewMessage.id)}
+                    disabled={assignMessageMutation.isPending}
+                  >
+                    {assignMessageMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        Assignation...
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-3 w-3 mr-1" />
+                        M'assigner
+                      </>
+                    )}
+                  </Button>
                 )}
               </div>
               <div className="flex gap-2">
