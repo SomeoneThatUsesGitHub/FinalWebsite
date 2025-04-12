@@ -2,60 +2,6 @@ import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzl
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Table des permissions administratives
-export const adminPermissions = pgTable("admin_permissions", {
-  id: serial("id").primaryKey(),
-  code: text("code").notNull().unique(), // Nom technique (ex: "manage_articles")
-  displayName: text("display_name").notNull(), // Nom d'affichage (ex: "Gestion des articles")
-  description: text("description").default(""),
-  icon: text("icon").default("FileText"), // Icône Lucide (par défaut)
-  category: text("category").default("content"), // Catégorie de permission (content, users, settings, etc.)
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const insertAdminPermissionSchema = createInsertSchema(adminPermissions).pick({
-  code: true,
-  displayName: true,
-  description: true,
-  icon: true,
-  category: true,
-});
-
-// Table des rôles personnalisés
-export const customRoles = pgTable("custom_roles", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull().unique(), // Nom technique du rôle
-  displayName: text("display_name").notNull(), // Nom d'affichage
-  description: text("description").default(""),
-  color: text("color").default("#6366f1"), // Couleur associée au rôle
-  isSystem: boolean("is_system").default(false), // Rôle système (non supprimable)
-  priority: integer("priority").default(0), // Priorité du rôle (plus élevé = plus important)
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertCustomRoleSchema = createInsertSchema(customRoles).pick({
-  name: true,
-  displayName: true,
-  description: true,
-  color: true,
-  isSystem: true,
-  priority: true,
-});
-
-// Table des permissions associées aux rôles
-export const rolePermissions = pgTable("role_permissions", {
-  id: serial("id").primaryKey(),
-  roleId: integer("role_id").notNull().references(() => customRoles.id, { onDelete: "cascade" }),
-  permissionId: integer("permission_id").notNull().references(() => adminPermissions.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const insertRolePermissionSchema = createInsertSchema(rolePermissions).pick({
-  roleId: true,
-  permissionId: true,
-});
-
 // User schema - for admin functionality
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -63,7 +9,6 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   displayName: text("display_name").notNull(),
   role: text("role").notNull().default("editor"),
-  customRoleId: integer("custom_role_id").references(() => customRoles.id),  // Référence vers un rôle personnalisé
   avatarUrl: text("avatar_url"),
   title: text("title"),  // Grade (Journaliste politique, éditeur, etc.)
   bio: text("bio"),      // Courte biographie
@@ -76,7 +21,6 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   displayName: true,
   role: true,
-  customRoleId: true,
   avatarUrl: true,
   title: true,
   bio: true,
@@ -271,16 +215,6 @@ export const insertEducationalContentSchema = createInsertSchema(educationalCont
   authorId: true,
   published: true,
 });
-
-// Define exported types for permissions and roles
-export type AdminPermission = typeof adminPermissions.$inferSelect;
-export type InsertAdminPermission = z.infer<typeof insertAdminPermissionSchema>;
-
-export type CustomRole = typeof customRoles.$inferSelect;
-export type InsertCustomRole = z.infer<typeof insertCustomRoleSchema>;
-
-export type RolePermission = typeof rolePermissions.$inferSelect;
-export type InsertRolePermission = z.infer<typeof insertRolePermissionSchema>;
 
 // Define exported types
 export type User = typeof users.$inferSelect;

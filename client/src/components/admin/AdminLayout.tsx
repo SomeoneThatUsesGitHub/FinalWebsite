@@ -17,7 +17,6 @@ import {
   ClipboardList,
   MessageSquareText,
   GraduationCap,
-  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -53,137 +52,88 @@ type NavItem = {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
   const [location, setLocation] = useLocation();
-  const { user, logoutMutation, hasPermission } = useAuth();
+  const { user, logoutMutation } = useAuth();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [permissionsLoaded, setPermissionsLoaded] = React.useState(false);
-  const [navItemsWithPermissions, setNavItemsWithPermissions] = React.useState<NavItem[]>([]);
 
-  // Définition des items de navigation avec les codes de permission correspondants
-  const baseNavItems: (NavItem & { permissionCode?: string })[] = [
+  // Navigation items
+  const mainNavItems: NavItem[] = [
     {
       name: "Tableau de bord",
       href: "/admin",
       icon: LayoutDashboard,
-      permissionCode: "dashboard"
     },
     {
       name: "Articles",
       href: "/admin/articles",
       icon: FileText,
-      permissionCode: "articles"
     },
     {
       name: "Catégories",
       href: "/admin/categories",
       icon: Tag,
-      permissionCode: "categories"
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Flash infos",
       href: "/admin/flash-infos",
       icon: Megaphone,
-      permissionCode: "flash_infos"
+      disabled: false,
     },
     {
       name: "Vidéos",
       href: "/admin/videos",
       icon: Video,
-      permissionCode: "videos"
+      disabled: false,
     },
     {
       name: "Directs",
       href: "/admin/directs",
       icon: Radio,
-      permissionCode: "live_coverage"
+      disabled: false, // Les éditeurs ont accès aux directs
     },
     {
       name: "Utilisateurs",
       href: "/admin/users",
       icon: Users,
-      permissionCode: "users"
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Équipe",
       href: "/admin/team",
       icon: Users,
-      permissionCode: "team"
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Newsletter",
       href: "/admin/newsletter",
       icon: Mail,
-      permissionCode: "newsletter"
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Candidatures",
       href: "/admin/applications",
       icon: ClipboardList,
-      permissionCode: "applications"
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Messages de contact",
       href: "/admin/messages",
       icon: MessageSquareText,
-      permissionCode: "messages"
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Contenu éducatif",
       href: "/admin/contenu-educatif",
       icon: GraduationCap,
-      permissionCode: "educational_content"
-    },
-    {
-      name: "Rôles",
-      href: "/admin/roles",
-      icon: ShieldCheck,
-      permissionCode: "roles"
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
       name: "Notes Éditoriales",
       href: "/admin/notes",
       icon: Clipboard,
-      permissionCode: "notes",
-      disabled: true, // Toujours désactivé pour le moment
+      disabled: true,
     },
   ];
-  
-  // Vérifier les permissions pour chaque élément de navigation
-  React.useEffect(() => {
-    async function checkPermissions() {
-      if (!user) {
-        setNavItemsWithPermissions([]);
-        setPermissionsLoaded(true);
-        return;
-      }
-      
-      // Nous n'utilisons plus l'ancien système - tout est basé sur les permissions
-      
-      // Pour les utilisateurs avec un rôle personnalisé, vérifier chaque permission
-      const navItemsPromises = baseNavItems.map(async (item) => {
-        if (item.permissionCode) {
-          const hasAccess = await hasPermission(item.permissionCode);
-          return {
-            ...item,
-            disabled: item.disabled === true || !hasAccess
-          };
-        }
-        // Si pas de code de permission défini, désactiver par défaut
-        return {
-          ...item,
-          disabled: true
-        };
-      });
-      
-      const resolvedNavItems = await Promise.all(navItemsPromises);
-      setNavItemsWithPermissions(resolvedNavItems);
-      setPermissionsLoaded(true);
-    }
-    
-    checkPermissions();
-  }, [user, hasPermission]);
-  
-  // Utiliser les éléments de navigation avec les permissions chargées
-  const mainNavItems = permissionsLoaded ? navItemsWithPermissions : [];
 
   // Fonction pour déterminer si un élément de nav est actif
   const isActive = (href: string) => {
@@ -256,7 +206,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
                 <div className="ml-3">
                   <p className="text-sm font-medium">{user?.username || "Utilisateur"}</p>
                   <p className="text-xs text-muted-foreground">
-                    {user?.customRoleName || "Rôle personnalisé"}
+                    {user?.role === "admin" || user?.isAdmin 
+                      ? "Administrateur" 
+                      : user?.role === "editor" 
+                        ? "Éditeur" 
+                        : "Utilisateur"}
                   </p>
                 </div>
               </div>
@@ -342,7 +296,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
               <div className="ml-3">
                 <p className="text-sm font-medium">{user?.username || "Utilisateur"}</p>
                 <p className="text-xs text-muted-foreground">
-                  {user?.customRoleName || "Rôle personnalisé"}
+                  {user?.role === "admin" || user?.isAdmin
+                    ? "Administrateur"
+                    : user?.role === "editor"
+                      ? "Éditeur"
+                      : "Utilisateur"}
                 </p>
               </div>
             </div>

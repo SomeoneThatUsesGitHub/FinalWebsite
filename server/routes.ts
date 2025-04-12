@@ -14,7 +14,6 @@ import {
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { createUser, updateUserPassword, listUsers, deleteUser, updateUserProfile, getTeamMembers } from "./userManagement";
-import rolesRoutes from "./routes/admin/roles";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes - prefix all with /api
@@ -507,11 +506,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             displayName: user.displayName,
             role: user.role,
             avatarUrl: user.avatarUrl,
-            isAdmin: user.role === "admin",
-            customRoleId: user.customRoleId || null
+            isAdmin: user.role === "admin"
           };
-          
-          console.log("Login réussi pour:", user.username, "- Rôle:", user.role, "- Rôle personnalisé ID:", user.customRoleId);
           
           return res.json({ user: safeUser });
         });
@@ -558,8 +554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           displayName: newUser.displayName,
           role: newUser.role,
           avatarUrl: newUser.avatarUrl,
-          isAdmin: newUser.role === "admin",
-          customRoleId: newUser.customRoleId || null
+          isAdmin: newUser.role === "admin"
         };
         
         return res.status(201).json({ user: safeUser });
@@ -593,8 +588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       displayName: user.displayName || user.username,
       role: user.role || "user",
       avatarUrl: user.avatarUrl || null,
-      isAdmin: user.role === "admin" || !!user.isAdmin,
-      customRoleId: user.customRoleId || null
+      isAdmin: user.role === "admin" || !!user.isAdmin
     };
     
     // Log pour debugging
@@ -602,32 +596,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Retourner l'utilisateur directement (sans l'encapsuler dans un objet)
     res.json(safeUser);
-  });
-  
-  // Route pour vérifier si l'utilisateur a une permission spécifique
-  app.get("/api/auth/check-permission", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const permissionCode = req.query.code as string;
-      
-      if (!permissionCode) {
-        return res.status(400).json({ 
-          message: "Code de permission manquant", 
-          hasPermission: false 
-        });
-      }
-      
-      const userId = (req.user as any).id;
-      const { hasPermission } = await import("./auth");
-      const result = await hasPermission(userId, permissionCode);
-      
-      res.json({ hasPermission: result });
-    } catch (error) {
-      console.error("Erreur lors de la vérification des permissions:", error);
-      res.status(500).json({ 
-        message: "Erreur lors de la vérification des permissions", 
-        hasPermission: false 
-      });
-    }
   });
   
   // Route pour récupérer les articles d'un utilisateur connecté
@@ -2244,9 +2212,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-  
-  // Routes admin pour la gestion des rôles
-  app.use("/api/admin/roles", rolesRoutes);
 
   const httpServer = createServer(app);
   return httpServer;

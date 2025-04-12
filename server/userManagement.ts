@@ -11,7 +11,6 @@ export async function createUser(userData: {
   displayName: string;
   password: string;
   role: string;
-  customRoleId?: number | null;
   avatarUrl?: string;
   title?: string;
   bio?: string;
@@ -37,7 +36,6 @@ export async function createUser(userData: {
       displayName: userData.displayName,
       password: hashedPassword,
       role: userData.role as any,
-      customRoleId: userData.customRoleId || null,
       avatarUrl: userData.avatarUrl || null,
       title: userData.title || null,
       bio: userData.bio || null,
@@ -108,7 +106,6 @@ export async function listUsers() {
       username: users.username,
       displayName: users.displayName,
       role: users.role,
-      customRoleId: users.customRoleId,
       avatarUrl: users.avatarUrl,
       title: users.title,
       bio: users.bio,
@@ -136,7 +133,6 @@ export async function listUsers() {
 export async function updateUserProfile(username: string, userData: {
   displayName?: string;
   role?: string;
-  customRoleId?: number | null;
   avatarUrl?: string;
   title?: string;
   bio?: string;
@@ -163,7 +159,6 @@ export async function updateUserProfile(username: string, userData: {
     const updateData = {
       displayName: userData.displayName !== undefined ? userData.displayName : existingUser[0].displayName,
       role: userData.role !== undefined ? userData.role as any : existingUser[0].role,
-      customRoleId: userData.customRoleId !== undefined ? userData.customRoleId : existingUser[0].customRoleId,
       avatarUrl: userData.avatarUrl !== undefined ? userData.avatarUrl : existingUser[0].avatarUrl,
       title: userData.title !== undefined ? userData.title : existingUser[0].title,
       bio: userData.bio !== undefined ? userData.bio : existingUser[0].bio,

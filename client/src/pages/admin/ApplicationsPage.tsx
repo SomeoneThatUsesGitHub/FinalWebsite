@@ -341,12 +341,9 @@ export default function ApplicationsPage() {
       </div>
 
       {/* Dialog de visualisation d'une candidature */}
-      <Dialog 
-        open={!!viewApplication} 
-        onOpenChange={(open) => !open && setViewApplication(null)}
-      >
+      <Dialog open={!!viewApplication} onOpenChange={(open) => !open && setViewApplication(null)}>
         {viewApplication && (
-          <DialogContent className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[800px] max-h-[85vh] overflow-hidden flex flex-col">
             <DialogHeader>
               <DialogTitle className="text-2xl">Candidature de {viewApplication.fullName}</DialogTitle>
               <DialogDescription>
@@ -354,133 +351,135 @@ export default function ApplicationsPage() {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="mt-2 pr-4 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center">
-                      <User className="h-4 w-4 mr-2" />
-                      Informations personnelles
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div>
-                      <span className="font-medium">Nom complet:</span>
-                      <p>{viewApplication.fullName}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium">Email:</span>
-                      <p className="flex items-center">
-                        <Mail className="h-4 w-4 mr-1" />
-                        <a href={`mailto:${viewApplication.email}`} className="text-blue-600 hover:underline">
-                          {viewApplication.email}
-                        </a>
-                      </p>
-                    </div>
-                    {viewApplication.phone && (
+            <ScrollArea className="flex-grow mt-2 pr-4">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center">
+                        <User className="h-4 w-4 mr-2" />
+                        Informations personnelles
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
                       <div>
-                        <span className="font-medium">Téléphone:</span>
+                        <span className="font-medium">Nom complet:</span>
+                        <p>{viewApplication.fullName}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Email:</span>
                         <p className="flex items-center">
-                          <Phone className="h-4 w-4 mr-1" />
-                          {viewApplication.phone}
+                          <Mail className="h-4 w-4 mr-1" />
+                          <a href={`mailto:${viewApplication.email}`} className="text-blue-600 hover:underline">
+                            {viewApplication.email}
+                          </a>
                         </p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                      {viewApplication.phone && (
+                        <div>
+                          <span className="font-medium">Téléphone:</span>
+                          <p className="flex items-center">
+                            <Phone className="h-4 w-4 mr-1" />
+                            {viewApplication.phone}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center">
+                        <Briefcase className="h-4 w-4 mr-2" />
+                        Informations professionnelles
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div>
+                        <span className="font-medium">Poste souhaité:</span>
+                        <p>{getPositionText(viewApplication.position)}</p>
+                      </div>
+
+                      {viewApplication.portfolio && (
+                        <div>
+                          <span className="font-medium">Portfolio:</span>
+                          <p className="flex items-center">
+                            <ExternalLink className="h-4 w-4 mr-1" />
+                            <a 
+                              href={viewApplication.portfolio} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline truncate"
+                            >
+                              {viewApplication.portfolio}
+                            </a>
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
                 
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center">
-                      <Briefcase className="h-4 w-4 mr-2" />
-                      Informations professionnelles
+                      <MessageSquareQuote className="h-4 w-4 mr-2" />
+                      Motivation
                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div>
-                      <span className="font-medium">Poste souhaité:</span>
-                      <p>{getPositionText(viewApplication.position)}</p>
-                    </div>
-
-                    {viewApplication.portfolio && (
-                      <div>
-                        <span className="font-medium">Portfolio:</span>
-                        <p className="flex items-center">
-                          <ExternalLink className="h-4 w-4 mr-1" />
-                          <a 
-                            href={viewApplication.portfolio} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline truncate"
-                          >
-                            {viewApplication.portfolio}
-                          </a>
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center">
-                    <MessageSquareQuote className="h-4 w-4 mr-2" />
-                    Motivation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="max-h-[150px] overflow-y-auto pr-2">
-                    <p className="whitespace-pre-wrap">{viewApplication.message}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {viewApplication.additionalInfo && (
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Informations supplémentaires</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="max-h-[150px] overflow-y-auto pr-2">
-                      <p className="whitespace-pre-wrap">{viewApplication.additionalInfo}</p>
-                    </div>
+                    <ScrollArea className="h-[150px]">
+                      <p className="whitespace-pre-wrap pr-4">{viewApplication.message}</p>
+                    </ScrollArea>
                   </CardContent>
                 </Card>
-              )}
-              
-              {viewApplication.status !== "pending" && (
-                <Card className={`border-l-4 ${
-                  viewApplication.status === "approved" ? "border-l-green-500" : "border-l-red-500"
-                }`}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center">
-                      {viewApplication.status === "approved" ? (
-                        <Check className="h-4 w-4 mr-2 text-green-500" />
-                      ) : (
-                        <X className="h-4 w-4 mr-2 text-red-500" />
-                      )}
-                      {viewApplication.status === "approved" ? "Candidature approuvée" : "Candidature refusée"}
-                    </CardTitle>
-                    {viewApplication.reviewedAt && (
-                      <CardDescription>
-                        Revue le {formatDate(viewApplication.reviewedAt)}
-                        {viewApplication.reviewerName && (
-                          <> par <span className="font-medium">{viewApplication.reviewerName}</span></>
-                        )}
-                      </CardDescription>
-                    )}
-                  </CardHeader>
-                  {viewApplication.notes && (
+                
+                {viewApplication.additionalInfo && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Informations supplémentaires</CardTitle>
+                    </CardHeader>
                     <CardContent>
-                      <div className="max-h-[100px] overflow-y-auto pr-2">
-                        <p className="whitespace-pre-wrap">{viewApplication.notes}</p>
-                      </div>
+                      <ScrollArea className="h-[150px]">
+                        <p className="whitespace-pre-wrap pr-4">{viewApplication.additionalInfo}</p>
+                      </ScrollArea>
                     </CardContent>
-                  )}
-                </Card>
-              )}
-            </div>
+                  </Card>
+                )}
+                
+                {viewApplication.status !== "pending" && (
+                  <Card className={`border-l-4 ${
+                    viewApplication.status === "approved" ? "border-l-green-500" : "border-l-red-500"
+                  }`}>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center">
+                        {viewApplication.status === "approved" ? (
+                          <Check className="h-4 w-4 mr-2 text-green-500" />
+                        ) : (
+                          <X className="h-4 w-4 mr-2 text-red-500" />
+                        )}
+                        {viewApplication.status === "approved" ? "Candidature approuvée" : "Candidature refusée"}
+                      </CardTitle>
+                      {viewApplication.reviewedAt && (
+                        <CardDescription>
+                          Revue le {formatDate(viewApplication.reviewedAt)}
+                          {viewApplication.reviewerName && (
+                            <> par <span className="font-medium">{viewApplication.reviewerName}</span></>
+                          )}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    {viewApplication.notes && (
+                      <CardContent>
+                        <ScrollArea className="h-[100px]">
+                          <p className="whitespace-pre-wrap pr-4">{viewApplication.notes}</p>
+                        </ScrollArea>
+                      </CardContent>
+                    )}
+                  </Card>
+                )}
+              </div>
+            </ScrollArea>
             
             <DialogFooter className="mt-4">
               <Button variant="outline" onClick={() => setViewApplication(null)}>
@@ -492,10 +491,7 @@ export default function ApplicationsPage() {
       </Dialog>
 
       {/* Dialog d'évaluation d'une candidature */}
-      <Dialog 
-        open={!!reviewApplication} 
-        onOpenChange={(open) => !open && setReviewApplication(null)}
-      >
+      <Dialog open={!!reviewApplication} onOpenChange={(open) => !open && setReviewApplication(null)}>
         {reviewApplication && (
           <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
             <DialogHeader>
@@ -517,7 +513,7 @@ export default function ApplicationsPage() {
               </div>
             </div>
             
-            <DialogFooter className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-2 mt-4">
+            <DialogFooter className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-2">
               <Button variant="outline" onClick={() => setReviewApplication(null)}>
                 Annuler
               </Button>
@@ -551,10 +547,7 @@ export default function ApplicationsPage() {
       </Dialog>
 
       {/* Dialog de confirmation de suppression */}
-      <Dialog 
-        open={!!deleteApplication} 
-        onOpenChange={(open) => !open && setDeleteApplication(null)}
-      >
+      <Dialog open={!!deleteApplication} onOpenChange={(open) => !open && setDeleteApplication(null)}>
         {deleteApplication && (
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -565,7 +558,7 @@ export default function ApplicationsPage() {
               </DialogDescription>
             </DialogHeader>
             
-            <DialogFooter className="mt-4">
+            <DialogFooter>
               <Button variant="outline" onClick={() => setDeleteApplication(null)}>
                 Annuler
               </Button>
