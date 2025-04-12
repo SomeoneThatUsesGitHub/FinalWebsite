@@ -248,6 +248,125 @@ const LearnPage: React.FC = () => {
       </div>
       
       <div className="container mx-auto px-4 py-3 mb-12">
+        {/* Barre de recherche et filtres */}
+        <motion.div 
+          className="mb-6 flex justify-between items-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            y: 0,
+            transition: {
+              type: "spring",
+              stiffness: 260,
+              damping: 20,
+              delay: 0.3
+            }
+          }}
+        >
+          {!showFilters && (
+            <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-none">
+              <Badge 
+                variant={!searchTerm && sortOrder === "latest" ? "default" : "outline"}
+                className="cursor-pointer py-2 px-4"
+                onClick={() => {
+                  setSearchTerm("");
+                  setSortOrder("latest");
+                }}
+              >
+                <Tag className="mr-1 h-4 w-4" />
+                Tous les sujets
+              </Badge>
+              
+              <Badge 
+                variant={sortOrder === "resourceCount" ? "default" : "outline"}
+                className="cursor-pointer py-2 px-4 whitespace-nowrap"
+                onClick={() => setSortOrder("resourceCount")}
+              >
+                <BookOpen className="mr-1 h-4 w-4" />
+                Plus de contenu
+              </Badge>
+              
+              <Badge 
+                variant={sortOrder === "alphabetical" ? "default" : "outline"}
+                className="cursor-pointer py-2 px-4"
+                onClick={() => setSortOrder("alphabetical")}
+              >
+                <Calendar className="mr-1 h-4 w-4" />
+                Alphabétique
+              </Badge>
+            </div>
+          )}
+          
+          <div className="flex items-center">
+            {!showFilters && (
+              <div className="relative max-w-xs mr-2">
+                <Input
+                  type="text"
+                  placeholder="Rechercher..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 h-10 text-sm"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center text-xs"
+              onClick={toggleFilters}
+            >
+              <Sliders className="h-4 w-4 mr-1" />
+              Filtres
+            </Button>
+          </div>
+        </motion.div>
+        
+        {showFilters && (
+          <div className="mb-8 bg-white p-4 rounded-xl shadow-md border border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <div className="relative md:col-span-7">
+                <Input
+                  type="text"
+                  placeholder="Rechercher dans les sujets..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="md:col-span-5">
+                <Select value={sortOrder} onValueChange={(value) => setSortOrder(value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Trier par" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="latest">Les plus récents</SelectItem>
+                    <SelectItem value="alphabetical">Ordre alphabétique</SelectItem>
+                    <SelectItem value="resourceCount">Nombre de ressources</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {searchTerm && (
+          <div className="mb-4 text-sm text-muted-foreground">
+            Résultats pour "{searchTerm}" ({filteredTopics.length} sujet{filteredTopics.length !== 1 ? 's' : ''} trouvé{filteredTopics.length !== 1 ? 's' : ''})
+            {searchTerm && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ml-2 h-7 px-2 text-xs"
+                onClick={() => setSearchTerm("")}
+              >
+                Effacer
+              </Button>
+            )}
+          </div>
+        )}
+        
         <TopicsContent />
       </div>
     </motion.div>
