@@ -2,7 +2,7 @@
  * Ce script pousse le schéma des cours éducatifs vers la base de données
  */
 
-import { courses, chapters, lessons } from "@shared/schema";
+import { courses, chapters, lessons } from "../shared/schema";
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { migrate } from "drizzle-orm/neon-serverless/migrator";

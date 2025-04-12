@@ -14,7 +14,10 @@ import {
   liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion,
   newsletterSubscribers, type NewsletterSubscriber, type InsertNewsletterSubscriber,
   teamApplications, type TeamApplication, type InsertTeamApplication,
-  contactMessages, type ContactMessage, type InsertContactMessage
+  contactMessages, type ContactMessage, type InsertContactMessage,
+  courses, type Course, type InsertCourse,
+  chapters, type Chapter, type InsertChapter,
+  lessons, type Lesson, type InsertLesson
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte, sql, lt } from "drizzle-orm";
@@ -50,6 +53,31 @@ export interface IStorage {
   markContactMessageAsRead(id: number): Promise<ContactMessage | undefined>;
   assignMessageToAdmin(id: number, adminId: number): Promise<ContactMessage | undefined>;
   deleteContactMessage(id: number): Promise<boolean>;
+  
+  // Courses operations
+  getAllCourses(showUnpublished?: boolean): Promise<Course[]>;
+  getCourseById(id: number): Promise<Course | undefined>;
+  getCourseBySlug(slug: string): Promise<Course | undefined>;
+  createCourse(course: InsertCourse): Promise<Course>;
+  updateCourse(id: number, courseData: Partial<InsertCourse>): Promise<Course | undefined>;
+  deleteCourse(id: number): Promise<boolean>;
+  
+  // Chapters operations
+  getChaptersByCourseId(courseId: number): Promise<Chapter[]>;
+  getChapterById(id: number): Promise<Chapter | undefined>;
+  createChapter(chapter: InsertChapter): Promise<Chapter>;
+  updateChapter(id: number, chapterData: Partial<InsertChapter>): Promise<Chapter | undefined>;
+  deleteChapter(id: number): Promise<boolean>;
+  
+  // Lessons operations
+  getLessonsByChapterId(chapterId: number): Promise<Lesson[]>;
+  getLessonById(id: number): Promise<Lesson | undefined>;
+  createLesson(lesson: InsertLesson): Promise<Lesson>;
+  updateLesson(id: number, lessonData: Partial<InsertLesson>): Promise<Lesson | undefined>;
+  deleteLesson(id: number): Promise<boolean>;
+  
+  // Fonctions spéciales
+  getFullCourseDataBySlug(slug: string): Promise<(Course & { chapters: (Chapter & { lessons: Lesson[] })[] }) | undefined>;
   
   // Article operations
   getAllArticles(filters?: {categoryId?: number, search?: string, sort?: string, year?: number, showUnpublished?: boolean, authorId?: number}): Promise<Article[]>;
