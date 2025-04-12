@@ -18,7 +18,7 @@ import AuthPage from "@/pages/AuthPage";
 import TestEditor from "@/pages/test-editor";
 import LiveCoveragePage from "@/pages/LiveCoveragePage";
 import LearnPage from "@/pages/LearnPage";
-import SimpleCourseDetailPage from "@/pages/SimpleCourseDetailPage";
+import CourseDetailPage from "@/pages/CourseDetailPage";
 
 // Pages admin
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -86,7 +86,7 @@ function App() {
               <Route path="/a-propos" component={AboutPage} />
               <Route path="/contact" component={ContactPage} />
               <Route path="/apprendre" component={LearnPage} />
-              <Route path="/apprendre/:courseSlug" component={SimpleCourseDetailPage} />
+              <Route path="/cours/:slug" component={CourseDetailPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
               <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />

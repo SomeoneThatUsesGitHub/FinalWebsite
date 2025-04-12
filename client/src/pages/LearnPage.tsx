@@ -136,7 +136,7 @@ const CourseCard: React.FC<{ course: Course; index: number }> = ({ course, index
   
   // Gestion du clic sur la carte
   const handleCardClick = () => {
-    navigate(`/apprendre/${courseSlug}`);
+    navigate(`/cours/${courseSlug}`);
   };
   
   return (
