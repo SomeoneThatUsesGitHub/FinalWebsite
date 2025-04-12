@@ -162,23 +162,56 @@ export const insertElectionSchema = createInsertSchema(elections).pick({
   upcoming: true,
 });
 
-// Educational Content schema - for the "Learn" section
+// Educational Topics schema - for main topics in the "Learn" section
+export const educationalTopics = pgTable("educational_topics", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description").notNull(),
+  imageUrl: text("image_url").notNull(),
+  icon: text("icon"), // Icône pour représenter le sujet (nom de l'icône Lucide-React)
+  color: text("color").notNull().default("#3B82F6"), // Couleur d'accentuation
+  order: integer("order").notNull().default(0), // Pour ordonner les sujets
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertEducationalTopicSchema = createInsertSchema(educationalTopics).pick({
+  title: true,
+  slug: true,
+  description: true,
+  imageUrl: true,
+  icon: true,
+  color: true,
+  order: true,
+});
+
+// Educational Content schema - for specific lessons within topics
 export const educationalContent = pgTable("educational_content", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  content: text("content").notNull(),
+  summary: text("summary").notNull(), // Résumé court du contenu
   imageUrl: text("image_url").notNull(),
-  content: text("content"),
-  categoryId: integer("category_id").references(() => categories.id),
+  topicId: integer("topic_id").references(() => educationalTopics.id).notNull(),
+  authorId: integer("author_id").references(() => users.id),
+  published: boolean("published").notNull().default(true),
   likes: integer("likes").notNull().default(0),
-  comments: integer("comments").notNull().default(0),
+  views: integer("views").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const insertEducationalContentSchema = createInsertSchema(educationalContent).pick({
   title: true,
-  imageUrl: true,
+  slug: true,
   content: true,
-  categoryId: true,
+  summary: true,
+  imageUrl: true,
+  topicId: true,
+  authorId: true,
+  published: true,
 });
 
 // Define exported types
@@ -202,6 +235,9 @@ export type InsertLiveEvent = z.infer<typeof insertLiveEventSchema>;
 
 export type Election = typeof elections.$inferSelect;
 export type InsertElection = z.infer<typeof insertElectionSchema>;
+
+export type EducationalTopic = typeof educationalTopics.$inferSelect;
+export type InsertEducationalTopic = z.infer<typeof insertEducationalTopicSchema>;
 
 export type EducationalContent = typeof educationalContent.$inferSelect;
 export type InsertEducationalContent = z.infer<typeof insertEducationalContentSchema>;

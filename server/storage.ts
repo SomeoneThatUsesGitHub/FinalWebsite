@@ -711,11 +711,68 @@ export class DatabaseStorage implements IStorage {
     return election;
   }
 
-  async getAllEducationalContent(categoryId?: number): Promise<EducationalContent[]> {
+  // Gestion des sujets éducatifs
+  async getAllEducationalTopics(): Promise<EducationalTopic[]> {
+    return db.select()
+      .from(educationalTopics)
+      .orderBy(educationalTopics.order);
+  }
+
+  async getEducationalTopicById(id: number): Promise<EducationalTopic | undefined> {
+    const [topic] = await db.select()
+      .from(educationalTopics)
+      .where(eq(educationalTopics.id, id));
+    
+    return topic;
+  }
+
+  async getEducationalTopicBySlug(slug: string): Promise<EducationalTopic | undefined> {
+    const [topic] = await db.select()
+      .from(educationalTopics)
+      .where(eq(educationalTopics.slug, slug));
+    
+    return topic;
+  }
+
+  async createEducationalTopic(insertTopic: InsertEducationalTopic): Promise<EducationalTopic> {
+    const [topic] = await db
+      .insert(educationalTopics)
+      .values({
+        ...insertTopic,
+        imageUrl: insertTopic.imageUrl,
+        icon: insertTopic.icon || null
+      })
+      .returning();
+    return topic;
+  }
+
+  async updateEducationalTopic(id: number, updateData: Partial<InsertEducationalTopic>): Promise<EducationalTopic | undefined> {
+    const [topic] = await db
+      .update(educationalTopics)
+      .set({
+        ...updateData,
+        updatedAt: new Date()
+      })
+      .where(eq(educationalTopics.id, id))
+      .returning();
+    
+    return topic;
+  }
+
+  async deleteEducationalTopic(id: number): Promise<boolean> {
+    const result = await db
+      .delete(educationalTopics)
+      .where(eq(educationalTopics.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  // Gestion du contenu éducatif
+  async getAllEducationalContent(topicId?: number): Promise<EducationalContent[]> {
     let query = db.select().from(educationalContent);
     
-    if (categoryId) {
-      query = query.where(eq(educationalContent.categoryId, categoryId));
+    if (topicId) {
+      query = query.where(eq(educationalContent.topicId, topicId));
     }
     
     return query.orderBy(educationalContent.title);
@@ -729,16 +786,53 @@ export class DatabaseStorage implements IStorage {
     return content;
   }
 
+  async getEducationalContentBySlug(slug: string): Promise<EducationalContent | undefined> {
+    const [content] = await db.select()
+      .from(educationalContent)
+      .where(eq(educationalContent.slug, slug));
+    
+    return content;
+  }
+
   async createEducationalContent(insertContent: InsertEducationalContent): Promise<EducationalContent> {
     const [content] = await db
       .insert(educationalContent)
       .values({
         ...insertContent,
-        imageUrl: insertContent.imageUrl || null,
-        categoryId: insertContent.categoryId || null
+        imageUrl: insertContent.imageUrl
       })
       .returning();
     return content;
+  }
+
+  async updateEducationalContent(id: number, updateData: Partial<InsertEducationalContent>): Promise<EducationalContent | undefined> {
+    const [content] = await db
+      .update(educationalContent)
+      .set({
+        ...updateData,
+        updatedAt: new Date()
+      })
+      .where(eq(educationalContent.id, id))
+      .returning();
+    
+    return content;
+  }
+
+  async deleteEducationalContent(id: number): Promise<boolean> {
+    const result = await db
+      .delete(educationalContent)
+      .where(eq(educationalContent.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  async incrementEducationalContentViews(id: number): Promise<void> {
+    await db
+      .update(educationalContent)
+      .set({
+        views: sql`${educationalContent.views} + 1`
+      })
+      .where(eq(educationalContent.id, id));
   }
 
   async getAllVideos(limit: number = 8): Promise<Video[]> {
@@ -1109,6 +1203,9 @@ async function initializeDb() {
       avatarUrl: null
     });
   }
+  
+  // Vérification s'il y a des sujets éducatifs
+  await initializeEducationalTopics();
 }
 
 // Initialiser spécifiquement les vidéos
@@ -1138,6 +1235,74 @@ async function initializeVideosOnly() {
         categoryId: 1
       }
     ]);
+  }
+}
+
+// Initialiser les sujets éducatifs
+async function initializeEducationalTopics() {
+  // Vérifier s'il y a déjà des sujets éducatifs
+  const topicsCount = await db.select({ count: sql<number>`count(*)` }).from(educationalTopics);
+  
+  if (topicsCount[0].count === 0) {
+    console.log("Initializing educational topics...");
+    
+    // Insérer des sujets éducatifs par défaut
+    await db.insert(educationalTopics).values([
+      { 
+        title: "Institutions politiques", 
+        slug: "institutions-politiques", 
+        description: "Tout ce qu'il faut savoir sur le fonctionnement des institutions politiques françaises et européennes.",
+        imageUrl: "https://picsum.photos/id/10/800/400",
+        icon: "GavelIcon",
+        color: "#3B82F6",
+        order: 1
+      },
+      { 
+        title: "Élections", 
+        slug: "elections", 
+        description: "Comprendre les différents systèmes électoraux et les enjeux des élections.",
+        imageUrl: "https://picsum.photos/id/20/800/400",
+        icon: "VoteIcon",
+        color: "#10B981",
+        order: 2
+      },
+      { 
+        title: "Budget et finances publiques", 
+        slug: "finances-publiques", 
+        description: "Décryptage du budget de l'État et des finances publiques.",
+        imageUrl: "https://picsum.photos/id/30/800/400",
+        icon: "BarChart2Icon",
+        color: "#F59E0B",
+        order: 3
+      },
+      { 
+        title: "Union européenne", 
+        slug: "union-europeenne", 
+        description: "Fonctionnement et enjeux de l'Union européenne.",
+        imageUrl: "https://picsum.photos/id/40/800/400",
+        icon: "GlobeIcon",
+        color: "#6366F1",
+        order: 4
+      }
+    ]);
+
+    // Ajouter des contenus pour ces sujets
+    const topics = await db.select().from(educationalTopics);
+    
+    if (topics.length > 0) {
+      for (const topic of topics) {
+        await db.insert(educationalContent).values({
+          title: `Introduction à ${topic.title}`,
+          slug: `introduction-a-${topic.slug}`,
+          content: `<h2>Introduction à ${topic.title}</h2><p>Ce contenu vous explique les bases sur ${topic.title}.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nunc, quis aliquam nisl nunc eu nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nunc, quis aliquam nisl nunc eu nisl.</p><h3>Points clés</h3><ul><li>Point 1</li><li>Point 2</li><li>Point 3</li></ul>`,
+          summary: `Une introduction complète aux concepts fondamentaux de ${topic.title}.`,
+          imageUrl: topic.imageUrl,
+          topicId: topic.id,
+          authorId: 1, // Administrateur
+          published: true
+        });
+      }
+    }
   }
 }
 
