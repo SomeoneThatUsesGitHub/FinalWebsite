@@ -726,9 +726,27 @@ export class DatabaseStorage implements IStorage {
 
   // Gestion des sujets éducatifs
   async getAllEducationalTopics(): Promise<EducationalTopic[]> {
-    return db.select()
+    // Récupérer les sujets et leur nombre de contenus associés
+    const topicsWithContentCount = await db
+      .select({
+        id: educationalTopics.id,
+        title: educationalTopics.title,
+        slug: educationalTopics.slug,
+        description: educationalTopics.description,
+        imageUrl: educationalTopics.imageUrl,
+        icon: educationalTopics.icon,
+        color: educationalTopics.color,
+        order: educationalTopics.order,
+        createdAt: educationalTopics.createdAt,
+        updatedAt: educationalTopics.updatedAt,
+        contentCount: sql<number>`COUNT(${educationalContent.id})::integer`
+      })
       .from(educationalTopics)
+      .leftJoin(educationalContent, eq(educationalTopics.id, educationalContent.topicId))
+      .groupBy(educationalTopics.id)
       .orderBy(educationalTopics.order);
+    
+    return topicsWithContentCount;
   }
 
   async getEducationalTopicById(id: number): Promise<EducationalTopic | undefined> {

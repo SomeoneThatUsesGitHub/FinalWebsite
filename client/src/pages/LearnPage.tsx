@@ -131,9 +131,11 @@ const LearnPage: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-4">
-                  {topic.description}
-                </p>
+                <div className="max-h-24 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                  <p className="text-sm text-muted-foreground break-words">
+                    {topic.description}
+                  </p>
+                </div>
               </CardContent>
               <CardFooter>
                 <Button asChild variant="outline">
