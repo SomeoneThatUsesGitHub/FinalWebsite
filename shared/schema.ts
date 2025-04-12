@@ -172,6 +172,7 @@ export const educationalTopics = pgTable("educational_topics", {
   icon: text("icon"), // Icône pour représenter le sujet (nom de l'icône Lucide-React)
   color: text("color").notNull().default("#3B82F6"), // Couleur d'accentuation
   order: integer("order").notNull().default(0), // Pour ordonner les sujets
+  authorId: integer("author_id").references(() => users.id), // Auteur du sujet
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -184,6 +185,7 @@ export const insertEducationalTopicSchema = createInsertSchema(educationalTopics
   icon: true,
   color: true,
   order: true,
+  authorId: true,
 });
 
 // Educational Content schema - for specific lessons within topics

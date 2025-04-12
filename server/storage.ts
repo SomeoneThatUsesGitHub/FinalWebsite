@@ -725,8 +725,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Gestion des sujets éducatifs
-  async getAllEducationalTopics(): Promise<EducationalTopic[]> {
-    // Récupérer les sujets et leur nombre de contenus associés
+  async getAllEducationalTopics(): Promise<(EducationalTopic & {
+    contentCount: number, 
+    author?: { 
+      displayName: string, 
+      title: string | null, 
+      avatarUrl: string | null 
+    }
+  })[]> {
+    // Récupérer les sujets et leur nombre de contenus associés, ainsi que l'auteur
     const topicsWithContentCount = await db
       .select({
         id: educationalTopics.id,
@@ -737,16 +744,39 @@ export class DatabaseStorage implements IStorage {
         icon: educationalTopics.icon,
         color: educationalTopics.color,
         order: educationalTopics.order,
+        authorId: educationalTopics.authorId,
         createdAt: educationalTopics.createdAt,
         updatedAt: educationalTopics.updatedAt,
-        contentCount: sql<number>`COUNT(${educationalContent.id})::integer`
+        contentCount: sql<number>`COUNT(${educationalContent.id})::integer`,
+        authorDisplayName: users.displayName,
+        authorTitle: users.title,
+        authorAvatarUrl: users.avatarUrl
       })
       .from(educationalTopics)
       .leftJoin(educationalContent, eq(educationalTopics.id, educationalContent.topicId))
-      .groupBy(educationalTopics.id)
+      .leftJoin(users, eq(educationalTopics.authorId, users.id))
+      .groupBy(educationalTopics.id, users.id)
       .orderBy(educationalTopics.order);
     
-    return topicsWithContentCount;
+    // Transformer les résultats pour ajouter les informations de l'auteur
+    return topicsWithContentCount.map(topic => {
+      const { authorDisplayName, authorTitle, authorAvatarUrl, ...topicData } = topic;
+      
+      const result: any = {
+        ...topicData,
+      };
+      
+      // Si l'auteur existe, ajouter ses informations
+      if (authorDisplayName) {
+        result.author = {
+          displayName: authorDisplayName,
+          title: authorTitle,
+          avatarUrl: authorAvatarUrl
+        };
+      }
+      
+      return result;
+    });
   }
 
   async getEducationalTopicById(id: number): Promise<EducationalTopic | undefined> {
