@@ -131,8 +131,8 @@ const LearnPage: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="max-h-24 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                  <p className="text-sm text-muted-foreground break-words">
+                <div className="max-h-24 overflow-y-auto pr-1 overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                  <p className="text-sm text-muted-foreground break-words whitespace-normal overflow-wrap-anywhere w-full">
                     {topic.description}
                   </p>
                 </div>
