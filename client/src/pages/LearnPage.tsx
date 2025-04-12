@@ -269,103 +269,71 @@ const LearnPage: React.FC = () => {
         )}
       </div>
       
-      {/* Section suggestion de thèmes - Effet carnet de notes */}
-      <div className="py-12 mt-8 bg-repeat" style={{ 
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0V0zm1 1v98h98V1H1zm9 9h80v80H10V10zm1 1v78h78V11H11z' fill='%23e0e0e0' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
-        backgroundColor: "#f8f9fa" 
-      }}>
+      {/* Section suggestion de thèmes - Style discret */}
+      <div className="py-10 mt-8 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div 
-            className="max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-blue-500 relative"
-            initial={{ opacity: 0, y: 30 }}
+            className="max-w-5xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-            style={{ 
-              backgroundImage: `repeating-linear-gradient(0deg, #cbd5e1, #cbd5e1 1px, transparent 1px, transparent 24px),
-                              repeating-linear-gradient(90deg, #cbd5e1, #cbd5e1 1px, white 1px, white 24px)`,
-              backgroundSize: "25px 25px",
-              backgroundPosition: "0 5px",
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.5)"
-            }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-50px" }}
           >
-            {/* Trombone décoratif */}
-            <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-8 h-16">
-              <div className="w-5 h-10 border-l-2 border-t-2 border-r-2 border-gray-400 rounded-t-lg mx-auto"></div>
-              <div className="w-8 h-4 bg-gray-400 rounded-b-lg mx-auto"></div>
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-semibold text-gray-800">Suggérer un thème</h3>
+              <div className="h-1 w-12 bg-blue-500 mx-auto mt-2"></div>
+              <p className="text-gray-600 mt-2 text-sm max-w-lg mx-auto">
+                Vous aimeriez approfondir un sujet politique particulier? Partagez vos idées avec nous.
+              </p>
             </div>
             
-            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2 text-center mt-4">Un sujet à suggérer ?</h2>
-            <p className="text-gray-600 mb-6 text-center">
-              Vous souhaitez en apprendre plus sur un thème particulier ? Proposez-nous vos idées !
-            </p>
-            
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Votre nom</label>
-                <input
-                  type="text"
-                  id="name"
-                  placeholder="Comment vous appelez-vous ?"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Votre email</label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Où pouvons-nous vous répondre ?"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="theme" className="block text-sm font-medium text-gray-700">Catégorie de sujet</label>
-                <select
-                  id="theme"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
-                >
-                  <option value="">Sélectionnez une catégorie</option>
-                  <option value="institutions">Institutions</option>
-                  <option value="personnalites">Personnalités</option>
-                  <option value="evenements">Événements</option>
-                  <option value="concepts">Concepts</option>
-                  <option value="autre">Autre</option>
-                </select>
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="suggestion" className="block text-sm font-medium text-gray-700">Votre suggestion</label>
-                <textarea
-                  id="suggestion"
-                  rows={5}
-                  placeholder="Décrivez le sujet qui vous intéresse..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
-                ></textarea>
-              </div>
-              
-              <div className="flex justify-center">
-                <motion.button
-                  type="button"
-                  className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Envoyer ma suggestion
-                </motion.button>
+            <form className="bg-white rounded-lg shadow-sm p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-1">
+                  <input
+                    type="text"
+                    placeholder="Votre nom"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+                
+                <div className="md:col-span-1">
+                  <input
+                    type="email"
+                    placeholder="Votre email"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+                
+                <div className="md:col-span-1">
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm bg-white"
+                  >
+                    <option value="">Catégorie</option>
+                    <option value="institutions">Institutions</option>
+                    <option value="personnalites">Personnalités</option>
+                    <option value="evenements">Événements</option>
+                    <option value="concepts">Concepts</option>
+                  </select>
+                </div>
+                
+                <div className="md:col-span-1">
+                  <button
+                    type="submit"
+                    className="w-full h-full bg-blue-600 hover:bg-blue-700 text-white rounded-md px-3 py-2 text-sm font-medium"
+                  >
+                    Envoyer
+                  </button>
+                </div>
+                
+                <div className="md:col-span-4">
+                  <textarea
+                    placeholder="Décrivez le sujet qui vous intéresse..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm h-24 resize-none"
+                  ></textarea>
+                </div>
               </div>
             </form>
-            
-            {/* Badge NEW */}
-            <div className="absolute -top-3 -right-3 h-8 w-8 bg-red-500 rounded-full flex items-center justify-center transform rotate-12 shadow-md">
-              <span className="text-white text-xs font-bold">NEW</span>
-            </div>
-            
-            {/* Coin replié */}
-            <div className="absolute bottom-0 right-0 w-0 h-0 border-b-[40px] border-r-[40px] border-b-blue-100 border-r-blue-100 shadow-inner"></div>
-            <div className="absolute bottom-0 right-0 w-0 h-0 border-t-[35px] border-l-[35px] border-t-white border-l-transparent"></div>
           </motion.div>
         </div>
       </div>
