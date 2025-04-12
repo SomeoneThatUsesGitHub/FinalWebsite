@@ -2213,6 +2213,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  
+  // Routes admin pour la gestion des rôles
+  app.use("/api/admin/roles", rolesRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
