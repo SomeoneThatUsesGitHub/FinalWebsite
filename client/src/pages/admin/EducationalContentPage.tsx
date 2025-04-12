@@ -32,10 +32,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface EducationalTopic {
   id: number;
-  name: string;
+  title: string;  // Changé de 'name' à 'title' pour correspondre au schéma
   slug: string;
   description: string;
+  imageUrl: string; // Ajouté car c'est un champ obligatoire
   color: string;
+  icon?: string;    // Optionnel
   contentCount?: number;
 }
 
