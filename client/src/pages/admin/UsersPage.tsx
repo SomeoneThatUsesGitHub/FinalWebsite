@@ -193,8 +193,8 @@ function UsersPage() {
   
   // Mutation pour changer le rôle d'un utilisateur
   const updateRoleMutation = useMutation({
-    mutationFn: async ({ username, role }: { username: string; role: string }) => {
-      const response = await apiRequest("PUT", `/api/admin/users/${username}/profile`, { role });
+    mutationFn: async ({ username, role, customRoleId }: { username: string; role: string; customRoleId?: number | null }) => {
+      const response = await apiRequest("PUT", `/api/admin/users/${username}/profile`, { role, customRoleId });
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Erreur lors de la modification du rôle");
@@ -370,9 +370,8 @@ function UsersPage() {
                           Changer le rôle
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Changer le rôle</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
+                      <DropdownMenuContent align="end" className="max-h-[300px] overflow-y-auto">
+                        <DropdownMenuLabel>Rôles principaux</DropdownMenuLabel>
                         <DropdownMenuItem
                           disabled={user.role === "admin"}
                           onClick={() => {
@@ -423,6 +422,57 @@ function UsersPage() {
                           <Badge className="bg-green-500 hover:bg-green-600 mr-2">U</Badge>
                           Utilisateur
                         </DropdownMenuItem>
+                        
+                        {customRoles && customRoles.length > 0 && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Rôles personnalisés</DropdownMenuLabel>
+                            
+                            {/* Option pour supprimer le rôle personnalisé */}
+                            <DropdownMenuItem
+                              onClick={() => {
+                                // Mise à jour du rôle personnalisé à null
+                                if (user.customRoleId !== null) {
+                                  // Ici on pourrait ajouter une API spécifique pour mettre à jour uniquement customRoleId
+                                  // Pour l'instant, on utilise la mutation existante de mise à jour du profil
+                                  updateRoleMutation.mutate({ 
+                                    username: user.username, 
+                                    role: user.role,
+                                    customRoleId: null 
+                                  });
+                                }
+                              }}
+                              className={user.customRoleId === null ? "bg-gray-50" : ""}
+                            >
+                              <Badge variant="outline" className="mr-2">-</Badge>
+                              Aucun rôle personnalisé
+                            </DropdownMenuItem>
+                            
+                            {/* Liste des rôles personnalisés */}
+                            {customRoles.map((role: any) => (
+                              <DropdownMenuItem
+                                key={role.id}
+                                disabled={user.customRoleId === role.id}
+                                onClick={() => {
+                                  if (user.customRoleId !== role.id) {
+                                    // Mise à jour du rôle personnalisé
+                                    updateRoleMutation.mutate({ 
+                                      username: user.username, 
+                                      role: user.role,
+                                      customRoleId: role.id 
+                                    });
+                                  }
+                                }}
+                                className={user.customRoleId === role.id ? "bg-purple-50" : ""}
+                              >
+                                <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-200 mr-2">
+                                  {role.name.charAt(0).toUpperCase()}
+                                </Badge>
+                                {role.displayName}
+                              </DropdownMenuItem>
+                            ))}
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>

@@ -133,6 +133,7 @@ export async function listUsers() {
 export async function updateUserProfile(username: string, userData: {
   displayName?: string;
   role?: string;
+  customRoleId?: number | null;
   avatarUrl?: string;
   title?: string;
   bio?: string;
