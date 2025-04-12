@@ -156,15 +156,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
         return;
       }
       
-      // Compatibilité avec l'ancien système - Administrateur a toutes les permissions
-      if (user.role === "admin" || user.isAdmin) {
-        setNavItemsWithPermissions(baseNavItems.map(item => ({
-          ...item,
-          disabled: item.disabled === true
-        })));
-        setPermissionsLoaded(true);
-        return;
-      }
+      // Nous n'utilisons plus l'ancien système - tout est basé sur les permissions
       
       // Pour les utilisateurs avec un rôle personnalisé, vérifier chaque permission
       const navItemsPromises = baseNavItems.map(async (item) => {
@@ -264,11 +256,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
                 <div className="ml-3">
                   <p className="text-sm font-medium">{user?.username || "Utilisateur"}</p>
                   <p className="text-xs text-muted-foreground">
-                    {user?.role === "admin" || user?.isAdmin 
-                      ? "Administrateur" 
-                      : user?.role === "editor" 
-                        ? "Éditeur" 
-                        : "Utilisateur"}
+                    {user?.customRoleName || "Rôle personnalisé"}
                   </p>
                 </div>
               </div>
@@ -354,11 +342,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
               <div className="ml-3">
                 <p className="text-sm font-medium">{user?.username || "Utilisateur"}</p>
                 <p className="text-xs text-muted-foreground">
-                  {user?.role === "admin" || user?.isAdmin
-                    ? "Administrateur"
-                    : user?.role === "editor"
-                      ? "Éditeur"
-                      : "Utilisateur"}
+                  {user?.customRoleName || "Rôle personnalisé"}
                 </p>
               </div>
             </div>

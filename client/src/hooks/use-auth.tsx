@@ -8,11 +8,10 @@ import { User as BaseUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-// Étendre le type User pour inclure isAdmin, role et customRoleId
+// Étendre le type User pour inclure seulement le rôle personnalisé
 type User = BaseUser & { 
-  isAdmin?: boolean; 
-  role?: "user" | "admin" | "editor";
-  customRoleId?: number;
+  customRoleId: number;
+  customRoleName?: string; // Nom du rôle personnalisé pour l'affichage
 };
 
 type AuthContextType = {
@@ -121,15 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hasPermission = async (permissionCode: string): Promise<boolean> => {
     if (!user) return false;
     
-    // Compatibilité avec l'ancien système
-    if (user.role === "admin") return true;
-    if (user.role === "editor" && [
-      "dashboard", "articles", "flash_infos", "videos", 
-      "categories", "educational_topics", "educational_content", "live_coverage"
-    ].includes(permissionCode)) {
-      return true;
-    }
-    
+    // Uniquement se baser sur le rôle personnalisé
     if (!user.customRoleId) return false;
     
     try {
@@ -185,8 +176,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await hasPermission(permissionCode);
     }
     
-    // Par défaut, pour les chemins non spécifiés
-    return user?.isAdmin || user?.role === "admin";
+    // Pour les chemins non spécifiés, vérifier la permission "admin" générale
+    return await hasPermission("admin");
   };
 
   return (
