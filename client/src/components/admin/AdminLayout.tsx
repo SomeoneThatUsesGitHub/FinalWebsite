@@ -53,94 +53,145 @@ type NavItem = {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
   const [location, setLocation] = useLocation();
-  const { user, logoutMutation } = useAuth();
+  const { user, logoutMutation, hasPermission } = useAuth();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [permissionsLoaded, setPermissionsLoaded] = React.useState(false);
+  const [navItemsWithPermissions, setNavItemsWithPermissions] = React.useState<NavItem[]>([]);
 
-  // Navigation items
-  const mainNavItems: NavItem[] = [
+  // Définition des items de navigation avec les codes de permission correspondants
+  const baseNavItems: (NavItem & { permissionCode?: string })[] = [
     {
       name: "Tableau de bord",
       href: "/admin",
       icon: LayoutDashboard,
+      permissionCode: "dashboard"
     },
     {
       name: "Articles",
       href: "/admin/articles",
       icon: FileText,
+      permissionCode: "articles"
     },
     {
       name: "Catégories",
       href: "/admin/categories",
       icon: Tag,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      permissionCode: "categories"
     },
     {
       name: "Flash infos",
       href: "/admin/flash-infos",
       icon: Megaphone,
-      disabled: false,
+      permissionCode: "flash_infos"
     },
     {
       name: "Vidéos",
       href: "/admin/videos",
       icon: Video,
-      disabled: false,
+      permissionCode: "videos"
     },
     {
       name: "Directs",
       href: "/admin/directs",
       icon: Radio,
-      disabled: false, // Les éditeurs ont accès aux directs
+      permissionCode: "live_coverage"
     },
     {
       name: "Utilisateurs",
       href: "/admin/users",
       icon: Users,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      permissionCode: "users"
     },
     {
       name: "Équipe",
       href: "/admin/team",
       icon: Users,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      permissionCode: "team"
     },
     {
       name: "Newsletter",
       href: "/admin/newsletter",
       icon: Mail,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      permissionCode: "newsletter"
     },
     {
       name: "Candidatures",
       href: "/admin/applications",
       icon: ClipboardList,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      permissionCode: "applications"
     },
     {
       name: "Messages de contact",
       href: "/admin/messages",
       icon: MessageSquareText,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      permissionCode: "messages"
     },
     {
       name: "Contenu éducatif",
       href: "/admin/contenu-educatif",
       icon: GraduationCap,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      permissionCode: "educational_content"
     },
     {
       name: "Rôles",
       href: "/admin/roles",
       icon: ShieldCheck,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+      permissionCode: "roles"
     },
     {
       name: "Notes Éditoriales",
       href: "/admin/notes",
       icon: Clipboard,
-      disabled: true,
+      permissionCode: "notes",
+      disabled: true, // Toujours désactivé pour le moment
     },
   ];
+  
+  // Vérifier les permissions pour chaque élément de navigation
+  React.useEffect(() => {
+    async function checkPermissions() {
+      if (!user) {
+        setNavItemsWithPermissions([]);
+        setPermissionsLoaded(true);
+        return;
+      }
+      
+      // Compatibilité avec l'ancien système - Administrateur a toutes les permissions
+      if (user.role === "admin" || user.isAdmin) {
+        setNavItemsWithPermissions(baseNavItems.map(item => ({
+          ...item,
+          disabled: item.disabled === true
+        })));
+        setPermissionsLoaded(true);
+        return;
+      }
+      
+      // Pour les utilisateurs avec un rôle personnalisé, vérifier chaque permission
+      const navItemsPromises = baseNavItems.map(async (item) => {
+        if (item.permissionCode) {
+          const hasAccess = await hasPermission(item.permissionCode);
+          return {
+            ...item,
+            disabled: item.disabled === true || !hasAccess
+          };
+        }
+        // Si pas de code de permission défini, désactiver par défaut
+        return {
+          ...item,
+          disabled: true
+        };
+      });
+      
+      const resolvedNavItems = await Promise.all(navItemsPromises);
+      setNavItemsWithPermissions(resolvedNavItems);
+      setPermissionsLoaded(true);
+    }
+    
+    checkPermissions();
+  }, [user, hasPermission]);
+  
+  // Utiliser les éléments de navigation avec les permissions chargées
+  const mainNavItems = permissionsLoaded ? navItemsWithPermissions : [];
 
   // Fonction pour déterminer si un élément de nav est actif
   const isActive = (href: string) => {

@@ -507,8 +507,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             displayName: user.displayName,
             role: user.role,
             avatarUrl: user.avatarUrl,
-            isAdmin: user.role === "admin"
+            isAdmin: user.role === "admin",
+            customRoleId: user.customRoleId || null
           };
+          
+          console.log("Login réussi pour:", user.username, "- Rôle:", user.role, "- Rôle personnalisé ID:", user.customRoleId);
           
           return res.json({ user: safeUser });
         });
@@ -555,7 +558,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           displayName: newUser.displayName,
           role: newUser.role,
           avatarUrl: newUser.avatarUrl,
-          isAdmin: newUser.role === "admin"
+          isAdmin: newUser.role === "admin",
+          customRoleId: newUser.customRoleId || null
         };
         
         return res.status(201).json({ user: safeUser });
