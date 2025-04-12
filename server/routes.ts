@@ -2056,6 +2056,293 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Routes pour les cours éducatifs
+  app.get("/api/courses", async (req: Request, res: Response) => {
+    try {
+      // Par défaut, ne montrer que les cours publiés
+      const { showAll } = req.query;
+      const showUnpublished = showAll === 'true' && req.isAuthenticated() && (req.user as any)?.role === 'admin';
+      
+      const courses = await storage.getAllCourses(showUnpublished);
+      res.json(courses);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des cours:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des cours" });
+    }
+  });
+  
+  app.get("/api/courses/:slug", async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      
+      // Récupérer le cours complet (avec chapitres et leçons) par son slug
+      const courseData = await storage.getFullCourseDataBySlug(slug);
+      
+      if (!courseData) {
+        return res.status(404).json({ message: "Cours non trouvé" });
+      }
+      
+      res.json(courseData);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du cours:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération du cours" });
+    }
+  });
+  
+  // Routes Admin pour les cours éducatifs
+  app.get("/api/admin/courses", isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Montrer tous les cours, y compris ceux non publiés
+      const courses = await storage.getAllCourses(true);
+      res.json(courses);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des cours pour l'admin:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des cours" });
+    }
+  });
+  
+  app.post("/api/admin/courses", isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Valider les données d'entrée
+      const validation = insertCourseSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Ajouter l'ID de l'auteur (l'utilisateur connecté)
+      const user = req.user as any;
+      const courseData = {
+        ...validation.data,
+        authorId: user.id
+      };
+      
+      // Créer le cours
+      const newCourse = await storage.createCourse(courseData);
+      res.status(201).json(newCourse);
+    } catch (error) {
+      console.error("Erreur lors de la création du cours:", error);
+      res.status(500).json({ message: "Erreur lors de la création du cours" });
+    }
+  });
+  
+  app.put("/api/admin/courses/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de cours invalide" });
+      }
+      
+      // Valider les données d'entrée (permettre des mises à jour partielles)
+      const validation = insertCourseSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Mettre à jour le cours
+      const updatedCourse = await storage.updateCourse(Number(id), validation.data);
+      
+      if (!updatedCourse) {
+        return res.status(404).json({ message: "Cours non trouvé" });
+      }
+      
+      res.json(updatedCourse);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du cours:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du cours" });
+    }
+  });
+  
+  app.delete("/api/admin/courses/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de cours invalide" });
+      }
+      
+      // Supprimer le cours (cela supprimera également tous les chapitres et leçons associés)
+      const result = await storage.deleteCourse(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Cours non trouvé" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du cours:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression du cours" });
+    }
+  });
+  
+  // Routes pour les chapitres
+  app.get("/api/courses/:courseId/chapters", async (req: Request, res: Response) => {
+    try {
+      const { courseId } = req.params;
+      
+      if (isNaN(Number(courseId))) {
+        return res.status(400).json({ message: "ID de cours invalide" });
+      }
+      
+      const chapters = await storage.getChaptersByCourseId(Number(courseId));
+      res.json(chapters);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des chapitres:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des chapitres" });
+    }
+  });
+  
+  app.post("/api/admin/chapters", isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Valider les données d'entrée
+      const validation = insertChapterSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Créer le chapitre
+      const newChapter = await storage.createChapter(validation.data);
+      res.status(201).json(newChapter);
+    } catch (error) {
+      console.error("Erreur lors de la création du chapitre:", error);
+      res.status(500).json({ message: "Erreur lors de la création du chapitre" });
+    }
+  });
+  
+  app.put("/api/admin/chapters/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de chapitre invalide" });
+      }
+      
+      // Valider les données d'entrée (permettre des mises à jour partielles)
+      const validation = insertChapterSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Mettre à jour le chapitre
+      const updatedChapter = await storage.updateChapter(Number(id), validation.data);
+      
+      if (!updatedChapter) {
+        return res.status(404).json({ message: "Chapitre non trouvé" });
+      }
+      
+      res.json(updatedChapter);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du chapitre:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du chapitre" });
+    }
+  });
+  
+  app.delete("/api/admin/chapters/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de chapitre invalide" });
+      }
+      
+      // Supprimer le chapitre (cela supprimera également toutes les leçons associées)
+      const result = await storage.deleteChapter(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Chapitre non trouvé" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du chapitre:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression du chapitre" });
+    }
+  });
+  
+  // Routes pour les leçons
+  app.get("/api/chapters/:chapterId/lessons", async (req: Request, res: Response) => {
+    try {
+      const { chapterId } = req.params;
+      
+      if (isNaN(Number(chapterId))) {
+        return res.status(400).json({ message: "ID de chapitre invalide" });
+      }
+      
+      const lessons = await storage.getLessonsByChapterId(Number(chapterId));
+      res.json(lessons);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des leçons:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des leçons" });
+    }
+  });
+  
+  app.post("/api/admin/lessons", isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Valider les données d'entrée
+      const validation = insertLessonSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Créer la leçon
+      const newLesson = await storage.createLesson(validation.data);
+      res.status(201).json(newLesson);
+    } catch (error) {
+      console.error("Erreur lors de la création de la leçon:", error);
+      res.status(500).json({ message: "Erreur lors de la création de la leçon" });
+    }
+  });
+  
+  app.put("/api/admin/lessons/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de leçon invalide" });
+      }
+      
+      // Valider les données d'entrée (permettre des mises à jour partielles)
+      const validation = insertLessonSchema.partial().safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      // Mettre à jour la leçon
+      const updatedLesson = await storage.updateLesson(Number(id), validation.data);
+      
+      if (!updatedLesson) {
+        return res.status(404).json({ message: "Leçon non trouvée" });
+      }
+      
+      res.json(updatedLesson);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la leçon:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour de la leçon" });
+    }
+  });
+  
+  app.delete("/api/admin/lessons/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de leçon invalide" });
+      }
+      
+      // Supprimer la leçon
+      const result = await storage.deleteLesson(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Leçon non trouvée" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la leçon:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression de la leçon" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
