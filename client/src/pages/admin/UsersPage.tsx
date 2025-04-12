@@ -276,32 +276,21 @@ function UsersPage() {
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Fonction pour obtenir la couleur en fonction du rôle
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "bg-red-500 hover:bg-red-600";
-      case "editor":
-        return "bg-blue-500 hover:bg-blue-600";
-      case "user":
-        return "bg-green-500 hover:bg-green-600";
-      default:
-        return "bg-gray-500 hover:bg-gray-600";
-    }
+  // Fonction pour obtenir la couleur en fonction du rôle personnalisé
+  // Nous n'utilisons plus de conditions basées sur les rôles standards
+  const getRoleBadgeColor = () => {
+    // Couleur unique pour tous les badges puisque nous n'utilisons que des rôles personnalisés
+    return "bg-purple-500 hover:bg-purple-600";
   };
 
   // Fonction pour obtenir le libellé du rôle en français
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "Administrateur";
-      case "editor":
-        return "Éditeur";
-      case "user":
-        return "Utilisateur";
-      default:
-        return role;
+  // Utilisé pour afficher le nom du rôle personnalisé
+  const getRoleLabel = (user: User) => {
+    if (user.customRoleId && customRoles) {
+      const customRole = customRoles.find((role: any) => role.id === user.customRoleId);
+      return customRole ? customRole.displayName : "Rôle inconnu";
     }
+    return "Rôle inconnu";
   };
 
   return (
@@ -343,8 +332,8 @@ function UsersPage() {
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <Badge className={getRoleBadgeColor(user.role)}>
-                      {getRoleLabel(user.role)}
+                    <Badge className={getRoleBadgeColor()}>
+                      {getRoleLabel(user)}
                     </Badge>
                     {user.customRoleId && customRoles && (
                       <Badge variant="outline" className="border-gray-300 text-xs">
@@ -369,62 +358,11 @@ function UsersPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="max-h-[300px] overflow-y-auto">
-                        <DropdownMenuLabel>Rôles principaux</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          disabled={user.role === "admin"}
-                          onClick={() => {
-                            if (user.role !== "admin") {
-                              updateRoleMutation.mutate({ username: user.username, role: "admin" });
-                            }
-                          }}
-                          className={user.role === "admin" ? "bg-red-50" : ""}
-                        >
-                          <Badge className="bg-red-500 hover:bg-red-600 mr-2">A</Badge>
-                          Administrateur
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          disabled={user.role === "editor"}
-                          onClick={() => {
-                            if (user.role !== "editor") {
-                              // Si l'utilisateur est admin et veut changer son propre rôle
-                              if (user.role === "admin" && user.username === currentUser?.username) {
-                                if (window.confirm("En changeant votre rôle d'administrateur à éditeur, vous allez perdre l'accès à certaines fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
-                                  updateRoleMutation.mutate({ username: user.username, role: "editor" });
-                                }
-                              } else {
-                                updateRoleMutation.mutate({ username: user.username, role: "editor" });
-                              }
-                            }
-                          }}
-                          className={user.role === "editor" ? "bg-blue-50" : ""}
-                        >
-                          <Badge className="bg-blue-500 hover:bg-blue-600 mr-2">E</Badge>
-                          Éditeur
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          disabled={user.role === "user"}
-                          onClick={() => {
-                            if (user.role !== "user") {
-                              // Si l'utilisateur est admin et veut changer son propre rôle
-                              if (user.role === "admin" && user.username === currentUser?.username) {
-                                if (window.confirm("En changeant votre rôle d'administrateur à utilisateur standard, vous allez perdre l'accès aux fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
-                                  updateRoleMutation.mutate({ username: user.username, role: "user" });
-                                }
-                              } else {
-                                updateRoleMutation.mutate({ username: user.username, role: "user" });
-                              }
-                            }
-                          }}
-                          className={user.role === "user" ? "bg-green-50" : ""}
-                        >
-                          <Badge className="bg-green-500 hover:bg-green-600 mr-2">U</Badge>
-                          Utilisateur
-                        </DropdownMenuItem>
+                        {/* Les rôles standards sont supprimés, nous utilisons uniquement les rôles personnalisés */}
                         
                         {customRoles && customRoles.length > 0 && (
                           <>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuLabel>Rôles personnalisés</DropdownMenuLabel>
+                            <DropdownMenuLabel>Rôles</DropdownMenuLabel>
                             
                             {/* Option pour supprimer le rôle personnalisé */}
                             <DropdownMenuItem
@@ -443,7 +381,7 @@ function UsersPage() {
                               className={user.customRoleId === null ? "bg-gray-50" : ""}
                             >
                               <Badge variant="outline" className="mr-2">-</Badge>
-                              Aucun rôle personnalisé
+                              Assigner un rôle par défaut
                             </DropdownMenuItem>
                             
                             {/* Liste des rôles personnalisés */}
@@ -572,14 +510,14 @@ function UsersPage() {
                 name="customRoleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Rôle personnalisé</FormLabel>
+                    <FormLabel>Rôle de l'utilisateur</FormLabel>
                     <Select 
                       onValueChange={(value) => field.onChange(value ? parseInt(value) : null)} 
                       value={field.value ? String(field.value) : undefined}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Sélectionnez un rôle personnalisé (optionnel)" />
+                          <SelectValue placeholder="Sélectionnez un rôle pour l'utilisateur" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -592,7 +530,7 @@ function UsersPage() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Permissions supplémentaires spécifiques
+                      Définit les permissions et les accès de l'utilisateur
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
