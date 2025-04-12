@@ -18,6 +18,8 @@ import AuthPage from "@/pages/AuthPage";
 import TestEditor from "@/pages/test-editor";
 import LiveCoveragePage from "@/pages/LiveCoveragePage";
 import LearnPage from "@/pages/LearnPage";
+import CourseDetailPage from "@/pages/CourseDetailPage";
+import LessonPage from "@/pages/LessonPage";
 
 // Pages admin
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -85,6 +87,8 @@ function App() {
               <Route path="/a-propos" component={AboutPage} />
               <Route path="/contact" component={ContactPage} />
               <Route path="/apprendre" component={LearnPage} />
+              <Route path="/apprendre/:courseSlug" component={CourseDetailPage} />
+              <Route path="/apprendre/:courseSlug/lecon/:lessonId" component={LessonPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />
               <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />

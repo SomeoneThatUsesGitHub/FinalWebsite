@@ -42,6 +42,16 @@ const cardAnimation = {
   }
 };
 
+// Slugs pour les cours (à remplacer par une logique de génération de slug)
+const slugMap: Record<number, string> = {
+  1: "assemblee-nationale",
+  2: "senat",
+  3: "emmanuel-macron",
+  4: "5eme-republique",
+  5: "mai-68",
+  6: "union-europeenne"
+};
+
 // Interface pour les catégories
 interface CourseCategory {
   id: number;
@@ -269,74 +279,7 @@ const LearnPage: React.FC = () => {
         )}
       </div>
       
-      {/* Section suggestion de thèmes - Style discret */}
-      <div className="py-10 mt-8 bg-gray-50">
-        <div className="container mx-auto px-4 md:px-6">
-          <motion.div 
-            className="max-w-5xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-800">Suggérer un thème</h3>
-              <div className="h-1 w-12 bg-blue-500 mx-auto mt-2"></div>
-              <p className="text-gray-600 mt-2 text-sm max-w-lg mx-auto">
-                Vous aimeriez approfondir un sujet politique particulier? Partagez vos idées avec nous.
-              </p>
-            </div>
-            
-            <form className="bg-white rounded-lg shadow-sm p-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="md:col-span-1">
-                  <input
-                    type="text"
-                    placeholder="Votre nom"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                  />
-                </div>
-                
-                <div className="md:col-span-1">
-                  <input
-                    type="email"
-                    placeholder="Votre email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                  />
-                </div>
-                
-                <div className="md:col-span-1">
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm bg-white"
-                  >
-                    <option value="">Catégorie</option>
-                    <option value="institutions">Institutions</option>
-                    <option value="personnalites">Personnalités</option>
-                    <option value="evenements">Événements</option>
-                    <option value="concepts">Concepts</option>
-                  </select>
-                </div>
-                
-                <div className="md:col-span-1">
-                  <button
-                    type="submit"
-                    className="w-full h-full bg-blue-600 hover:bg-blue-700 text-white rounded-md px-3 py-2 text-sm font-medium"
-                  >
-                    Envoyer
-                  </button>
-                </div>
-                
-                <div className="md:col-span-4">
-                  <textarea
-                    placeholder="Décrivez le sujet qui vous intéresse..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm h-24 resize-none"
-                  ></textarea>
-                </div>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      </div>
+
     </motion.div>
   );
 };
