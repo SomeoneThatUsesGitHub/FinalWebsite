@@ -14,6 +14,7 @@ import {
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { createUser, updateUserPassword, listUsers, deleteUser, updateUserProfile, getTeamMembers } from "./userManagement";
+import rolesRoutes from "./routes/admin/roles";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes - prefix all with /api
