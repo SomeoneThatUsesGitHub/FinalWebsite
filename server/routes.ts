@@ -9,7 +9,7 @@ import {
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
   insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema, insertTeamApplicationSchema,
-  insertContactMessageSchema
+  insertContactMessageSchema, insertEducationalTopicSchema, insertEducationalContentSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -176,33 +176,190 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(election);
   });
   
+  // Educational Topics
+  app.get("/api/educational-topics", async (_req: Request, res: Response) => {
+    try {
+      const topics = await storage.getAllEducationalTopics();
+      res.json(topics);
+    } catch (error) {
+      console.error("Error fetching educational topics:", error);
+      res.status(500).json({ error: "Error fetching educational topics" });
+    }
+  });
+  
+  app.get("/api/educational-topics/:slug", async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const topic = await storage.getEducationalTopicBySlug(slug);
+      
+      if (!topic) {
+        return res.status(404).json({ message: "Topic not found" });
+      }
+      
+      res.json(topic);
+    } catch (error) {
+      console.error("Error fetching educational topic:", error);
+      res.status(500).json({ error: "Error fetching educational topic" });
+    }
+  });
+
   // Educational Content
   app.get("/api/educational-content", async (req: Request, res: Response) => {
-    const { categoryId } = req.query;
-    
-    let categoryIdNum: number | undefined = undefined;
-    if (categoryId && !isNaN(Number(categoryId))) {
-      categoryIdNum = Number(categoryId);
+    try {
+      const { topicId } = req.query;
+      
+      let topicIdNum: number | undefined = undefined;
+      if (topicId && !isNaN(Number(topicId))) {
+        topicIdNum = Number(topicId);
+      }
+      
+      const content = await storage.getAllEducationalContent(topicIdNum);
+      res.json(content);
+    } catch (error) {
+      console.error("Error fetching educational content:", error);
+      res.status(500).json({ error: "Error fetching educational content" });
     }
-    
-    const content = await storage.getAllEducationalContent(categoryIdNum);
-    res.json(content);
   });
   
   app.get("/api/educational-content/:id", async (req: Request, res: Response) => {
-    const { id } = req.params;
-    
-    if (isNaN(Number(id))) {
-      return res.status(400).json({ message: "Invalid content ID" });
+    try {
+      const { id } = req.params;
+      
+      // Check if the id is a number or a slug
+      if (!isNaN(Number(id))) {
+        // If it's a number, get content by id
+        const content = await storage.getEducationalContentById(Number(id));
+        
+        if (!content) {
+          return res.status(404).json({ message: "Content not found" });
+        }
+        
+        await storage.incrementEducationalContentViews(content.id);
+        res.json(content);
+      } else {
+        // If it's not a number, assume it's a slug
+        const content = await storage.getEducationalContentBySlug(id);
+        
+        if (!content) {
+          return res.status(404).json({ message: "Content not found" });
+        }
+        
+        await storage.incrementEducationalContentViews(content.id);
+        res.json(content);
+      }
+    } catch (error) {
+      console.error("Error fetching educational content:", error);
+      res.status(500).json({ error: "Error fetching educational content" });
     }
-    
-    const content = await storage.getEducationalContentById(Number(id));
-    
-    if (!content) {
-      return res.status(404).json({ message: "Content not found" });
+  });
+  
+  // Admin routes for educational content
+  app.post("/api/educational-topics", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const topicData = insertEducationalTopicSchema.parse(req.body);
+      const newTopic = await storage.createEducationalTopic(topicData);
+      res.status(201).json(newTopic);
+    } catch (error) {
+      console.error("Error creating educational topic:", error);
+      res.status(400).json({ error: "Invalid topic data" });
     }
-    
-    res.json(content);
+  });
+  
+  app.post("/api/educational-content", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const contentData = insertEducationalContentSchema.parse(req.body);
+      const newContent = await storage.createEducationalContent(contentData);
+      res.status(201).json(newContent);
+    } catch (error) {
+      console.error("Error creating educational content:", error);
+      res.status(400).json({ error: "Invalid content data" });
+    }
+  });
+  
+  app.put("/api/educational-topics/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid topic ID" });
+      }
+      
+      const updateData = req.body;
+      const updated = await storage.updateEducationalTopic(Number(id), updateData);
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Topic not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating educational topic:", error);
+      res.status(500).json({ error: "Error updating educational topic" });
+    }
+  });
+  
+  app.put("/api/educational-content/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid content ID" });
+      }
+      
+      const updateData = req.body;
+      const updated = await storage.updateEducationalContent(Number(id), updateData);
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Content not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating educational content:", error);
+      res.status(500).json({ error: "Error updating educational content" });
+    }
+  });
+  
+  app.delete("/api/educational-topics/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid topic ID" });
+      }
+      
+      const deleted = await storage.deleteEducationalTopic(Number(id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Topic not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting educational topic:", error);
+      res.status(500).json({ error: "Error deleting educational topic" });
+    }
+  });
+  
+  app.delete("/api/educational-content/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid content ID" });
+      }
+      
+      const deleted = await storage.deleteEducationalContent(Number(id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Content not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting educational content:", error);
+      res.status(500).json({ error: "Error deleting educational content" });
+    }
   });
   
   // Videos

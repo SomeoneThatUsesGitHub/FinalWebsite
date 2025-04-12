@@ -6,6 +6,7 @@ import {
   flashInfos, type FlashInfo, type InsertFlashInfo,
   liveEvents, type LiveEvent, type InsertLiveEvent,
   elections, type Election, type InsertElection,
+  educationalTopics, type EducationalTopic, type InsertEducationalTopic,
   educationalContent, type EducationalContent, type InsertEducationalContent,
   videos, type Video, type InsertVideo,
   liveCoverages, type LiveCoverage, type InsertLiveCoverage,
