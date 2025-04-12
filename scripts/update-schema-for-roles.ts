@@ -5,7 +5,7 @@
 
 import { db } from "../server/db";
 import { adminPermissions, customRoles, rolePermissions, users } from "../shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, or, inArray, SQL } from "drizzle-orm";
 
 const DEFAULT_ADMIN_PERMISSIONS = [
   {
@@ -192,8 +192,12 @@ async function main() {
         // Les éditeurs ont toutes les permissions de contenu, mais pas d'administration système
         const contentPermissions = await db.select()
           .from(adminPermissions)
-          .where(eq(adminPermissions.category, "content"))
-          .orWhere(eq(adminPermissions.category, "general"));
+          .where(
+            or(
+              eq(adminPermissions.category, "content"),
+              eq(adminPermissions.category, "general")
+            )
+          );
         
         for (const permission of contentPermissions) {
           const existingRolePermission = await db.select()
@@ -214,9 +218,7 @@ async function main() {
         const permissionCodes = ["dashboard", "articles", "flash_infos", "categories"];
         const relevantPermissions = await db.select()
           .from(adminPermissions)
-          .where(
-            permissionCodes.map(code => eq(adminPermissions.code, code)).reduce((prev, curr) => ({ ...prev, or: curr }))
-          );
+          .where(inArray(adminPermissions.code, permissionCodes));
         
         for (const permission of relevantPermissions) {
           const existingRolePermission = await db.select()
@@ -237,9 +239,7 @@ async function main() {
         const permissionCodes = ["dashboard", "videos"];
         const relevantPermissions = await db.select()
           .from(adminPermissions)
-          .where(
-            permissionCodes.map(code => eq(adminPermissions.code, code)).reduce((prev, curr) => ({ ...prev, or: curr }))
-          );
+          .where(inArray(adminPermissions.code, permissionCodes));
         
         for (const permission of relevantPermissions) {
           const existingRolePermission = await db.select()
