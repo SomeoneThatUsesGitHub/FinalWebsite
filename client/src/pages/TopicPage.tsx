@@ -10,10 +10,11 @@ import MainLayout from '@/components/layout/MainLayout';
 
 interface EducationalTopic {
   id: number;
-  name: string;
+  title: string;
   slug: string;
   description: string;
   color: string;
+  imageUrl: string;
 }
 
 interface EducationalContent {
@@ -63,7 +64,7 @@ const TopicPage: React.FC = () => {
             </div>
           ) : topic ? (
             <PageHeader
-              title={topic.name}
+              title={topic.title}
               description={topic.description}
               icon={<GraduationCap className="h-8 w-8 mr-3 text-primary" />}
             />

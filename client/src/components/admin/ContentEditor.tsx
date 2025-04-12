@@ -277,7 +277,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
                 size="sm"
                 onClick={() => editor?.chain().focus().setHorizontalRule().run()}
               >
-                <Separator className="h-4 w-4 mr-1" />
+                <Minus className="h-4 w-4 mr-1" />
                 Séparateur
               </Button>
             </div>
