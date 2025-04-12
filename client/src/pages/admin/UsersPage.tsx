@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Trash2, Pencil, UserPlus, Key } from "lucide-react";
+import { Trash2, Pencil, UserPlus, Key, UserCog } from "lucide-react";
 
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,14 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Schéma pour la création d'un utilisateur
 const createUserSchema = z.object({
@@ -157,6 +165,37 @@ function UsersPage() {
         description: "L'utilisateur a été supprimé avec succès",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Mutation pour changer le rôle d'un utilisateur
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ username, role }: { username: string; role: string }) => {
+      const response = await apiRequest("PUT", `/api/admin/users/${username}/profile`, { role });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Erreur lors de la modification du rôle");
+      }
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Rôle modifié",
+        description: "Le rôle de l'utilisateur a été modifié avec succès",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      
+      // Si l'utilisateur a changé son propre rôle, il faut mettre à jour les données de session
+      if (data.user && data.user.username === window.localStorage.getItem("currentUsername")) {
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -286,6 +325,58 @@ function UsersPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex justify-end gap-2 mt-4">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                      >
+                        <UserCog className="mr-2 h-4 w-4" />
+                        Rôle
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Changer le rôle</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        disabled={user.role === "admin"}
+                        onClick={() => {
+                          if (user.role !== "admin") {
+                            updateRoleMutation.mutate({ username: user.username, role: "admin" });
+                          }
+                        }}
+                        className={user.role === "admin" ? "bg-red-50" : ""}
+                      >
+                        <Badge className="bg-red-500 hover:bg-red-600 mr-2">A</Badge>
+                        Administrateur
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={user.role === "editor"}
+                        onClick={() => {
+                          if (user.role !== "editor") {
+                            updateRoleMutation.mutate({ username: user.username, role: "editor" });
+                          }
+                        }}
+                        className={user.role === "editor" ? "bg-blue-50" : ""}
+                      >
+                        <Badge className="bg-blue-500 hover:bg-blue-600 mr-2">E</Badge>
+                        Éditeur
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={user.role === "user"}
+                        onClick={() => {
+                          if (user.role !== "user") {
+                            updateRoleMutation.mutate({ username: user.username, role: "user" });
+                          }
+                        }}
+                        className={user.role === "user" ? "bg-green-50" : ""}
+                      >
+                        <Badge className="bg-green-500 hover:bg-green-600 mr-2">U</Badge>
+                        Utilisateur
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
                   <Button
                     variant="outline"
                     size="sm"

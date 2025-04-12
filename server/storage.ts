@@ -240,6 +240,35 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return user;
   }
+  
+  async updateUserRole(username: string, role: string): Promise<User | undefined> {
+    try {
+      console.log(`Mise à jour du rôle de ${username} vers ${role}`);
+      
+      // Vérifier si le rôle est valide
+      if (!["admin", "editor", "user"].includes(role)) {
+        throw new Error("Rôle invalide. Doit être 'admin', 'editor' ou 'user'");
+      }
+      
+      // Mettre à jour le rôle de l'utilisateur
+      const [updatedUser] = await db
+        .update(users)
+        .set({ role: role as any })
+        .where(eq(users.username, username))
+        .returning();
+      
+      if (updatedUser) {
+        console.log(`Rôle de ${username} mis à jour avec succès vers ${role}`);
+        return updatedUser;
+      } else {
+        console.error(`Utilisateur ${username} non trouvé lors de la mise à jour du rôle`);
+        return undefined;
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du rôle:", error);
+      throw error;
+    }
+  }
 
   async getAllCategories(): Promise<Category[]> {
     return db.select().from(categories).orderBy(categories.name);
