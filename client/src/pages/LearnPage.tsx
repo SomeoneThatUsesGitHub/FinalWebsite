@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
-import { Book } from 'lucide-react';
+import { Book, Search, Sliders, Tag, BookOpen, Calendar, ArrowRight, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Helmet } from "react-helmet";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { pageTransition } from '@/lib/animations';
 
 // Animation avec effet de rebond
@@ -59,6 +63,10 @@ interface EducationalTopic {
 }
 
 const LearnPage: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("latest");
+  const [showFilters, setShowFilters] = useState(false);
+  
   const { data: topics, isLoading, error } = useQuery<EducationalTopic[]>({
     queryKey: ['/api/educational-topics'],
   });
@@ -66,6 +74,36 @@ const LearnPage: React.FC = () => {
   if (error) {
     console.error('Erreur lors du chargement des sujets éducatifs:', error);
   }
+  
+  // Filtrer et trier les sujets
+  const filteredTopics = useMemo(() => {
+    if (!topics) return [];
+    
+    let result = [...topics];
+    
+    // Appliquer la recherche
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      result = result.filter(topic => 
+        topic.title.toLowerCase().includes(searchLower) || 
+        topic.description.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Appliquer le tri
+    if (sortOrder === "alphabetical") {
+      result.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortOrder === "resourceCount") {
+      result.sort((a, b) => (b.contentCount || 0) - (a.contentCount || 0));
+    }
+    // Par défaut: "latest" - pas besoin de tri supplémentaire car les données sont déjà triées par date
+    
+    return result;
+  }, [topics, searchTerm, sortOrder]);
+  
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
 
   const TopicsContent = () => {
     if (isLoading) {
@@ -110,44 +148,59 @@ const LearnPage: React.FC = () => {
         initial="hidden"
         animate="visible"
       >
-        {topics.map((topic) => (
+        {filteredTopics.map((topic) => (
           <motion.div key={topic.id} variants={cardAnimation}>
-            <Card className="hover:shadow-md transition-shadow overflow-hidden group h-full">
-              <div className="relative w-full h-40 overflow-hidden">
+            <Card className="hover:shadow-xl transition-all duration-300 overflow-hidden group h-full border-t-4 hover:translate-y-[-5px]" style={{ borderTopColor: topic.color || '#3b82f6' }}>
+              <div className="relative w-full h-44 overflow-hidden">
                 <img 
                   src={topic.imageUrl} 
                   alt={topic.title} 
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: topic.color || '#3b82f6' }}></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-3 right-3">
+                  <Badge variant="outline" className="bg-white/90 text-dark font-semibold">
+                    <BookOpen className="h-3.5 w-3.5 mr-1" />
+                    {topic.contentCount || 0} ressource{topic.contentCount !== 1 ? 's' : ''}
+                  </Badge>
+                </div>
               </div>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-1">
                 <CardTitle className="flex items-center">
-                  <Book className="h-5 w-5 mr-2 text-primary" />
-                  {topic.title}
+                  <div className="h-7 w-7 rounded-full mr-2 flex items-center justify-center" style={{ backgroundColor: topic.color || '#3b82f6', color: 'white' }}>
+                    <Book className="h-4 w-4" />
+                  </div>
+                  <span className="text-lg font-bold text-primary group-hover:text-blue-700 transition-colors">
+                    {topic.title}
+                  </span>
                 </CardTitle>
-                <CardDescription>
-                  {topic.contentCount || 0} ressource{topic.contentCount !== 1 ? 's' : ''}
-                </CardDescription>
+                <div className="mt-1 w-12 h-0.5 bg-primary/30 rounded-full"></div>
               </CardHeader>
               <CardContent className="px-4 py-3">
                 <div className="w-full max-h-24 pr-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
-                  <div className="w-full">
-                    {topic.description.split(' ').map((word, index) => (
-                      <React.Fragment key={index}>
-                        <span className="inline-block text-sm text-muted-foreground">
-                          {word}
-                        </span>
-                        <span className="inline-block text-sm text-muted-foreground">&nbsp;</span>
-                      </React.Fragment>
-                    ))}
-                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {topic.description}
+                  </p>
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button asChild variant="outline">
+              <CardFooter className="flex justify-between items-center pt-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center text-xs text-slate-500">
+                        <Info className="h-4 w-4 mr-1" />
+                        <span>Détails</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm">{topic.description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <Button asChild variant="default" size="sm" className="group-hover:bg-primary/90 transition-colors">
                   <Link href={`/apprendre/${topic.slug}`}>
-                    Explorer
+                    <span>Explorer</span>
+                    <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
               </CardFooter>
