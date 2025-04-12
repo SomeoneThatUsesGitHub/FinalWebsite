@@ -199,23 +199,26 @@ const LearnPage: React.FC = () => {
               </CardContent>
               <CardFooter className="flex justify-between items-center pt-2">
                 <div className="flex items-center">
-                  {topic.author ? (
-                    <div className="flex items-center text-xs text-slate-500">
-                      <img 
-                        src={topic.author.avatarUrl || '/assets/default-avatar.svg'} 
-                        alt={topic.author.displayName || "Auteur"} 
-                        className="h-5 w-5 rounded-full mr-1.5"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/assets/default-avatar.svg';
-                        }}
-                      />
-                      <span>{topic.author.displayName}</span>
+                  <div className="flex items-center text-xs text-slate-500">
+                    <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold mr-1.5 overflow-hidden">
+                      {topic.author ? (
+                        <img 
+                          src={topic.author.avatarUrl || '/assets/default-avatar.svg'} 
+                          alt={topic.author.displayName || "Auteur"} 
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            // Si l'image échoue, on affiche l'initiale de l'auteur
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            e.currentTarget.parentElement!.textContent = 
+                              topic.author?.displayName?.charAt(0).toUpperCase() || 'A';
+                          }}
+                        />
+                      ) : (
+                        "A"
+                      )}
                     </div>
-                  ) : (
-                    <div className="flex items-center text-xs text-slate-500">
-                      <span>Admin</span>
-                    </div>
-                  )}
+                    <span>{topic.author?.displayName || "Administrateur"}</span>
+                  </div>
                 </div>
                 <Button asChild variant="default" size="sm" className="group-hover:bg-primary/90 transition-colors">
                   <Link href={`/apprendre/${topic.slug}`}>
