@@ -5,6 +5,7 @@ import { queryClient } from "@/lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
+import { PermissionProtectedRoute } from "@/lib/permission-protected-route";
 
 // Pages publiques
 import Home from "@/pages/Home";
@@ -96,32 +97,29 @@ function App() {
               <Route path="/apprendre/:slug" component={TopicPage} />
               <Route path="/apprendre/:topicSlug/:contentSlug" component={ContentPage} />
               
-              {/* Routes admin protégées - accessibles aux admins et éditeurs */}
-              <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
-              <ProtectedRoute path="/admin/articles" component={ArticlesPage} adminOnly />
-              <ProtectedRoute path="/admin/articles/new" component={EditArticlePage} adminOnly />
-              <ProtectedRoute path="/admin/articles/:id" component={EditArticlePage} adminOnly />
-              <ProtectedRoute path="/admin/flash-infos" component={FlashInfosPage} adminOnly />
-              <ProtectedRoute path="/admin/videos" component={VideosPage} adminOnly />
-
+              {/* Routes admin protégées avec permissions */}
+              <PermissionProtectedRoute path="/admin" component={AdminDashboard} permissionCode="dashboard" />
+              <PermissionProtectedRoute path="/admin/articles" component={ArticlesPage} permissionCode="articles" />
+              <PermissionProtectedRoute path="/admin/articles/new" component={EditArticlePage} permissionCode="articles" />
+              <PermissionProtectedRoute path="/admin/articles/:id" component={EditArticlePage} permissionCode="articles" />
+              <PermissionProtectedRoute path="/admin/flash-infos" component={FlashInfosPage} permissionCode="flash_infos" />
+              <PermissionProtectedRoute path="/admin/videos" component={VideosPage} permissionCode="videos" />
+              <PermissionProtectedRoute path="/admin/categories" component={CategoriesPage} permissionCode="categories" />
+              <PermissionProtectedRoute path="/admin/users" component={UsersPage} permissionCode="users" />
+              <PermissionProtectedRoute path="/admin/team" component={AdminTeamPage} permissionCode="team" />
+              <PermissionProtectedRoute path="/admin/newsletter" component={NewsletterSubscribersPage} permissionCode="newsletter" />
+              <PermissionProtectedRoute path="/admin/applications" component={ApplicationsPage} permissionCode="applications" />
+              <PermissionProtectedRoute path="/admin/messages" component={ContactMessagesPage} permissionCode="messages" />
+              <PermissionProtectedRoute path="/admin/contenu-educatif" component={EducationalContentPage} permissionCode="educational_content" />
+              <PermissionProtectedRoute path="/admin/roles" component={RolesPage} permissionCode="roles" />
               
-              {/* Routes admin protégées - accessibles uniquement aux admins */}
-              <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
-              <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
-              <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
-              <ProtectedRoute path="/admin/newsletter" component={NewsletterSubscribersPage} adminOnly />
-              <ProtectedRoute path="/admin/applications" component={ApplicationsPage} adminOnly />
-              <ProtectedRoute path="/admin/messages" component={ContactMessagesPage} adminOnly />
-              <ProtectedRoute path="/admin/contenu-educatif" component={EducationalContentPage} adminOnly />
-              <ProtectedRoute path="/admin/roles" component={RolesPage} adminOnly />
-              
-              {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
-              <ProtectedRoute path="/admin/directs" component={DirectsPage} />
-              <ProtectedRoute path="/admin/directs/nouveau" component={DirectForm} adminOnly />
-              <ProtectedRoute path="/admin/directs/editer/:id" component={DirectForm} adminOnly />
-              <ProtectedRoute path="/admin/directs/:id/editeurs" component={DirectEditorsPage} adminOnly />
-              <ProtectedRoute path="/admin/directs/:id/questions" component={DirectQuestionsPage} />
-              <ProtectedRoute path="/admin/directs/:id/mises-a-jour" component={DirectUpdatesPage} />
+              {/* Routes pour les suivis en direct - accessibles via permission */}
+              <PermissionProtectedRoute path="/admin/directs" component={DirectsPage} permissionCode="live_coverage" />
+              <PermissionProtectedRoute path="/admin/directs/nouveau" component={DirectForm} permissionCode="live_coverage" />
+              <PermissionProtectedRoute path="/admin/directs/editer/:id" component={DirectForm} permissionCode="live_coverage" />
+              <PermissionProtectedRoute path="/admin/directs/:id/editeurs" component={DirectEditorsPage} permissionCode="live_coverage" />
+              <PermissionProtectedRoute path="/admin/directs/:id/questions" component={DirectQuestionsPage} permissionCode="live_coverage" />
+              <PermissionProtectedRoute path="/admin/directs/:id/mises-a-jour" component={DirectUpdatesPage} permissionCode="live_coverage" />
               
               {/* Fallback */}
               <Route path="/:rest*" component={NotFound} />
