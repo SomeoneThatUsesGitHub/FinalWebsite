@@ -371,8 +371,8 @@ function UsersPage() {
                           onClick={() => {
                             if (user.role !== "editor") {
                               // Si l'utilisateur est admin et veut changer son propre rôle
-                              if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
-                                if (confirm("En changeant votre rôle d'administrateur à éditeur, vous allez perdre l'accès à certaines fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
+                              if (user.role === "admin" && user.username === currentUser?.username) {
+                                if (window.confirm("En changeant votre rôle d'administrateur à éditeur, vous allez perdre l'accès à certaines fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
                                   updateRoleMutation.mutate({ username: user.username, role: "editor" });
                                 }
                               } else {
@@ -390,8 +390,8 @@ function UsersPage() {
                           onClick={() => {
                             if (user.role !== "user") {
                               // Si l'utilisateur est admin et veut changer son propre rôle
-                              if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
-                                if (confirm("En changeant votre rôle d'administrateur à utilisateur standard, vous allez perdre l'accès aux fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
+                              if (user.role === "admin" && user.username === currentUser?.username) {
+                                if (window.confirm("En changeant votre rôle d'administrateur à utilisateur standard, vous allez perdre l'accès aux fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
                                   updateRoleMutation.mutate({ username: user.username, role: "user" });
                                 }
                               } else {
