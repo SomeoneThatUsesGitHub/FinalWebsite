@@ -21,6 +21,8 @@ interface ContentEditorProps {
     slug: string;
     description: string;
     content: string;
+    summary?: string;
+    imageUrl?: string;
   };
   topicId: number;
   onSave: (content: { 
@@ -29,6 +31,8 @@ interface ContentEditorProps {
     slug: string; 
     description: string; 
     content: string; 
+    summary: string;
+    imageUrl: string;
     topicId: number;
   }) => void;
   onCancel: () => void;
@@ -46,6 +50,8 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
   const [title, setTitle] = useState(initialContent?.title || '');
   const [slug, setSlug] = useState(initialContent?.slug || '');
   const [description, setDescription] = useState(initialContent?.description || '');
+  const [summary, setSummary] = useState(initialContent?.summary || '');
+  const [imageUrl, setImageUrl] = useState(initialContent?.imageUrl || 'https://placehold.co/600x400/3b82f6/white?text=Contenu+%C3%A9ducatif');
   const [activeTab, setActiveTab] = useState<string>('editor');
   const [isAutoSlug, setIsAutoSlug] = useState(!initialContent?.slug);
 
@@ -98,6 +104,24 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
       return;
     }
 
+    if (!summary.trim()) {
+      toast({
+        title: "Résumé requis",
+        description: "Veuillez entrer un résumé pour ce contenu éducatif.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!imageUrl.trim()) {
+      toast({
+        title: "URL d'image requise",
+        description: "Veuillez entrer une URL d'image pour ce contenu éducatif.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!editor?.getHTML() || editor?.getHTML() === '<p></p>') {
       toast({
         title: "Contenu requis",
@@ -113,6 +137,8 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
       slug,
       description,
       content: editor?.getHTML() || '',
+      summary,
+      imageUrl,
       topicId,
     });
   };
@@ -174,6 +200,33 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
             className="mt-1"
             rows={3}
           />
+        </div>
+        <div className="mt-4">
+          <Label htmlFor="summary">Résumé</Label>
+          <Textarea
+            id="summary"
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            placeholder="Résumé court et accrocheur du contenu"
+            className="mt-1"
+            rows={2}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Ce résumé sera affiché dans les cartes et les aperçus (obligatoire).
+          </p>
+        </div>
+        <div className="mt-4">
+          <Label htmlFor="imageUrl">URL de l'image</Label>
+          <Input
+            id="imageUrl"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="https://example.com/image.jpg"
+            className="mt-1"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            URL d'une image représentant ce contenu (obligatoire).
+          </p>
         </div>
       </Card>
 

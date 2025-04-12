@@ -318,9 +318,22 @@ const EducationalContentPage: React.FC = () => {
     topicId: number;
   }) => {
     if (content.id) {
-      updateContentMutation.mutate(content as EducationalContent);
+      updateContentMutation.mutate({
+        id: content.id,
+        title: content.title,
+        slug: content.slug,
+        description: content.description,
+        content: content.content,
+        topicId: content.topicId
+      });
     } else {
-      createContentMutation.mutate(content);
+      createContentMutation.mutate({
+        title: content.title,
+        slug: content.slug,
+        description: content.description,
+        content: content.content,
+        topicId: content.topicId
+      });
     }
   };
 
