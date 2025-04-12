@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ContentEditorProps {
   initialContent?: {
+    id?: number;
     title: string;
     slug: string;
     description: string;

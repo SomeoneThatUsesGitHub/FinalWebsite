@@ -158,7 +158,13 @@ const EducationalContentPage: React.FC = () => {
   });
 
   const createContentMutation = useMutation({
-    mutationFn: async (content: Omit<EducationalContent, 'id' | 'createdAt' | 'updatedAt'>) => {
+    mutationFn: async (content: { 
+      title: string; 
+      slug: string; 
+      description: string; 
+      content: string; 
+      topicId: number;
+    }) => {
       const res = await apiRequest('POST', '/api/educational-content', content);
       return await res.json();
     },
@@ -183,8 +189,16 @@ const EducationalContentPage: React.FC = () => {
   });
 
   const updateContentMutation = useMutation({
-    mutationFn: async ({ id, ...content }: EducationalContent) => {
-      const res = await apiRequest('PUT', `/api/educational-content/${id}`, content);
+    mutationFn: async (content: { 
+      id: number; 
+      title: string; 
+      slug: string; 
+      description: string; 
+      content: string; 
+      topicId: number;
+    }) => {
+      const { id, ...contentData } = content;
+      const res = await apiRequest('PUT', `/api/educational-content/${id}`, contentData);
       return await res.json();
     },
     onSuccess: () => {
@@ -295,7 +309,14 @@ const EducationalContentPage: React.FC = () => {
     setEditingTopicId(null);
   };
 
-  const handleSaveContent = (content: Omit<EducationalContent, 'createdAt' | 'updatedAt'>) => {
+  const handleSaveContent = (content: { 
+    id?: number; 
+    title: string; 
+    slug: string; 
+    description: string; 
+    content: string; 
+    topicId: number;
+  }) => {
     if (content.id) {
       updateContentMutation.mutate(content as EducationalContent);
     } else {

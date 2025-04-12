@@ -90,7 +90,6 @@ const LearnPage: React.FC = () => {
                 animate="visible"
                 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative"
               >
-                <GraduationCap className="inline-block h-10 w-10 mb-2 mr-3 text-primary" />
                 Apprendre
               </motion.h1>
               <motion.div 
@@ -102,17 +101,6 @@ const LearnPage: React.FC = () => {
                 }}
                 className="h-1 w-20 bg-blue-500 mx-auto rounded-full"
               ></motion.div>
-              
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ 
-                  opacity: 1,
-                  transition: { delay: 0.5, duration: 0.5 } 
-                }}
-                className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto"
-              >
-                Découvrez nos différentes ressources éducatives pour comprendre les enjeux politiques, économiques et historiques
-              </motion.p>
             </div>
           </div>
         </div>
