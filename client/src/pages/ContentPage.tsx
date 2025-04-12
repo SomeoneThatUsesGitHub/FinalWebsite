@@ -1,11 +1,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'wouter';
-import { BookOpen, ChevronLeft, GraduationCap } from 'lucide-react';
-import { PageHeader } from '@/components/ui/page-header';
+import { BookOpen, ChevronLeft, GraduationCap, Clock, Calendar, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import MainLayout from '@/components/layout/MainLayout';
 
 interface EducationalTopic {
@@ -49,62 +49,93 @@ const ContentPage: React.FC = () => {
 
   return (
     <MainLayout>
+      {isLoading ? (
+        <div className="bg-blue-50 py-12 shadow-md mb-6 animate-pulse">
+          <div className="container mx-auto px-4">
+            <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
+            <Skeleton className="h-4 w-3/4 mx-auto" />
+          </div>
+        </div>
+      ) : content ? (
+        <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 shadow-md mb-6">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              {topic && (
+                <div className="mb-4">
+                  <Button variant="outline" className="bg-white hover:bg-blue-50" asChild>
+                    <Link href={`/apprendre/${topicSlug}`}>
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Retour à {topic.name}
+                    </Link>
+                  </Button>
+                </div>
+              )}
+              
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mt-4">
+                <div className="bg-white/10 p-4 rounded-full backdrop-blur-sm">
+                  <BookOpen className="h-12 w-12 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{content.title}</h1>
+                  <p className="text-blue-100 text-lg mb-4">{content.description}</p>
+                  
+                  <div className="flex flex-wrap gap-3 mt-2">
+                    <Badge variant="secondary" className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white">
+                      <Calendar className="h-3 w-3" />
+                      Publié le {new Date(content.createdAt).toLocaleDateString('fr-FR')}
+                    </Badge>
+                    <Badge variant="secondary" className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white">
+                      <RefreshCw className="h-3 w-3" />
+                      Mis à jour le {new Date(content.updatedAt).toLocaleDateString('fr-FR')}
+                    </Badge>
+                    <Badge variant="secondary" className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white">
+                      <Clock className="h-3 w-3" />
+                      Temps de lecture: ~5 min
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-blue-50 py-12 shadow-md mb-6">
+          <div className="container mx-auto px-4">
+            <p className="text-center text-muted-foreground">Contenu introuvable</p>
+          </div>
+        </div>
+      )}
+      
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          {topic && (
-            <Button variant="outline" className="mb-4" asChild>
-              <Link href={`/apprendre/${topicSlug}`}>
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                Retour à {topic.name}
-              </Link>
-            </Button>
-          )}
-
+        <div className="max-w-4xl mx-auto">
           {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-3/4" />
-              <Skeleton className="h-4 w-full" />
+            <div className="space-y-4">
+              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-64 w-full" />
             </div>
           ) : content ? (
-            <PageHeader
-              title={content.title}
-              description={content.description}
-              icon={<BookOpen className="h-8 w-8 mr-3 text-primary" />}
-            />
+            <Card className="shadow-sm">
+              <CardContent className="p-6">
+                <div className="prose prose-blue max-w-none" dangerouslySetInnerHTML={{ __html: content.content }} />
+              </CardContent>
+            </Card>
           ) : (
-            <div className="text-center py-6">
-              <p className="text-muted-foreground">Contenu introuvable</p>
+            <div className="text-center py-12">
+              <div className="inline-block p-4 rounded-full bg-primary/10 mb-4">
+                <GraduationCap className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Contenu introuvable</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Le contenu que vous recherchez n'est pas disponible ou a été déplacé.
+              </p>
+              <Button className="mt-4" asChild>
+                <Link href="/apprendre">
+                  Retour à la page d'apprentissage
+                </Link>
+              </Button>
             </div>
           )}
         </div>
-
-        {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-64 w-full" />
-          </div>
-        ) : content ? (
-          <Card className="shadow-sm">
-            <CardContent className="p-6">
-              <div className="prose prose-blue max-w-none" dangerouslySetInnerHTML={{ __html: content.content }} />
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="text-center py-12">
-            <div className="inline-block p-4 rounded-full bg-primary/10 mb-4">
-              <GraduationCap className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Contenu introuvable</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Le contenu que vous recherchez n'est pas disponible ou a été déplacé.
-            </p>
-            <Button className="mt-4" asChild>
-              <Link href="/apprendre">
-                Retour à la page d'apprentissage
-              </Link>
-            </Button>
-          </div>
-        )}
       </div>
     </MainLayout>
   );

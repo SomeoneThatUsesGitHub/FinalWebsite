@@ -48,6 +48,33 @@ const TopicPage: React.FC = () => {
 
   return (
     <MainLayout>
+      {topicLoading ? (
+        <div className="bg-blue-50 py-12 shadow-md mb-6 animate-pulse">
+          <div className="container mx-auto px-4">
+            <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
+            <Skeleton className="h-4 w-3/4 mx-auto" />
+          </div>
+        </div>
+      ) : topic ? (
+        <div className="bg-blue-50 py-12 shadow-md mb-6" style={{ backgroundImage: topic.imageUrl ? `url(${topic.imageUrl})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+          <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-sm"></div>
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl mx-auto text-center">
+              <GraduationCap className="h-16 w-16 mx-auto text-white mb-4" />
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{topic.title}</h1>
+              <div className="h-1 w-20 bg-white mx-auto my-4 rounded-full"></div>
+              <p className="text-white/90 text-lg max-w-2xl mx-auto">{topic.description}</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-blue-50 py-12 shadow-md mb-6">
+          <div className="container mx-auto px-4">
+            <p className="text-center text-muted-foreground">Sujet introuvable</p>
+          </div>
+        </div>
+      )}
+      
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <Button variant="outline" className="mb-4" asChild>
@@ -56,23 +83,6 @@ const TopicPage: React.FC = () => {
               Retour aux sujets
             </Link>
           </Button>
-          
-          {topicLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-1/2" />
-              <Skeleton className="h-4 w-full" />
-            </div>
-          ) : topic ? (
-            <PageHeader
-              title={topic.title}
-              description={topic.description}
-              icon={<GraduationCap className="h-8 w-8 mr-3 text-primary" />}
-            />
-          ) : (
-            <div className="text-center py-6">
-              <p className="text-muted-foreground">Sujet introuvable</p>
-            </div>
-          )}
         </div>
 
         {isLoading ? (
