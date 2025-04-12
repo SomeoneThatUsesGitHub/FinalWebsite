@@ -78,6 +78,7 @@ interface User {
   username: string;
   displayName: string;
   role: "admin" | "editor" | "user";
+  customRoleId: number | null;
   avatarUrl: string | null;
 }
 
@@ -221,6 +222,15 @@ function UsersPage() {
     },
   });
 
+  // Récupérer les rôles personnalisés
+  const { data: customRoles } = useQuery({
+    queryKey: ["/api/admin/roles"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/admin/roles");
+      return response.ok ? await response.json() : [];
+    },
+  });
+  
   // Formulaire de création d'utilisateur
   const createForm = useForm<CreateUserFormValues>({
     resolver: zodResolver(createUserSchema),
@@ -229,6 +239,7 @@ function UsersPage() {
       displayName: "",
       password: "",
       role: "editor",
+      customRoleId: null,
     },
   });
 
@@ -333,9 +344,16 @@ function UsersPage() {
                       <CardDescription className="text-sm">@{user.username}</CardDescription>
                     </div>
                   </div>
-                  <Badge className={getRoleBadgeColor(user.role)}>
-                    {getRoleLabel(user.role)}
-                  </Badge>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge className={getRoleBadgeColor(user.role)}>
+                      {getRoleLabel(user.role)}
+                    </Badge>
+                    {user.customRoleId && customRoles && (
+                      <Badge variant="outline" className="border-gray-300 text-xs">
+                        {customRoles.find((role: any) => role.id === user.customRoleId)?.displayName || "Rôle personnalisé"}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -504,7 +522,7 @@ function UsersPage() {
                 name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Rôle</FormLabel>
+                    <FormLabel>Rôle principal</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -518,7 +536,39 @@ function UsersPage() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Les droits d'accès de l'utilisateur
+                      Les droits d'accès principaux de l'utilisateur
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={createForm.control}
+                name="customRoleId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rôle personnalisé</FormLabel>
+                    <Select 
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : null)} 
+                      value={field.value ? String(field.value) : undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez un rôle personnalisé (optionnel)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">Aucun rôle personnalisé</SelectItem>
+                        {customRoles && customRoles.map((role: any) => (
+                          <SelectItem key={role.id} value={String(role.id)}>
+                            {role.displayName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Permissions supplémentaires spécifiques
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
