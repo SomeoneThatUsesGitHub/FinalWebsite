@@ -493,7 +493,7 @@ export default function ApplicationsPage() {
       {/* Dialog d'évaluation d'une candidature */}
       <Dialog open={!!reviewApplication} onOpenChange={(open) => !open && setReviewApplication(null)}>
         {reviewApplication && (
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Évaluer la candidature</DialogTitle>
               <DialogDescription>

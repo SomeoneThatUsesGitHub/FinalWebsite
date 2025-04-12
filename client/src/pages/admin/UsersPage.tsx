@@ -328,8 +328,9 @@ function UsersPage() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-800"
                       >
                         <UserCog className="mr-2 h-4 w-4" />
                         Rôle
@@ -354,7 +355,14 @@ function UsersPage() {
                         disabled={user.role === "editor"}
                         onClick={() => {
                           if (user.role !== "editor") {
-                            updateRoleMutation.mutate({ username: user.username, role: "editor" });
+                            // Si l'utilisateur est admin et veut changer son propre rôle
+                            if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
+                              if (confirm("En changeant votre rôle d'administrateur à éditeur, vous allez perdre l'accès à certaines fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
+                                updateRoleMutation.mutate({ username: user.username, role: "editor" });
+                              }
+                            } else {
+                              updateRoleMutation.mutate({ username: user.username, role: "editor" });
+                            }
                           }
                         }}
                         className={user.role === "editor" ? "bg-blue-50" : ""}
@@ -366,7 +374,14 @@ function UsersPage() {
                         disabled={user.role === "user"}
                         onClick={() => {
                           if (user.role !== "user") {
-                            updateRoleMutation.mutate({ username: user.username, role: "user" });
+                            // Si l'utilisateur est admin et veut changer son propre rôle
+                            if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
+                              if (confirm("En changeant votre rôle d'administrateur à utilisateur standard, vous allez perdre l'accès aux fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
+                                updateRoleMutation.mutate({ username: user.username, role: "user" });
+                              }
+                            } else {
+                              updateRoleMutation.mutate({ username: user.username, role: "user" });
+                            }
                           }
                         }}
                         className={user.role === "user" ? "bg-green-50" : ""}
