@@ -85,6 +85,20 @@ function UsersPage() {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  
+  // Récupérer les informations de l'utilisateur connecté
+  const { data: currentUser } = useQuery({
+    queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/auth/me");
+      const userData = await response.json();
+      // Stocker le nom d'utilisateur dans le localStorage pour le retrouver facilement
+      if (userData && userData.username) {
+        window.localStorage.setItem("currentUsername", userData.username);
+      }
+      return userData;
+    },
+  });
 
   // Récupérer la liste des utilisateurs
   const { data: users, isLoading } = useQuery<User[]>({
@@ -324,93 +338,97 @@ function UsersPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex justify-end gap-2 mt-4">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-800"
-                      >
-                        <UserCog className="mr-2 h-4 w-4" />
-                        Rôle
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Changer le rôle</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        disabled={user.role === "admin"}
-                        onClick={() => {
-                          if (user.role !== "admin") {
-                            updateRoleMutation.mutate({ username: user.username, role: "admin" });
-                          }
-                        }}
-                        className={user.role === "admin" ? "bg-red-50" : ""}
-                      >
-                        <Badge className="bg-red-500 hover:bg-red-600 mr-2">A</Badge>
-                        Administrateur
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={user.role === "editor"}
-                        onClick={() => {
-                          if (user.role !== "editor") {
-                            // Si l'utilisateur est admin et veut changer son propre rôle
-                            if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
-                              if (confirm("En changeant votre rôle d'administrateur à éditeur, vous allez perdre l'accès à certaines fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
+                <div className="flex flex-col space-y-4">
+                  <div className="flex justify-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="bg-gray-100 hover:bg-gray-200 text-gray-800 w-full"
+                        >
+                          <UserCog className="mr-2 h-4 w-4" />
+                          Changer le rôle
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Changer le rôle</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          disabled={user.role === "admin"}
+                          onClick={() => {
+                            if (user.role !== "admin") {
+                              updateRoleMutation.mutate({ username: user.username, role: "admin" });
+                            }
+                          }}
+                          className={user.role === "admin" ? "bg-red-50" : ""}
+                        >
+                          <Badge className="bg-red-500 hover:bg-red-600 mr-2">A</Badge>
+                          Administrateur
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          disabled={user.role === "editor"}
+                          onClick={() => {
+                            if (user.role !== "editor") {
+                              // Si l'utilisateur est admin et veut changer son propre rôle
+                              if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
+                                if (confirm("En changeant votre rôle d'administrateur à éditeur, vous allez perdre l'accès à certaines fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
+                                  updateRoleMutation.mutate({ username: user.username, role: "editor" });
+                                }
+                              } else {
                                 updateRoleMutation.mutate({ username: user.username, role: "editor" });
                               }
-                            } else {
-                              updateRoleMutation.mutate({ username: user.username, role: "editor" });
                             }
-                          }
-                        }}
-                        className={user.role === "editor" ? "bg-blue-50" : ""}
-                      >
-                        <Badge className="bg-blue-500 hover:bg-blue-600 mr-2">E</Badge>
-                        Éditeur
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={user.role === "user"}
-                        onClick={() => {
-                          if (user.role !== "user") {
-                            // Si l'utilisateur est admin et veut changer son propre rôle
-                            if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
-                              if (confirm("En changeant votre rôle d'administrateur à utilisateur standard, vous allez perdre l'accès aux fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
+                          }}
+                          className={user.role === "editor" ? "bg-blue-50" : ""}
+                        >
+                          <Badge className="bg-blue-500 hover:bg-blue-600 mr-2">E</Badge>
+                          Éditeur
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          disabled={user.role === "user"}
+                          onClick={() => {
+                            if (user.role !== "user") {
+                              // Si l'utilisateur est admin et veut changer son propre rôle
+                              if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
+                                if (confirm("En changeant votre rôle d'administrateur à utilisateur standard, vous allez perdre l'accès aux fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
+                                  updateRoleMutation.mutate({ username: user.username, role: "user" });
+                                }
+                              } else {
                                 updateRoleMutation.mutate({ username: user.username, role: "user" });
                               }
-                            } else {
-                              updateRoleMutation.mutate({ username: user.username, role: "user" });
                             }
-                          }
-                        }}
-                        className={user.role === "user" ? "bg-green-50" : ""}
-                      >
-                        <Badge className="bg-green-500 hover:bg-green-600 mr-2">U</Badge>
-                        Utilisateur
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                          }}
+                          className={user.role === "user" ? "bg-green-50" : ""}
+                        >
+                          <Badge className="bg-green-500 hover:bg-green-600 mr-2">U</Badge>
+                          Utilisateur
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                   
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setOpenPasswordModal(true);
-                    }}
-                  >
-                    <Key className="mr-2 h-4 w-4" />
-                    Mot de passe
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteUser(user)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Supprimer
-                  </Button>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setOpenPasswordModal(true);
+                      }}
+                    >
+                      <Key className="mr-2 h-4 w-4" />
+                      Mot de passe
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteUser(user)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Supprimer
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
