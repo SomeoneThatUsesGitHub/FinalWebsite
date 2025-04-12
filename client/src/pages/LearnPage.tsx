@@ -287,56 +287,44 @@ const LearnPage: React.FC = () => {
           }}
         >
           {!showFilters && (
-            <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-none">
+            <div className="flex-1 flex flex-wrap gap-2 pb-2">
               <Badge 
                 variant={!searchTerm && sortOrder === "latest" ? "default" : "outline"}
-                className="cursor-pointer py-2 px-4"
+                className="cursor-pointer py-2 px-3 sm:px-4"
                 onClick={() => {
                   setSearchTerm("");
                   setSortOrder("latest");
                 }}
               >
                 <Tag className="mr-1 h-4 w-4" />
-                Toutes les années
+                <span className="whitespace-nowrap">Toutes les années</span>
               </Badge>
               
               <Badge 
                 variant={sortOrder === "2025" ? "default" : "outline"}
-                className="cursor-pointer py-2 px-4 whitespace-nowrap"
+                className="cursor-pointer py-2 px-3 sm:px-4"
                 onClick={() => setSortOrder("2025")}
               >
                 <Calendar className="mr-1 h-4 w-4" />
-                2025
+                <span className="whitespace-nowrap">2025</span>
               </Badge>
               
               <Badge 
                 variant={sortOrder === "2024" ? "default" : "outline"}
-                className="cursor-pointer py-2 px-4"
+                className="cursor-pointer py-2 px-3 sm:px-4"
                 onClick={() => setSortOrder("2024")}
               >
                 <Calendar className="mr-1 h-4 w-4" />
-                2024
+                <span className="whitespace-nowrap">2024</span>
               </Badge>
             </div>
           )}
           
-          <div className="flex items-center">
-            {!showFilters && (
-              <div className="relative max-w-xs mr-2">
-                <Input
-                  type="text"
-                  placeholder="Rechercher..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 h-10 text-sm"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              </div>
-            )}
+          <div className="flex items-center ml-2">
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center text-xs"
+              className="flex items-center text-xs whitespace-nowrap"
               onClick={toggleFilters}
             >
               <Sliders className="h-4 w-4 mr-1" />
