@@ -85,28 +85,24 @@ const courseData = {
               Le Serment du Jeu de paume
             </h2>
             
-            <div class="flex flex-col md:flex-row gap-6 my-6">
-              <div class="md:w-1/2">
-                <p class="mb-4">Le 20 juin 1789, les députés se réunissent dans la salle du Jeu de paume à Versailles et jurent de ne pas se séparer avant d'avoir doté la France d'une Constitution. C'est le célèbre "Serment du Jeu de paume", immortalisé par le peintre Jacques-Louis David.</p>
+            <p class="mb-4">Le 20 juin 1789, les députés se réunissent dans la salle du Jeu de paume à Versailles et jurent de ne pas se séparer avant d'avoir doté la France d'une Constitution. C'est le célèbre "Serment du Jeu de paume", immortalisé par le peintre Jacques-Louis David.</p>
                 
-                <p class="mb-4">Cet acte symbolique marque une rupture définitive avec la monarchie absolue et pose les bases d'un régime représentatif où la souveraineté appartient désormais à la nation et non plus au roi.</p>
-                
-                <div class="flex items-center p-3 bg-blue-50 rounded-lg mt-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                  </svg>
-                  <span class="text-blue-700 font-medium">Le Serment du Jeu de paume est considéré comme l'acte fondateur de la démocratie française moderne.</span>
+            <p class="mb-4">Cet acte symbolique marque une rupture définitive avec la monarchie absolue et pose les bases d'un régime représentatif où la souveraineté appartient désormais à la nation et non plus au roi.</p>
+            
+            <div class="my-6">
+              <div class="relative">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Le_Serment_du_Jeu_de_paume.jpg/800px-Le_Serment_du_Jeu_de_paume.jpg" alt="Le Serment du Jeu de paume" class="rounded-lg shadow-md mx-auto" />
+                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-3 rounded-b-lg">
+                  <p class="text-sm font-medium">Le Serment du Jeu de paume par Jacques-Louis David (1791)</p>
                 </div>
               </div>
-              
-              <div class="md:w-1/2">
-                <div class="relative">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Le_Serment_du_Jeu_de_paume.jpg/800px-Le_Serment_du_Jeu_de_paume.jpg" alt="Le Serment du Jeu de paume" class="rounded-lg shadow-md" />
-                  <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-3 rounded-b-lg">
-                    <p class="text-sm font-medium">Le Serment du Jeu de paume par Jacques-Louis David (1791)</p>
-                  </div>
-                </div>
-              </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-blue-50 rounded-lg my-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+              <span class="text-blue-700 font-medium">Le Serment du Jeu de paume est considéré comme l'acte fondateur de la démocratie française moderne.</span>
             </div>
             
             <div class="border border-gray-200 rounded-lg p-5 my-8 bg-gray-50">
@@ -369,60 +365,38 @@ const courseData = {
               Les députés de l'Assemblée Nationale
             </h2>
             
-            <div class="flex flex-col md:flex-row gap-8 my-6">
-              <div class="md:w-3/5">
-                <p class="mb-4">L'Assemblée nationale comprend <span class="font-semibold bg-yellow-100 px-1">577 députés</span> élus pour un mandat de 5 ans au suffrage universel direct. Ils représentent à la fois leur circonscription et la nation tout entière.</p>
-                
-                <div class="bg-gray-100 rounded-lg p-4 my-4">
-                  <h3 class="font-bold text-gray-800 mb-2 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Composition actuelle (16e législature 2022-2027)
-                  </h3>
-                  <p class="text-gray-700">Suite aux élections législatives de 2022, l'Assemblée nationale est composée de plusieurs groupes politiques, aucun ne disposant de la majorité absolue (289 sièges), ce qui constitue une situation inédite sous la Ve République.</p>
-                </div>
-                
-                <h3 class="text-xl font-bold text-gray-800 mb-3 mt-6">Mode d'élection</h3>
-                
-                <p class="mb-4">Les députés sont élus au scrutin uninominal majoritaire à deux tours dans le cadre de circonscriptions. La France métropolitaine et d'outre-mer est divisée en 577 circonscriptions :</p>
-                
-                <ul class="space-y-2 mb-6">
-                  <li class="flex items-start">
-                    <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-blue-100 text-blue-800 font-semibold mr-2 flex-shrink-0">556</span>
-                    <span>circonscriptions pour la France métropolitaine</span>
-                  </li>
-                  <li class="flex items-start">
-                    <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-blue-100 text-blue-800 font-semibold mr-2 flex-shrink-0">10</span>
-                    <span>circonscriptions pour les DOM-TOM</span>
-                  </li>
-                  <li class="flex items-start">
-                    <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-blue-100 text-blue-800 font-semibold mr-2 flex-shrink-0">11</span>
-                    <span>circonscriptions pour les Français établis hors de France</span>
-                  </li>
-                </ul>
-              </div>
-              
-              <div class="md:w-2/5">
-                <div class="sticky top-24">
-                  <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Hemicycle_of_the_National_Assembly_of_France%2C_27_November_2021.jpg" alt="Hémicycle de l'Assemblée nationale" class="w-full h-auto" />
-                    <div class="p-4">
-                      <p class="text-sm text-gray-600 italic">L'hémicycle de l'Assemblée nationale au Palais Bourbon à Paris, siège des députés français</p>
-                    </div>
-                  </div>
-                  
-                  <div class="mt-6 bg-white border border-gray-200 rounded-lg p-4">
-                    <h4 class="font-bold text-gray-800 mb-3 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Le saviez-vous ?
-                    </h4>
-                    <p class="text-gray-700">Contrairement à d'autres pays, la France a choisi un scrutin majoritaire plutôt que proportionnel pour l'élection des députés, afin de favoriser l'émergence de majorités stables.</p>
-                  </div>
-                </div>
-              </div>
+            <p class="mb-4">L'Assemblée nationale comprend <span class="font-semibold bg-yellow-100 px-1">577 députés</span> élus pour un mandat de 5 ans au suffrage universel direct. Ils représentent à la fois leur circonscription et la nation tout entière.</p>
+            
+            <div class="my-6">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Hemicycle_of_the_National_Assembly_of_France%2C_27_November_2021.jpg" alt="Hémicycle de l'Assemblée nationale" class="w-full h-auto rounded-lg shadow-md" />
+              <p class="text-sm text-gray-600 italic text-center mt-2">L'hémicycle de l'Assemblée nationale au Palais Bourbon à Paris, siège des députés français</p>
+            </div>
+            
+            <div class="bg-gray-100 rounded-lg p-4 my-4">
+              <h3 class="font-bold text-gray-800 mb-2 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Composition actuelle (16e législature 2022-2027)
+              </h3>
+              <p class="text-gray-700">Suite aux élections législatives de 2022, l'Assemblée nationale est composée de plusieurs groupes politiques, aucun ne disposant de la majorité absolue (289 sièges), ce qui constitue une situation inédite sous la Ve République.</p>
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-800 mb-3 mt-6">Mode d'élection</h3>
+            
+            <p class="mb-4">Les députés sont élus au scrutin uninominal majoritaire à deux tours dans le cadre de circonscriptions. La France métropolitaine et d'outre-mer est divisée en 577 circonscriptions :</p>
+            
+            <p class="mb-4">
+              • <strong>556</strong> circonscriptions pour la France métropolitaine<br>
+              • <strong>10</strong> circonscriptions pour les DOM-TOM<br>
+              • <strong>11</strong> circonscriptions pour les Français établis hors de France
+            </p>
+            
+            <div class="bg-blue-50 p-4 rounded-lg my-6 border-l-4 border-blue-400">
+              <p class="text-blue-800">
+                <span class="font-semibold">À noter : </span> 
+                Contrairement à d'autres pays, la France a choisi un scrutin majoritaire plutôt que proportionnel pour l'élection des députés, afin de favoriser l'émergence de majorités stables.
+              </p>
             </div>
             
             <h3 class="text-xl font-bold text-gray-800 mb-3 mt-8">Statut du député</h3>
@@ -589,71 +563,24 @@ const courseData = {
             
             <p class="mb-6">Depuis la révision constitutionnelle de 2008, l'Assemblée nationale compte huit commissions permanentes :</p>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
-              <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-2">
-                  <span class="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
-                  <h4 class="font-bold text-gray-800">Commission des affaires culturelles et de l'éducation</h4>
-                </div>
-                <p class="text-gray-600 text-sm ml-11">Éducation, enseignement supérieur, recherche, jeunesse, sports, culture, communication</p>
-              </div>
-              
-              <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-2">
-                  <span class="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
-                  <h4 class="font-bold text-gray-800">Commission des affaires économiques</h4>
-                </div>
-                <p class="text-gray-600 text-sm ml-11">Agriculture, énergie, industrie, commerce, consommation, numérique, tourisme</p>
-              </div>
-              
-              <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-2">
-                  <span class="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
-                  <h4 class="font-bold text-gray-800">Commission des affaires étrangères</h4>
-                </div>
-                <p class="text-gray-600 text-sm ml-11">Politique étrangère, relations internationales, traités, organisations internationales</p>
-              </div>
-              
-              <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-2">
-                  <span class="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">4</span>
-                  <h4 class="font-bold text-gray-800">Commission des affaires sociales</h4>
-                </div>
-                <p class="text-gray-600 text-sm ml-11">Santé, solidarité, travail, emploi, formation professionnelle, retraites</p>
-              </div>
-              
-              <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-2">
-                  <span class="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">5</span>
-                  <h4 class="font-bold text-gray-800">Commission de la défense nationale</h4>
-                </div>
-                <p class="text-gray-600 text-sm ml-11">Organisation générale de la défense, politique militaire, armement</p>
-              </div>
-              
-              <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-2">
-                  <span class="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">6</span>
-                  <h4 class="font-bold text-gray-800">Commission du développement durable</h4>
-                </div>
-                <p class="text-gray-600 text-sm ml-11">Environnement, transports, infrastructures, aménagement du territoire</p>
-              </div>
-              
-              <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-2">
-                  <span class="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">7</span>
-                  <h4 class="font-bold text-gray-800">Commission des finances</h4>
-                </div>
-                <p class="text-gray-600 text-sm ml-11">Budget, fiscalité, finances publiques, contrôle budgétaire</p>
-              </div>
-              
-              <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-2">
-                  <span class="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">8</span>
-                  <h4 class="font-bold text-gray-800">Commission des lois</h4>
-                </div>
-                <p class="text-gray-600 text-sm ml-11">Constitution, lois, justice, libertés publiques, collectivités territoriales</p>
-              </div>
+            <p class="mb-4">
+              <strong>1. Commission des affaires culturelles et de l'éducation :</strong> Éducation, enseignement supérieur, recherche, jeunesse, sports, culture, communication<br><br>
+              <strong>2. Commission des affaires économiques :</strong> Agriculture, énergie, industrie, commerce, consommation, numérique, tourisme<br><br>
+              <strong>3. Commission des affaires étrangères :</strong> Politique étrangère, relations internationales, traités, organisations internationales<br><br>
+              <strong>4. Commission des affaires sociales :</strong> Santé, solidarité, travail, emploi, formation professionnelle, retraites
+            </p>
+            
+            <div class="my-6">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Commission_Defense_Assemblee_Nationale.jpg/800px-Commission_Defense_Assemblee_Nationale.jpg" alt="Commission de la défense nationale" class="w-full h-auto rounded-lg shadow-md" />
+              <p class="text-sm text-gray-600 italic text-center mt-2">Réunion de la Commission de la défense nationale à l'Assemblée Nationale</p>
             </div>
+            
+            <p class="mb-4">
+              <strong>5. Commission de la défense nationale :</strong> Organisation générale de la défense, politique militaire, armement<br><br>
+              <strong>6. Commission du développement durable :</strong> Environnement, transports, infrastructures, aménagement du territoire<br><br>
+              <strong>7. Commission des finances :</strong> Budget, fiscalité, finances publiques, contrôle budgétaire<br><br>
+              <strong>8. Commission des lois :</strong> Constitution, lois, justice, libertés publiques, collectivités territoriales
+            </p>
             
             <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">Commissions spéciales et commissions d'enquête</h3>
             
@@ -765,7 +692,7 @@ const SimpleCourseDetailPage: React.FC = () => {
           </Link>
           
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="md:w-2/3">
+            <div className="md:w-3/5">
               <div className="flex items-center mb-3">
                 <span className="inline-block bg-blue-900 bg-opacity-50 text-blue-100 px-3 py-1 rounded-full text-sm font-medium mr-3">
                   {course.category}
@@ -779,7 +706,7 @@ const SimpleCourseDetailPage: React.FC = () => {
               </div>
               
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">{course.title}</h1>
-              <p className="text-blue-100 md:text-lg md:pr-12">{course.description}</p>
+              <p className="text-blue-100 md:text-lg">{course.description}</p>
               
               <div className="mt-6 hidden md:block">
                 <div className="inline-flex items-center text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">
@@ -791,21 +718,17 @@ const SimpleCourseDetailPage: React.FC = () => {
               </div>
             </div>
             
-            <div className="mt-6 md:mt-0 md:w-1/3 flex flex-col items-center">
-              <div className="bg-white p-1 rounded-lg shadow-lg mb-4 w-full max-w-xs">
+            <div className="mt-6 md:mt-0 md:w-2/5">
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                 <img 
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Assemblée_nationale_française_logo.svg/1200px-Assemblée_nationale_française_logo.svg.png" 
-                  alt="Logo Assemblée Nationale" 
-                  className="w-full h-auto rounded"
+                  src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Palais_Bourbon_front.jpg" 
+                  alt="Palais Bourbon - Siège de l'Assemblée Nationale" 
+                  className="w-full h-auto"
                 />
+                <div className="bg-white bg-opacity-90 p-2 absolute bottom-0 left-0 right-0">
+                  <p className="text-xs text-center text-gray-700 font-medium">Le Palais Bourbon, siège de l'Assemblée Nationale française</p>
+                </div>
               </div>
-              <button className="bg-white text-blue-700 hover:bg-blue-50 font-bold py-3 px-6 rounded-full shadow-md transition-colors w-full max-w-xs flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Commencer le cours
-              </button>
             </div>
           </div>
         </div>
