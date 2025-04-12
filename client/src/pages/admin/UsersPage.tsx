@@ -60,8 +60,7 @@ const createUserSchema = z.object({
   username: z.string().min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères"),
   displayName: z.string().min(2, "Le nom d'affichage doit contenir au moins 2 caractères"),
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
-  role: z.enum(["admin", "editor", "user"]),
-  customRoleId: z.number().nullable().optional(),
+  customRoleId: z.number(),
 });
 
 // Schéma pour la mise à jour du mot de passe
@@ -77,8 +76,8 @@ interface User {
   id: number;
   username: string;
   displayName: string;
-  role: "admin" | "editor" | "user";
-  customRoleId: number | null;
+  role: string; // Gardé provisoirement pour compatibilité mais sera supprimé à terme
+  customRoleId: number;
   avatarUrl: string | null;
 }
 
