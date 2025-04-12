@@ -8,8 +8,12 @@ import { User as BaseUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-// Étendre le type User pour inclure isAdmin et role
-type User = BaseUser & { isAdmin?: boolean; role?: "user" | "admin" | "editor" };
+// Étendre le type User pour inclure isAdmin, role et customRoleId
+type User = BaseUser & { 
+  isAdmin?: boolean; 
+  role?: "user" | "admin" | "editor";
+  customRoleId?: number;
+};
 
 type AuthContextType = {
   user: User | null;
@@ -18,6 +22,10 @@ type AuthContextType = {
   loginMutation: UseMutationResult<any, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<any, Error, RegisterData>;
+  // Nouvelles fonctions pour vérifier les permissions
+  hasPermission: (permissionCode: string) => Promise<boolean>;
+  hasAnyPermission: (permissionCodes: string[]) => Promise<boolean>;
+  checkPermissionForRoute: (pathname: string) => Promise<boolean>;
 };
 
 type LoginData = Pick<InsertUser, "username" | "password">;
@@ -109,6 +117,78 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  // Fonction pour vérifier si l'utilisateur a une permission spécifique
+  const hasPermission = async (permissionCode: string): Promise<boolean> => {
+    if (!user) return false;
+    
+    // Compatibilité avec l'ancien système
+    if (user.role === "admin") return true;
+    if (user.role === "editor" && [
+      "dashboard", "articles", "flash_infos", "videos", 
+      "categories", "educational_topics", "educational_content", "live_coverage"
+    ].includes(permissionCode)) {
+      return true;
+    }
+    
+    if (!user.customRoleId) return false;
+    
+    try {
+      // Appel API pour vérifier les permissions
+      const response = await fetch(`/api/auth/check-permission?code=${permissionCode}`);
+      if (!response.ok) {
+        return false;
+      }
+      const data = await response.json();
+      return data.hasPermission;
+    } catch (error) {
+      console.error("Erreur lors de la vérification des permissions:", error);
+      return false;
+    }
+  };
+  
+  // Fonction pour vérifier si l'utilisateur a l'une des permissions listées
+  const hasAnyPermission = async (permissionCodes: string[]): Promise<boolean> => {
+    for (const code of permissionCodes) {
+      if (await hasPermission(code)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  // Fonction pour vérifier les permissions basées sur le chemin
+  const checkPermissionForRoute = async (pathname: string): Promise<boolean> => {
+    // Si c'est le tableau de bord principal
+    if (pathname === "/admin") {
+      return await hasPermission("dashboard");
+    }
+    
+    // Map des chemins vers les codes de permission
+    const routePermissionMap: Record<string, string> = {
+      "/admin/articles": "articles",
+      "/admin/categories": "categories",
+      "/admin/flash-infos": "flash_infos",
+      "/admin/videos": "videos",
+      "/admin/directs": "live_coverage",
+      "/admin/users": "users",
+      "/admin/team": "team",
+      "/admin/newsletter": "newsletter",
+      "/admin/applications": "applications",
+      "/admin/messages": "messages",
+      "/admin/contenu-educatif": "educational_content",
+      "/admin/roles": "roles"
+    };
+    
+    // Vérifier la permission correspondante au chemin
+    const permissionCode = routePermissionMap[pathname];
+    if (permissionCode) {
+      return await hasPermission(permissionCode);
+    }
+    
+    // Par défaut, pour les chemins non spécifiés
+    return user?.isAdmin || user?.role === "admin";
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -118,6 +198,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
+        hasPermission,
+        hasAnyPermission,
+        checkPermissionForRoute
       }}
     >
       {children}

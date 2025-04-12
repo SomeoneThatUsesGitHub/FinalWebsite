@@ -589,7 +589,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       displayName: user.displayName || user.username,
       role: user.role || "user",
       avatarUrl: user.avatarUrl || null,
-      isAdmin: user.role === "admin" || !!user.isAdmin
+      isAdmin: user.role === "admin" || !!user.isAdmin,
+      customRoleId: user.customRoleId || null
     };
     
     // Log pour debugging
@@ -597,6 +598,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Retourner l'utilisateur directement (sans l'encapsuler dans un objet)
     res.json(safeUser);
+  });
+  
+  // Route pour vérifier si l'utilisateur a une permission spécifique
+  app.get("/api/auth/check-permission", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const permissionCode = req.query.code as string;
+      
+      if (!permissionCode) {
+        return res.status(400).json({ 
+          message: "Code de permission manquant", 
+          hasPermission: false 
+        });
+      }
+      
+      const userId = (req.user as any).id;
+      const { hasPermission } = await import("./auth");
+      const result = await hasPermission(userId, permissionCode);
+      
+      res.json({ hasPermission: result });
+    } catch (error) {
+      console.error("Erreur lors de la vérification des permissions:", error);
+      res.status(500).json({ 
+        message: "Erreur lors de la vérification des permissions", 
+        hasPermission: false 
+      });
+    }
   });
   
   // Route pour récupérer les articles d'un utilisateur connecté
