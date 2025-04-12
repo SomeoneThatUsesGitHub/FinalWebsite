@@ -68,7 +68,8 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
     content: initialContent?.content || '<p>Commencez à rédiger ici...</p>',
     editorProps: {
       attributes: {
-        class: 'prose prose-blue focus:outline-none min-h-[300px] p-4',
+        class: 'prose prose-blue focus:outline-none min-h-[300px] p-4 w-full break-words',
+        style: 'width: 100%; max-width: 100%; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;',
       },
     },
   });
@@ -237,8 +238,8 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
         </TabsList>
 
         <TabsContent value="editor" className="space-y-4">
-          <Card className="p-2">
-            <div className="flex flex-wrap gap-1 p-1 border-b">
+          <Card className="p-2 w-full">
+            <div className="flex flex-wrap gap-1 p-1 border-b w-full">
               <Toggle
                 pressed={editor?.isActive('heading', { level: 1 })}
                 onPressedChange={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -335,7 +336,16 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
                 Séparateur
               </Button>
             </div>
-            <EditorContent editor={editor} className="min-h-[400px]" />
+            <EditorContent 
+              editor={editor} 
+              className="min-h-[400px] w-full px-4 py-3"
+              style={{ 
+                width: '100%', 
+                maxWidth: '100%', 
+                overflowWrap: 'break-word',
+                wordBreak: 'break-word'
+              }}
+            />
           </Card>
         </TabsContent>
 
