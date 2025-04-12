@@ -154,15 +154,29 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
   const handleAddImage = () => {
     const url = window.prompt('URL de l\'image:');
     if (url && editor) {
-      // Insérer l'image avec un meilleur style et une figure complète
-      editor.chain().focus().insertContent(`
-        <figure class="my-6 text-center">
-          <img src="${url}" alt="Image insérée" class="mx-auto max-w-full h-auto rounded-lg shadow-md" style="max-height: 400px; object-fit: contain;" />
-          <figcaption class="text-sm text-gray-600 mt-2">
-            ${window.prompt('Légende de l\'image (optionnel):') || ''}
-          </figcaption>
-        </figure>
-      `).run();
+      const caption = window.prompt('Légende de l\'image (optionnel):') || '';
+      
+      // Créer un élément DOM pour l'image plutôt que d'insérer du HTML brut
+      const figure = document.createElement('figure');
+      figure.className = 'my-6 text-center';
+      
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Image insérée';
+      img.className = 'mx-auto max-w-full h-auto rounded-lg shadow-md';
+      img.style.maxHeight = '400px';
+      img.style.objectFit = 'contain';
+      
+      const figcaption = document.createElement('figcaption');
+      figcaption.className = 'text-sm text-gray-600 mt-2';
+      figcaption.textContent = caption;
+      
+      figure.appendChild(img);
+      figure.appendChild(figcaption);
+      
+      // Insérer le nœud DOM dans l'éditeur
+      const htmlContent = figure.outerHTML;
+      editor.chain().focus().insertContent(htmlContent).run();
     }
   };
 

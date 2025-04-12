@@ -117,7 +117,24 @@ const ContentPage: React.FC = () => {
           ) : content ? (
             <Card className="shadow-sm">
               <CardContent className="p-6">
-                <div className="prose prose-blue max-w-none" dangerouslySetInnerHTML={{ __html: content.content }} />
+                <div className="prose prose-blue max-w-none" dangerouslySetInnerHTML={{ 
+                  __html: content.content
+                    // Remplacer les balises img qui apparaissent sous forme de texte
+                    .replace(/&lt;img/g, '<img')
+                    .replace(/class=&quot;([^&]*)&quot;/g, 'class="$1"')
+                    .replace(/src=&quot;([^&]*)&quot;/g, 'src="$1"')
+                    .replace(/alt=&quot;([^&]*)&quot;/g, 'alt="$1"')
+                    .replace(/style=&quot;([^&]*)&quot;/g, 'style="$1"')
+                    .replace(/\/&gt;/g, '/>')
+                    // Alternative avec les guillemets non-échappés
+                    .replace(/<img src="([^"]*)" alt="([^"]*)" class="([^"]*)" \/>/g, 
+                             '<img src="$1" alt="$2" class="$3" />')
+                    // Correction pour les balises figure et figcaption
+                    .replace(/&lt;figure/g, '<figure')
+                    .replace(/&lt;figcaption/g, '<figcaption')
+                    .replace(/&lt;\/figure&gt;/g, '</figure>')
+                    .replace(/&lt;\/figcaption&gt;/g, '</figcaption>')
+                }} />
               </CardContent>
             </Card>
           ) : (
