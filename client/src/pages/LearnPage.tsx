@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import { Helmet } from "react-helmet";
+import { Link, useLocation } from "wouter";
 
 // Animation avec effet de rebond
 const fadeInWithBounce = {
@@ -130,14 +131,23 @@ const sampleCourses: Course[] = [
 ];
 
 const CourseCard: React.FC<{ course: Course; index: number }> = ({ course, index }) => {
+  const [, navigate] = useLocation();
+  const courseSlug = slugMap[course.id];
+  
+  // Gestion du clic sur la carte
+  const handleCardClick = () => {
+    navigate(`/apprendre/${courseSlug}`);
+  };
+  
   return (
     <motion.div
-      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
       variants={cardAnimation}
       initial="hidden"
       animate="visible"
       whileHover="hover"
       transition={{ delay: index * 0.1 }}
+      onClick={handleCardClick}
     >
       <div className="h-3 bg-blue-500"></div>
       <div className="p-6">
@@ -161,6 +171,21 @@ const CourseCard: React.FC<{ course: Course; index: number }> = ({ course, index
             </svg>
             {course.level}
           </span>
+        </div>
+        
+        <div className="mt-5 flex justify-end">
+          <button 
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors"
+            onClick={(e) => {
+              e.stopPropagation(); // Empêcher la propagation pour éviter le déclenchement du onClick parent
+              navigate(`/apprendre/${courseSlug}`);
+            }}
+          >
+            Démarrer le cours
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
         </div>
       </div>
     </motion.div>
