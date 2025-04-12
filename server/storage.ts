@@ -116,10 +116,22 @@ export interface IStorage {
   getElectionById(id: number): Promise<Election | undefined>;
   createElection(election: InsertElection): Promise<Election>;
   
+  // Educational Topics operations
+  getAllEducationalTopics(): Promise<EducationalTopic[]>;
+  getEducationalTopicBySlug(slug: string): Promise<EducationalTopic | undefined>;
+  getEducationalTopicById(id: number): Promise<EducationalTopic | undefined>;
+  createEducationalTopic(topic: InsertEducationalTopic): Promise<EducationalTopic>;
+  updateEducationalTopic(id: number, data: Partial<InsertEducationalTopic>): Promise<EducationalTopic | undefined>;
+  deleteEducationalTopic(id: number): Promise<boolean>;
+  
   // Educational Content operations
-  getAllEducationalContent(categoryId?: number): Promise<EducationalContent[]>;
+  getAllEducationalContent(topicId?: number): Promise<EducationalContent[]>;
   getEducationalContentById(id: number): Promise<EducationalContent | undefined>;
+  getEducationalContentBySlug(slug: string): Promise<EducationalContent | undefined>;
   createEducationalContent(content: InsertEducationalContent): Promise<EducationalContent>;
+  updateEducationalContent(id: number, data: Partial<InsertEducationalContent>): Promise<EducationalContent | undefined>;
+  deleteEducationalContent(id: number): Promise<boolean>;
+  incrementEducationalContentViews(id: number): Promise<void>;
   
   // Videos operations
   getAllVideos(limit?: number): Promise<Video[]>;
