@@ -1,441 +1,312 @@
 import React, { useState, useEffect } from 'react';
-import { useRoute, useLocation } from 'wouter';
+import { useRoute, Link } from 'wouter';
 import { motion } from 'framer-motion';
 import { pageTransition } from '@/lib/animations';
 import { Helmet } from 'react-helmet';
-import { ChevronLeft, ChevronRight, Star, Clock, Award, CheckCircle, BookOpen, Target } from 'lucide-react';
-import { Link } from 'wouter';
+import { ChevronLeft, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
-// Interface pour les leçons
+// Types pour les données de cours provenant de notre API
 interface Lesson {
   id: number;
   title: string;
-  type: 'lecture' | 'quiz' | 'interactive';
-  completed: boolean;
-  duration: string;
-  points: number;
-  description: string;
+  content: string;
+  order: number;
+  chapterId: number;
 }
 
-// Interface pour les sections
-interface Section {
+interface Chapter {
   id: number;
   title: string;
+  order: number;
+  courseId: number;
   lessons: Lesson[];
-  completed: boolean;
 }
 
-// Composant pour le module individuel (leçon)
-const LessonCard: React.FC<{ lesson: Lesson; courseSlug: string; sectionId: number; onClick: () => void }> = ({ 
-  lesson, 
-  courseSlug,
-  sectionId,
-  onClick 
-}) => {
-  const iconMap = {
-    'lecture': <BookOpen className="h-5 w-5" />,
-    'quiz': <Target className="h-5 w-5" />,
-    'interactive': <BookOpen className="h-5 w-5" />
-  };
-
-  return (
-    <motion.div
-      className={`relative flex flex-col p-5 rounded-xl shadow-sm border ${
-        lesson.completed ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'
-      } hover:shadow-md transition-all duration-300 cursor-pointer`}
-      whileHover={{ y: -5 }}
-      onClick={onClick}
-    >
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center">
-          <div className={`p-2 rounded-full mr-3 ${
-            lesson.completed ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
-          }`}>
-            {lesson.completed ? <CheckCircle className="h-5 w-5" /> : iconMap[lesson.type]}
-          </div>
-          <h3 className="font-medium text-gray-800">{lesson.title}</h3>
-        </div>
-        
-        {lesson.completed && (
-          <div className="bg-green-500 text-white text-xs py-1 px-2 rounded-full">
-            Complété
-          </div>
-        )}
-      </div>
-      
-      <p className="text-gray-600 text-sm mb-4">{lesson.description}</p>
-      
-      <div className="flex justify-between items-center mt-auto text-sm">
-        <div className="flex items-center text-gray-500">
-          <Clock className="h-4 w-4 mr-1" />
-          <span>{lesson.duration}</span>
-        </div>
-        
-        <div className="flex items-center text-amber-500">
-          <Star className="h-4 w-4 mr-1 fill-current" />
-          <span>{lesson.points} pts</span>
-        </div>
-      </div>
-      
-      {lesson.completed && (
-        <div className="absolute -top-2 -right-2 h-6 w-6 bg-green-500 rounded-full flex items-center justify-center">
-          <CheckCircle className="h-4 w-4 text-white" />
-        </div>
-      )}
-    </motion.div>
-  );
-};
-
-// Composant pour l'affichage des sections de cours
-const SectionAccordion: React.FC<{ 
-  section: Section; 
-  isOpen: boolean; 
-  toggleOpen: () => void;
-  courseSlug: string;
-  navigate: (path: string) => void;
-}> = ({ section, isOpen, toggleOpen, courseSlug, navigate }) => {
-  const completedLessons = section.lessons.filter(lesson => lesson.completed).length;
-  const progress = (completedLessons / section.lessons.length) * 100;
-  
-  return (
-    <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
-      <div 
-        className={`flex justify-between items-center p-4 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors ${section.completed ? 'bg-green-50' : ''}`}
-        onClick={toggleOpen}
-      >
-        <div className="flex items-center">
-          <div className={`p-2 rounded-full mr-3 ${section.completed ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
-            {section.completed ? <CheckCircle className="h-5 w-5" /> : <BookOpen className="h-5 w-5" />}
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-800">{section.title}</h3>
-            <p className="text-xs text-gray-500">{completedLessons} sur {section.lessons.length} modules complétés</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center">
-          <div className="h-2 w-24 bg-gray-200 rounded-full mr-3 overflow-hidden">
-            <div 
-              className="h-full bg-blue-500 rounded-full"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-          {isOpen ? <ChevronUp className="h-5 w-5 text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
-        </div>
-      </div>
-      
-      {isOpen && (
-        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {section.lessons.map((lesson) => (
-            <LessonCard 
-              key={lesson.id} 
-              lesson={lesson} 
-              courseSlug={courseSlug}
-              sectionId={section.id}
-              onClick={() => navigate(`/apprendre/${courseSlug}/lecon/${lesson.id}`)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Composant pour la barre de progression
-const ProgressBar: React.FC<{ course: any; sections: Section[] }> = ({ course, sections }) => {
-  const totalLessons = sections.reduce((total, section) => total + section.lessons.length, 0);
-  const completedLessons = sections.reduce((total, section) => 
-    total + section.lessons.filter(lesson => lesson.completed).length, 0);
-  const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
-  
-  return (
-    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6">
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="font-semibold text-gray-800">Votre progression</h3>
-        <div className="text-sm text-gray-600">{completedLessons}/{totalLessons} modules</div>
-      </div>
-      
-      <div className="h-3 w-full bg-gray-200 rounded-full overflow-hidden">
-        <motion.div 
-          className="h-full bg-blue-500 rounded-full"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        ></motion.div>
-      </div>
-      
-      <div className="flex justify-between items-center mt-3">
-        <div className="flex items-center">
-          <Award className="h-5 w-5 text-amber-500 mr-1" />
-          <span className="text-sm text-gray-600">Points gagnés: {completedLessons * 10}</span>
-        </div>
-        
-        {progress === 100 && (
-          <div className="flex items-center text-green-600">
-            <CheckCircle className="h-5 w-5 mr-1" />
-            <span className="text-sm font-semibold">Cours complété !</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Composant principal pour les détails du cours
-const CourseDetailPage: React.FC = () => {
-  const [match, params] = useRoute('/apprendre/:courseSlug');
-  const courseSlug = params?.courseSlug || '';
-  const [openSectionId, setOpenSectionId] = useState<number | null>(1);
-  const [, navigate] = useLocation();
-
-  // Exemple de données de cours (À remplacer par des données réelles à l'avenir)
-  const courseData: {
+interface CourseData {
+  course: {
     id: number;
     title: string;
     slug: string;
     description: string;
     category: string;
-    level: string;
-    duration: string;
-    image: string;
-    sections: Section[];
-  } = {
-    id: 1,
-    title: "L'Assemblée Nationale",
-    slug: "assemblee-nationale",
-    description: "Découvrez le fonctionnement et le rôle de l'Assemblée Nationale dans la démocratie française.",
-    category: "Institutions",
-    level: "Débutant",
-    duration: "2h",
-    image: "https://via.placeholder.com/800x400",
-    sections: [
-      {
-        id: 1,
-        title: "Introduction à l'Assemblée Nationale",
-        completed: false,
-        lessons: [
-          {
-            id: 101,
-            title: "Histoire de l'Assemblée Nationale",
-            type: 'lecture',
-            completed: true,
-            duration: "15 min",
-            points: 10,
-            description: "Découvrez comment l'Assemblée Nationale a évolué depuis la Révolution française."
-          },
-          {
-            id: 102,
-            title: "Rôle constitutionnel",
-            type: 'lecture',
-            completed: false,
-            duration: "10 min",
-            points: 10,
-            description: "Comprendre le rôle de l'Assemblée dans la Constitution de la Ve République."
-          },
-          {
-            id: 103,
-            title: "Quiz - Introduction",
-            type: 'quiz',
-            completed: false,
-            duration: "5 min",
-            points: 15,
-            description: "Testez vos connaissances sur les fondamentaux de l'Assemblée Nationale."
-          }
-        ]
-      },
-      {
-        id: 2,
-        title: "Fonctionnement et Organisation",
-        completed: false,
-        lessons: [
-          {
-            id: 201,
-            title: "Les députés",
-            type: 'lecture',
-            completed: false,
-            duration: "12 min",
-            points: 10,
-            description: "Qui sont les députés et comment sont-ils élus?"
-          },
-          {
-            id: 202,
-            title: "Les commissions parlementaires",
-            type: 'lecture',
-            completed: false,
-            duration: "10 min",
-            points: 10,
-            description: "Fonctionnement et rôle des commissions parlementaires."
-          },
-          {
-            id: 203,
-            title: "Le processus législatif",
-            type: 'interactive',
-            completed: false,
-            duration: "20 min",
-            points: 20,
-            description: "Apprenez comment une loi est créée et adoptée à l'Assemblée."
-          }
-        ]
-      },
-      {
-        id: 3,
-        title: "Applications pratiques",
-        completed: false,
-        lessons: [
-          {
-            id: 301,
-            title: "Étude de cas - Une loi récente",
-            type: 'lecture',
-            completed: false,
-            duration: "15 min",
-            points: 15,
-            description: "Analysez le parcours d'une loi récemment adoptée."
-          },
-          {
-            id: 302,
-            title: "Quiz final",
-            type: 'quiz',
-            completed: false,
-            duration: "10 min",
-            points: 25,
-            description: "Évaluez votre compréhension globale du fonctionnement de l'Assemblée Nationale."
-          }
-        ]
-      }
-    ]
+    createdAt: string;
+    updatedAt: string;
+    published: boolean;
+    authorId: number;
+    author?: {
+      displayName: string;
+      title: string | null;
+    };
   };
+  chapters: Chapter[];
+}
 
-  // Trouver le cours correspondant au slug (simulation)
-  const course = courseData.slug === courseSlug ? courseData : null;
+const CourseDetailPage: React.FC = () => {
+  const [, params] = useRoute<{ slug: string }>('/cours/:slug');
+  const slug = params?.slug || '';
   
-  // Gérer le changement de section ouverte
-  const toggleSection = (sectionId: number) => {
-    setOpenSectionId(openSectionId === sectionId ? null : sectionId);
+  const [currentChapterIndex, setCurrentChapterIndex] = useState<number | null>(null);
+  const [currentLessonIndex, setCurrentLessonIndex] = useState<number | null>(null);
+
+  // Fetch course data using the slug
+  const { data: courseData, isLoading, error } = useQuery<CourseData>({
+    queryKey: [`/api/courses/${slug}`],
+    enabled: !!slug,
+  });
+
+  // Reset lesson selection when course or chapter changes
+  useEffect(() => {
+    if (courseData && courseData.chapters.length > 0 && currentChapterIndex === null) {
+      setCurrentChapterIndex(0);
+      
+      if (courseData.chapters[0].lessons.length > 0) {
+        setCurrentLessonIndex(0);
+      }
+    }
+  }, [courseData, currentChapterIndex]);
+
+  // Get current chapter and lesson
+  const currentChapter = currentChapterIndex !== null && courseData?.chapters ? 
+    courseData.chapters[currentChapterIndex] : null;
+  
+  const currentLesson = currentChapter && currentLessonIndex !== null && currentChapter.lessons ? 
+    currentChapter.lessons[currentLessonIndex] : null;
+
+  // Navigation functions
+  const goToNextLesson = () => {
+    if (!currentChapter || currentLessonIndex === null) return;
+    
+    if (currentLessonIndex < currentChapter.lessons.length - 1) {
+      // Next lesson in current chapter
+      setCurrentLessonIndex(currentLessonIndex + 1);
+    } else if (currentChapterIndex !== null && currentChapterIndex < (courseData?.chapters.length || 0) - 1) {
+      // First lesson of next chapter
+      setCurrentChapterIndex(currentChapterIndex + 1);
+      setCurrentLessonIndex(0);
+    }
   };
 
-  // Si le cours n'est pas trouvé
-  if (!course) {
+  const goToPrevLesson = () => {
+    if (currentLessonIndex === null || currentChapterIndex === null) return;
+    
+    if (currentLessonIndex > 0) {
+      // Previous lesson in current chapter
+      setCurrentLessonIndex(currentLessonIndex - 1);
+    } else if (currentChapterIndex > 0) {
+      // Last lesson of previous chapter
+      const prevChapter = courseData?.chapters[currentChapterIndex - 1];
+      if (prevChapter) {
+        setCurrentChapterIndex(currentChapterIndex - 1);
+        setCurrentLessonIndex(prevChapter.lessons.length - 1);
+      }
+    }
+  };
+
+  if (isLoading) {
     return (
-      <motion.div 
-        variants={pageTransition}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        className="container mx-auto px-4 py-12 text-center"
-      >
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Cours non trouvé</h1>
-        <p className="text-gray-600 mb-6">Le cours que vous recherchez n'existe pas ou a été déplacé.</p>
-        <Link href="/apprendre">
-          <a className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-            Retour aux cours
-          </a>
-        </Link>
-      </motion.div>
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-2 text-blue-600 font-medium">Chargement du cours...</span>
+      </div>
     );
   }
 
-  return (
-    <motion.div
-      variants={pageTransition}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
-      <Helmet>
-        <title>{course.title} | Apprendre | Politiquensemble</title>
-        <meta name="description" content={course.description} />
-      </Helmet>
-      
-      {/* En-tête du cours */}
-      <div className="bg-blue-600 text-white py-10 md:py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="md:w-2/3">
-              <Link href="/apprendre">
-                <a className="inline-flex items-center text-blue-100 hover:text-white mb-4 transition-colors">
-                  <ChevronLeft className="h-5 w-5 mr-1" />
-                  Retour aux cours
-                </a>
-              </Link>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">{course.title}</h1>
-              <p className="text-blue-100 mb-4">{course.description}</p>
-              
-              <div className="flex flex-wrap gap-3 mb-4">
-                <div className="bg-blue-700 rounded-full px-3 py-1 text-sm font-medium">
-                  {course.category}
-                </div>
-                <div className="bg-blue-700 rounded-full px-3 py-1 text-sm font-medium flex items-center">
-                  <Clock className="h-4 w-4 mr-1" />
-                  {course.duration}
-                </div>
-                <div className="bg-blue-700 rounded-full px-3 py-1 text-sm font-medium">
-                  Niveau: {course.level}
-                </div>
-              </div>
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 max-w-lg">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
             </div>
-            
-            <div className="mt-6 md:mt-0 md:w-1/3 flex justify-center md:justify-end">
-              <motion.button
-                className="bg-white text-blue-600 font-bold py-3 px-6 rounded-lg shadow-md hover:bg-blue-50 transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  // Trouver la première leçon non complétée
-                  for (const section of course.sections) {
-                    for (const lesson of section.lessons) {
-                      if (!lesson.completed) {
-                        navigate(`/apprendre/${course.slug}/lecon/${lesson.id}`);
-                        return;
-                      }
-                    }
-                  }
-                  // Si tout est complété, commencer par la première leçon
-                  navigate(`/apprendre/${course.slug}/lecon/${course.sections[0].lessons[0].id}`);
-                }}
-              >
-                Commencer
-              </motion.button>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Erreur lors du chargement du cours</h3>
+              <p className="mt-2 text-sm text-red-700">
+                {error instanceof Error ? error.message : "Impossible de charger les données du cours. Veuillez réessayer ultérieurement."}
+              </p>
+              <div className="mt-4">
+                <Link href="/apprendre">
+                  <a className="text-sm font-medium text-red-800 hover:underline">
+                    Retour à la liste des cours
+                  </a>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Contenu principal */}
-      <div className="container mx-auto px-4 py-10">
-        {/* Barre de progression */}
-        <ProgressBar course={course} sections={course.sections} />
-        
-        {/* Sections du cours */}
-        <div className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Modules du cours</h2>
+    );
+  }
+
+  if (!courseData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 max-w-lg">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">Cours non trouvé</h3>
+              <p className="mt-2 text-sm text-blue-700">
+                Ce cours n'existe pas ou n'est pas disponible actuellement.
+              </p>
+              <div className="mt-4">
+                <Link href="/apprendre">
+                  <a className="text-sm font-medium text-blue-800 hover:underline">
+                    Voir tous les cours disponibles
+                  </a>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div 
+      key="course-detail"
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageTransition}
+      className="bg-gray-50 min-h-screen"
+    >
+      <Helmet>
+        <title>{courseData.course.title} | Politiquensemble</title>
+        <meta name="description" content={courseData.course.description} />
+      </Helmet>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link href="/apprendre">
+            <a className="inline-flex items-center text-blue-600 hover:text-blue-800">
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              <span>Retour aux cours</span>
+            </a>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900 mt-2">{courseData.course.title}</h1>
+          <p className="text-gray-600 mt-2">{courseData.course.description}</p>
           
-          {course.sections.map((section) => (
-            <SectionAccordion
-              key={section.id}
-              section={section}
-              isOpen={openSectionId === section.id}
-              toggleOpen={() => toggleSection(section.id)}
-              courseSlug={course.slug}
-              navigate={navigate}
-            />
-          ))}
+          {courseData.course.author && (
+            <div className="mt-4 text-sm text-gray-600">
+              <span>Par </span>
+              <span className="font-medium">{courseData.course.author.displayName}</span>
+              {courseData.course.author.title && (
+                <span>, {courseData.course.author.title}</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-4">
+            {/* Navigation des chapitres et leçons */}
+            <div className="bg-gray-50 p-4 border-r border-gray-200 md:min-h-[600px]">
+              <h2 className="text-lg font-bold text-gray-800 mb-4">Sommaire</h2>
+              
+              {courseData.chapters.length === 0 ? (
+                <p className="text-gray-500">Aucun chapitre disponible</p>
+              ) : (
+                <div className="space-y-4">
+                  {courseData.chapters.map((chapter, chapterIdx) => (
+                    <div key={chapter.id} className="space-y-2">
+                      <h3 
+                        className={`font-medium flex items-center cursor-pointer ${
+                          currentChapterIndex === chapterIdx ? 'text-blue-600' : 'text-gray-700'
+                        }`}
+                        onClick={() => {
+                          setCurrentChapterIndex(chapterIdx);
+                          if (chapter.lessons.length > 0) {
+                            setCurrentLessonIndex(0);
+                          }
+                        }}
+                      >
+                        <span className="bg-blue-100 text-blue-800 w-6 h-6 flex items-center justify-center rounded-full mr-2 text-xs font-bold">
+                          {chapter.order}
+                        </span>
+                        {chapter.title}
+                      </h3>
+                      
+                      {chapter.lessons.length > 0 && (
+                        <ul className="pl-8 space-y-1">
+                          {chapter.lessons.map((lesson, lessonIdx) => (
+                            <li key={lesson.id}>
+                              <button 
+                                className={`text-sm hover:text-blue-600 text-left ${
+                                  currentChapterIndex === chapterIdx && currentLessonIndex === lessonIdx 
+                                    ? 'text-blue-600 font-medium' 
+                                    : 'text-gray-600'
+                                }`}
+                                onClick={() => {
+                                  setCurrentChapterIndex(chapterIdx);
+                                  setCurrentLessonIndex(lessonIdx);
+                                }}
+                              >
+                                {lesson.title}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Contenu de la leçon */}
+            <div className="p-6 md:col-span-3">
+              {currentLesson ? (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">{currentLesson.title}</h2>
+                  
+                  <div 
+                    className="prose max-w-none lesson-content"
+                    dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+                  />
+                  
+                  <div className="mt-8 flex justify-between">
+                    <button 
+                      className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={currentLessonIndex === 0 && currentChapterIndex === 0}
+                      onClick={goToPrevLesson}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Précédent
+                    </button>
+                    
+                    <button 
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={
+                        currentChapterIndex === courseData.chapters.length - 1 && 
+                        currentLessonIndex === (currentChapter?.lessons.length || 0) - 1
+                      }
+                      onClick={goToNextLesson}
+                    >
+                      Suivant
+                      <ChevronLeft className="h-4 w-4 ml-1 transform rotate-180" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">Sélectionnez une leçon pour commencer</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
   );
 };
-
-// Icônes pour l'accordéon
-const ChevronDown: React.FC<{ className?: string }> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <polyline points="6 9 12 15 18 9"></polyline>
-  </svg>
-);
-
-const ChevronUp: React.FC<{ className?: string }> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <polyline points="18 15 12 9 6 15"></polyline>
-  </svg>
-);
 
 export default CourseDetailPage;
