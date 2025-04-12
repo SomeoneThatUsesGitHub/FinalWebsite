@@ -237,8 +237,7 @@ function UsersPage() {
       username: "",
       displayName: "",
       password: "",
-      role: "editor",
-      customRoleId: null,
+      customRoleId: customRoles && customRoles.length > 0 ? customRoles[0].id : 1,
     },
   });
 
@@ -437,7 +436,7 @@ function UsersPage() {
                                   updateRoleMutation.mutate({ 
                                     username: user.username, 
                                     role: user.role,
-                                    customRoleId: null 
+                                    customRoleId: 1 // Assignez un rôle personnalisé par défaut
                                   });
                                 }
                               }}
@@ -566,31 +565,7 @@ function UsersPage() {
                 )}
               />
 
-              <FormField
-                control={createForm.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rôle principal</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionnez un rôle" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="admin">Administrateur</SelectItem>
-                        <SelectItem value="editor">Éditeur</SelectItem>
-                        <SelectItem value="user">Utilisateur</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Les droits d'accès principaux de l'utilisateur
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Le sélecteur de rôle standard est supprimé, nous utilisons uniquement les rôles personnalisés */}
 
               <FormField
                 control={createForm.control}
@@ -608,7 +583,7 @@ function UsersPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Aucun rôle personnalisé</SelectItem>
+                        {/* L'option "aucun rôle" est enlevée, tous les utilisateurs doivent avoir un rôle personnalisé */}
                         {customRoles && customRoles.map((role: any) => (
                           <SelectItem key={role.id} value={String(role.id)}>
                             {role.displayName}
