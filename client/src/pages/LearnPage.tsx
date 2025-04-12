@@ -178,7 +178,7 @@ const CourseCard: React.FC<{ course: Course; index: number }> = ({ course, index
             className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors"
             onClick={(e) => {
               e.stopPropagation(); // Empêcher la propagation pour éviter le déclenchement du onClick parent
-              navigate(`/apprendre/${courseSlug}`);
+              navigate(`/cours/${courseSlug}`);
             }}
           >
             Démarrer le cours
