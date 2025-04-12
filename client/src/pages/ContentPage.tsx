@@ -58,21 +58,18 @@ const ContentPage: React.FC = () => {
         </div>
       ) : content ? (
         <>
-          {topic && (
-            <div className="container mx-auto px-4 py-3">
-              <div className="max-w-4xl mx-auto">
-                <Button variant="outline" className="bg-white hover:bg-blue-50" asChild>
-                  <Link href={`/apprendre/${topicSlug}`}>
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    Retour à {topic.title}
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          )}
-          
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 shadow-md mb-6">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 shadow-md mb-6 relative">
             <div className="container mx-auto px-4">
+              {topic && (
+                <div className="max-w-4xl mx-auto mb-6">
+                  <Button variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30" asChild>
+                    <Link href={`/apprendre/${topicSlug}`}>
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Retour à {topic.title}
+                    </Link>
+                  </Button>
+                </div>
+              )}
               <div className="max-w-4xl mx-auto">
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                   <div className="bg-white/10 p-4 rounded-full backdrop-blur-sm">

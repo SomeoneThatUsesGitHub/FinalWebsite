@@ -154,8 +154,15 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
   const handleAddImage = () => {
     const url = window.prompt('URL de l\'image:');
     if (url && editor) {
-      // Insérer l'image directement dans le HTML
-      editor.chain().focus().insertContent(`<img src="${url}" alt="Image insérée" class="my-2 max-w-full h-auto rounded" />`).run();
+      // Insérer l'image avec un meilleur style et une figure complète
+      editor.chain().focus().insertContent(`
+        <figure class="my-6 text-center">
+          <img src="${url}" alt="Image insérée" class="mx-auto max-w-full h-auto rounded-lg shadow-md" style="max-height: 400px; object-fit: contain;" />
+          <figcaption class="text-sm text-gray-600 mt-2">
+            ${window.prompt('Légende de l\'image (optionnel):') || ''}
+          </figcaption>
+        </figure>
+      `).run();
     }
   };
 

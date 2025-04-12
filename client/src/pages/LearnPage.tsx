@@ -170,7 +170,7 @@ const LearnPage: React.FC = () => {
         <meta name="description" content="Ressources éducatives pour comprendre les enjeux politiques, économiques et historiques." />
       </Helmet>
       
-      <div className="bg-blue-50 py-8 md:py-12 shadow-md mb-2">
+      <div className="bg-blue-50 py-12 md:py-16 lg:py-20 shadow-md mb-6">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <motion.h1 
