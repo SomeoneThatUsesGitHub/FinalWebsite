@@ -733,50 +733,92 @@ export class DatabaseStorage implements IStorage {
       avatarUrl: string | null 
     }
   })[]> {
-    // Récupérer les sujets et leur nombre de contenus associés, ainsi que l'auteur
-    const topicsWithContentCount = await db
-      .select({
-        id: educationalTopics.id,
-        title: educationalTopics.title,
-        slug: educationalTopics.slug,
-        description: educationalTopics.description,
-        imageUrl: educationalTopics.imageUrl,
-        icon: educationalTopics.icon,
-        color: educationalTopics.color,
-        order: educationalTopics.order,
-        authorId: educationalTopics.authorId,
-        createdAt: educationalTopics.createdAt,
-        updatedAt: educationalTopics.updatedAt,
-        contentCount: sql<number>`COUNT(${educationalContent.id})::integer`,
-        authorDisplayName: users.displayName,
-        authorTitle: users.title,
-        authorAvatarUrl: users.avatarUrl
-      })
-      .from(educationalTopics)
-      .leftJoin(educationalContent, eq(educationalTopics.id, educationalContent.topicId))
-      .leftJoin(users, eq(educationalTopics.authorId, users.id))
-      .groupBy(educationalTopics.id, users.id)
-      .orderBy(educationalTopics.order);
-    
-    // Transformer les résultats pour ajouter les informations de l'auteur
-    return topicsWithContentCount.map(topic => {
-      const { authorDisplayName, authorTitle, authorAvatarUrl, ...topicData } = topic;
+    try {
+      // Vérifier si la colonne author_id existe
+      const result = await db.execute(sql`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'educational_topics' 
+        AND column_name = 'author_id'
+      `);
       
-      const result: any = {
-        ...topicData,
-      };
+      const authorIdExists = result.rows.length > 0;
       
-      // Si l'auteur existe, ajouter ses informations
-      if (authorDisplayName) {
-        result.author = {
-          displayName: authorDisplayName,
-          title: authorTitle,
-          avatarUrl: authorAvatarUrl
-        };
+      // Si la colonne author_id existe, utiliser la requête complète
+      if (authorIdExists) {
+        // Récupérer les sujets et leur nombre de contenus associés, ainsi que l'auteur
+        const topicsWithContentCount = await db
+          .select({
+            id: educationalTopics.id,
+            title: educationalTopics.title,
+            slug: educationalTopics.slug,
+            description: educationalTopics.description,
+            imageUrl: educationalTopics.imageUrl,
+            icon: educationalTopics.icon,
+            color: educationalTopics.color,
+            order: educationalTopics.order,
+            authorId: educationalTopics.authorId,
+            createdAt: educationalTopics.createdAt,
+            updatedAt: educationalTopics.updatedAt,
+            contentCount: sql<number>`COUNT(${educationalContent.id})::integer`,
+            authorDisplayName: users.displayName,
+            authorTitle: users.title,
+            authorAvatarUrl: users.avatarUrl
+          })
+          .from(educationalTopics)
+          .leftJoin(educationalContent, eq(educationalTopics.id, educationalContent.topicId))
+          .leftJoin(users, eq(educationalTopics.authorId, users.id))
+          .groupBy(educationalTopics.id, users.id)
+          .orderBy(educationalTopics.order);
+        
+        // Transformer les résultats pour ajouter les informations de l'auteur
+        return topicsWithContentCount.map(topic => {
+          const { authorDisplayName, authorTitle, authorAvatarUrl, ...topicData } = topic;
+          
+          const result: any = {
+            ...topicData,
+          };
+          
+          // Si l'auteur existe, ajouter ses informations
+          if (authorDisplayName) {
+            result.author = {
+              displayName: authorDisplayName,
+              title: authorTitle,
+              avatarUrl: authorAvatarUrl
+            };
+          }
+          
+          return result;
+        });
+      } 
+      // Sinon, utiliser la requête sans la colonne author_id
+      else {
+        // Récupérer les sujets et leur nombre de contenus associés sans l'auteur
+        const topicsWithContentCount = await db
+          .select({
+            id: educationalTopics.id,
+            title: educationalTopics.title,
+            slug: educationalTopics.slug,
+            description: educationalTopics.description,
+            imageUrl: educationalTopics.imageUrl,
+            icon: educationalTopics.icon,
+            color: educationalTopics.color,
+            order: educationalTopics.order,
+            createdAt: educationalTopics.createdAt,
+            updatedAt: educationalTopics.updatedAt,
+            contentCount: sql<number>`COUNT(${educationalContent.id})::integer`
+          })
+          .from(educationalTopics)
+          .leftJoin(educationalContent, eq(educationalTopics.id, educationalContent.topicId))
+          .groupBy(educationalTopics.id)
+          .orderBy(educationalTopics.order);
+        
+        return topicsWithContentCount;
       }
-      
-      return result;
-    });
+    } catch (error) {
+      console.error("Error fetching educational topics:", error);
+      throw error;
+    }
   }
 
   async getEducationalTopicById(id: number): Promise<EducationalTopic | undefined> {
