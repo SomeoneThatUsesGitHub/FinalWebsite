@@ -86,6 +86,7 @@ function App() {
               <Route path="/a-propos" component={AboutPage} />
               <Route path="/contact" component={ContactPage} />
               <Route path="/apprendre" component={LearnPage} />
+              <Route path="/cours" component={LearnPage} />
               <Route path="/cours/:slug" component={CourseDetailPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/test-editor" component={TestEditor} />

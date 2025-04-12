@@ -128,7 +128,7 @@ const CourseDetailPage: React.FC = () => {
                 {error instanceof Error ? error.message : "Impossible de charger les données du cours. Veuillez réessayer ultérieurement."}
               </p>
               <div className="mt-4">
-                <Link href="/apprendre">
+                <Link href="/cours">
                   <a className="text-sm font-medium text-red-800 hover:underline">
                     Retour à la liste des cours
                   </a>
@@ -157,7 +157,7 @@ const CourseDetailPage: React.FC = () => {
                 Ce cours n'existe pas ou n'est pas disponible actuellement.
               </p>
               <div className="mt-4">
-                <Link href="/apprendre">
+                <Link href="/cours">
                   <a className="text-sm font-medium text-blue-800 hover:underline">
                     Voir tous les cours disponibles
                   </a>
@@ -186,7 +186,7 @@ const CourseDetailPage: React.FC = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href="/apprendre">
+          <Link href="/cours">
             <a className="inline-flex items-center text-blue-600 hover:text-blue-800">
               <ChevronLeft className="h-4 w-4 mr-1" />
               <span>Retour aux cours</span>
