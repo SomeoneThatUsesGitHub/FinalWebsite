@@ -130,11 +130,18 @@ const LearnPage: React.FC = () => {
                   {topic.contentCount || 0} ressource{topic.contentCount !== 1 ? 's' : ''}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="max-h-24 overflow-y-auto overflow-x-hidden">
-                <div className="pr-2" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', width: '100%' }}>
-                  <p className="text-sm text-muted-foreground">
-                    {topic.description}
-                  </p>
+              <CardContent className="px-4 py-3">
+                <div className="w-full max-h-24 pr-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
+                  <div className="w-full">
+                    {topic.description.split(' ').map((word, index) => (
+                      <React.Fragment key={index}>
+                        <span className="inline-block text-sm text-muted-foreground">
+                          {word}
+                        </span>
+                        <span className="inline-block text-sm text-muted-foreground">&nbsp;</span>
+                      </React.Fragment>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
