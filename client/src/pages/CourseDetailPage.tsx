@@ -3,7 +3,7 @@ import { useRoute, Link } from 'wouter';
 import { motion } from 'framer-motion';
 import { pageTransition } from '@/lib/animations';
 import { Helmet } from 'react-helmet';
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import { ChevronLeft, Loader2, MenuIcon, Book, BookOpen, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 // Types pour les données de cours provenant de notre API
@@ -48,6 +48,7 @@ const CourseDetailPage: React.FC = () => {
   
   const [currentChapterIndex, setCurrentChapterIndex] = useState<number | null>(null);
   const [currentLessonIndex, setCurrentLessonIndex] = useState<number | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Fetch course data using the slug
   const { data: courseData, isLoading, error } = useQuery<CourseData>({
@@ -72,6 +73,13 @@ const CourseDetailPage: React.FC = () => {
   
   const currentLesson = currentChapter && currentLessonIndex !== null && currentChapter.lessons ? 
     currentChapter.lessons[currentLessonIndex] : null;
+
+  // Close sidebar when a lesson is selected on mobile
+  useEffect(() => {
+    if (sidebarOpen && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  }, [currentLessonIndex, currentChapterIndex]);
 
   // Navigation functions
   const goToNextLesson = () => {
