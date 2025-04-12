@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { AdminLayout } from "@/components/admin/AdminLayout";
+import AdminLayout from "@/components/admin/AdminLayout";
 import {
   Card,
   CardContent,
@@ -275,11 +275,10 @@ export default function RolesPage() {
   };
   
   return (
-    <AdminLayout currentPage="roles">
+    <AdminLayout title="Gestion des rôles">
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Gestion des rôles</h1>
             <p className="text-muted-foreground">
               Créez et gérez les rôles et leurs permissions
             </p>
