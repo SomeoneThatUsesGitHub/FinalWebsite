@@ -56,8 +56,10 @@ const TopicPage: React.FC = () => {
           </div>
         </div>
       ) : topic ? (
-        <div className="bg-blue-50 py-12 shadow-md mb-6" style={{ backgroundImage: topic.imageUrl ? `url(${topic.imageUrl})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
-          <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-sm"></div>
+        <div className="py-12 shadow-md mb-6 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 relative overflow-hidden">
+          <div className="absolute inset-0 bg-pattern opacity-10"></div>
+          <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl opacity-20 -translate-y-24 translate-x-24"></div>
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-400 rounded-full filter blur-3xl opacity-20 translate-y-24 -translate-x-24"></div>
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-3xl mx-auto text-center">
               <GraduationCap className="h-16 w-16 mx-auto text-white mb-4" />

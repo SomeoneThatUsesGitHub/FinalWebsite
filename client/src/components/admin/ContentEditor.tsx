@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo, Heading1, Heading2, Heading3, Minus } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo, Heading1, Heading2, Heading3, Minus, Image as ImageIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
@@ -148,6 +148,14 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
     const url = window.prompt('URL:');
     if (url && editor) {
       editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    }
+  };
+  
+  const handleAddImage = () => {
+    const url = window.prompt('URL de l\'image:');
+    if (url && editor) {
+      // Insérer l'image directement dans le HTML
+      editor.chain().focus().insertContent(`<img src="${url}" alt="Image insérée" class="my-2 max-w-full h-auto rounded" />`).run();
     }
   };
 
@@ -304,6 +312,13 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
                 aria-label="Ajouter un lien"
               >
                 <LinkIcon className="h-4 w-4" />
+              </Toggle>
+              
+              <Toggle
+                onPressedChange={handleAddImage}
+                aria-label="Insérer une image"
+              >
+                <ImageIcon className="h-4 w-4" />
               </Toggle>
 
               <UISeparator orientation="vertical" className="mx-1 h-6" />

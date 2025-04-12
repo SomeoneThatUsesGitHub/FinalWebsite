@@ -170,7 +170,7 @@ const LearnPage: React.FC = () => {
         <meta name="description" content="Ressources éducatives pour comprendre les enjeux politiques, économiques et historiques." />
       </Helmet>
       
-      <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-4">
+      <div className="bg-blue-50 py-8 md:py-12 shadow-md mb-2">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <motion.h1 
@@ -194,7 +194,7 @@ const LearnPage: React.FC = () => {
         </div>
       </div>
       
-      <div className="container mx-auto px-4 py-6 mb-12">
+      <div className="container mx-auto px-4 py-3 mb-12">
         <TopicsContent />
       </div>
     </motion.div>
