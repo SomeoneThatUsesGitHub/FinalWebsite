@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'wouter';
-import { BookOpen, ChevronLeft, GraduationCap, Clock, Calendar, RefreshCw } from 'lucide-react';
+import { BookOpen, ChevronLeft, GraduationCap, Calendar, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -87,10 +87,6 @@ const ContentPage: React.FC = () => {
                       <Badge variant="secondary" className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white">
                         <RefreshCw className="h-3 w-3" />
                         Mis à jour le {new Date(content.updatedAt).toLocaleDateString('fr-FR')}
-                      </Badge>
-                      <Badge variant="secondary" className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white">
-                        <Clock className="h-3 w-3" />
-                        Temps de lecture: ~5 min
                       </Badge>
                     </div>
                   </div>

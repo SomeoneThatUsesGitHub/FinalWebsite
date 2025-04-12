@@ -60,6 +60,12 @@ interface EducationalTopic {
   color: string;
   imageUrl: string;
   contentCount?: number;
+  createdAt?: string;
+  author?: {
+    displayName: string;
+    title?: string;
+    avatarUrl?: string;
+  };
 }
 
 const LearnPage: React.FC = () => {
@@ -90,13 +96,21 @@ const LearnPage: React.FC = () => {
       );
     }
     
-    // Appliquer le tri
-    if (sortOrder === "alphabetical") {
-      result.sort((a, b) => a.title.localeCompare(b.title));
-    } else if (sortOrder === "resourceCount") {
-      result.sort((a, b) => (b.contentCount || 0) - (a.contentCount || 0));
+    // Appliquer les filtres par année
+    if (sortOrder === "2025") {
+      result = result.filter(topic => {
+        if (!topic.createdAt) return false;
+        const year = new Date(topic.createdAt).getFullYear();
+        return year === 2025;
+      });
+    } else if (sortOrder === "2024") {
+      result = result.filter(topic => {
+        if (!topic.createdAt) return false;
+        const year = new Date(topic.createdAt).getFullYear();
+        return year === 2024;
+      });
     }
-    // Par défaut: "latest" - pas besoin de tri supplémentaire car les données sont déjà triées par date
+    // Pour "latest", on affiche tous les sujets
     
     return result;
   }, [topics, searchTerm, sortOrder]);
@@ -184,19 +198,25 @@ const LearnPage: React.FC = () => {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between items-center pt-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center text-xs text-slate-500">
-                        <Info className="h-4 w-4 mr-1" />
-                        <span>Détails</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm">{topic.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <div className="flex items-center">
+                  {topic.author ? (
+                    <div className="flex items-center text-xs text-slate-500">
+                      <img 
+                        src={topic.author.avatarUrl || '/assets/default-avatar.svg'} 
+                        alt={topic.author.displayName || "Auteur"} 
+                        className="h-5 w-5 rounded-full mr-1.5"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/assets/default-avatar.svg';
+                        }}
+                      />
+                      <span>{topic.author.displayName}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-xs text-slate-500">
+                      <span>Admin</span>
+                    </div>
+                  )}
+                </div>
                 <Button asChild variant="default" size="sm" className="group-hover:bg-primary/90 transition-colors">
                   <Link href={`/apprendre/${topic.slug}`}>
                     <span>Explorer</span>
@@ -274,25 +294,25 @@ const LearnPage: React.FC = () => {
                 }}
               >
                 <Tag className="mr-1 h-4 w-4" />
-                Tous les sujets
+                Toutes les années
               </Badge>
               
               <Badge 
-                variant={sortOrder === "resourceCount" ? "default" : "outline"}
+                variant={sortOrder === "2025" ? "default" : "outline"}
                 className="cursor-pointer py-2 px-4 whitespace-nowrap"
-                onClick={() => setSortOrder("resourceCount")}
-              >
-                <BookOpen className="mr-1 h-4 w-4" />
-                Plus de contenu
-              </Badge>
-              
-              <Badge 
-                variant={sortOrder === "alphabetical" ? "default" : "outline"}
-                className="cursor-pointer py-2 px-4"
-                onClick={() => setSortOrder("alphabetical")}
+                onClick={() => setSortOrder("2025")}
               >
                 <Calendar className="mr-1 h-4 w-4" />
-                Alphabétique
+                2025
+              </Badge>
+              
+              <Badge 
+                variant={sortOrder === "2024" ? "default" : "outline"}
+                className="cursor-pointer py-2 px-4"
+                onClick={() => setSortOrder("2024")}
+              >
+                <Calendar className="mr-1 h-4 w-4" />
+                2024
               </Badge>
             </div>
           )}
@@ -341,9 +361,9 @@ const LearnPage: React.FC = () => {
                     <SelectValue placeholder="Trier par" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="latest">Les plus récents</SelectItem>
-                    <SelectItem value="alphabetical">Ordre alphabétique</SelectItem>
-                    <SelectItem value="resourceCount">Nombre de ressources</SelectItem>
+                    <SelectItem value="latest">Toutes les années</SelectItem>
+                    <SelectItem value="2025">2025</SelectItem>
+                    <SelectItem value="2024">2024</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
