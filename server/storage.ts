@@ -125,6 +125,42 @@ export interface IStorage {
   getVideoById(id: number): Promise<Video | undefined>;
   createVideo(video: InsertVideo): Promise<Video>;
   updateVideoViews(id: number): Promise<void>;
+  
+  // Courses operations
+  getAllCourses(showUnpublished?: boolean): Promise<Course[]>;
+  getCourseById(id: number): Promise<Course | undefined>;
+  getCourseBySlug(slug: string): Promise<Course | undefined>;
+  createCourse(course: InsertCourse): Promise<Course>;
+  updateCourse(id: number, courseData: Partial<InsertCourse>): Promise<Course | undefined>;
+  deleteCourse(id: number): Promise<boolean>;
+  
+  // Chapters operations
+  getChaptersByCourseId(courseId: number): Promise<Chapter[]>;
+  getChapterById(id: number): Promise<Chapter | undefined>;
+  createChapter(chapter: InsertChapter): Promise<Chapter>;
+  updateChapter(id: number, chapterData: Partial<InsertChapter>): Promise<Chapter | undefined>;
+  deleteChapter(id: number): Promise<boolean>;
+  
+  // Lessons operations
+  getLessonsByChapterId(chapterId: number): Promise<Lesson[]>;
+  getLessonById(id: number): Promise<Lesson | undefined>;
+  createLesson(lesson: InsertLesson): Promise<Lesson>;
+  updateLesson(id: number, lessonData: Partial<InsertLesson>): Promise<Lesson | undefined>;
+  deleteLesson(id: number): Promise<boolean>;
+  
+  // Course data operations
+  getFullCourseData(courseId: number): Promise<{
+    course: Course;
+    chapters: (Chapter & {
+      lessons: Lesson[];
+    })[];
+  } | undefined>;
+  getFullCourseDataBySlug(slug: string): Promise<{
+    course: Course;
+    chapters: (Chapter & {
+      lessons: Lesson[];
+    })[];
+  } | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {

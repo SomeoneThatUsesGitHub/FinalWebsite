@@ -692,7 +692,7 @@ const SimpleCourseDetailPage: React.FC = () => {
           </Link>
           
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="md:w-3/5">
+            <div className="w-full">
               <div className="flex items-center mb-3">
                 <span className="inline-block bg-blue-900 bg-opacity-50 text-blue-100 px-3 py-1 rounded-full text-sm font-medium mr-3">
                   {course.category}
@@ -706,27 +706,14 @@ const SimpleCourseDetailPage: React.FC = () => {
               </div>
               
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">{course.title}</h1>
-              <p className="text-blue-100 md:text-lg">{course.description}</p>
+              <p className="text-blue-100 md:text-lg max-w-3xl">{course.description}</p>
               
-              <div className="mt-6 hidden md:block">
+              <div className="mt-4">
                 <div className="inline-flex items-center text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   {course.chapters.length} chapitres • {course.chapters.reduce((acc, chapter) => acc + chapter.lessons.length, 0)} leçons
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-6 md:mt-0 md:w-2/5">
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <img 
-                  src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Palais_Bourbon_front.jpg" 
-                  alt="Palais Bourbon - Siège de l'Assemblée Nationale" 
-                  className="w-full h-auto"
-                />
-                <div className="bg-white bg-opacity-90 p-2 absolute bottom-0 left-0 right-0">
-                  <p className="text-xs text-center text-gray-700 font-medium">Le Palais Bourbon, siège de l'Assemblée Nationale française</p>
                 </div>
               </div>
             </div>

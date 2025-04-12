@@ -394,3 +394,67 @@ export const insertContactMessageSchema = createInsertSchema(contactMessages).pi
 
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
+
+// Cours éducatifs
+export const courses = pgTable("courses", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  authorId: integer("author_id").references(() => users.id).notNull(),
+  published: boolean("published").notNull().default(false),
+});
+
+export const chapters = pgTable("chapters", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  order: integer("order").notNull(),
+  courseId: integer("course_id").references(() => courses.id, { onDelete: 'cascade' }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const lessons = pgTable("lessons", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  order: integer("order").notNull(),
+  chapterId: integer("chapter_id").references(() => chapters.id, { onDelete: 'cascade' }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Relations - implémentation différée
+// Nous utiliserons des jointures manuelles au lieu de relations pour l'instant
+
+// Schemas pour les insertions
+export const insertCourseSchema = createInsertSchema(courses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertChapterSchema = createInsertSchema(chapters).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertLessonSchema = createInsertSchema(lessons).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Types
+export type Course = typeof courses.$inferSelect;
+export type InsertCourse = z.infer<typeof insertCourseSchema>;
+
+export type Chapter = typeof chapters.$inferSelect;
+export type InsertChapter = z.infer<typeof insertChapterSchema>;
+
+export type Lesson = typeof lessons.$inferSelect;
+export type InsertLesson = z.infer<typeof insertLessonSchema>;
