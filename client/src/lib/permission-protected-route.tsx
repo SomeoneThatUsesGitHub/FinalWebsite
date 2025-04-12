@@ -70,27 +70,7 @@ function AuthenticationCheck({
         return;
       }
 
-      // Vérification de l'ancien système
-      if (user.role === "admin") {
-        setHasAccess(true);
-        setCheckingPermission(false);
-        return;
-      }
-
-      // Vérification des rôles standards pour compatibilité avec l'ancien système
-      if (adminOnly && !(user.role === "admin" || user.role === "editor")) {
-        setHasAccess(false);
-        setCheckingPermission(false);
-        return;
-      }
-
-      if (!editorsAllowed && user.role === "editor") {
-        setHasAccess(false);
-        setCheckingPermission(false);
-        return;
-      }
-
-      // Nouveau système de permissions
+      // Utiliser uniquement le système de permissions basé sur les rôles personnalisés
       if (permissionCode) {
         try {
           const permitted = await hasPermission(permissionCode);
@@ -101,8 +81,16 @@ function AuthenticationCheck({
           setHasAccess(false);
         }
       } else {
-        // Si pas de code de permission spécifié, utiliser l'ancien système
-        setHasAccess(user.role === "admin" || (!adminOnly && user.role === "editor"));
+        // Si pas de code de permission spécifié, vérifier l'accès général à l'admin
+        try {
+          // Vérifier l'accès au dashboard par défaut
+          const permitted = await hasPermission("dashboard");
+          console.log(`Vérification permission 'dashboard' par défaut pour ${path}:`, permitted);
+          setHasAccess(permitted);
+        } catch (error) {
+          console.error("Erreur lors de la vérification des permissions par défaut:", error);
+          setHasAccess(false);
+        }
       }
       
       setCheckingPermission(false);
