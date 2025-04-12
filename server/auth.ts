@@ -128,33 +128,62 @@ export function isAuthenticated(req: any, res: any, next: any) {
 }
 
 // Middleware pour vérifier si l'utilisateur est un admin ou un éditeur
-export function isAdmin(req: any, res: any, next: any) {
+// Utilise maintenant le système de rôles personnalisés via hasPermission
+export async function isAdmin(req: any, res: any, next: any) {
   console.log("Vérification admin - User:", req.user);
   
-  // Compatibilité avec l'ancien système (en attendant la migration complète)
-  if (req.isAuthenticated() && (req.user.role === "admin" || req.user.role === "editor" || Boolean(req.user.isAdmin))) {
-    console.log("Utilisateur authentifié comme admin ou éditeur (ancien système)");
-    return next();
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Non authentifié" });
   }
   
-  // Le isAdmin sera géré par hasPermission dans la version future
-  console.log("Accès admin refusé");
-  res.status(403).json({ message: "Accès refusé" });
+  try {
+    // Vérifier si l'utilisateur a au moins une permission d'accès à l'admin panel
+    // Liste des codes de permissions à vérifier (toutes les sections du panneau d'administration)
+    const adminPermissions = [
+      "articles", "categories", "flash_infos", "videos", 
+      "dashboard", "educational_topics", "educational_content", 
+      "live_coverage", "users", "newsletter", "applications", "messages"
+    ];
+    
+    const userId = req.user.id;
+    const hasAccess = await hasAnyPermission(userId, adminPermissions);
+    
+    if (hasAccess) {
+      return next();
+    }
+    
+    console.log("Accès admin refusé - Aucune permission d'accès trouvée");
+    res.status(403).json({ message: "Accès refusé" });
+  } catch (error) {
+    console.error("Erreur lors de la vérification des permissions admin:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
 }
 
 // Middleware pour vérifier si l'utilisateur est uniquement admin (pas éditeur)
-export function isAdminOnly(req: any, res: any, next: any) {
+// Utilise maintenant le système de rôles personnalisés via hasPermission
+export async function isAdminOnly(req: any, res: any, next: any) {
   console.log("Vérification admin uniquement - User:", req.user);
   
-  // Compatibilité avec l'ancien système (en attendant la migration complète)
-  if (req.isAuthenticated() && (req.user.role === "admin" || Boolean(req.user.isAdmin))) {
-    console.log("Utilisateur authentifié comme admin (ancien système)");
-    return next();
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Non authentifié" });
   }
   
-  // Le isAdminOnly sera géré par hasPermission dans la version future
-  console.log("Accès admin uniquement refusé");
-  res.status(403).json({ message: "Accès refusé - Réservé aux administrateurs" });
+  try {
+    // Vérifier si l'utilisateur a la permission 'users' qui est réservée aux administrateurs
+    const userId = req.user.id;
+    const hasUsersAccess = await hasPermission(userId, "users");
+    
+    if (hasUsersAccess) {
+      return next();
+    }
+    
+    console.log("Accès admin uniquement refusé - Permission 'users' manquante");
+    res.status(403).json({ message: "Accès refusé - Réservé aux administrateurs" });
+  } catch (error) {
+    console.error("Erreur lors de la vérification des permissions admin:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
 }
 
 // Middleware pour vérifier une permission spécifique
@@ -219,18 +248,7 @@ export async function hasPermission(userId: number, permissionCode: string): Pro
     const user = await storage.getUser(userId);
     if (!user) return false;
     
-    // Compatible avec l'ancien système: admin a toutes les permissions
-    if (user.role === "admin") return true;
-
-    // Compatible avec l'ancien système: editor a certaines permissions de contenu
-    if (user.role === "editor" && [
-      "dashboard", "articles", "flash_infos", "videos", 
-      "categories", "educational_topics", "educational_content", "live_coverage"
-    ].includes(permissionCode)) {
-      return true;
-    }
-    
-    // Vérifier le rôle personnalisé
+    // IMPORTANT: Utiliser uniquement le système de rôles personnalisés
     if (!user.customRoleId) return false;
     
     // Récupérer l'ID de la permission
@@ -250,6 +268,7 @@ export async function hasPermission(userId: number, permissionCode: string): Pro
         )
       );
     
+    console.log(`Vérification permission ${permissionCode} pour utilisateur ${user.username} avec rôle custom ${user.customRoleId}: ${Boolean(rolePermission)}`);
     return Boolean(rolePermission);
   } catch (error) {
     console.error("Erreur lors de la vérification des permissions:", error);
