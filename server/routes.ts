@@ -243,6 +243,258 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Courses (educational content) routes
+  app.get("/api/courses", async (req: Request, res: Response) => {
+    try {
+      const showUnpublished = req.query.showUnpublished === "true" && isAdmin(req);
+      const courses = await storage.getAllCourses(showUnpublished);
+      res.json(courses);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      res.status(500).json({ error: "Error fetching courses" });
+    }
+  });
+  
+  app.get("/api/courses/:slug", async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const courseData = await storage.getFullCourseDataBySlug(slug);
+      
+      if (!courseData) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      
+      // Verify that the course is published or the user is admin
+      if (!courseData.course.published && !isAdmin(req)) {
+        return res.status(403).json({ message: "This course is not published yet" });
+      }
+      
+      res.json(courseData);
+    } catch (error) {
+      console.error("Error fetching course:", error);
+      res.status(500).json({ error: "Error fetching course" });
+    }
+  });
+  
+  // Admin routes for courses
+  app.post("/api/admin/courses", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      // Validate input
+      const validation = insertCourseSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const courseData = validation.data;
+      
+      // Add author ID (the connected user)
+      courseData.authorId = (req.user as User).id;
+      
+      const newCourse = await storage.createCourse(courseData);
+      res.status(201).json(newCourse);
+    } catch (error) {
+      console.error("Error creating course:", error);
+      res.status(500).json({ error: "Error creating course" });
+    }
+  });
+  
+  app.put("/api/admin/courses/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+      
+      const courseData = req.body;
+      const updatedCourse = await storage.updateCourse(Number(id), courseData);
+      
+      if (!updatedCourse) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      
+      res.json(updatedCourse);
+    } catch (error) {
+      console.error("Error updating course:", error);
+      res.status(500).json({ error: "Error updating course" });
+    }
+  });
+  
+  app.delete("/api/admin/courses/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+      
+      const result = await storage.deleteCourse(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      res.status(500).json({ error: "Error deleting course" });
+    }
+  });
+  
+  // Chapter routes
+  app.get("/api/chapters/course/:courseId", async (req: Request, res: Response) => {
+    try {
+      const { courseId } = req.params;
+      
+      if (isNaN(Number(courseId))) {
+        return res.status(400).json({ message: "Invalid course ID" });
+      }
+      
+      const chapters = await storage.getChaptersByCourseId(Number(courseId));
+      res.json(chapters);
+    } catch (error) {
+      console.error("Error fetching chapters:", error);
+      res.status(500).json({ error: "Error fetching chapters" });
+    }
+  });
+  
+  app.post("/api/admin/chapters", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      // Validate input
+      const validation = insertChapterSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const chapterData = validation.data;
+      const newChapter = await storage.createChapter(chapterData);
+      res.status(201).json(newChapter);
+    } catch (error) {
+      console.error("Error creating chapter:", error);
+      res.status(500).json({ error: "Error creating chapter" });
+    }
+  });
+  
+  app.put("/api/admin/chapters/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+      
+      const chapterData = req.body;
+      const updatedChapter = await storage.updateChapter(Number(id), chapterData);
+      
+      if (!updatedChapter) {
+        return res.status(404).json({ message: "Chapter not found" });
+      }
+      
+      res.json(updatedChapter);
+    } catch (error) {
+      console.error("Error updating chapter:", error);
+      res.status(500).json({ error: "Error updating chapter" });
+    }
+  });
+  
+  app.delete("/api/admin/chapters/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+      
+      const result = await storage.deleteChapter(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Chapter not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting chapter:", error);
+      res.status(500).json({ error: "Error deleting chapter" });
+    }
+  });
+  
+  // Lesson routes
+  app.get("/api/lessons/chapter/:chapterId", async (req: Request, res: Response) => {
+    try {
+      const { chapterId } = req.params;
+      
+      if (isNaN(Number(chapterId))) {
+        return res.status(400).json({ message: "Invalid chapter ID" });
+      }
+      
+      const lessons = await storage.getLessonsByChapterId(Number(chapterId));
+      res.json(lessons);
+    } catch (error) {
+      console.error("Error fetching lessons:", error);
+      res.status(500).json({ error: "Error fetching lessons" });
+    }
+  });
+  
+  app.post("/api/admin/lessons", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      // Validate input
+      const validation = insertLessonSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const lessonData = validation.data;
+      const newLesson = await storage.createLesson(lessonData);
+      res.status(201).json(newLesson);
+    } catch (error) {
+      console.error("Error creating lesson:", error);
+      res.status(500).json({ error: "Error creating lesson" });
+    }
+  });
+  
+  app.put("/api/admin/lessons/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+      
+      const lessonData = req.body;
+      const updatedLesson = await storage.updateLesson(Number(id), lessonData);
+      
+      if (!updatedLesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      
+      res.json(updatedLesson);
+    } catch (error) {
+      console.error("Error updating lesson:", error);
+      res.status(500).json({ error: "Error updating lesson" });
+    }
+  });
+  
+  app.delete("/api/admin/lessons/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+      
+      const result = await storage.deleteLesson(Number(id));
+      
+      if (!result) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting lesson:", error);
+      res.status(500).json({ error: "Error deleting lesson" });
+    }
+  });
+
   // Flash Info (Breaking News) routes
   app.get("/api/flash-infos", async (req: Request, res: Response) => {
     try {
