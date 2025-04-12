@@ -130,9 +130,9 @@ const LearnPage: React.FC = () => {
                   {topic.contentCount || 0} ressource{topic.contentCount !== 1 ? 's' : ''}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="max-h-24 overflow-y-auto pr-1 overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                  <p className="text-sm text-muted-foreground break-words whitespace-normal overflow-wrap-anywhere w-full">
+              <CardContent className="max-h-24 overflow-y-auto overflow-x-hidden">
+                <div className="pr-2" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', width: '100%' }}>
+                  <p className="text-sm text-muted-foreground">
                     {topic.description}
                   </p>
                 </div>
