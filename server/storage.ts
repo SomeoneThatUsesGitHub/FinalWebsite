@@ -905,6 +905,248 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount ? result.rowCount > 0 : false;
   }
 
+  // Courses operations
+  async getAllCourses(showUnpublished: boolean = false): Promise<(Course & { author?: { displayName: string, title: string | null } })[]> {
+    const query = db.select({
+      course: courses,
+      author: {
+        displayName: users.displayName,
+        title: users.title
+      }
+    })
+    .from(courses)
+    .leftJoin(users, eq(courses.authorId, users.id));
+    
+    if (!showUnpublished) {
+      query.where(eq(courses.published, true));
+    }
+    
+    query.orderBy(desc(courses.createdAt));
+    
+    const results = await query;
+    
+    return results.map(row => {
+      const authorData = row.author && row.author.displayName ? row.author : undefined;
+      return {
+        ...row.course,
+        author: authorData
+      };
+    });
+  }
+  
+  async getCourseById(id: number): Promise<(Course & { author?: { displayName: string, title: string | null } }) | undefined> {
+    const results = await db.select({
+      course: courses,
+      author: {
+        displayName: users.displayName,
+        title: users.title
+      }
+    })
+    .from(courses)
+    .leftJoin(users, eq(courses.authorId, users.id))
+    .where(eq(courses.id, id));
+    
+    if (results.length === 0) {
+      return undefined;
+    }
+    
+    const row = results[0];
+    const authorData = row.author && row.author.displayName ? row.author : undefined;
+    
+    return {
+      ...row.course,
+      author: authorData
+    };
+  }
+  
+  async getCourseBySlug(slug: string): Promise<(Course & { author?: { displayName: string, title: string | null } }) | undefined> {
+    const results = await db.select({
+      course: courses,
+      author: {
+        displayName: users.displayName,
+        title: users.title
+      }
+    })
+    .from(courses)
+    .leftJoin(users, eq(courses.authorId, users.id))
+    .where(eq(courses.slug, slug));
+    
+    if (results.length === 0) {
+      return undefined;
+    }
+    
+    const row = results[0];
+    const authorData = row.author && row.author.displayName ? row.author : undefined;
+    
+    return {
+      ...row.course,
+      author: authorData
+    };
+  }
+  
+  async createCourse(course: InsertCourse): Promise<Course> {
+    const [newCourse] = await db
+      .insert(courses)
+      .values(course)
+      .returning();
+    return newCourse;
+  }
+  
+  async updateCourse(id: number, courseData: Partial<InsertCourse>): Promise<Course | undefined> {
+    const [updatedCourse] = await db
+      .update(courses)
+      .set(courseData)
+      .where(eq(courses.id, id))
+      .returning();
+    return updatedCourse;
+  }
+  
+  async deleteCourse(id: number): Promise<boolean> {
+    // Les chapitres et leçons seront supprimés automatiquement grâce à ON DELETE CASCADE
+    const result = await db.delete(courses).where(eq(courses.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+  
+  // Chapters operations
+  async getChaptersByCourseId(courseId: number): Promise<Chapter[]> {
+    return db
+      .select()
+      .from(chapters)
+      .where(eq(chapters.courseId, courseId))
+      .orderBy(chapters.order);
+  }
+  
+  async getChapterById(id: number): Promise<Chapter | undefined> {
+    const [chapter] = await db
+      .select()
+      .from(chapters)
+      .where(eq(chapters.id, id));
+    return chapter;
+  }
+  
+  async createChapter(chapter: InsertChapter): Promise<Chapter> {
+    const [newChapter] = await db
+      .insert(chapters)
+      .values(chapter)
+      .returning();
+    return newChapter;
+  }
+  
+  async updateChapter(id: number, chapterData: Partial<InsertChapter>): Promise<Chapter | undefined> {
+    const [updatedChapter] = await db
+      .update(chapters)
+      .set(chapterData)
+      .where(eq(chapters.id, id))
+      .returning();
+    return updatedChapter;
+  }
+  
+  async deleteChapter(id: number): Promise<boolean> {
+    // Les leçons seront supprimées automatiquement grâce à ON DELETE CASCADE
+    const result = await db.delete(chapters).where(eq(chapters.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+  
+  // Lessons operations
+  async getLessonsByChapterId(chapterId: number): Promise<Lesson[]> {
+    return db
+      .select()
+      .from(lessons)
+      .where(eq(lessons.chapterId, chapterId))
+      .orderBy(lessons.order);
+  }
+  
+  async getLessonById(id: number): Promise<Lesson | undefined> {
+    const [lesson] = await db
+      .select()
+      .from(lessons)
+      .where(eq(lessons.id, id));
+    return lesson;
+  }
+  
+  async createLesson(lesson: InsertLesson): Promise<Lesson> {
+    const [newLesson] = await db
+      .insert(lessons)
+      .values(lesson)
+      .returning();
+    return newLesson;
+  }
+  
+  async updateLesson(id: number, lessonData: Partial<InsertLesson>): Promise<Lesson | undefined> {
+    const [updatedLesson] = await db
+      .update(lessons)
+      .set(lessonData)
+      .where(eq(lessons.id, id))
+      .returning();
+    return updatedLesson;
+  }
+  
+  async deleteLesson(id: number): Promise<boolean> {
+    const result = await db.delete(lessons).where(eq(lessons.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+  
+  // Méthode spéciale pour récupérer toutes les données d'un cours
+  async getFullCourseDataBySlug(slug: string): Promise<{
+    course: Course & { author?: { displayName: string, title: string | null } };
+    chapters: (Chapter & { lessons: Lesson[] })[];
+  } | undefined> {
+    // Récupérer le cours avec les détails de l'auteur
+    const courseData = await this.getCourseBySlug(slug);
+    if (!courseData) {
+      return undefined;
+    }
+    
+    // Récupérer tous les chapitres du cours
+    const chaptersData = await this.getChaptersByCourseId(courseData.id);
+    
+    // Pour chaque chapitre, récupérer les leçons
+    const chaptersWithLessons = await Promise.all(
+      chaptersData.map(async (chapter) => {
+        const lessonsList = await this.getLessonsByChapterId(chapter.id);
+        return {
+          ...chapter,
+          lessons: lessonsList
+        };
+      })
+    );
+    
+    return {
+      course: courseData,
+      chapters: chaptersWithLessons
+    };
+  }
+  
+  async getFullCourseData(courseId: number): Promise<{
+    course: Course & { author?: { displayName: string, title: string | null } };
+    chapters: (Chapter & { lessons: Lesson[] })[];
+  } | undefined> {
+    // Récupérer le cours avec les détails de l'auteur
+    const courseData = await this.getCourseById(courseId);
+    if (!courseData) {
+      return undefined;
+    }
+    
+    // Récupérer tous les chapitres du cours
+    const chaptersData = await this.getChaptersByCourseId(courseId);
+    
+    // Pour chaque chapitre, récupérer les leçons
+    const chaptersWithLessons = await Promise.all(
+      chaptersData.map(async (chapter) => {
+        const lessonsList = await this.getLessonsByChapterId(chapter.id);
+        return {
+          ...chapter,
+          lessons: lessonsList
+        };
+      })
+    );
+    
+    return {
+      course: courseData,
+      chapters: chaptersWithLessons
+    };
+  }
+
   // LiveCoverage operations (Suivis en direct)
   async getAllLiveCoverages(): Promise<LiveCoverage[]> {
     return db.select().from(liveCoverages).orderBy(desc(liveCoverages.createdAt));
