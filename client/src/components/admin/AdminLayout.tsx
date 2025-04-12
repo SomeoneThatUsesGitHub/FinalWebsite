@@ -122,6 +122,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {
+      name: "Contenu éducatif",
+      href: "/admin/contenu-educatif",
+      icon: GraduationCap,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+    },
+    {
       name: "Notes Éditoriales",
       href: "/admin/notes",
       icon: Clipboard,

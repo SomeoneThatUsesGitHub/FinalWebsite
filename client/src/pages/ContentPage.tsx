@@ -1,184 +1,109 @@
 import React from 'react';
-import { useParams, Link, useLocation } from 'wouter';
-import { Helmet } from 'react-helmet';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, BookOpen, Eye, ThumbsUp, Clock, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { useParams, Link } from 'wouter';
+import { BookOpen, ChevronLeft, GraduationCap } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import MainLayout from '@/components/layout/MainLayout';
 
-type EducationalTopic = {
+interface EducationalTopic {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  color: string;
+}
+
+interface EducationalContent {
   id: number;
   title: string;
   slug: string;
   description: string;
-  imageUrl: string;
-  icon: string | null;
-  color: string;
-  order: number;
-};
-
-type EducationalContent = {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  summary: string;
-  imageUrl: string;
   topicId: number;
-  authorId: number | null;
-  published: boolean;
-  likes: number;
-  views: number;
+  content: string;
   createdAt: string;
   updatedAt: string;
-};
+  topic?: EducationalTopic;
+}
 
 const ContentPage: React.FC = () => {
-  const params = useParams<{ topicSlug: string, contentSlug: string }>();
-  const [, setLocation] = useLocation();
-  const { topicSlug, contentSlug } = params;
+  const { topicSlug, contentSlug } = useParams();
 
-  const { data: topic, isLoading: isTopicLoading } = useQuery<EducationalTopic>({
+  const { data: topic, isLoading: topicLoading } = useQuery<EducationalTopic>({
     queryKey: [`/api/educational-topics/${topicSlug}`],
     enabled: !!topicSlug,
   });
 
-  const { data: content, isLoading: isContentLoading, error: contentError } = useQuery<EducationalContent>({
+  const { data: content, isLoading: contentLoading, error } = useQuery<EducationalContent>({
     queryKey: [`/api/educational-content/${contentSlug}`],
     enabled: !!contentSlug,
   });
 
-  const isLoading = isTopicLoading || isContentLoading;
+  if (error) {
+    console.error('Erreur lors du chargement du contenu:', error);
+  }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return format(date, 'dd MMMM yyyy', { locale: fr });
-  };
+  const isLoading = topicLoading || contentLoading;
 
   return (
     <MainLayout>
-      <Helmet>
-        <title>
-          {content ? `${content.title} | ${topic?.title || 'Apprendre'}` : 'Chargement...'} | Politiquensemble
-        </title>
-        <meta name="description" content={content?.summary || "Chargement du contenu éducatif..."} />
-      </Helmet>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          {topic && (
+            <Button variant="outline" className="mb-4" asChild>
+              <Link href={`/apprendre/${topicSlug}`}>
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Retour à {topic.name}
+              </Link>
+            </Button>
+          )}
 
-      <div className="mb-8">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="mb-4"
-          onClick={() => topicSlug ? setLocation(`/apprendre/${topicSlug}`) : setLocation('/apprendre')}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Retour {topic ? `à ${topic.title}` : 'aux sujets'}
-        </Button>
+          {isLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          ) : content ? (
+            <PageHeader
+              title={content.title}
+              description={content.description}
+              icon={<BookOpen className="h-8 w-8 mr-3 text-primary" />}
+            />
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-muted-foreground">Contenu introuvable</p>
+            </div>
+          )}
+        </div>
 
         {isLoading ? (
-          <>
-            <Skeleton className="h-10 w-3/4 mb-4" />
-            <Skeleton className="h-6 w-2/3 mb-6" />
-            <Skeleton className="h-[300px] w-full mb-8" />
-          </>
-        ) : contentError ? (
-          <Alert variant="destructive" className="mb-6">
-            <AlertTitle>Erreur</AlertTitle>
-            <AlertDescription>
-              Une erreur est survenue lors du chargement du contenu.
-              <Button onClick={() => window.location.reload()} variant="outline" className="mt-2">
-                Réessayer
-              </Button>
-            </AlertDescription>
-          </Alert>
-        ) : content && topic ? (
-          <>
-            <PageHeader 
-              title={content.title}
-              description={content.summary} 
-              icon={<BookOpen className="h-6 w-6 mr-2" />}
-            />
-
-            <div className="flex flex-wrap gap-2 mt-4 mb-6">
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Eye className="h-3.5 w-3.5" />
-                {content.views} vues
-              </Badge>
-              
-              <Badge variant="outline" className="flex items-center gap-1">
-                <ThumbsUp className="h-3.5 w-3.5" />
-                {content.likes} j'aime
-              </Badge>
-
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" />
-                Publié le {formatDate(content.createdAt)}
-              </Badge>
-
-              {content.updatedAt !== content.createdAt && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" />
-                  Mis à jour le {formatDate(content.updatedAt)}
-                </Badge>
-              )}
-            </div>
-
-            <div className="relative">
-              <img 
-                src={content.imageUrl} 
-                alt={content.title} 
-                className="w-full h-[300px] object-cover rounded-md mb-8"
-              />
-              <div 
-                className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm py-1 px-3 rounded-full"
-              >
-                <Link href={`/apprendre/${topicSlug}`}>
-                  <Badge 
-                    className="hover:bg-primary/10 cursor-pointer"
-                    style={{ backgroundColor: topic.color + '33' }}
-                  >
-                    {topic.title}
-                  </Badge>
-                </Link>
-              </div>
-            </div>
-
-            <Separator className="my-6" />
-            
-            <div 
-              className="prose prose-blue dark:prose-invert max-w-none mb-12"
-              dangerouslySetInnerHTML={{ __html: content.content }}
-            />
-
-            <div className="flex justify-between mt-8">
-              <Button 
-                variant="outline" 
-                onClick={() => setLocation(`/apprendre/${topicSlug}`)}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour au sujet
-              </Button>
-            </div>
-          </>
+          <div className="space-y-4">
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-64 w-full" />
+          </div>
+        ) : content ? (
+          <Card className="shadow-sm">
+            <CardContent className="p-6">
+              <div className="prose prose-blue max-w-none" dangerouslySetInnerHTML={{ __html: content.content }} />
+            </CardContent>
+          </Card>
         ) : (
-          <Alert className="mb-6">
-            <AlertTitle>Contenu non trouvé</AlertTitle>
-            <AlertDescription>
-              Le contenu demandé n'existe pas ou n'est plus disponible.
-              <div className="flex gap-2 mt-2">
-                <Button onClick={() => topicSlug ? setLocation(`/apprendre/${topicSlug}`) : setLocation('/apprendre')}>
-                  Retour {topic ? `à ${topic.title}` : 'aux sujets'}
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
+          <div className="text-center py-12">
+            <div className="inline-block p-4 rounded-full bg-primary/10 mb-4">
+              <GraduationCap className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Contenu introuvable</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Le contenu que vous recherchez n'est pas disponible ou a été déplacé.
+            </p>
+            <Button className="mt-4" asChild>
+              <Link href="/apprendre">
+                Retour à la page d'apprentissage
+              </Link>
+            </Button>
+          </div>
         )}
       </div>
     </MainLayout>
