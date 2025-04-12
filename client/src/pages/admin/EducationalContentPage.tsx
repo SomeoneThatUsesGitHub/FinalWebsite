@@ -69,10 +69,11 @@ const EducationalContentPage: React.FC = () => {
   const [contentToDelete, setContentToDelete] = useState<number | null>(null);
 
   // État du formulaire de sujet
-  const [topicName, setTopicName] = useState('');
+  const [topicTitle, setTopicTitle] = useState('');
   const [topicSlug, setTopicSlug] = useState('');
   const [topicDescription, setTopicDescription] = useState('');
   const [topicColor, setTopicColor] = useState(DEFAULT_TOPIC_COLOR);
+  const [topicImageUrl, setTopicImageUrl] = useState('https://placehold.co/600x400/3b82f6/white?text=Sujet+%C3%A9ducatif');
 
   // Requêtes
   const { data: topics, isLoading: isLoadingTopics } = useQuery<EducationalTopic[]>({
@@ -232,10 +233,10 @@ const EducationalContentPage: React.FC = () => {
 
   // Handlers
   const handleCreateTopic = () => {
-    if (!topicName.trim()) {
+    if (!topicTitle.trim()) {
       toast({
-        title: 'Nom requis',
-        description: 'Veuillez entrer un nom pour ce sujet.',
+        title: 'Titre requis',
+        description: 'Veuillez entrer un titre pour ce sujet.',
         variant: 'destructive',
       });
       return;
@@ -251,10 +252,11 @@ const EducationalContentPage: React.FC = () => {
     }
 
     const topic = {
-      name: topicName,
+      title: topicTitle,
       slug: topicSlug,
       description: topicDescription,
       color: topicColor,
+      imageUrl: topicImageUrl,
     };
 
     if (editingTopicId) {
@@ -266,10 +268,11 @@ const EducationalContentPage: React.FC = () => {
 
   const handleEditTopic = (topic: EducationalTopic) => {
     setEditingTopicId(topic.id);
-    setTopicName(topic.name);
+    setTopicTitle(topic.title);
     setTopicSlug(topic.slug);
     setTopicDescription(topic.description);
     setTopicColor(topic.color || DEFAULT_TOPIC_COLOR);
+    setTopicImageUrl(topic.imageUrl);
     setTopicFormOpen(true);
   };
 
@@ -284,10 +287,11 @@ const EducationalContentPage: React.FC = () => {
   };
 
   const resetTopicForm = () => {
-    setTopicName('');
+    setTopicTitle('');
     setTopicSlug('');
     setTopicDescription('');
     setTopicColor(DEFAULT_TOPIC_COLOR);
+    setTopicImageUrl('https://placehold.co/600x400/3b82f6/white?text=Sujet+%C3%A9ducatif');
     setEditingTopicId(null);
   };
 
@@ -341,12 +345,12 @@ const EducationalContentPage: React.FC = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-2">
                   <div className="space-y-2">
-                    <Label htmlFor="topicName">Nom du sujet</Label>
+                    <Label htmlFor="topicTitle">Titre du sujet</Label>
                     <Input
-                      id="topicName"
-                      value={topicName}
+                      id="topicTitle"
+                      value={topicTitle}
                       onChange={(e) => {
-                        setTopicName(e.target.value);
+                        setTopicTitle(e.target.value);
                         if (!editingTopicId) {
                           setTopicSlug(generateSlug(e.target.value));
                         }
@@ -391,6 +395,18 @@ const EducationalContentPage: React.FC = () => {
                         className="flex-1"
                       />
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="topicImageUrl">URL de l'image</Label>
+                    <Input
+                      id="topicImageUrl"
+                      value={topicImageUrl}
+                      onChange={(e) => setTopicImageUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      URL d'une image représentant ce sujet (obligatoire)
+                    </p>
                   </div>
                 </div>
                 <DialogFooter>
@@ -438,7 +454,7 @@ const EducationalContentPage: React.FC = () => {
                   />
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      <span className="line-clamp-1">{topic.name}</span>
+                      <span className="line-clamp-1">{topic.title}</span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -561,7 +577,7 @@ const EducationalContentPage: React.FC = () => {
                     <h2 className="text-xl font-medium">
                       Contenu pour{' '}
                       <span className="text-primary">
-                        {topics?.find((t) => t.id === selectedTopicId)?.name}
+                        {topics?.find((t) => t.id === selectedTopicId)?.title}
                       </span>
                     </h2>
                   </div>
