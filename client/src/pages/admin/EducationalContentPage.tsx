@@ -47,6 +47,8 @@ interface EducationalContent {
   slug: string;
   description: string;
   content: string;
+  summary: string;
+  imageUrl: string;
   topicId: number;
   createdAt: string;
   updatedAt: string;
@@ -163,6 +165,8 @@ const EducationalContentPage: React.FC = () => {
       slug: string; 
       description: string; 
       content: string; 
+      summary: string;
+      imageUrl: string;
       topicId: number;
     }) => {
       const res = await apiRequest('POST', '/api/educational-content', content);
@@ -195,6 +199,8 @@ const EducationalContentPage: React.FC = () => {
       slug: string; 
       description: string; 
       content: string; 
+      summary: string;
+      imageUrl: string;
       topicId: number;
     }) => {
       const { id, ...contentData } = content;
@@ -315,6 +321,8 @@ const EducationalContentPage: React.FC = () => {
     slug: string; 
     description: string; 
     content: string; 
+    summary: string;
+    imageUrl: string;
     topicId: number;
   }) => {
     if (content.id) {
@@ -324,6 +332,8 @@ const EducationalContentPage: React.FC = () => {
         slug: content.slug,
         description: content.description,
         content: content.content,
+        summary: content.summary,
+        imageUrl: content.imageUrl,
         topicId: content.topicId
       });
     } else {
@@ -332,6 +342,8 @@ const EducationalContentPage: React.FC = () => {
         slug: content.slug,
         description: content.description,
         content: content.content,
+        summary: content.summary,
+        imageUrl: content.imageUrl,
         topicId: content.topicId
       });
     }
