@@ -42,16 +42,12 @@ const fadeInWithBounce = {
   }
 };
 
-// Fonction pour afficher le drapeau d'un pays à partir de son code pays
-const getCountryFlag = (countryCode: string): string => {
-  // Convertir le code pays en caractères d'emoji de drapeau
-  // Le code pays est converti en paires de caractères régionaux Unicode
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
-  
-  return String.fromCodePoint(...codePoints);
+// Fonction pour obtenir l'URL du drapeau d'un pays à partir de son code pays
+const getCountryFlagUrl = (countryCode: string): string => {
+  // En production, on utiliserait une API ou des images stockées
+  // Pour cet exemple, on utilise les drapeaux de Flagcdn
+  const code = countryCode.toLowerCase();
+  return `https://flagcdn.com/w320/${code}.png`;
 };
 
 const CountryElectionsPage: React.FC = () => {
@@ -141,7 +137,13 @@ const CountryElectionsPage: React.FC = () => {
                 animate="visible"
                 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative flex items-center justify-center"
               >
-                <span className="text-5xl md:text-6xl lg:text-7xl mr-4">{getCountryFlag(countryCode)}</span>
+                <div className="w-16 h-12 md:w-20 md:h-16 lg:w-24 lg:h-20 inline-block mr-4 overflow-hidden rounded shadow-md">
+                  <img 
+                    src={getCountryFlagUrl(countryCode)} 
+                    alt={`Drapeau ${countryName}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 {countryName}
               </motion.h1>
               <motion.div 
@@ -282,24 +284,27 @@ const ElectionDetails: React.FC<ElectionDetailsProps> = ({ election }) => {
             <CardDescription>Liste complète des candidats et leurs performances</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-3">
               {electionData.results.map((result, index) => (
-                <Card key={index} className="border-l-4" style={{ borderLeftColor: result.color }}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold">{result.candidate}</h3>
-                      <Badge variant="outline" className="text-lg font-semibold">
-                        {result.percentage.toFixed(1)}%
-                      </Badge>
+                <div key={index} className="flex items-center rounded-lg border p-3 hover:bg-gray-50 transition-colors">
+                  <div className="flex-shrink-0 w-1 h-8 rounded mr-3" style={{ backgroundColor: result.color }}></div>
+                  <div className="flex-grow">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h3 className="font-semibold text-md">{result.candidate}</h3>
+                        <p className="text-xs text-muted-foreground">{result.party}</p>
+                      </div>
+                      <div className="flex items-center mt-1 sm:mt-0">
+                        {result.votes && (
+                          <span className="text-xs text-muted-foreground mr-3">
+                            <Users className="h-3 w-3 inline mr-1" />
+                            {result.votes.toLocaleString('fr-FR')}
+                          </span>
+                        )}
+                        <div className="font-bold text-md">{result.percentage.toFixed(1)}%</div>
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">{result.party}</p>
-                    {result.votes && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        <Users className="h-3 w-3 inline mr-1" />
-                        {result.votes.toLocaleString('fr-FR')} votes
-                      </p>
-                    )}
-                    <div className="w-full bg-gray-200 h-2 mt-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-gray-100 h-1.5 mt-1.5 rounded-full overflow-hidden">
                       <div 
                         className="h-full rounded-full" 
                         style={{ 
@@ -308,8 +313,8 @@ const ElectionDetails: React.FC<ElectionDetailsProps> = ({ election }) => {
                         }}
                       ></div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           </CardContent>
