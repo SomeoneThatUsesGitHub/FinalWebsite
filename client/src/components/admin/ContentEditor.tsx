@@ -180,8 +180,6 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
     }
   };
   
-
-  
   const handleAddInstagram = () => {
     const url = window.prompt('URL de la publication Instagram:');
     if (url && editor) {
@@ -444,8 +442,6 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
               >
                 <ImageIcon className="h-4 w-4" />
               </Toggle>
-              
-
 
               <UISeparator orientation="vertical" className="mx-1 h-6" />
 
@@ -510,95 +506,6 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
           {isSaving ? 'Enregistrement...' : 'Enregistrer'}
         </Button>
       </div>
-      
-      {/* Dialogue pour créer un carrousel d'images */}
-      <Dialog open={showCarouselDialog} onOpenChange={setShowCarouselDialog}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Créer un carrousel d'images</DialogTitle>
-            <DialogDescription>
-              Ajoutez des images pour créer un carrousel interactif qui s'intégrera dans votre contenu.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 my-4">
-            <div className="grid grid-cols-1 gap-4">
-              {/* Formulaire d'ajout d'image */}
-              <div className="space-y-2 border rounded-md p-4">
-                <Label htmlFor="imageUrl">URL de l'image</Label>
-                <Input
-                  id="imageUrl"
-                  value={currentImageUrl}
-                  onChange={(e) => setCurrentImageUrl(e.target.value)}
-                  placeholder="https://exemple.com/image.jpg"
-                />
-                
-                <Label htmlFor="imageCaption">Légende (optionnelle)</Label>
-                <Input
-                  id="imageCaption"
-                  value={currentImageCaption}
-                  onChange={(e) => setCurrentImageCaption(e.target.value)}
-                  placeholder="Description de l'image"
-                />
-                
-                <Button 
-                  onClick={addImageToCarousel} 
-                  disabled={!currentImageUrl.trim()}
-                  className="mt-2 w-full"
-                >
-                  Ajouter cette image
-                </Button>
-              </div>
-              
-              {/* Liste des images ajoutées */}
-              {carouselImages.length > 0 && (
-                <div className="border rounded-md p-4">
-                  <h3 className="font-medium mb-3">Images du carrousel ({carouselImages.length})</h3>
-                  <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2">
-                    {carouselImages.map((image, index) => (
-                      <div key={index} className="flex items-center gap-3 p-2 border rounded-md">
-                        <div className="w-16 h-12 rounded overflow-hidden flex-shrink-0">
-                          <img 
-                            src={image.url} 
-                            alt={`Image ${index + 1}`} 
-                            className="w-full h-full object-cover"
-                            onError={(e) => (e.target as HTMLImageElement).src = 'https://placehold.co/400x300/cccccc/999999?text=Erreur'}
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs truncate">{image.url}</p>
-                          {image.caption && (
-                            <p className="text-xs text-muted-foreground truncate">
-                              {image.caption}
-                            </p>
-                          )}
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => removeImageFromCarousel(index)}
-                          className="h-8 w-8 flex-shrink-0"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                          </svg>
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCarouselDialog(false)}>Annuler</Button>
-            <Button onClick={insertCarousel} disabled={carouselImages.length === 0}>
-              Insérer le carrousel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
