@@ -164,70 +164,69 @@ const LearnPage: React.FC = () => {
       >
         {filteredTopics.map((topic) => (
           <motion.div key={topic.id} variants={cardAnimation}>
-            <Card className="hover:shadow-xl transition-all duration-300 overflow-hidden group h-full border-t-4 hover:translate-y-[-5px]" style={{ borderTopColor: topic.color || '#3b82f6' }}>
-              <div className="relative w-full h-44 overflow-hidden">
-                <img 
-                  src={topic.imageUrl} 
-                  alt={topic.title} 
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
-                <div className="absolute bottom-3 right-3">
-                  <Badge variant="outline" className="bg-white/90 text-dark font-semibold">
-                    <BookOpen className="h-3.5 w-3.5 mr-1" />
-                    {topic.contentCount || 0} ressource{topic.contentCount !== 1 ? 's' : ''}
-                  </Badge>
-                </div>
-              </div>
-              <CardHeader className="pb-1">
-                <CardTitle className="flex items-center">
-                  <div className="h-7 w-7 rounded-full mr-2 flex items-center justify-center" style={{ backgroundColor: topic.color || '#3b82f6', color: 'white' }}>
-                    <Book className="h-4 w-4" />
+            <Link href={`/apprendre/${topic.slug}`} className="block h-full cursor-pointer">
+              <Card className="hover:shadow-xl transition-all duration-300 overflow-hidden group h-full border-t-4 hover:translate-y-[-5px]" style={{ borderTopColor: topic.color || '#3b82f6' }}>
+                <div className="relative w-full h-44 overflow-hidden">
+                  <img 
+                    src={topic.imageUrl} 
+                    alt={topic.title} 
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+                  <div className="absolute bottom-3 right-3">
+                    <Badge variant="outline" className="bg-white/90 text-dark font-semibold">
+                      <BookOpen className="h-3.5 w-3.5 mr-1" />
+                      {topic.contentCount || 0} ressource{topic.contentCount !== 1 ? 's' : ''}
+                    </Badge>
                   </div>
-                  <span className="text-lg font-bold text-primary group-hover:text-blue-700 transition-colors">
-                    {topic.title}
-                  </span>
-                </CardTitle>
-                <div className="mt-1 w-12 h-0.5 bg-primary/30 rounded-full"></div>
-              </CardHeader>
-              <CardContent className="px-4 py-3">
-                <div className="w-full max-h-24 pr-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
-                  <p className="text-sm text-muted-foreground">
-                    {topic.description}
-                  </p>
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-between items-center pt-2">
-                <div className="flex items-center">
-                  <div className="flex items-center text-xs text-slate-500">
-                    <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold mr-1.5 overflow-hidden">
-                      {topic.author ? (
-                        <img 
-                          src={topic.author.avatarUrl || '/assets/default-avatar.svg'} 
-                          alt={topic.author.displayName || "Auteur"} 
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            // Si l'image échoue, on affiche l'initiale de l'auteur
-                            (e.target as HTMLImageElement).style.display = 'none';
-                            e.currentTarget.parentElement!.textContent = 
-                              topic.author?.displayName?.charAt(0).toUpperCase() || 'A';
-                          }}
-                        />
-                      ) : (
-                        "A"
-                      )}
+                <CardHeader className="pb-1">
+                  <CardTitle>
+                    <span className="text-lg font-bold text-primary group-hover:text-blue-700 transition-colors">
+                      {topic.title}
+                    </span>
+                  </CardTitle>
+                  <div className="mt-1 w-12 h-0.5 bg-primary/30 rounded-full"></div>
+                </CardHeader>
+                <CardContent className="px-4 py-3">
+                  <div className="w-full max-h-24 pr-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
+                    <p className="text-sm text-muted-foreground">
+                      {topic.description}
+                    </p>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between items-center pt-2">
+                  <div className="flex items-center">
+                    <div className="flex items-center text-xs text-slate-500">
+                      <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold mr-1.5 overflow-hidden">
+                        {topic.author ? (
+                          <img 
+                            src={topic.author.avatarUrl || '/assets/default-avatar.svg'} 
+                            alt={topic.author.displayName || "Auteur"} 
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              // Si l'image échoue, on affiche l'initiale de l'auteur
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              e.currentTarget.parentElement!.textContent = 
+                                topic.author?.displayName?.charAt(0).toUpperCase() || 'A';
+                            }}
+                          />
+                        ) : (
+                          "A"
+                        )}
+                      </div>
+                      <span>{topic.author?.displayName || "Administrateur"}</span>
                     </div>
-                    <span>{topic.author?.displayName || "Administrateur"}</span>
                   </div>
-                </div>
-                <Button asChild variant="default" size="sm" className="group-hover:bg-primary/90 transition-colors">
-                  <Link href={`/apprendre/${topic.slug}`}>
-                    <span>Explorer</span>
-                    <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+                  <div className="hidden md:block">
+                    <Button variant="default" size="sm" className="group-hover:bg-primary/90 transition-colors">
+                      <span>Explorer</span>
+                      <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  </div>
+                </CardFooter>
+              </Card>
+            </Link>
           </motion.div>
         ))}
       </motion.div>
@@ -287,7 +286,7 @@ const LearnPage: React.FC = () => {
           }}
         >
           {!showFilters && (
-            <div className="flex-1 flex flex-wrap gap-2 pb-2">
+            <div className="flex-1 hidden md:flex flex-wrap gap-2 pb-2">
               <Badge 
                 variant={!searchTerm && sortOrder === "latest" ? "default" : "outline"}
                 className="cursor-pointer py-2 px-3 sm:px-4"
