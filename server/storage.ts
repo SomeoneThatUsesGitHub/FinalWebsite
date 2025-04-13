@@ -8,6 +8,7 @@ import {
   elections, type Election, type InsertElection,
   educationalTopics, type EducationalTopic, type InsertEducationalTopic,
   educationalContent, type EducationalContent, type InsertEducationalContent,
+  educationalQuizzes, type EducationalQuiz, type InsertEducationalQuiz,
   videos, type Video, type InsertVideo,
   liveCoverages, type LiveCoverage, type InsertLiveCoverage,
   liveCoverageEditors, type LiveCoverageEditor, type InsertLiveCoverageEditor,
@@ -132,6 +133,13 @@ export interface IStorage {
   updateEducationalContent(id: number, data: Partial<InsertEducationalContent>): Promise<EducationalContent | undefined>;
   deleteEducationalContent(id: number): Promise<boolean>;
   incrementEducationalContentViews(id: number): Promise<void>;
+  
+  // Quiz éducatifs operations
+  getQuizzesByContentId(contentId: number): Promise<EducationalQuiz[]>;
+  getQuizById(id: number): Promise<EducationalQuiz | undefined>;
+  createQuiz(quiz: InsertEducationalQuiz): Promise<EducationalQuiz>;
+  updateQuiz(id: number, data: Partial<InsertEducationalQuiz>): Promise<EducationalQuiz | undefined>;
+  deleteQuiz(id: number): Promise<boolean>;
   
   // Videos operations
   getAllVideos(limit?: number): Promise<Video[]>;
@@ -965,6 +973,54 @@ export class DatabaseStorage implements IStorage {
         views: sql`${educationalContent.views} + 1`
       })
       .where(eq(educationalContent.id, id));
+  }
+  
+  // Gestion des quiz éducatifs
+  async getQuizzesByContentId(contentId: number): Promise<EducationalQuiz[]> {
+    return db
+      .select()
+      .from(educationalQuizzes)
+      .where(eq(educationalQuizzes.contentId, contentId))
+      .orderBy(educationalQuizzes.id);
+  }
+
+  async getQuizById(id: number): Promise<EducationalQuiz | undefined> {
+    const [quiz] = await db
+      .select()
+      .from(educationalQuizzes)
+      .where(eq(educationalQuizzes.id, id));
+    
+    return quiz;
+  }
+
+  async createQuiz(insertQuiz: InsertEducationalQuiz): Promise<EducationalQuiz> {
+    const [quiz] = await db
+      .insert(educationalQuizzes)
+      .values(insertQuiz)
+      .returning();
+    
+    return quiz;
+  }
+
+  async updateQuiz(id: number, updateData: Partial<InsertEducationalQuiz>): Promise<EducationalQuiz | undefined> {
+    const [quiz] = await db
+      .update(educationalQuizzes)
+      .set({
+        ...updateData,
+        updatedAt: new Date()
+      })
+      .where(eq(educationalQuizzes.id, id))
+      .returning();
+    
+    return quiz;
+  }
+
+  async deleteQuiz(id: number): Promise<boolean> {
+    const result = await db
+      .delete(educationalQuizzes)
+      .where(eq(educationalQuizzes.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   async getAllVideos(limit: number = 8): Promise<Video[]> {

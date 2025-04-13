@@ -362,6 +362,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Quiz éducatifs
+  app.get("/api/educational-content/:contentId/quiz", async (req: Request, res: Response) => {
+    try {
+      const { contentId } = req.params;
+      
+      if (isNaN(Number(contentId))) {
+        return res.status(400).json({ message: "ID de contenu invalide" });
+      }
+      
+      const quizzes = await storage.getQuizzesByContentId(Number(contentId));
+      res.json(quizzes);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des quiz:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des quiz" });
+    }
+  });
+
+  app.post("/api/educational-content/:contentId/quiz", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { contentId } = req.params;
+      const quizData = req.body;
+      
+      if (isNaN(Number(contentId))) {
+        return res.status(400).json({ message: "ID de contenu invalide" });
+      }
+      
+      // Vérifier si le contenu existe
+      const content = await storage.getEducationalContentById(Number(contentId));
+      if (!content) {
+        return res.status(404).json({ message: "Contenu éducatif non trouvé" });
+      }
+      
+      // S'assurer que l'option correcte est valide (1, 2 ou 3)
+      if (![1, 2, 3].includes(quizData.correctOption)) {
+        return res.status(400).json({ message: "L'option correcte doit être 1, 2 ou 3" });
+      }
+      
+      const quiz = await storage.createQuiz({
+        ...quizData,
+        contentId: Number(contentId)
+      });
+      
+      res.status(201).json(quiz);
+    } catch (error) {
+      console.error("Erreur lors de la création du quiz:", error);
+      res.status(500).json({ error: "Erreur lors de la création du quiz" });
+    }
+  });
+
+  app.put("/api/educational-content/:contentId/quiz/:quizId", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { contentId, quizId } = req.params;
+      const quizData = req.body;
+      
+      if (isNaN(Number(contentId)) || isNaN(Number(quizId))) {
+        return res.status(400).json({ message: "ID invalide" });
+      }
+      
+      // Vérifier si le quiz existe
+      const quiz = await storage.getQuizById(Number(quizId));
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz non trouvé" });
+      }
+      
+      // Vérifier si le contenu existe
+      const content = await storage.getEducationalContentById(Number(contentId));
+      if (!content) {
+        return res.status(404).json({ message: "Contenu éducatif non trouvé" });
+      }
+      
+      // S'assurer que l'option correcte est valide (1, 2 ou 3)
+      if (quizData.correctOption && ![1, 2, 3].includes(quizData.correctOption)) {
+        return res.status(400).json({ message: "L'option correcte doit être 1, 2 ou 3" });
+      }
+      
+      const updatedQuiz = await storage.updateQuiz(Number(quizId), quizData);
+      
+      if (!updatedQuiz) {
+        return res.status(404).json({ message: "Quiz non trouvé" });
+      }
+      
+      res.json(updatedQuiz);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du quiz:", error);
+      res.status(500).json({ error: "Erreur lors de la mise à jour du quiz" });
+    }
+  });
+
+  app.delete("/api/educational-content/:contentId/quiz/:quizId", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { contentId, quizId } = req.params;
+      
+      if (isNaN(Number(contentId)) || isNaN(Number(quizId))) {
+        return res.status(400).json({ message: "ID invalide" });
+      }
+      
+      // Vérifier si le quiz existe
+      const quiz = await storage.getQuizById(Number(quizId));
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz non trouvé" });
+      }
+      
+      // Vérifier si le contenu existe
+      const content = await storage.getEducationalContentById(Number(contentId));
+      if (!content) {
+        return res.status(404).json({ message: "Contenu éducatif non trouvé" });
+      }
+      
+      const deleted = await storage.deleteQuiz(Number(quizId));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Quiz non trouvé" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du quiz:", error);
+      res.status(500).json({ error: "Erreur lors de la suppression du quiz" });
+    }
+  });
+  
   // Videos
   app.get("/api/videos", async (req: Request, res: Response) => {
     try {
