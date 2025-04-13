@@ -51,7 +51,7 @@ const ContentPage: React.FC = () => {
   useEffect(() => {
     if (content && !isLoading) {
       // Vérifier si le contenu contient une intégration Instagram
-      if (content.content.includes('instagram-embed-container')) {
+      if (content.content.includes('instagram-media')) {
         const processEmbeds = () => {
           if ((window as any).instgrm) {
             // Force Instagram à traiter les embeds
@@ -85,7 +85,7 @@ const ContentPage: React.FC = () => {
     return () => {
       if ((window as any).instgrm) {
         // Aucune méthode officielle pour nettoyer, mais on peut essayer
-        const embeds = document.querySelectorAll('.instagram-embed-container');
+        const embeds = document.querySelectorAll('.instagram-media');
         embeds.forEach(embed => {
           if (embed.parentNode) {
             const wrapperDiv = embed.parentNode;
@@ -164,24 +164,29 @@ const ContentPage: React.FC = () => {
           ) : content ? (
             <Card className="shadow-sm border-0 sm:border">
               <CardContent className="p-3 sm:p-6">
-                <div className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none" dangerouslySetInnerHTML={{ 
-                  __html: content.content
-                    // Remplacer les balises img qui apparaissent sous forme de texte
-                    .replace(/&lt;img/g, '<img')
-                    .replace(/class=&quot;([^&]*)&quot;/g, 'class="$1"')
-                    .replace(/src=&quot;([^&]*)&quot;/g, 'src="$1"')
-                    .replace(/alt=&quot;([^&]*)&quot;/g, 'alt="$1"')
-                    .replace(/style=&quot;([^&]*)&quot;/g, 'style="$1"')
-                    .replace(/\/&gt;/g, '/>')
-                    // Alternative avec les guillemets non-échappés
-                    .replace(/<img src="([^"]*)" alt="([^"]*)" class="([^"]*)" \/>/g, 
-                             '<img src="$1" alt="$2" class="$3" />')
-                    // Correction pour les balises figure et figcaption
-                    .replace(/&lt;figure/g, '<figure')
-                    .replace(/&lt;figcaption/g, '<figcaption')
-                    .replace(/&lt;\/figure&gt;/g, '</figure>')
-                    .replace(/&lt;\/figcaption&gt;/g, '</figcaption>')
-                }} />
+                <div className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none" 
+                  dangerouslySetInnerHTML={{
+                    __html: content.content
+                      // Remplacer les balises img qui apparaissent sous forme de texte
+                      .replace(/&lt;img/g, '<img')
+                      .replace(/class=&quot;([^&]*)&quot;/g, 'class="$1"')
+                      .replace(/src=&quot;([^&]*)&quot;/g, 'src="$1"')
+                      .replace(/alt=&quot;([^&]*)&quot;/g, 'alt="$1"')
+                      .replace(/style=&quot;([^&]*)&quot;/g, 'style="$1"')
+                      .replace(/\/&gt;/g, '/>')
+                      // Alternative avec les guillemets non-échappés
+                      .replace(/<img src="([^"]*)" alt="([^"]*)" class="([^"]*)" \/>/g, 
+                              '<img src="$1" alt="$2" class="$3" />')
+                      // Correction pour les balises figure et figcaption
+                      .replace(/&lt;figure/g, '<figure')
+                      .replace(/&lt;figcaption/g, '<figcaption')
+                      .replace(/&lt;\/figure&gt;/g, '</figure>')
+                      .replace(/&lt;\/figcaption&gt;/g, '</figcaption>')
+                  }}
+                />
+                <div id="instagram-embed-api">
+                  <script async src="https://www.instagram.com/embed.js"></script>
+                </div>
               </CardContent>
             </Card>
           ) : (
