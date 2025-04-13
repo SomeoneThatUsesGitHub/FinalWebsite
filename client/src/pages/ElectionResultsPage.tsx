@@ -164,13 +164,6 @@ const ElectionResultsPage: React.FC = () => {
                 animate="visible"
                 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-6 pt-4 relative flex items-center justify-center"
               >
-                <div className="w-16 h-12 md:w-20 md:h-16 lg:w-24 lg:h-20 inline-block mr-4 overflow-hidden rounded shadow-md">
-                  <img 
-                    src={getCountryFlagUrl(countryCode || '')} 
-                    alt={`Drapeau ${country}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
                 {title}
               </motion.h1>
               <motion.div 
@@ -228,17 +221,12 @@ const ElectionResultsPage: React.FC = () => {
           
           {!upcoming && electionData.results.length > 0 ? (
             <div className="space-y-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Résultats des élections</CardTitle>
-                  <CardDescription>Répartition des votes entre les différents candidats</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[400px]">
-                    <ElectionResultsChart data={electionData} />
-                  </div>
-                </CardContent>
-              </Card>
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Résultats des élections</h2>
+                <div className="h-[450px]">
+                  <ElectionResultsChart data={{...electionData, title: '', date: '', type: ''}} />
+                </div>
+              </div>
               
               <Card>
                 <CardHeader>
