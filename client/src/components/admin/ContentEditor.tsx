@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo, Heading1, Heading2, Heading3, Minus, Image as ImageIcon, Images as ImagesIcon } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo, Heading1, Heading2, Heading3, Minus, Image as ImageIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
@@ -13,15 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 interface ContentEditorProps {
   initialContent?: {
@@ -189,167 +180,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
     }
   };
   
-  // Nouvelle fonction pour ajouter un carrousel d'images
-  const [carouselImages, setCarouselImages] = useState<Array<{url: string, caption: string}>>([]);
-  const [showCarouselDialog, setShowCarouselDialog] = useState(false);
-  const [currentImageUrl, setCurrentImageUrl] = useState('');
-  const [currentImageCaption, setCurrentImageCaption] = useState('');
-  
-  const handleAddCarousel = () => {
-    setCarouselImages([]);
-    setCurrentImageUrl('');
-    setCurrentImageCaption('');
-    setShowCarouselDialog(true);
-  };
-  
-  const addImageToCarousel = () => {
-    if (currentImageUrl.trim()) {
-      setCarouselImages([...carouselImages, {
-        url: currentImageUrl,
-        caption: currentImageCaption
-      }]);
-      setCurrentImageUrl('');
-      setCurrentImageCaption('');
-    }
-  };
-  
-  const removeImageFromCarousel = (index: number) => {
-    setCarouselImages(carouselImages.filter((_, i) => i !== index));
-  };
-  
-  const insertCarousel = () => {
-    if (carouselImages.length === 0) {
-      toast({
-        title: "Ajoutez des images",
-        description: "Veuillez ajouter au moins une image au carrousel.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (editor) {
-      // Utiliser une approche beaucoup plus simple avec div.classList.toggle
-      let html = `
-      <div class="image-carousel-container my-8 relative mx-auto p-0 max-w-3xl rounded-lg shadow-lg overflow-hidden">
-        <div class="carousel-inner relative">
-      `;
-      
-      // Ajouter chaque image comme un élément du carrousel
-      carouselImages.forEach((image, index) => {
-        const isActive = index === 0;
-        html += `
-          <div class="carousel-item absolute top-0 left-0 w-full h-full transition-opacity duration-300 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'}" data-index="${index}">
-            <img src="${image.url}" alt="${image.caption || `Image ${index + 1}`}" class="w-full h-auto object-contain max-h-[500px]">
-            ${image.caption ? `<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-3 text-sm">${image.caption}</div>` : ''}
-          </div>
-        `;
-      });
-      
-      // Ajouter les boutons de navigation
-      html += `
-        </div>
-        
-        <!-- Flèches de navigation -->
-        <button type="button" onclick="
-          const container = this.closest('.image-carousel-container');
-          const items = container.querySelectorAll('.carousel-item');
-          const active = container.querySelector('.carousel-item.opacity-100');
-          const currentIndex = parseInt(active.dataset.index);
-          let prevIndex = currentIndex - 1;
-          if (prevIndex < 0) prevIndex = items.length - 1;
-          
-          active.classList.remove('opacity-100', 'z-10');
-          active.classList.add('opacity-0', 'z-0');
-          
-          items[prevIndex].classList.remove('opacity-0', 'z-0');
-          items[prevIndex].classList.add('opacity-100', 'z-10');
-          
-          // Update indicators
-          const dots = container.querySelectorAll('.carousel-dot');
-          dots.forEach((dot, i) => {
-            if (i === prevIndex) dot.classList.add('bg-blue-500');
-            else dot.classList.remove('bg-blue-500');
-          });
-        " class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-20">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </button>
-        
-        <button type="button" onclick="
-          const container = this.closest('.image-carousel-container');
-          const items = container.querySelectorAll('.carousel-item');
-          const active = container.querySelector('.carousel-item.opacity-100');
-          const currentIndex = parseInt(active.dataset.index);
-          let nextIndex = currentIndex + 1;
-          if (nextIndex >= items.length) nextIndex = 0;
-          
-          active.classList.remove('opacity-100', 'z-10');
-          active.classList.add('opacity-0', 'z-0');
-          
-          items[nextIndex].classList.remove('opacity-0', 'z-0');
-          items[nextIndex].classList.add('opacity-100', 'z-10');
-          
-          // Update indicators
-          const dots = container.querySelectorAll('.carousel-dot');
-          dots.forEach((dot, i) => {
-            if (i === nextIndex) dot.classList.add('bg-blue-500');
-            else dot.classList.remove('bg-blue-500');
-          });
-        " class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-20">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </button>
-      `;
-      
-      // Ajouter des indicateurs si plusieurs images
-      if (carouselImages.length > 1) {
-        html += `
-          <!-- Indicateurs -->
-          <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-20">
-        `;
-        
-        carouselImages.forEach((_, index) => {
-          html += `
-            <button type="button" onclick="
-              const container = this.closest('.image-carousel-container');
-              const items = container.querySelectorAll('.carousel-item');
-              const active = container.querySelector('.carousel-item.opacity-100');
-              
-              active.classList.remove('opacity-100', 'z-10');
-              active.classList.add('opacity-0', 'z-0');
-              
-              items[${index}].classList.remove('opacity-0', 'z-0');
-              items[${index}].classList.add('opacity-100', 'z-10');
-              
-              // Update indicators
-              const dots = container.querySelectorAll('.carousel-dot');
-              dots.forEach((dot, i) => {
-                if (i === ${index}) dot.classList.add('bg-blue-500');
-                else dot.classList.remove('bg-blue-500');
-              });
-            " class="carousel-dot w-3 h-3 rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'}"></button>
-          `;
-        });
-        
-        html += `
-          </div>
-        `;
-      }
-      
-      // Fermer le conteneur
-      html += `</div>`;
-      
-      // Insérer le HTML du carrousel dans l'éditeur
-      editor.chain().focus().insertContent(html).run();
-      
-      // Fermer le dialogue
-      setShowCarouselDialog(false);
-      
-      // Notification
-      toast({
-        title: "Carrousel d'images ajouté",
-        description: `Carrousel créé avec ${carouselImages.length} image(s).`,
-      });
-    }
-  };
+
   
   const handleAddInstagram = () => {
     const url = window.prompt('URL de la publication Instagram:');
@@ -614,64 +445,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
                 <ImageIcon className="h-4 w-4" />
               </Toggle>
               
-              <Toggle
-                onPressedChange={() => {
-                  if (!editor) return;
-                  
-                  // Demander les URLs des images
-                  let imageUrls = [];
-                  
-                  const url1 = prompt("URL de la première image:");
-                  if (!url1) return;
-                  imageUrls.push(url1);
-                  
-                  const url2 = prompt("URL de la deuxième image (facultatif):");
-                  if (url2) imageUrls.push(url2);
-                  
-                  // Optionnellement demander une troisième image
-                  if (imageUrls.length >= 2) {
-                    const url3 = prompt("URL de la troisième image (facultatif):");
-                    if (url3) imageUrls.push(url3);
-                  }
-                  
-                  // Générer un ID unique pour ce carrousel
-                  const carouselId = `carousel-${Date.now()}`;
-                  
-                  // Créer une galerie d'images simple sans JavaScript
-                  let html = `
-                  <div class="image-gallery max-w-2xl mx-auto my-8">
-                    <div class="grid grid-cols-1 md:grid-cols-${Math.min(imageUrls.length, 3)} gap-4">
-                  `;
-                  
-                  // Ajouter les images comme une grille simple
-                  imageUrls.forEach((url, index) => {
-                    html += `
-                      <div class="image-item rounded-lg shadow-lg overflow-hidden">
-                        <img src="${url}" alt="Image ${index + 1}" class="w-full h-auto object-cover" style="max-height: 300px;">
-                      </div>
-                    `;
-                  });
-                  
-                  // Fermer les divs
-                  html += `
-                    </div>
-                    <div class="text-center text-sm text-gray-500 mt-2">Galerie d'images (${imageUrls.length})</div>
-                  </div>
-                  `;
-                  
-                  // Insérer dans l'éditeur
-                  editor.chain().focus().insertContent(html).run();
-                  
-                  // Notification
-                  toast({
-                    title: "Carrousel ajouté",
-                    description: `Carrousel créé avec ${imageUrls.length} image(s).`,
-                  });
-                }}
-                aria-label="Insérer un carrousel d'images"
-              >
-                <ImagesIcon className="h-4 w-4" />
-              </Toggle>
+
 
               <UISeparator orientation="vertical" className="mx-1 h-6" />
 
