@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'wouter';
-import { BookOpen, ChevronLeft, GraduationCap, Calendar, RefreshCw } from 'lucide-react';
+import { BookOpen, ChevronLeft, GraduationCap, Calendar, RefreshCw, BookOpenText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import MainLayout from '@/components/layout/MainLayout';
 import { pageTransition } from '@/lib/animations';
+import GlossaryHighlighter from '@/components/GlossaryHighlighter';
 
 // Animation avec effet de rebond
 const fadeInWithBounce = {
@@ -165,27 +166,35 @@ const ContentPage: React.FC = () => {
           ) : content ? (
             <Card className="shadow-sm border-0 sm:border">
               <CardContent className="p-3 sm:p-6">
-                <div 
-                  className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none"
-                  dangerouslySetInnerHTML={{
-                    __html: content.content
-                      // Remplacer les balises img qui apparaissent sous forme de texte
-                      .replace(/&lt;img/g, '<img')
-                      .replace(/class=&quot;([^&]*)&quot;/g, 'class="$1"')
-                      .replace(/src=&quot;([^&]*)&quot;/g, 'src="$1"')
-                      .replace(/alt=&quot;([^&]*)&quot;/g, 'alt="$1"')
-                      .replace(/style=&quot;([^&]*)&quot;/g, 'style="$1"')
-                      .replace(/\/&gt;/g, '/>')
-                      // Alternative avec les guillemets non-échappés
-                      .replace(/<img src="([^"]*)" alt="([^"]*)" class="([^"]*)" \/>/g, 
-                              '<img src="$1" alt="$2" class="$3" />')
-                      // Correction pour les balises figure et figcaption
-                      .replace(/&lt;figure/g, '<figure')
-                      .replace(/&lt;figcaption/g, '<figcaption')
-                      .replace(/&lt;\/figure&gt;/g, '</figure>')
-                      .replace(/&lt;\/figcaption&gt;/g, '</figcaption>')
-                  }}
-                />
+                <div className="mb-4 flex items-center text-sm text-muted-foreground bg-primary/5 px-4 py-3 rounded-lg">
+                  <BookOpenText className="h-5 w-5 mr-2 text-primary" />
+                  <p>
+                    <span className="font-medium text-primary">Décodeur politique :</span> Surlignez un terme dans le texte pour voir sa définition.
+                  </p>
+                </div>
+                <GlossaryHighlighter>
+                  <div 
+                    className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: content.content
+                        // Remplacer les balises img qui apparaissent sous forme de texte
+                        .replace(/&lt;img/g, '<img')
+                        .replace(/class=&quot;([^&]*)&quot;/g, 'class="$1"')
+                        .replace(/src=&quot;([^&]*)&quot;/g, 'src="$1"')
+                        .replace(/alt=&quot;([^&]*)&quot;/g, 'alt="$1"')
+                        .replace(/style=&quot;([^&]*)&quot;/g, 'style="$1"')
+                        .replace(/\/&gt;/g, '/>')
+                        // Alternative avec les guillemets non-échappés
+                        .replace(/<img src="([^"]*)" alt="([^"]*)" class="([^"]*)" \/>/g, 
+                                '<img src="$1" alt="$2" class="$3" />')
+                        // Correction pour les balises figure et figcaption
+                        .replace(/&lt;figure/g, '<figure')
+                        .replace(/&lt;figcaption/g, '<figcaption')
+                        .replace(/&lt;\/figure&gt;/g, '</figure>')
+                        .replace(/&lt;\/figcaption&gt;/g, '</figcaption>')
+                    }}
+                  />
+                </GlossaryHighlighter>
               </CardContent>
             </Card>
           ) : (
