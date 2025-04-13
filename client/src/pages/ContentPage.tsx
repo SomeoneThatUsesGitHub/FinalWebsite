@@ -79,7 +79,7 @@ const ContentPage: React.FC = () => {
         </div>
       ) : content ? (
         <>
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-16 md:py-24 mb-6 relative -mt-[4.25rem] overflow-hidden w-screen left-1/2 right-1/2 -translate-x-1/2">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-16 md:py-24 mb-6 -mt-[4.25rem]" style={{ width: '100%', overflow: 'hidden', boxSizing: 'border-box' }}>
             {/* Éléments décoratifs pour rendre la bannière plus dynamique */}
             <div className="absolute inset-0 bg-pattern opacity-5"></div>
             <div className="absolute top-0 right-0 w-72 h-72 md:w-96 md:h-96 bg-blue-500 rounded-full filter blur-3xl opacity-20 -translate-y-24 translate-x-24"></div>
