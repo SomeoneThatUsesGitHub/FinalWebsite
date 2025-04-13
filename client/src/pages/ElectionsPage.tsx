@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, VoteIcon, Filter } from 'lucide-react';
@@ -19,7 +18,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ElectionResultsChart, ElectionResultsData } from '@/components/ElectionResultsChart';
-import { getCountryFlag } from '@/lib/countries';
 
 // Animation avec effet de rebond
 const fadeInWithBounce = {
@@ -35,6 +33,18 @@ const fadeInWithBounce = {
       stiffness: 120
     }
   }
+};
+
+// Fonction pour afficher le drapeau d'un pays à partir de son code pays
+const getCountryFlag = (countryCode: string): string => {
+  // Convertir le code pays en caractères d'emoji de drapeau
+  // Le code pays est converti en paires de caractères régionaux Unicode
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  
+  return String.fromCodePoint(...codePoints);
 };
 
 // Définir l'interface pour une élection
@@ -158,8 +168,8 @@ const ElectionsPage: React.FC = () => {
         exit="exit"
         variants={pageTransition}
       >
-        {/* Bannière d'en-tête prenant toute la hauteur */}
-        <div className="bg-blue-50 min-h-screen flex items-center justify-center shadow-md mb-8 w-screen relative left-1/2 transform -translate-x-1/2">
+        {/* Bannière d'en-tête identique à celle de la page Articles */}
+        <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8 w-screen relative left-1/2 transform -translate-x-1/2">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto text-center">
               <motion.h1 
@@ -177,33 +187,8 @@ const ElectionsPage: React.FC = () => {
                   scale: 1,
                   transition: { delay: 0.3, duration: 0.5 } 
                 }}
-                className="h-1 w-20 bg-blue-500 mx-auto rounded-full mb-6"
+                className="h-1 w-20 bg-blue-500 mx-auto rounded-full"
               ></motion.div>
-              
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0,
-                  transition: { delay: 0.5, duration: 0.5 } 
-                }}
-                className="text-lg text-blue-800/80 max-w-2xl mx-auto mb-8"
-              >
-                Découvrez les élections du monde entier, leurs résultats et les analyses détaillées de notre équipe éditoriale
-              </motion.p>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0,
-                  transition: { delay: 0.7, duration: 0.5 } 
-                }}
-              >
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}>
-                  Découvrir les élections
-                </Button>
-              </motion.div>
             </div>
           </div>
         </div>
@@ -442,8 +427,7 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
   onSelectCountry,
 }) => {
   const [expanded, setExpanded] = useState(false);
-  const [, setLocation] = useLocation();
-  const { id, title, country, countryCode, date, type, description, results, upcoming } = election;
+  const { title, country, countryCode, date, type, description, results, upcoming } = election;
   
   // Formater la date
   const formattedDate = new Date(date).toLocaleDateString('fr-FR', {
@@ -460,14 +444,9 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
     results: parsedResults?.results || []
   };
   
-  // Fonction pour naviguer vers la page détaillée de l'élection
-  const goToElectionDetail = () => {
-    setLocation(`/election/${id}`);
-  };
-  
   return (
-    <Card className={`border-l-4 ${upcoming ? 'border-l-amber-500' : isRecent ? 'border-l-green-500' : 'border-l-blue-500'} hover:shadow-md transition-shadow`}>
-      <CardHeader className="pb-2 cursor-pointer" onClick={goToElectionDetail}>
+    <Card className={`border-l-4 ${upcoming ? 'border-l-amber-500' : isRecent ? 'border-l-green-500' : 'border-l-blue-500'}`}>
+      <CardHeader className="pb-2">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
           <div className="w-full">
             <CardTitle className="flex flex-wrap items-center gap-2 mb-2">
@@ -505,13 +484,13 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
         </div>
       </CardHeader>
       
-      <CardContent className="cursor-pointer" onClick={goToElectionDetail}>
+      <CardContent>
         {description && (
           <p className="text-muted-foreground mb-4">{description}</p>
         )}
         
         {parsedResults && expanded && (
-          <div className="mt-4 overflow-x-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="mt-4 overflow-x-auto">
             <div className="min-w-[500px] md:min-w-0">
               <ElectionResultsChart data={electionData} />
             </div>
@@ -524,21 +503,9 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
           variant="outline" 
           size="sm" 
           className="w-full sm:w-auto"
-          onClick={(e) => {
-            e.stopPropagation();
-            setExpanded(!expanded);
-          }}
+          onClick={() => setExpanded(!expanded)}
         >
           {expanded ? 'Masquer les résultats' : 'Voir les résultats'}
-        </Button>
-        
-        <Button 
-          variant="default" 
-          size="sm"
-          className="w-full sm:w-auto" 
-          onClick={goToElectionDetail}
-        >
-          Voir les détails
         </Button>
         
         {!selectedCountry && (
