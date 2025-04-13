@@ -36,16 +36,12 @@ const fadeInWithBounce = {
   }
 };
 
-// Fonction pour afficher le drapeau d'un pays à partir de son code pays
-const getCountryFlag = (countryCode: string): string => {
-  // Convertir le code pays en caractères d'emoji de drapeau
-  // Le code pays est converti en paires de caractères régionaux Unicode
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
-  
-  return String.fromCodePoint(...codePoints);
+// Fonction pour obtenir l'URL du drapeau d'un pays à partir de son code pays
+const getCountryFlagUrl = (countryCode: string): string => {
+  // En production, on utiliserait une API ou des images stockées
+  // Pour cet exemple, on utilise les drapeaux de Flagcdn
+  const code = countryCode.toLowerCase();
+  return `https://flagcdn.com/w160/${code}.png`;
 };
 
 // Définir l'interface pour une élection
@@ -169,8 +165,8 @@ const ElectionsPage: React.FC = () => {
         exit="exit"
         variants={pageTransition}
       >
-        {/* Bannière d'en-tête identique à celle de la page Articles */}
-        <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8 w-screen relative left-1/2 transform -translate-x-1/2 -mt-4">
+        {/* Bannière d'en-tête */}
+        <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8 w-screen relative left-1/2 transform -translate-x-1/2 -mt-16">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto text-center">
               <motion.h1 
@@ -277,15 +273,18 @@ const ElectionsPage: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {uniqueCountries.map((country) => (
-                    <Link href={`/elections/${country.countryCode.toLowerCase()}`}>
+                    <Link key={country.countryCode} href={`/elections/${country.countryCode.toLowerCase()}`}>
                       <Card 
-                        key={country.countryCode} 
                         className="hover:shadow-lg transition-shadow cursor-pointer"
                       >
                         <CardContent className="p-6 flex items-center justify-between">
                           <div className="flex items-center">
-                            <div className="w-12 h-12 flex items-center justify-center mr-3">
-                              <span className="text-4xl">{getCountryFlag(country.countryCode)}</span>
+                            <div className="w-12 h-12 flex items-center justify-center mr-3 overflow-hidden rounded">
+                              <img 
+                                src={getCountryFlagUrl(country.countryCode)} 
+                                alt={`Drapeau ${country.country}`} 
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                             <div>
                               <h3 className="font-medium">{country.country}</h3>
@@ -452,7 +451,13 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
         <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
           <div className="w-full">
             <CardTitle className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="text-xl mr-1">{getCountryFlag(countryCode)}</span>
+              <div className="w-6 h-6 inline-block mr-2 overflow-hidden rounded">
+                <img 
+                  src={getCountryFlagUrl(countryCode)} 
+                  alt={`Drapeau ${country}`} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <span className="mr-2">{title}</span>
               <div className="flex flex-wrap gap-1">
                 {upcoming && (
@@ -528,6 +533,6 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
   );
 };
 
-// La fonction getCountryFlag est déjà définie plus haut dans le fichier
+// Fin du composant ElectionCard
 
 export default ElectionsPage;
