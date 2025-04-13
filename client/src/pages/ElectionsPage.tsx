@@ -19,6 +19,34 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ElectionResultsChart, ElectionResultsData } from '@/components/ElectionResultsChart';
 
+// Animation avec effet de rebond
+const fadeInWithBounce = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond accentué
+      bounce: 0.4,
+      type: "spring",
+      stiffness: 120
+    }
+  }
+};
+
+// Fonction pour afficher le drapeau d'un pays à partir de son code pays
+const getCountryFlag = (countryCode: string): string => {
+  // Convertir le code pays en caractères d'emoji de drapeau
+  // Le code pays est converti en paires de caractères régionaux Unicode
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  
+  return String.fromCodePoint(...codePoints);
+};
+
 // Définir l'interface pour une élection
 interface Election {
   id: number;
@@ -140,23 +168,14 @@ const ElectionsPage: React.FC = () => {
         exit="exit"
         variants={pageTransition}
       >
-        {/* Bannière d'en-tête similaire à celle de la page Articles */}
-        <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8 -mt-[4.25rem]">
+        {/* Bannière d'en-tête identique à celle de la page Articles */}
+        <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto text-center">
               <motion.h1 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0,
-                  transition: {
-                    duration: 0.7,
-                    ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond accentué
-                    bounce: 0.4,
-                    type: "spring",
-                    stiffness: 120
-                  }
-                }}
+                variants={fadeInWithBounce}
+                initial="hidden"
+                animate="visible"
                 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative"
               >
                 Élections Internationales
@@ -168,16 +187,8 @@ const ElectionsPage: React.FC = () => {
                   scale: 1,
                   transition: { delay: 0.3, duration: 0.5 } 
                 }}
-                className="h-1 w-20 bg-blue-500 mx-auto rounded-full mb-4"
+                className="h-1 w-20 bg-blue-500 mx-auto rounded-full"
               ></motion.div>
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-                className="text-xl text-gray-700 text-center max-w-2xl mx-auto"
-              >
-                Découvrez les résultats des élections récentes et les prochains scrutins à travers le monde
-              </motion.p>
             </div>
           </div>
         </div>
@@ -515,17 +526,6 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
   );
 };
 
-// Fonction helper pour obtenir l'emoji du drapeau à partir du code pays
-const getCountryFlag = (countryCode: string): string => {
-  // Les codes pays sont en majuscules et ont 2 caractères
-  const uppercaseCode = countryCode.toUpperCase();
-  const codePoints = [];
-  
-  for (let i = 0; i < uppercaseCode.length; i++) {
-    codePoints.push(127397 + uppercaseCode.charCodeAt(i));
-  }
-  
-  return String.fromCodePoint(...codePoints);
-};
+// La fonction getCountryFlag est déjà définie plus haut dans le fichier
 
 export default ElectionsPage;

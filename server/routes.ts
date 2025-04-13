@@ -10,7 +10,7 @@ import {
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
   insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema, insertTeamApplicationSchema,
   insertContactMessageSchema, insertEducationalTopicSchema, insertEducationalContentSchema,
-  insertEducationalQuizSchema
+  insertEducationalQuizSchema, insertElectionSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -178,7 +178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Crée une nouvelle élection (requiert authentification admin)
-  app.post("/api/elections", isAuth, isAdminOrEditor, async (req: Request, res: Response) => {
+  app.post("/api/elections", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const electionData = insertElectionSchema.parse(req.body);
       const election = await storage.createElection(electionData);
@@ -193,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Met à jour une élection existante (requiert authentification admin)
-  app.put("/api/elections/:id", isAuth, isAdminOrEditor, async (req: Request, res: Response) => {
+  app.put("/api/elections/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     const { id } = req.params;
     
     if (isNaN(Number(id))) {
@@ -218,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Supprime une élection (requiert authentification admin)
-  app.delete("/api/elections/:id", isAuth, isAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/elections/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     const { id } = req.params;
     
     if (isNaN(Number(id))) {
