@@ -473,7 +473,5 @@ export const insertEducationalQuizSchema = createInsertSchema(educationalQuizzes
 export type EducationalQuiz = typeof educationalQuizzes.$inferSelect;
 export type InsertEducationalQuiz = z.infer<typeof insertEducationalQuizSchema>;
 
-export const insertPoliticalGlossaryTerm = createInsertSchema(politicalGlossary);
-
 export type PoliticalGlossaryTerm = typeof politicalGlossary.$inferSelect;
 export type InsertPoliticalGlossaryTerm = z.infer<typeof insertPoliticalGlossarySchema>;
