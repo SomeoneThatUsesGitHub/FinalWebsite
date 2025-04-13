@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
-import { Plus, Pencil, Trash, BookOpen, GraduationCap, ArrowLeft } from 'lucide-react';
+import { Plus, Pencil, Trash, BookOpen, GraduationCap, ArrowLeft, BrainCircuit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ContentEditor from '@/components/admin/ContentEditor';
+import QuizManager from '@/components/admin/QuizManager';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -607,6 +608,17 @@ const EducationalContentPage: React.FC = () => {
                   }}
                   isSaving={createContentMutation.isPending || updateContentMutation.isPending}
                 />
+                
+                {editingContentId && (
+                  <div className="mt-8">
+                    <h3 className="text-lg font-medium mb-4">Quiz et questions</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Vous pouvez ajouter des quiz à ce contenu pour tester les connaissances des lecteurs.
+                      Les modifications seront disponibles après avoir enregistré le contenu.
+                    </p>
+                    <QuizManager contentId={editingContentId} />
+                  </div>
+                )}
               </>
             ) : (
               <>

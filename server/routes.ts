@@ -9,7 +9,8 @@ import {
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
   insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema, insertTeamApplicationSchema,
-  insertContactMessageSchema, insertEducationalTopicSchema, insertEducationalContentSchema
+  insertContactMessageSchema, insertEducationalTopicSchema, insertEducationalContentSchema,
+  insertEducationalQuizSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
