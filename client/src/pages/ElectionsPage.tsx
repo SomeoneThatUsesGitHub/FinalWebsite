@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, VoteIcon, Filter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -276,24 +277,25 @@ const ElectionsPage: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {uniqueCountries.map((country) => (
-                    <Card 
-                      key={country.countryCode} 
-                      className="hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => setSelectedCountry(country.countryCode)}
-                    >
-                      <CardContent className="p-6 flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 flex items-center justify-center mr-3">
-                            <span className="text-4xl">{getCountryFlag(country.countryCode)}</span>
+                    <Link href={`/elections/${country.countryCode.toLowerCase()}`}>
+                      <Card 
+                        key={country.countryCode} 
+                        className="hover:shadow-lg transition-shadow cursor-pointer"
+                      >
+                        <CardContent className="p-6 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="w-12 h-12 flex items-center justify-center mr-3">
+                              <span className="text-4xl">{getCountryFlag(country.countryCode)}</span>
+                            </div>
+                            <div>
+                              <h3 className="font-medium">{country.country}</h3>
+                              <p className="text-sm text-muted-foreground">{country.count} élection{country.count > 1 ? 's' : ''}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="font-medium">{country.country}</h3>
-                            <p className="text-sm text-muted-foreground">{country.count} élection{country.count > 1 ? 's' : ''}</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline">{country.countryCode}</Badge>
-                      </CardContent>
-                    </Card>
+                          <Badge variant="outline">{country.countryCode}</Badge>
+                        </CardContent>
+                      </Card>
+                    </Link>
                   ))}
                 </div>
               )}
