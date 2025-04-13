@@ -74,7 +74,7 @@ const TopicPage: React.FC = () => {
           </div>
         </div>
       ) : topic ? (
-        <div className="py-20 mb-6 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 relative overflow-hidden w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-[4.25rem]">
+        <div className="py-20 mb-6 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 -mt-[4.25rem] w-full">
           <div className="absolute inset-0 bg-pattern opacity-10"></div>
           <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl opacity-20 -translate-y-24 translate-x-24"></div>
           <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-400 rounded-full filter blur-3xl opacity-20 translate-y-24 -translate-x-24"></div>
