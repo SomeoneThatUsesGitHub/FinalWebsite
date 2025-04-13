@@ -47,56 +47,7 @@ const ContentPage: React.FC = () => {
 
   const isLoading = topicLoading || contentLoading;
   
-  // Chargement du script Instagram quand le contenu est chargé
-  useEffect(() => {
-    if (content && !isLoading) {
-      // Vérifier si le contenu contient une intégration Instagram
-      if (content.content.includes('instagram-media')) {
-        const processEmbeds = () => {
-          if ((window as any).instgrm) {
-            // Force Instagram à traiter les embeds
-            (window as any).instgrm.Embeds.process();
-          } else {
-            // Si Instagram n'est pas encore chargé, réessayer dans 500ms
-            setTimeout(processEmbeds, 500);
-          }
-        };
-        
-        // Créer et charger le script Instagram
-        let instagramScript = document.querySelector('script[src*="instagram.com/embed.js"]') as HTMLScriptElement;
-        
-        if (!instagramScript) {
-          instagramScript = document.createElement('script');
-          instagramScript.src = 'https://www.instagram.com/embed.js';
-          instagramScript.async = true;
-          instagramScript.defer = true;
-          document.body.appendChild(instagramScript);
-        }
-        
-        // Après que le script est chargé, traiter les embeds
-        instagramScript.onload = processEmbeds;
-        
-        // Si le script est déjà chargé, essayer de traiter les embeds
-        setTimeout(processEmbeds, 1000);
-      }
-    }
-    
-    // Nettoyage au démontage
-    return () => {
-      if ((window as any).instgrm) {
-        // Aucune méthode officielle pour nettoyer, mais on peut essayer
-        const embeds = document.querySelectorAll('.instagram-media');
-        embeds.forEach(embed => {
-          if (embed.parentNode) {
-            const wrapperDiv = embed.parentNode;
-            if (wrapperDiv.parentNode) {
-              wrapperDiv.parentNode.replaceChild(embed, wrapperDiv);
-            }
-          }
-        });
-      }
-    };
-  }, [content, isLoading]);
+  // Plus besoin du useEffect car nous utilisons la méthode ref directement sur la div du contenu
 
   return (
     <MainLayout>
@@ -164,7 +115,35 @@ const ContentPage: React.FC = () => {
           ) : content ? (
             <Card className="shadow-sm border-0 sm:border">
               <CardContent className="p-3 sm:p-6">
-                <div className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none" 
+                <div 
+                  className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none" 
+                  ref={(el) => {
+                    // Fonction pour charger et initialiser le script Instagram
+                    if (el && content.content.includes('instagram-media')) {
+                      // Créer ou obtenir un script Instagram
+                      let instaScript = document.getElementById('instagram-embed-js') as HTMLScriptElement;
+                      if (!instaScript) {
+                        instaScript = document.createElement('script');
+                        instaScript.id = 'instagram-embed-js';
+                        instaScript.src = 'https://www.instagram.com/embed.js';
+                        instaScript.async = true;
+                        
+                        // Quand le script est chargé, traiter les embeds
+                        instaScript.onload = () => {
+                          if ((window as any).instgrm) {
+                            (window as any).instgrm.Embeds.process();
+                          }
+                        };
+                        
+                        document.body.appendChild(instaScript);
+                      } else if ((window as any).instgrm) {
+                        // Si le script est déjà chargé, traiter les embeds immédiatement
+                        setTimeout(() => {
+                          (window as any).instgrm.Embeds.process();
+                        }, 500);
+                      }
+                    }
+                  }}
                   dangerouslySetInnerHTML={{
                     __html: content.content
                       // Remplacer les balises img qui apparaissent sous forme de texte
@@ -184,9 +163,6 @@ const ContentPage: React.FC = () => {
                       .replace(/&lt;\/figcaption&gt;/g, '</figcaption>')
                   }}
                 />
-                <div id="instagram-embed-api">
-                  <script async src="https://www.instagram.com/embed.js"></script>
-                </div>
               </CardContent>
             </Card>
           ) : (
