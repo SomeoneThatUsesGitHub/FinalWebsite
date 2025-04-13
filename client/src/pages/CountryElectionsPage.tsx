@@ -226,7 +226,7 @@ const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   };
   
   return (
-    <Link href={`/elections/${election.countryCode.toLowerCase()}/resultats?id=${election.id}`}>
+    <Link href={`/elections/${election.countryCode.toLowerCase()}/resultats/${election.id}`}>
       <Card className={`hover:shadow-md transition-shadow h-full ${upcoming ? 'border-amber-300' : 'border-blue-300'}`}>
         <CardHeader className="pb-2">
           <CardTitle className="text-xl font-semibold">{title}</CardTitle>
