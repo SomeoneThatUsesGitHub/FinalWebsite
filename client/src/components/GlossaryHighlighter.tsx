@@ -43,7 +43,9 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
         top: 50%;
         transform: translate(-50%, -50%);
         width: 300px;
-        max-width: 90%;
+        max-width: 90vw;
+        margin: 0 auto;
+        right: auto;
         background: white;
         border-radius: 8px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -212,7 +214,18 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
       {activeTerm && (
         <>
           <div className="glossary-overlay" onClick={handleClose}></div>
-          <div className="glossary-dialog">
+          <div 
+            className="glossary-dialog"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)', 
+              width: '300px',
+              maxWidth: '85%',
+              boxSizing: 'border-box'
+            }}
+          >
             <button className="glossary-close" onClick={handleClose}>×</button>
             
             <h3 className="glossary-title">{activeTerm.term}</h3>
