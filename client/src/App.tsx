@@ -100,6 +100,7 @@ function App() {
               <Route path="/apprendre/:topicSlug/:contentSlug" component={ContentPage} />
               <Route path="/elections" component={ElectionsPage} />
               <Route path="/elections/:countryCode" component={CountryElectionsPage} />
+              <Route path="/elections/:countryCode/resultats" component={ElectionResultsPage} />
               
               {/* Routes admin protégées - accessibles aux admins et éditeurs */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
