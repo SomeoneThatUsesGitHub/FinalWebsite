@@ -58,7 +58,7 @@ const ContentPage: React.FC = () => {
         </div>
       ) : content ? (
         <>
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 shadow-md mb-6 relative">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative w-full">
             <div className="container mx-auto px-4">
               {topic && (
                 <div className="max-w-4xl mx-auto mb-6">
@@ -103,17 +103,17 @@ const ContentPage: React.FC = () => {
         </div>
       )}
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="container mx-auto px-3 sm:px-4 py-8">
+        <div className="max-w-4xl mx-auto w-full">
           {isLoading ? (
             <div className="space-y-4">
               <Skeleton className="h-64 w-full" />
               <Skeleton className="h-64 w-full" />
             </div>
           ) : content ? (
-            <Card className="shadow-sm">
-              <CardContent className="p-6">
-                <div className="prose prose-blue max-w-none" dangerouslySetInnerHTML={{ 
+            <Card className="shadow-sm border-0 sm:border">
+              <CardContent className="p-3 sm:p-6">
+                <div className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none" dangerouslySetInnerHTML={{ 
                   __html: content.content
                     // Remplacer les balises img qui apparaissent sous forme de texte
                     .replace(/&lt;img/g, '<img')
