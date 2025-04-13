@@ -284,6 +284,49 @@
   }
 }
 
+/* Styles pour le contenu éducatif */
+.prose {
+  font-size: 1.05rem;
+}
+
+.prose p {
+  margin-bottom: 1.25em;
+  line-height: 1.7;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem auto;
+  border-radius: 0.5rem;
+  display: block;
+}
+
+.prose figure {
+  margin: 1.5rem 0;
+  max-width: 100%;
+}
+
+.prose figcaption {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .prose {
+    font-size: 1rem;
+  }
+
+  .prose img {
+    width: 100%;
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+    max-width: calc(100% + 0.5rem);
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
