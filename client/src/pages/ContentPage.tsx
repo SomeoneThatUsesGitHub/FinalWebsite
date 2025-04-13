@@ -109,7 +109,7 @@ const ContentPage: React.FC = () => {
         </div>
       ) : content ? (
         <>
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-6">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-[4.25rem]">
             <div className="container mx-auto px-4">
               {topic && (
                 <div className="max-w-4xl mx-auto mb-6">
