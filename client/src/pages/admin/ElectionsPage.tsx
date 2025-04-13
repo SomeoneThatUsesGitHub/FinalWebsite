@@ -51,7 +51,7 @@ const electionFormSchema = z.object({
   country: z.string().min(1, "Le pays est requis"),
   countryCode: z.string().min(2, "Le code pays est requis").max(2, "Le code pays ne doit pas dépasser 2 caractères"),
   title: z.string().min(3, "Le titre est requis (min. 3 caractères)"),
-  date: z.date(),
+  date: z.string().min(1, "La date est requise"),
   type: z.string().min(1, "Le type d'élection est requis"),
   description: z.string().optional(),
   upcoming: z.boolean().default(false),
@@ -273,7 +273,7 @@ const AdminElectionsPage: React.FC = () => {
       country: '',
       countryCode: '',
       title: '',
-      date: new Date(),
+      date: format(new Date(), 'dd MMMM yyyy'),
       type: '',
       description: '',
       upcoming: false,
@@ -317,10 +317,9 @@ const AdminElectionsPage: React.FC = () => {
     // Préparer les données de l'élection
     const electionData = {
       ...data,
-      date: format(data.date, 'yyyy-MM-dd'),
       results: JSON.stringify({
         title: data.title,
-        date: format(data.date, 'dd MMMM yyyy', { locale: fr }),
+        date: data.date,
         type: data.type,
         results: electionResults,
       }),
