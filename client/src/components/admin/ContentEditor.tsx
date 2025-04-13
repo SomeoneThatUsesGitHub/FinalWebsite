@@ -185,6 +185,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
     if (url && editor) {
       // Extrait l'ID de la publication Instagram depuis l'URL
       // Format: https://www.instagram.com/p/[POST_ID]/ ou https://www.instagram.com/reel/[POST_ID]/
+      // Accepte également les paramètres comme ?img_index=1 à la fin
       const regex = /instagram\.com\/(p|reel)\/([^\/\?]+)/i;
       const match = url.match(regex);
       
@@ -196,17 +197,21 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
         container.className = 'instagram-embed-container my-8 mx-auto max-w-xl';
         container.style.minHeight = '500px'; // Espace minimum pour éviter le sautillement pendant le chargement
         
+        // Extraire l'URL complète sans modifier les paramètres
+        // Exemple: https://www.instagram.com/p/CODE/?img_index=1
+        const fullUrl = url.trim();
+        
         // Créer le bloc d'intégration Instagram avec le code blockquote recommandé par Instagram
         const embedCode = `
           <blockquote 
             class="instagram-media" 
             data-instgrm-captioned 
-            data-instgrm-permalink="https://www.instagram.com/p/${postId}/" 
+            data-instgrm-permalink="${fullUrl}" 
             data-instgrm-version="14" 
             style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"
           >
             <div style="padding:16px;">
-              <a href="https://www.instagram.com/p/${postId}/" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank">
+              <a href="${fullUrl}" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank">
                 <div style="display: flex; flex-direction: row; align-items: center;">
                   <div style="background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 40px; margin-right: 14px; width: 40px;"></div>
                   <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center;">
