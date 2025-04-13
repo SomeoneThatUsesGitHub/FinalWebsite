@@ -228,44 +228,117 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
     }
     
     if (editor) {
-      // Créer un carrousel simple avec des images et des boutons de navigation
-      const carouselHTML = `
-        <div class="carousel-container relative mx-auto my-8 max-w-3xl rounded-lg shadow-lg overflow-hidden">
-          <div class="carousel-images relative">
-            ${carouselImages.map((image, index) => `
-              <div class="carousel-item ${index === 0 ? 'block' : 'hidden'}" data-index="${index}">
-                <img src="${image.url}" alt="${image.caption || `Image ${index + 1}`}" class="mx-auto" style="max-height: 500px;">
-                ${image.caption ? `<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white p-3 text-sm">${image.caption}</div>` : ''}
-              </div>
-            `).join('')}
-            
-            ${carouselImages.length > 1 ? `
-              <button onclick="this.closest('.carousel-container').querySelector('.carousel-prev').click()" class="carousel-nav-btn absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 text-blue-600 rounded-full p-2 shadow-md z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-              </button>
-              
-              <button onclick="this.closest('.carousel-container').querySelector('.carousel-next').click()" class="carousel-nav-btn absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 text-blue-600 rounded-full p-2 shadow-md z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </button>
-            ` : ''}
-          </div>
-          
-          ${carouselImages.length > 1 ? `
-            <div class="carousel-indicators absolute bottom-3 left-0 right-0 flex justify-center space-x-2 z-10">
-              ${carouselImages.map((_, index) => `
-                <button onclick="this.closest('.carousel-container').querySelector('[data-index=\\'${index}\\']').classList.remove('hidden'); this.closest('.carousel-container').querySelector('[data-index=\\'${index}\\']').classList.add('block'); this.closest('.carousel-container').querySelectorAll('[data-index]:not([data-index=\\'${index}\\'])').forEach(el => {el.classList.remove('block'); el.classList.add('hidden');}); this.closest('.carousel-container').querySelectorAll('.carousel-indicators button').forEach(btn => btn.classList.remove('bg-blue-500')); this.classList.add('bg-blue-500');" class="w-3 h-3 rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'}"></button>
-              `).join('')}
-            </div>
-            
-            <button class="carousel-prev hidden" onclick="const container = this.closest('.carousel-container'); const items = container.querySelectorAll('.carousel-item'); const currentItem = container.querySelector('.carousel-item.block'); const currentIndex = parseInt(currentItem.getAttribute('data-index')); let prevIndex = currentIndex - 1; if (prevIndex < 0) prevIndex = items.length - 1; currentItem.classList.remove('block'); currentItem.classList.add('hidden'); items[prevIndex].classList.remove('hidden'); items[prevIndex].classList.add('block'); container.querySelectorAll('.carousel-indicators button').forEach((btn, i) => { if (i === prevIndex) btn.classList.add('bg-blue-500'); else btn.classList.remove('bg-blue-500'); });">Précédent</button>
-            
-            <button class="carousel-next hidden" onclick="const container = this.closest('.carousel-container'); const items = container.querySelectorAll('.carousel-item'); const currentItem = container.querySelector('.carousel-item.block'); const currentIndex = parseInt(currentItem.getAttribute('data-index')); let nextIndex = currentIndex + 1; if (nextIndex >= items.length) nextIndex = 0; currentItem.classList.remove('block'); currentItem.classList.add('hidden'); items[nextIndex].classList.remove('hidden'); items[nextIndex].classList.add('block'); container.querySelectorAll('.carousel-indicators button').forEach((btn, i) => { if (i === nextIndex) btn.classList.add('bg-blue-500'); else btn.classList.remove('bg-blue-500'); });">Suivant</button>
-          ` : ''}
-        </div>
+      // Utiliser une approche beaucoup plus simple avec div.classList.toggle
+      let html = `
+      <div class="image-carousel-container my-8 relative mx-auto p-0 max-w-3xl rounded-lg shadow-lg overflow-hidden">
+        <div class="carousel-inner relative">
       `;
       
+      // Ajouter chaque image comme un élément du carrousel
+      carouselImages.forEach((image, index) => {
+        const isActive = index === 0;
+        html += `
+          <div class="carousel-item absolute top-0 left-0 w-full h-full transition-opacity duration-300 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'}" data-index="${index}">
+            <img src="${image.url}" alt="${image.caption || `Image ${index + 1}`}" class="w-full h-auto object-contain max-h-[500px]">
+            ${image.caption ? `<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-3 text-sm">${image.caption}</div>` : ''}
+          </div>
+        `;
+      });
+      
+      // Ajouter les boutons de navigation
+      html += `
+        </div>
+        
+        <!-- Flèches de navigation -->
+        <button type="button" onclick="
+          const container = this.closest('.image-carousel-container');
+          const items = container.querySelectorAll('.carousel-item');
+          const active = container.querySelector('.carousel-item.opacity-100');
+          const currentIndex = parseInt(active.dataset.index);
+          let prevIndex = currentIndex - 1;
+          if (prevIndex < 0) prevIndex = items.length - 1;
+          
+          active.classList.remove('opacity-100', 'z-10');
+          active.classList.add('opacity-0', 'z-0');
+          
+          items[prevIndex].classList.remove('opacity-0', 'z-0');
+          items[prevIndex].classList.add('opacity-100', 'z-10');
+          
+          // Update indicators
+          const dots = container.querySelectorAll('.carousel-dot');
+          dots.forEach((dot, i) => {
+            if (i === prevIndex) dot.classList.add('bg-blue-500');
+            else dot.classList.remove('bg-blue-500');
+          });
+        " class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-20">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        
+        <button type="button" onclick="
+          const container = this.closest('.image-carousel-container');
+          const items = container.querySelectorAll('.carousel-item');
+          const active = container.querySelector('.carousel-item.opacity-100');
+          const currentIndex = parseInt(active.dataset.index);
+          let nextIndex = currentIndex + 1;
+          if (nextIndex >= items.length) nextIndex = 0;
+          
+          active.classList.remove('opacity-100', 'z-10');
+          active.classList.add('opacity-0', 'z-0');
+          
+          items[nextIndex].classList.remove('opacity-0', 'z-0');
+          items[nextIndex].classList.add('opacity-100', 'z-10');
+          
+          // Update indicators
+          const dots = container.querySelectorAll('.carousel-dot');
+          dots.forEach((dot, i) => {
+            if (i === nextIndex) dot.classList.add('bg-blue-500');
+            else dot.classList.remove('bg-blue-500');
+          });
+        " class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-20">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      `;
+      
+      // Ajouter des indicateurs si plusieurs images
+      if (carouselImages.length > 1) {
+        html += `
+          <!-- Indicateurs -->
+          <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-20">
+        `;
+        
+        carouselImages.forEach((_, index) => {
+          html += `
+            <button type="button" onclick="
+              const container = this.closest('.image-carousel-container');
+              const items = container.querySelectorAll('.carousel-item');
+              const active = container.querySelector('.carousel-item.opacity-100');
+              
+              active.classList.remove('opacity-100', 'z-10');
+              active.classList.add('opacity-0', 'z-0');
+              
+              items[${index}].classList.remove('opacity-0', 'z-0');
+              items[${index}].classList.add('opacity-100', 'z-10');
+              
+              // Update indicators
+              const dots = container.querySelectorAll('.carousel-dot');
+              dots.forEach((dot, i) => {
+                if (i === ${index}) dot.classList.add('bg-blue-500');
+                else dot.classList.remove('bg-blue-500');
+              });
+            " class="carousel-dot w-3 h-3 rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'}"></button>
+          `;
+        });
+        
+        html += `
+          </div>
+        `;
+      }
+      
+      // Fermer le conteneur
+      html += `</div>`;
+      
       // Insérer le HTML du carrousel dans l'éditeur
-      editor.chain().focus().insertContent(carouselHTML).run();
+      editor.chain().focus().insertContent(html).run();
       
       // Fermer le dialogue
       setShowCarouselDialog(false);

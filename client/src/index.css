@@ -50,80 +50,89 @@
 }
 
 /* Styles pour le carrousel d'images */
-.image-carousel-wrapper {
+.image-carousel-container {
   position: relative;
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   max-width: 100%;
   margin: 2rem auto;
+  height: 500px;
 }
 
-.image-carousel-wrapper img {
+.carousel-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.image-carousel-container img {
   display: block;
   margin: 0 auto;
   max-width: 100%;
-  height: auto;
+  max-height: 100%;
   object-fit: contain;
-  max-height: 500px;
 }
 
-.image-carousel-wrapper button {
+.image-carousel-container button {
   border: none;
   cursor: pointer;
   opacity: 0.8;
   transition: all 0.2s ease;
 }
 
-.image-carousel-wrapper button:hover {
+.image-carousel-container button:hover {
   opacity: 1;
   transform: scale(1.1);
 }
 
-.image-carousel-wrapper button:focus {
+.image-carousel-container button:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
 }
 
 /* Style pour les indicateurs de position (points) */
-.image-carousel-wrapper [data-action="goto"] {
+.carousel-dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   border: none;
   padding: 0;
   transition: all 0.2s ease;
+  background-color: #d1d5db;
 }
 
-.image-carousel-wrapper [data-action="goto"]:hover {
+.carousel-dot:hover {
   transform: scale(1.2);
 }
 
-/* Styles pour les boutons précédent/suivant */
-.image-carousel-wrapper [data-action="prev"],
-.image-carousel-wrapper [data-action="next"] {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-carousel-wrapper [data-action="prev"] svg,
-.image-carousel-wrapper [data-action="next"] svg {
-  width: 24px;
-  height: 24px;
+.carousel-dot.bg-blue-500 {
+  background-color: #3b82f6;
 }
 
 /* Animation pour améliorer la transition entre les diapositives */
-@keyframes fadeSlide {
-  from { opacity: 0.4; }
+@keyframes fadeIn {
+  from { opacity: 0; }
   to { opacity: 1; }
 }
 
-.image-carousel-wrapper img {
-  animation: fadeSlide 0.5s ease-in-out;
+.carousel-item.opacity-100 {
+  opacity: 1;
+  z-index: 10;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .milestone-card {
