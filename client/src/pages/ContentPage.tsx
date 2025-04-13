@@ -116,31 +116,7 @@ const ContentPage: React.FC = () => {
             <Card className="shadow-sm border-0 sm:border">
               <CardContent className="p-3 sm:p-6">
                 <div 
-                  className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none" 
-                  ref={(el) => {
-                    // Test avec l'intégration directe de la publication Instagram fournie
-                    if (el && content.content.includes('instagram-media')) {
-                      console.log("Instagram embed détecté, chargement du script...");
-                      
-                      // Insérer le script Instagram s'il n'existe pas déjà
-                      if (!document.getElementById('instagram-embed-js')) {
-                        const script = document.createElement('script');
-                        script.id = 'instagram-embed-js';
-                        script.src = 'https://www.instagram.com/embed.js';
-                        script.async = true;
-                        document.body.appendChild(script);
-                      }
-                      
-                      // Attendre que le script soit chargé et traiter les embeds
-                      const checkInsta = setInterval(() => {
-                        if ((window as any).instgrm) {
-                          console.log("Script Instagram chargé, traitement des embeds...");
-                          (window as any).instgrm.Embeds.process();
-                          clearInterval(checkInsta);
-                        }
-                      }, 100);
-                    }
-                  }}
+                  className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none"
                   dangerouslySetInnerHTML={{
                     __html: content.content
                       // Remplacer les balises img qui apparaissent sous forme de texte

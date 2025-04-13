@@ -247,7 +247,7 @@ const LearnPage: React.FC = () => {
       
       <div className="bg-blue-50 py-12 md:py-16 lg:py-20 shadow-md mb-6 w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] relative -mt-[4.25rem]">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-3xl mx-auto text-center pt-8">
             <motion.h1 
               variants={fadeInWithBounce}
               initial="hidden"
