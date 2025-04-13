@@ -2,11 +2,29 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'wouter';
 import { BookOpen, ChevronLeft, FileText, GraduationCap } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import MainLayout from '@/components/layout/MainLayout';
+import { pageTransition } from '@/lib/animations';
+
+// Animation avec effet de rebond
+const fadeInWithBounce = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond accentué
+      bounce: 0.4,
+      type: "spring",
+      stiffness: 120
+    }
+  }
+};
 
 interface EducationalTopic {
   id: number;
@@ -56,16 +74,44 @@ const TopicPage: React.FC = () => {
           </div>
         </div>
       ) : topic ? (
-        <div className="py-16 mb-6 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 relative overflow-hidden w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-[4.25rem]">
+        <div className="py-20 mb-6 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 relative overflow-hidden w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-[4.25rem]">
           <div className="absolute inset-0 bg-pattern opacity-10"></div>
           <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl opacity-20 -translate-y-24 translate-x-24"></div>
           <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-400 rounded-full filter blur-3xl opacity-20 translate-y-24 -translate-x-24"></div>
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl mx-auto text-center">
-              <GraduationCap className="h-16 w-16 mx-auto text-white mb-4" />
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{topic.title}</h1>
-              <div className="h-1 w-20 bg-white mx-auto my-4 rounded-full"></div>
-              <p className="text-white/90 text-lg max-w-2xl mx-auto">{topic.description}</p>
+            <div className="max-w-3xl mx-auto text-center pt-8">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <GraduationCap className="h-16 w-16 mx-auto text-white mb-4" />
+              </motion.div>
+              <motion.h1 
+                variants={fadeInWithBounce}
+                initial="hidden"
+                animate="visible"
+                className="text-4xl md:text-5xl font-bold text-white mb-2"
+              >
+                {topic.title}
+              </motion.h1>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1,
+                  transition: { delay: 0.3, duration: 0.5 } 
+                }}
+                className="h-1 w-20 bg-white mx-auto my-4 rounded-full"
+              ></motion.div>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="text-white/90 text-lg max-w-2xl mx-auto"
+              >
+                {topic.description}
+              </motion.p>
             </div>
           </div>
         </div>

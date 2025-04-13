@@ -442,13 +442,6 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
               >
                 <ImageIcon className="h-4 w-4" />
               </Toggle>
-              
-              <Toggle
-                onPressedChange={handleAddInstagram}
-                aria-label="Intégrer une publication Instagram"
-              >
-                <Instagram className="h-4 w-4" />
-              </Toggle>
 
               <UISeparator orientation="vertical" className="mx-1 h-6" />
 
