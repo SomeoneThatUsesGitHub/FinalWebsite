@@ -165,11 +165,24 @@ const baseInsertElectionSchema = createInsertSchema(elections).pick({
 
 // Modification du schéma pour transformer automatiquement la date
 export const insertElectionSchema = baseInsertElectionSchema.extend({
-  // Accepter une date sous forme de chaîne et la convertir en objet Date
-  date: z.union([
-    z.date(),
-    z.string().transform((str) => new Date(str)),
-  ]),
+  // Accepter différents formats de date et les convertir en objet Date
+  date: z.preprocess((val) => {
+    // Si c'est déjà une date, retourner directement
+    if (val instanceof Date) return val;
+    
+    // Si c'est une chaîne de caractères, essayer de la convertir
+    if (typeof val === 'string') {
+      const date = new Date(val);
+      // Vérifier si la date est valide
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    
+    // Si la conversion a échoué, retourner la valeur d'origine
+    // (elle sera rejetée par le validateur de date)
+    return val;
+  }, z.date()),
 });
 
 // Educational Topics schema - for main topics in the "Learn" section
