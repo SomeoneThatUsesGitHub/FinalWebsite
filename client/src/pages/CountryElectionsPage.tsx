@@ -128,14 +128,14 @@ const CountryElectionsPage: React.FC = () => {
         variants={pageTransition}
       >
         {/* Bannière d'en-tête */}
-        <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8 w-screen relative left-1/2 transform -translate-x-1/2 -mt-16">
+        <div className="bg-blue-50 py-16 md:py-24 shadow-md mb-8 w-screen relative left-1/2 transform -translate-x-1/2 -mt-16">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto text-center">
               <motion.h1 
                 variants={fadeInWithBounce}
                 initial="hidden"
                 animate="visible"
-                className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative flex items-center justify-center"
+                className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-6 pt-4 relative flex items-center justify-center"
               >
                 <div className="w-16 h-12 md:w-20 md:h-16 lg:w-24 lg:h-20 inline-block mr-4 overflow-hidden rounded shadow-md">
                   <img 
