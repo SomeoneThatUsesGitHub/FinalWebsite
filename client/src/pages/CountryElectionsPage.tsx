@@ -53,7 +53,7 @@ const getCountryFlagUrl = (countryCode: string): string => {
 const CountryElectionsPage: React.FC = () => {
   const [_, params] = useRoute('/elections/:countryCode');
   const countryCode = params?.countryCode.toUpperCase();
-  const [activeTab, setActiveTab] = useState('all');
+  // Plus besoin d'onglets
   
   // Récupérer toutes les élections
   const { data: allElections, isLoading } = useQuery<Election[]>({
@@ -177,50 +177,36 @@ const CountryElectionsPage: React.FC = () => {
             </Button>
           </Link>
           
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="all">Toutes les élections</TabsTrigger>
-              <TabsTrigger value="upcoming">À venir ({upcomingElections.length})</TabsTrigger>
-              <TabsTrigger value="past">Passées ({pastElections.length})</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="all">
-              <ElectionsList elections={sortedElections} />
-            </TabsContent>
-            
-            <TabsContent value="upcoming">
-              <ElectionsList elections={upcomingElections} />
-            </TabsContent>
-            
-            <TabsContent value="past">
-              <ElectionsList elections={pastElections} />
-            </TabsContent>
-          </Tabs>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-6">Élections passées</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {pastElections.map((election) => (
+                <ElectionCard key={election.id} election={election} />
+              ))}
+            </div>
+          </div>
+
+          {upcomingElections.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-6">Élections à venir</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {upcomingElections.map((election) => (
+                  <ElectionCard key={election.id} election={election} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </MainLayout>
   );
 };
 
-interface ElectionsListProps {
-  elections: Election[];
-}
-
-const ElectionsList: React.FC<ElectionsListProps> = ({ elections }) => {
-  return (
-    <div className="space-y-12">
-      {elections.map((election) => (
-        <ElectionDetails key={election.id} election={election} />
-      ))}
-    </div>
-  );
-};
-
-interface ElectionDetailsProps {
+interface ElectionCardProps {
   election: Election;
 }
 
-const ElectionDetails: React.FC<ElectionDetailsProps> = ({ election }) => {
+const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   const { title, date, type, description, results, upcoming } = election;
   
   // Formater la date
@@ -240,98 +226,50 @@ const ElectionDetails: React.FC<ElectionDetailsProps> = ({ election }) => {
   };
   
   return (
-    <div className="space-y-6">
-      <div className="border-b pb-4">
-        <h2 className="text-3xl font-bold mb-2">{title}</h2>
-        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-          <div className="flex items-center">
-            <Calendar className="h-4 w-4 mr-1" />
-            {formattedDate}
+    <Link href={`/elections/${election.countryCode.toLowerCase()}/resultats?id=${election.id}`}>
+      <Card className={`hover:shadow-md transition-shadow h-full ${upcoming ? 'border-amber-300' : 'border-blue-300'}`}>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl font-semibold">{title}</CardTitle>
+          <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center">
+              <Calendar className="h-4 w-4 mr-1" />
+              {formattedDate}
+            </div>
+            <div className="flex items-center">
+              <Award className="h-4 w-4 mr-1" />
+              {type}
+            </div>
+            {upcoming && (
+              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                À venir
+              </Badge>
+            )}
           </div>
-          <div className="flex items-center">
-            <Award className="h-4 w-4 mr-1" />
-            {type}
-          </div>
-          {upcoming && (
-            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-              À venir
-            </Badge>
+        </CardHeader>
+        
+        <CardContent>
+          {description && (
+            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{description}</p>
           )}
-        </div>
-        {description && (
-          <p className="mt-4 text-muted-foreground">{description}</p>
-        )}
-      </div>
-      
-      {!upcoming && electionData.results.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Résultats des élections</CardTitle>
-            <CardDescription>Répartition des votes entre les différents candidats</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[400px]">
-              <ElectionResultsChart data={electionData} />
+          
+          {!upcoming && parsedResults?.results && parsedResults.results.length > 0 && (
+            <div className="flex items-center justify-between mt-4">
+              <Button variant="outline" size="sm" className="w-full">
+                Voir les résultats
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-      
-      {!upcoming && electionData.results.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Détail des candidats</CardTitle>
-            <CardDescription>Liste complète des candidats et leurs performances</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {electionData.results.map((result, index) => (
-                <div key={index} className="flex items-center rounded-lg border p-3 hover:bg-gray-50 transition-colors">
-                  <div className="flex-shrink-0 w-1 h-8 rounded mr-3" style={{ backgroundColor: result.color }}></div>
-                  <div className="flex-grow">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <h3 className="font-semibold text-md">{result.candidate}</h3>
-                        <p className="text-xs text-muted-foreground">{result.party}</p>
-                      </div>
-                      <div className="flex items-center mt-1 sm:mt-0">
-                        {result.votes && (
-                          <span className="text-xs text-muted-foreground mr-3">
-                            <Users className="h-3 w-3 inline mr-1" />
-                            {result.votes.toLocaleString('fr-FR')}
-                          </span>
-                        )}
-                        <div className="font-bold text-md">{result.percentage.toFixed(1)}%</div>
-                      </div>
-                    </div>
-                    <div className="w-full bg-gray-100 h-1.5 mt-1.5 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full rounded-full" 
-                        style={{ 
-                          width: `${result.percentage}%`,
-                          backgroundColor: result.color 
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          )}
+          
+          {upcoming && (
+            <div className="flex items-center justify-between mt-4">
+              <Badge variant="outline" className="w-full py-1.5 justify-center">
+                Élection à venir le {formattedDate}
+              </Badge>
             </div>
-          </CardContent>
-        </Card>
-      )}
-      
-      {upcoming && (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <h3 className="text-xl font-bold mb-2">Élection à venir</h3>
-            <p className="text-muted-foreground">
-              Les résultats seront disponibles après le {formattedDate}
-            </p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 

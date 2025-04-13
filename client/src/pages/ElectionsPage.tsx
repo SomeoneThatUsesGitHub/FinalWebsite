@@ -110,6 +110,11 @@ const ElectionsPage: React.FC = () => {
     if (!elections) return [];
     
     return elections.filter(election => {
+      // Ne garder que les élections passées
+      if (election.upcoming) {
+        return false;
+      }
+      
       // Filtrer par pays si un pays est sélectionné
       if (selectedCountry && election.countryCode !== selectedCountry) {
         return false;
@@ -303,46 +308,17 @@ const ElectionsPage: React.FC = () => {
           
           {/* Liste des élections */}
           {(selectedCountry || searchQuery || filterType) && (
-            <Tabs defaultValue="all" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">Toutes les élections</TabsTrigger>
-                <TabsTrigger value="upcoming">À venir</TabsTrigger>
-                <TabsTrigger value="past">Passées</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="all">
-                <ElectionsList 
-                  elections={sortedElections} 
-                  isLoading={isLoading} 
-                  selectedCountry={selectedCountry}
-                  uniqueCountries={uniqueCountries}
-                  onSelectCountry={setSelectedCountry}
-                  isRecentElection={isRecentElection}
-                />
-              </TabsContent>
-              
-              <TabsContent value="upcoming">
-                <ElectionsList 
-                  elections={upcomingElections} 
-                  isLoading={isLoading} 
-                  selectedCountry={selectedCountry}
-                  uniqueCountries={uniqueCountries}
-                  onSelectCountry={setSelectedCountry}
-                  isRecentElection={isRecentElection}
-                />
-              </TabsContent>
-              
-              <TabsContent value="past">
-                <ElectionsList 
-                  elections={pastElections} 
-                  isLoading={isLoading} 
-                  selectedCountry={selectedCountry}
-                  uniqueCountries={uniqueCountries}
-                  onSelectCountry={setSelectedCountry}
-                  isRecentElection={isRecentElection}
-                />
-              </TabsContent>
-            </Tabs>
+            <div className="w-full">
+              <h2 className="text-2xl font-bold mb-4">Élections passées</h2>
+              <ElectionsList 
+                elections={pastElections} 
+                isLoading={isLoading} 
+                selectedCountry={selectedCountry}
+                uniqueCountries={uniqueCountries}
+                onSelectCountry={setSelectedCountry}
+                isRecentElection={isRecentElection}
+              />
+            </div>
           )}
         </div>
       </motion.div>

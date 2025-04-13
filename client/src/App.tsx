@@ -22,6 +22,7 @@ import TopicPage from "@/pages/TopicPage";
 import ContentPage from "@/pages/ContentPage";
 import ElectionsPage from "@/pages/ElectionsPage";
 import CountryElectionsPage from "@/pages/CountryElectionsPage";
+import ElectionResultsPage from "@/pages/ElectionResultsPage";
 
 // Pages admin
 import AdminDashboard from "@/pages/admin/AdminDashboard";
