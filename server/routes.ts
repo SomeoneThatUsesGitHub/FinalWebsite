@@ -2213,6 +2213,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Routes pour le glossaire politique
+  app.get("/api/glossary", async (_req: Request, res: Response) => {
+    try {
+      const terms = await db.select().from(schema.politicalGlossary).orderBy(schema.politicalGlossary.term);
+      res.json(terms);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du glossaire:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération du glossaire" });
+    }
+  });
+  
+  app.get("/api/glossary/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const [term] = await db.select().from(schema.politicalGlossary).where(eq(schema.politicalGlossary.id, parseInt(id)));
+      
+      if (!term) {
+        return res.status(404).json({ message: "Terme non trouvé" });
+      }
+      
+      res.json(term);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du terme:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération du terme" });
+    }
+  });
+  
+  app.post("/api/admin/glossary", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const termData = schema.insertPoliticalGlossarySchema.parse(req.body);
+      
+      // Vérifier si le terme existe déjà
+      const existingTerm = await db.select()
+        .from(schema.politicalGlossary)
+        .where(eq(schema.politicalGlossary.term, termData.term));
+        
+      if (existingTerm.length > 0) {
+        return res.status(400).json({ message: "Ce terme existe déjà dans le glossaire" });
+      }
+      
+      const [newTerm] = await db.insert(schema.politicalGlossary)
+        .values(termData)
+        .returning();
+        
+      res.status(201).json(newTerm);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du terme:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Données invalides", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).json({ message: "Erreur lors de l'ajout du terme" });
+    }
+  });
+  
+  app.put("/api/admin/glossary/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const termData = schema.insertPoliticalGlossarySchema.parse(req.body);
+      
+      // Vérifier que le terme existe
+      const existingTerm = await db.select()
+        .from(schema.politicalGlossary)
+        .where(eq(schema.politicalGlossary.id, parseInt(id)));
+        
+      if (existingTerm.length === 0) {
+        return res.status(404).json({ message: "Terme non trouvé" });
+      }
+      
+      // Vérifier si le nouveau terme n'est pas déjà utilisé par un autre enregistrement
+      if (termData.term !== existingTerm[0].term) {
+        const termCheck = await db.select()
+          .from(schema.politicalGlossary)
+          .where(eq(schema.politicalGlossary.term, termData.term));
+          
+        if (termCheck.length > 0) {
+          return res.status(400).json({ message: "Ce terme existe déjà dans le glossaire" });
+        }
+      }
+      
+      const [updatedTerm] = await db.update(schema.politicalGlossary)
+        .set({
+          ...termData,
+          updatedAt: new Date()
+        })
+        .where(eq(schema.politicalGlossary.id, parseInt(id)))
+        .returning();
+        
+      res.json(updatedTerm);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du terme:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Données invalides", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).json({ message: "Erreur lors de la mise à jour du terme" });
+    }
+  });
+  
+  app.delete("/api/admin/glossary/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      // Vérifier que le terme existe
+      const existingTerm = await db.select()
+        .from(schema.politicalGlossary)
+        .where(eq(schema.politicalGlossary.id, parseInt(id)));
+        
+      if (existingTerm.length === 0) {
+        return res.status(404).json({ message: "Terme non trouvé" });
+      }
+      
+      await db.delete(schema.politicalGlossary)
+        .where(eq(schema.politicalGlossary.id, parseInt(id)));
+        
+      res.status(200).json({ message: "Terme supprimé avec succès" });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du terme:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression du terme" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
