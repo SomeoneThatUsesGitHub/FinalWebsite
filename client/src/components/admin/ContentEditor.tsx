@@ -618,43 +618,112 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
                 onPressedChange={() => {
                   if (!editor) return;
                   
-                  // Demander directement les URLs des images
+                  // Demander les URLs des images
+                  let imageUrls = [];
+                  
                   const url1 = prompt("URL de la première image:");
                   if (!url1) return;
+                  imageUrls.push(url1);
                   
                   const url2 = prompt("URL de la deuxième image (facultatif):");
+                  if (url2) imageUrls.push(url2);
                   
-                  // Créer HTML sans aucun JavaScript
-                  let html = `<div class="image-gallery flex flex-wrap gap-4 justify-center my-8">`;
-                  
-                  // Ajouter chaque image dans un conteneur flex
-                  html += `
-                    <div class="image-item max-w-md shadow-lg rounded-lg overflow-hidden">
-                      <img src="${url1}" alt="Image 1" class="max-w-full h-auto" />
-                    </div>
-                  `;
-                  
-                  if (url2) {
-                    html += `
-                      <div class="image-item max-w-md shadow-lg rounded-lg overflow-hidden">
-                        <img src="${url2}" alt="Image 2" class="max-w-full h-auto" />
-                      </div>
-                    `;
+                  // Optionnellement demander une troisième image
+                  if (imageUrls.length >= 2) {
+                    const url3 = prompt("URL de la troisième image (facultatif):");
+                    if (url3) imageUrls.push(url3);
                   }
                   
-                  // Fermer le conteneur
-                  html += `</div>`;
+                  // Générer un ID unique pour ce carrousel
+                  const carouselId = `carousel-${Date.now()}`;
+                  
+                  // Créer le HTML du carrousel en utilisant le modèle Flowbite
+                  let html = `
+                  <div id="${carouselId}" class="relative w-full max-w-3xl mx-auto my-8 z-0">
+                    <!-- Indicateurs de slides -->
+                    <div class="relative h-56 overflow-hidden rounded-lg md:h-96">
+                  `;
+                  
+                  // Ajouter les slides
+                  imageUrls.forEach((url, index) => {
+                    html += `
+                      <!-- Slide ${index + 1} -->
+                      <div class="${index === 0 ? 'block' : 'hidden'} duration-700 ease-in-out" data-carousel-item>
+                        <img src="${url}" class="absolute block max-w-full h-auto -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Image ${index + 1}">
+                      </div>
+                    `;
+                  });
+                  
+                  // Fermer le conteneur des slides et ajouter les contrôles
+                  html += `
+                    </div>
+                    
+                    <!-- Boutons de navigation -->
+                    <button type="button" class="absolute top-0 left-0 z-20 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
+                      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+                        <svg class="w-4 h-4 text-white dark:text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
+                        </svg>
+                        <span class="sr-only">Précédent</span>
+                      </span>
+                    </button>
+                    <button type="button" class="absolute top-0 right-0 z-20 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next>
+                      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+                        <svg class="w-4 h-4 text-white dark:text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                        </svg>
+                        <span class="sr-only">Suivant</span>
+                      </span>
+                    </button>
+                  </div>
+                  
+                  <script>
+                    // Initialiser le carrousel
+                    document.addEventListener('DOMContentLoaded', function() {
+                      // Obtenir toutes les slides
+                      const items = document.querySelectorAll('#${carouselId} [data-carousel-item]');
+                      const prevButton = document.querySelector('#${carouselId} [data-carousel-prev]');
+                      const nextButton = document.querySelector('#${carouselId} [data-carousel-next]');
+                      
+                      if (!items.length) return;
+                      
+                      let activeIndex = 0;
+                      
+                      // Fonction pour afficher une slide
+                      function showSlide(index) {
+                        // Cacher toutes les slides
+                        items.forEach(item => item.classList.add('hidden'));
+                        
+                        // Afficher la slide active
+                        items[index].classList.remove('hidden');
+                        activeIndex = index;
+                      }
+                      
+                      // Gestionnaire pour le bouton précédent
+                      prevButton.addEventListener('click', function() {
+                        activeIndex = (activeIndex - 1 + items.length) % items.length;
+                        showSlide(activeIndex);
+                      });
+                      
+                      // Gestionnaire pour le bouton suivant
+                      nextButton.addEventListener('click', function() {
+                        activeIndex = (activeIndex + 1) % items.length;
+                        showSlide(activeIndex);
+                      });
+                    });
+                  </script>
+                  `;
                   
                   // Insérer dans l'éditeur
                   editor.chain().focus().insertContent(html).run();
                   
                   // Notification
                   toast({
-                    title: "Galerie d'images ajoutée",
-                    description: url2 ? "Deux images ont été ajoutées côte à côte." : "Une image a été ajoutée.",
+                    title: "Carrousel ajouté",
+                    description: `Carrousel créé avec ${imageUrls.length} image(s).`,
                   });
                 }}
-                aria-label="Insérer une galerie d'images"
+                aria-label="Insérer un carrousel d'images"
               >
                 <ImagesIcon className="h-4 w-4" />
               </Toggle>
