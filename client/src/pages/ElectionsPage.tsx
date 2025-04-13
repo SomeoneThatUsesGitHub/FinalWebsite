@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ElectionResultsChart, ElectionResultsData } from '@/components/ElectionResultsChart';
+
 
 // Animation avec effet de rebond
 const fadeInWithBounce = {
@@ -94,15 +94,7 @@ const ElectionsPage: React.FC = () => {
     return Array.from(countriesMap.values());
   };
 
-  // Fonction pour obtenir les types d'élections uniques (non utilisée)
-  const getUniqueElectionTypes = () => {
-    if (!elections) return [];
-    
-    const typesSet = new Set<string>();
-    elections.forEach(election => typesSet.add(election.type));
-    
-    return Array.from(typesSet);
-  };
+
 
   // Filtrer les élections par pays et recherche
   const getFilteredElections = () => {
@@ -154,7 +146,6 @@ const ElectionsPage: React.FC = () => {
 
   // Obtenir les pays uniques
   const uniqueCountries = getUniqueCountries();
-  const uniqueElectionTypes = getUniqueElectionTypes();
 
   return (
     <MainLayout>
@@ -365,7 +356,6 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
   uniqueCountries,
   onSelectCountry,
 }) => {
-  const [expanded, setExpanded] = useState(false);
   const { title, country, countryCode, date, type, description, results, upcoming } = election;
   
   // Formater la date
@@ -374,14 +364,6 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
     month: 'long',
     year: 'numeric',
   });
-  
-  const parsedResults = results && typeof results === 'string' ? JSON.parse(results) : results;
-  const electionData: ElectionResultsData = {
-    title: title,
-    date: formattedDate,
-    type: type,
-    results: parsedResults?.results || []
-  };
   
   return (
     <Card className={`border-l-4 ${upcoming ? 'border-l-amber-500' : isRecent ? 'border-l-green-500' : 'border-l-blue-500'}`}>
@@ -433,39 +415,21 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
         {description && (
           <p className="text-muted-foreground mb-4">{description}</p>
         )}
-        
-        {parsedResults && expanded && (
-          <div className="mt-4 overflow-x-auto">
-            <div className="min-w-[500px] md:min-w-0">
-              <ElectionResultsChart data={electionData} />
-            </div>
-          </div>
-        )}
       </CardContent>
       
       <CardFooter className="flex flex-col sm:flex-row gap-2 justify-between pt-0">
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Link 
+          href={`/elections/${countryCode.toLowerCase()}/resultats/${election.id}`}
           className="w-full sm:w-auto"
-          onClick={() => setExpanded(!expanded)}
         >
-          {expanded ? 'Masquer les résultats' : 'Voir les résultats'}
-        </Button>
-        
-        {!selectedCountry && (
           <Button 
-            variant="ghost" 
-            size="sm"
-            className="w-full sm:w-auto" 
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelectCountry(countryCode);
-            }}
+            variant="outline" 
+            size="sm" 
+            className="w-full"
           >
-            Voir toutes les élections de {country}
+            Voir les résultats détaillés
           </Button>
-        )}
+        </Link>
       </CardFooter>
     </Card>
   );
