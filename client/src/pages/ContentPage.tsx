@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'wouter';
 import { BookOpen, ChevronLeft, GraduationCap, Calendar, RefreshCw } from 'lucide-react';
@@ -46,11 +46,40 @@ const ContentPage: React.FC = () => {
   }
 
   const isLoading = topicLoading || contentLoading;
+  
+  // Chargement du script Instagram quand le contenu est chargé
+  useEffect(() => {
+    if (content && !isLoading) {
+      // Vérifier si le contenu contient une intégration Instagram
+      if (content.content.includes('instagram-embed-container')) {
+        // Créer et charger le script Instagram
+        const instagramScript = document.createElement('script');
+        instagramScript.src = '//www.instagram.com/embed.js';
+        instagramScript.async = true;
+        instagramScript.defer = true;
+        
+        // Si un script Instagram existe déjà, on le supprime d'abord
+        const existingScript = document.querySelector('script[src*="instagram.com/embed.js"]');
+        if (existingScript) {
+          existingScript.remove();
+        }
+        
+        document.body.appendChild(instagramScript);
+        
+        // Si 'instgrm' est déjà défini (rechargement), on force le processus d'Instagram
+        if (window.instgrm) {
+          setTimeout(() => {
+            window.instgrm.Embeds.process();
+          }, 500);
+        }
+      }
+    }
+  }, [content, isLoading]);
 
   return (
     <MainLayout>
       {isLoading ? (
-        <div className="bg-blue-50 py-12 shadow-md mb-6 animate-pulse">
+        <div className="bg-blue-50 py-12 animate-pulse -mt-6 -mx-4 md:-mx-6 lg:-mx-8">
           <div className="container mx-auto px-4">
             <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
             <Skeleton className="h-4 w-3/4 mx-auto" />
@@ -58,7 +87,7 @@ const ContentPage: React.FC = () => {
         </div>
       ) : content ? (
         <>
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative w-full">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative -mt-6 -mx-4 md:-mx-6 lg:-mx-8">
             <div className="container mx-auto px-4">
               {topic && (
                 <div className="max-w-4xl mx-auto mb-6">

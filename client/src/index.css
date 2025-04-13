@@ -314,6 +314,20 @@
   margin-top: 0.5rem;
 }
 
+/* Styles pour l'intégration d'Instagram */
+.instagram-embed-container {
+  width: 100%;
+  max-width: 540px;
+  margin: 2rem auto;
+}
+
+.instagram-media {
+  width: 100% !important;
+  min-width: 280px !important;
+  max-width: 540px !important;
+}
+
+/* Ajustement du style de l'intégration instagram sur petits écrans */
 @media (max-width: 640px) {
   .prose {
     font-size: 1rem;
@@ -324,6 +338,13 @@
     margin-left: -0.25rem;
     margin-right: -0.25rem;
     max-width: calc(100% + 0.5rem);
+  }
+  
+  /* Style pour l'intégration Instagram sur mobile */
+  .instagram-embed-container {
+    width: calc(100% + 0.5rem);
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
   }
 }
 

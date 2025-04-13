@@ -49,14 +49,14 @@ const TopicPage: React.FC = () => {
   return (
     <MainLayout>
       {topicLoading ? (
-        <div className="bg-blue-50 py-12 shadow-md mb-6 animate-pulse">
+        <div className="bg-blue-50 py-12 animate-pulse -mt-6 -mx-4 md:-mx-6 lg:-mx-8">
           <div className="container mx-auto px-4">
             <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
             <Skeleton className="h-4 w-3/4 mx-auto" />
           </div>
         </div>
       ) : topic ? (
-        <div className="py-12 mb-6 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 relative overflow-hidden w-full">
+        <div className="py-16 mb-6 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 relative overflow-hidden -mt-6 -mx-4 md:-mx-6 lg:-mx-8">
           <div className="absolute inset-0 bg-pattern opacity-10"></div>
           <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl opacity-20 -translate-y-24 translate-x-24"></div>
           <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-400 rounded-full filter blur-3xl opacity-20 translate-y-24 -translate-x-24"></div>
