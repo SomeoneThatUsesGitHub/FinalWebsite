@@ -220,10 +220,10 @@ const ElectionResultsPage: React.FC = () => {
           )}
           
           {!upcoming && electionData.results.length > 0 ? (
-            <div className="space-y-8">
+            <div className="space-y-4">
               <div>
                 <h2 className="text-2xl font-bold mb-4">Résultats des élections</h2>
-                <div className="h-[450px]">
+                <div className="h-[450px] mb-4">
                   <ElectionResultsChart data={{...electionData, title: '', date: '', type: ''}} />
                 </div>
               </div>

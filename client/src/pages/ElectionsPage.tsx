@@ -62,7 +62,6 @@ const ElectionsPage: React.FC = () => {
   const { toast } = useToast();
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<string | null>(null);
 
   // Récupérer toutes les élections
   const { data: elections, isLoading, error } = useQuery<Election[]>({
@@ -95,7 +94,7 @@ const ElectionsPage: React.FC = () => {
     return Array.from(countriesMap.values());
   };
 
-  // Obtenir les types d'élections uniques
+  // Fonction pour obtenir les types d'élections uniques (non utilisée)
   const getUniqueElectionTypes = () => {
     if (!elections) return [];
     
@@ -117,11 +116,6 @@ const ElectionsPage: React.FC = () => {
       
       // Filtrer par pays si un pays est sélectionné
       if (selectedCountry && election.countryCode !== selectedCountry) {
-        return false;
-      }
-      
-      // Filtrer par type d'élection si un type est sélectionné
-      if (filterType && election.type !== filterType) {
         return false;
       }
       
@@ -214,52 +208,20 @@ const ElectionsPage: React.FC = () => {
                   </svg>
                 </div>
               </div>
-              
-              <div className="flex-shrink-0">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                      <Filter className="h-4 w-4 mr-2" />
-                      Filtrer par type
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="max-h-[200px] overflow-y-auto">
-                    {uniqueElectionTypes.map(type => (
-                      <DropdownMenuItem key={type} onClick={() => setFilterType(type)}>
-                        {type}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
             </div>
             
             {/* Filtres actifs */}
-            {(selectedCountry || filterType) && (
+            {selectedCountry && (
               <div className="flex flex-wrap gap-2">
-                {selectedCountry && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setSelectedCountry(null)}
-                    className="flex items-center gap-1"
-                  >
-                    <span>Pays: {uniqueCountries.find(c => c.countryCode === selectedCountry)?.country}</span>
-                    <span className="text-xs">✕</span>
-                  </Button>
-                )}
-                
-                {filterType && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setFilterType(null)}
-                    className="flex items-center gap-1"
-                  >
-                    <span>Type: {filterType}</span>
-                    <span className="text-xs">✕</span>
-                  </Button>
-                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setSelectedCountry(null)}
+                  className="flex items-center gap-1"
+                >
+                  <span>Pays: {uniqueCountries.find(c => c.countryCode === selectedCountry)?.country}</span>
+                  <span className="text-xs">✕</span>
+                </Button>
               </div>
             )}
           </div>
@@ -307,7 +269,7 @@ const ElectionsPage: React.FC = () => {
           )}
           
           {/* Liste des élections */}
-          {(selectedCountry || searchQuery || filterType) && (
+          {(selectedCountry || searchQuery) && (
             <div className="w-full">
               <h2 className="text-2xl font-bold mb-4">Élections passées</h2>
               <ElectionsList 
