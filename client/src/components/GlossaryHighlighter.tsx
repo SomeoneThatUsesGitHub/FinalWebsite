@@ -107,7 +107,7 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
 
   return (
     <>
-      <div ref={contentRef} className="glossary-highlighter w-full">
+      <div ref={contentRef} className="glossary-highlighter w-full overflow-hidden">
         {children}
       </div>
       
