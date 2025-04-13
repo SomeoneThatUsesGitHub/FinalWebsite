@@ -179,12 +179,7 @@ const ContentPage: React.FC = () => {
           ) : content ? (
             <Card className="shadow-sm border-0 sm:border">
               <CardContent className="p-3 sm:p-6">
-                <div className="mb-4 flex items-center text-sm text-muted-foreground bg-primary/5 px-4 py-3 rounded-lg">
-                  <BookOpenText className="h-5 w-5 mr-2 text-primary" />
-                  <p>
-                    <span className="font-medium text-primary">Décodeur politique :</span> Surlignez un terme dans le texte pour voir sa définition.
-                  </p>
-                </div>
+
                 <GlossaryHighlighter>
                   <div 
                     className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none"

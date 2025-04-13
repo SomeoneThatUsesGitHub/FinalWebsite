@@ -446,5 +446,34 @@ export const politicalGlossary = pgTable('political_glossary', {
 
 export const insertPoliticalGlossarySchema = createInsertSchema(politicalGlossary);
 
+// Quiz pour contenu éducatif
+export const educationalQuizzes = pgTable('educational_quizzes', {
+  id: serial('id').primaryKey(),
+  contentId: integer('content_id').references(() => educationalContent.id).notNull(),
+  question: text('question').notNull(),
+  option1: text('option1').notNull(),
+  option2: text('option2').notNull(),
+  option3: text('option3').notNull(),
+  correctOption: integer('correct_option').notNull(), // 1, 2 ou 3
+  explanation: text('explanation'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const insertEducationalQuizSchema = createInsertSchema(educationalQuizzes).pick({
+  contentId: true,
+  question: true,
+  option1: true,
+  option2: true,
+  option3: true,
+  correctOption: true,
+  explanation: true,
+});
+
+export type EducationalQuiz = typeof educationalQuizzes.$inferSelect;
+export type InsertEducationalQuiz = z.infer<typeof insertEducationalQuizSchema>;
+
+export const insertPoliticalGlossaryTerm = createInsertSchema(politicalGlossary);
+
 export type PoliticalGlossaryTerm = typeof politicalGlossary.$inferSelect;
 export type InsertPoliticalGlossaryTerm = z.infer<typeof insertPoliticalGlossarySchema>;
