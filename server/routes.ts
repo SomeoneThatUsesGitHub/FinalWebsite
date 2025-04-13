@@ -180,7 +180,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Crée une nouvelle élection (requiert authentification admin)
   app.post("/api/elections", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const electionData = insertElectionSchema.parse(req.body);
+      // Assurons-nous que la date est bien convertie en objet Date
+      const requestData = { ...req.body };
+      
+      // Si la date est une chaîne, convertissons-la en objet Date
+      if (requestData.date && typeof requestData.date === 'string') {
+        requestData.date = new Date(requestData.date);
+      }
+      
+      const electionData = insertElectionSchema.parse(requestData);
       const election = await storage.createElection(electionData);
       res.status(201).json(election);
     } catch (error) {
@@ -201,7 +209,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const updatedElection = await storage.updateElection(Number(id), req.body);
+      // Assurons-nous que la date est bien convertie en objet Date
+      const requestData = { ...req.body };
+      
+      // Si la date est une chaîne, convertissons-la en objet Date
+      if (requestData.date && typeof requestData.date === 'string') {
+        requestData.date = new Date(requestData.date);
+      }
+      
+      const updatedElection = await storage.updateElection(Number(id), requestData);
       
       if (!updatedElection) {
         return res.status(404).json({ message: "Élection non trouvée" });
