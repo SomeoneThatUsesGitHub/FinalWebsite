@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo, Heading1, Heading2, Heading3, Minus, Image as ImageIcon, Instagram } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo, Heading1, Heading2, Heading3, Minus, Image as ImageIcon, ImagesIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
@@ -13,6 +13,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface ContentEditorProps {
   initialContent?: {
@@ -177,6 +186,191 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
       // Insérer le nœud DOM dans l'éditeur
       const htmlContent = figure.outerHTML;
       editor.chain().focus().insertContent(htmlContent).run();
+    }
+  };
+  
+  // Nouvelle fonction pour ajouter un carrousel d'images
+  const [carouselImages, setCarouselImages] = useState<Array<{url: string, caption: string}>>([]);
+  const [showCarouselDialog, setShowCarouselDialog] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState('');
+  const [currentImageCaption, setCurrentImageCaption] = useState('');
+  
+  const handleAddCarousel = () => {
+    setCarouselImages([]);
+    setCurrentImageUrl('');
+    setCurrentImageCaption('');
+    setShowCarouselDialog(true);
+  };
+  
+  const addImageToCarousel = () => {
+    if (currentImageUrl.trim()) {
+      setCarouselImages([...carouselImages, {
+        url: currentImageUrl,
+        caption: currentImageCaption
+      }]);
+      setCurrentImageUrl('');
+      setCurrentImageCaption('');
+    }
+  };
+  
+  const removeImageFromCarousel = (index: number) => {
+    setCarouselImages(carouselImages.filter((_, i) => i !== index));
+  };
+  
+  const insertCarousel = () => {
+    if (carouselImages.length > 0 && editor) {
+      // Créer un conteneur de carrousel
+      const carouselContainer = document.createElement('div');
+      carouselContainer.className = 'carousel-container my-8 overflow-hidden rounded-lg shadow-lg';
+      
+      // Ajouter une classe CSS spéciale pour le styling du carrousel
+      carouselContainer.classList.add('image-carousel');
+      
+      // Conteneur pour les images du carrousel
+      const carouselInner = document.createElement('div');
+      carouselInner.className = 'carousel-inner flex flex-nowrap';
+      carouselInner.setAttribute('data-carousel', 'true');
+      
+      // Ajouter chaque image au carrousel
+      carouselImages.forEach((image, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-item flex-shrink-0 w-full';
+        slide.setAttribute('data-slide-index', index.toString());
+        
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'relative aspect-video';
+        
+        const img = document.createElement('img');
+        img.src = image.url;
+        img.alt = `Image ${index + 1} du carrousel`;
+        img.className = 'w-full h-full object-cover';
+        
+        if (image.caption) {
+          const captionDiv = document.createElement('div');
+          captionDiv.className = 'absolute bottom-0 left-0 right-0 bg-black/60 text-white p-2 text-sm';
+          captionDiv.textContent = image.caption;
+          imgContainer.appendChild(captionDiv);
+        }
+        
+        imgContainer.appendChild(img);
+        slide.appendChild(imgContainer);
+        carouselInner.appendChild(slide);
+      });
+      
+      carouselContainer.appendChild(carouselInner);
+      
+      // Ajouter les contrôles de navigation du carrousel
+      const controls = document.createElement('div');
+      controls.className = 'carousel-controls flex justify-between absolute top-1/2 left-0 right-0 -translate-y-1/2 px-4';
+      
+      const prevButton = document.createElement('button');
+      prevButton.className = 'carousel-prev bg-white/80 hover:bg-white rounded-full p-2 shadow-md';
+      prevButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+      prevButton.setAttribute('data-carousel-prev', 'true');
+      
+      const nextButton = document.createElement('button');
+      nextButton.className = 'carousel-next bg-white/80 hover:bg-white rounded-full p-2 shadow-md';
+      nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+      nextButton.setAttribute('data-carousel-next', 'true');
+      
+      controls.appendChild(prevButton);
+      controls.appendChild(nextButton);
+      
+      carouselContainer.appendChild(controls);
+      
+      // Ajouter des indicateurs
+      const indicators = document.createElement('div');
+      indicators.className = 'carousel-indicators flex justify-center mt-2 gap-1';
+      
+      carouselImages.forEach((_, index) => {
+        const dot = document.createElement('button');
+        dot.className = 'w-2 h-2 rounded-full bg-gray-300';
+        dot.setAttribute('data-carousel-indicator', index.toString());
+        if (index === 0) dot.classList.add('bg-primary');
+        indicators.appendChild(dot);
+      });
+      
+      carouselContainer.appendChild(indicators);
+      
+      // Ajouter un petit script qui sera inclus dans le HTML pour faire fonctionner le carrousel
+      const carouselScript = document.createElement('script');
+      carouselScript.setAttribute('type', 'text/javascript');
+      carouselScript.textContent = `
+        document.addEventListener('DOMContentLoaded', function() {
+          const carousels = document.querySelectorAll('[data-carousel="true"]');
+          
+          carousels.forEach(carousel => {
+            const container = carousel.closest('.carousel-container');
+            const slides = carousel.querySelectorAll('[data-slide-index]');
+            const prevBtn = container.querySelector('[data-carousel-prev]');
+            const nextBtn = container.querySelector('[data-carousel-next]');
+            const indicators = container.querySelectorAll('[data-carousel-indicator]');
+            
+            let currentIndex = 0;
+            
+            function showSlide(index) {
+              if (index < 0) index = slides.length - 1;
+              if (index >= slides.length) index = 0;
+              
+              currentIndex = index;
+              
+              slides.forEach((slide, i) => {
+                slide.style.transform = \`translateX(\${(i - currentIndex) * 100}%)\`;
+              });
+              
+              indicators.forEach((dot, i) => {
+                dot.classList.toggle('bg-primary', i === currentIndex);
+                dot.classList.toggle('bg-gray-300', i !== currentIndex);
+              });
+            }
+            
+            // Initialize
+            slides.forEach((slide, i) => {
+              slide.style.transform = \`translateX(\${(i - currentIndex) * 100}%)\`;
+            });
+            
+            // Add event listeners
+            prevBtn.addEventListener('click', () => showSlide(currentIndex - 1));
+            nextBtn.addEventListener('click', () => showSlide(currentIndex + 1));
+            
+            indicators.forEach((dot, i) => {
+              dot.addEventListener('click', () => showSlide(i));
+            });
+          });
+        });
+      `;
+      
+      const carouselStyle = document.createElement('style');
+      carouselStyle.textContent = `
+        .carousel-container { position: relative; }
+        .carousel-inner { transition: transform 0.5s ease; }
+        .carousel-item { transition: transform 0.5s ease; position: relative; }
+      `;
+      
+      // Créer un wrapper pour contenir tout
+      const wrapper = document.createElement('div');
+      wrapper.className = 'carousel-wrapper mb-8';
+      wrapper.appendChild(carouselContainer);
+      wrapper.appendChild(carouselScript);
+      wrapper.appendChild(carouselStyle);
+      
+      // Insérer dans l'éditeur
+      editor.chain().focus().insertContent(wrapper.outerHTML).run();
+      
+      // Fermer le dialogue
+      setShowCarouselDialog(false);
+      
+      // Notification
+      toast({
+        title: "Carrousel d'images ajouté",
+        description: `Carrousel créé avec ${carouselImages.length} image(s).`,
+      });
+    } else {
+      toast({
+        title: "Ajoutez des images",
+        description: "Veuillez ajouter au moins une image au carrousel.",
+        variant: "destructive",
+      });
     }
   };
   
