@@ -177,6 +177,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(election);
   });
   
+  // Crée une nouvelle élection (requiert authentification admin)
+  app.post("/api/elections", isAuth, isAdminOrEditor, async (req: Request, res: Response) => {
+    try {
+      const electionData = insertElectionSchema.parse(req.body);
+      const election = await storage.createElection(electionData);
+      res.status(201).json(election);
+    } catch (error) {
+      console.error("Erreur lors de la création de l'élection:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Données invalides", errors: error.errors });
+      }
+      res.status(500).json({ message: "Erreur lors de la création de l'élection" });
+    }
+  });
+  
+  // Met à jour une élection existante (requiert authentification admin)
+  app.put("/api/elections/:id", isAuth, isAdminOrEditor, async (req: Request, res: Response) => {
+    const { id } = req.params;
+    
+    if (isNaN(Number(id))) {
+      return res.status(400).json({ message: "ID d'élection invalide" });
+    }
+    
+    try {
+      const updatedElection = await storage.updateElection(Number(id), req.body);
+      
+      if (!updatedElection) {
+        return res.status(404).json({ message: "Élection non trouvée" });
+      }
+      
+      res.json(updatedElection);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'élection:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Données invalides", errors: error.errors });
+      }
+      res.status(500).json({ message: "Erreur lors de la mise à jour de l'élection" });
+    }
+  });
+  
+  // Supprime une élection (requiert authentification admin)
+  app.delete("/api/elections/:id", isAuth, isAdmin, async (req: Request, res: Response) => {
+    const { id } = req.params;
+    
+    if (isNaN(Number(id))) {
+      return res.status(400).json({ message: "ID d'élection invalide" });
+    }
+    
+    try {
+      const success = await storage.deleteElection(Number(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "Élection non trouvée" });
+      }
+      
+      res.status(200).json({ message: "Élection supprimée avec succès" });
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'élection:", error);
+      res.status(500).json({ message: "Erreur lors de la suppression de l'élection" });
+    }
+  });
+  
   // Educational Topics
   app.get("/api/educational-topics", async (_req: Request, res: Response) => {
     try {
