@@ -17,6 +17,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { PoliticalGlossaryTerm } from "@shared/schema";
+import AdminLayout from "@/components/admin/AdminLayout";
 
 const GlossaryFormSchema = z.object({
   term: z.string().min(2, {
@@ -174,268 +175,270 @@ export default function GlossaryPage() {
   }
 
   return (
-    <div className="container py-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Glossaire Politique</CardTitle>
-            <CardDescription>
-              Gérez les termes et définitions du décodeur politique pour les utilisateurs
-            </CardDescription>
-          </div>
-          <Button onClick={openAddDialog}>
-            <Plus className="mr-2 h-4 w-4" /> Ajouter un terme
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    <AdminLayout>
+      <div className="container py-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Glossaire Politique</CardTitle>
+              <CardDescription>
+                Gérez les termes et définitions du décodeur politique pour les utilisateurs
+              </CardDescription>
             </div>
-          ) : error ? (
-            <div className="text-center py-8 text-destructive">
-              Une erreur est survenue lors du chargement du glossaire
-            </div>
-          ) : (
-            <Table>
-              <TableCaption>Liste des termes du glossaire politique</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Terme</TableHead>
-                  <TableHead>Catégorie</TableHead>
-                  <TableHead>Dernière modification</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {glossaryTerms && glossaryTerms.length > 0 ? (
-                  glossaryTerms.map((term) => (
-                    <TableRow key={term.id}>
-                      <TableCell className="font-medium">{term.term}</TableCell>
-                      <TableCell>
-                        {term.category ? (
-                          <Badge variant="outline">{term.category}</Badge>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">Non catégorisé</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(term.updatedAt).toLocaleDateString("fr-FR", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric"
-                        })}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openViewDialog(term)}
-                        >
-                          <Info className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditDialog(term)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openDeleteDialog(term)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+            <Button onClick={openAddDialog}>
+              <Plus className="mr-2 h-4 w-4" /> Ajouter un terme
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-destructive">
+                Une erreur est survenue lors du chargement du glossaire
+              </div>
+            ) : (
+              <Table>
+                <TableCaption>Liste des termes du glossaire politique</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Terme</TableHead>
+                    <TableHead>Catégorie</TableHead>
+                    <TableHead>Dernière modification</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {glossaryTerms && glossaryTerms.length > 0 ? (
+                    glossaryTerms.map((term) => (
+                      <TableRow key={term.id}>
+                        <TableCell className="font-medium">{term.term}</TableCell>
+                        <TableCell>
+                          {term.category ? (
+                            <Badge variant="outline">{term.category}</Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">Non catégorisé</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(term.updatedAt).toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric"
+                          })}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openViewDialog(term)}
+                          >
+                            <Info className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openEditDialog(term)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openDeleteDialog(term)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-4">
+                        Aucun terme n'a été ajouté au glossaire
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-4">
-                      Aucun terme n'a été ajouté au glossaire
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Dialog pour ajouter/modifier un terme */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>
-              {currentTerm ? "Modifier un terme" : "Ajouter un terme"}
-            </DialogTitle>
-            <DialogDescription>
-              {currentTerm
-                ? "Modifiez les informations du terme politique"
-                : "Ajoutez un nouveau terme au glossaire politique"}
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="term"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Terme</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Motion de censure" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Le terme politique à définir
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="definition"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Définition</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Définition claire et concise du terme..."
-                        className="min-h-[120px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Explication simple et accessible pour les jeunes lecteurs
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="examples"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Exemples (optionnel)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Exemples concrets d'utilisation..."
-                        className="min-h-[100px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Exemples concrets pour illustrer l'usage du terme
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Catégorie (optionnel)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ex: Institutions, Élections, International..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Catégorie thématique du terme
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="outline">
-                    Annuler
-                  </Button>
-                </DialogClose>
-                <Button 
-                  type="submit" 
-                  disabled={addMutation.isPending || updateMutation.isPending}
-                >
-                  {(addMutation.isPending || updateMutation.isPending) && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  {currentTerm ? "Mettre à jour" : "Ajouter"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog de visualisation détaillée */}
-      <Dialog open={!!termToView} onOpenChange={(open) => !open && setTermToView(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{termToView?.term}</DialogTitle>
-            {termToView?.category && (
-              <Badge variant="outline" className="mt-1">
-                {termToView.category}
-              </Badge>
+                </TableBody>
+              </Table>
             )}
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <h4 className="text-sm font-medium">Définition</h4>
-              <p className="mt-1 text-sm">{termToView?.definition}</p>
-            </div>
-            
-            {termToView?.examples && (
+          </CardContent>
+        </Card>
+
+        {/* Dialog pour ajouter/modifier un terme */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>
+                {currentTerm ? "Modifier un terme" : "Ajouter un terme"}
+              </DialogTitle>
+              <DialogDescription>
+                {currentTerm
+                  ? "Modifiez les informations du terme politique"
+                  : "Ajoutez un nouveau terme au glossaire politique"}
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="term"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Terme</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: Motion de censure" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Le terme politique à définir
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="definition"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Définition</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Définition claire et concise du terme..."
+                          className="min-h-[120px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Explication simple et accessible pour les jeunes lecteurs
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="examples"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exemples (optionnel)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Exemples concrets d'utilisation..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Exemples concrets pour illustrer l'usage du terme
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Catégorie (optionnel)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ex: Institutions, Élections, International..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Catégorie thématique du terme
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="outline">
+                      Annuler
+                    </Button>
+                  </DialogClose>
+                  <Button 
+                    type="submit" 
+                    disabled={addMutation.isPending || updateMutation.isPending}
+                  >
+                    {(addMutation.isPending || updateMutation.isPending) && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {currentTerm ? "Mettre à jour" : "Ajouter"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog de visualisation détaillée */}
+        <Dialog open={!!termToView} onOpenChange={(open) => !open && setTermToView(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{termToView?.term}</DialogTitle>
+              {termToView?.category && (
+                <Badge variant="outline" className="mt-1">
+                  {termToView.category}
+                </Badge>
+              )}
+            </DialogHeader>
+            <div className="space-y-4 py-2">
               <div>
-                <h4 className="text-sm font-medium">Exemples</h4>
-                <p className="mt-1 text-sm">{termToView.examples}</p>
+                <h4 className="text-sm font-medium">Définition</h4>
+                <p className="mt-1 text-sm">{termToView?.definition}</p>
               </div>
-            )}
-            
-            <Separator />
-            
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Créé le: {termToView && new Date(termToView.createdAt).toLocaleDateString()}</span>
-              <span>Mis à jour le: {termToView && new Date(termToView.updatedAt).toLocaleDateString()}</span>
+              
+              {termToView?.examples && (
+                <div>
+                  <h4 className="text-sm font-medium">Exemples</h4>
+                  <p className="mt-1 text-sm">{termToView.examples}</p>
+                </div>
+              )}
+              
+              <Separator />
+              
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Créé le: {termToView && new Date(termToView.createdAt).toLocaleDateString()}</span>
+                <span>Mis à jour le: {termToView && new Date(termToView.updatedAt).toLocaleDateString()}</span>
+              </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
 
-      {/* Confirmation de suppression */}
-      <AlertDialog open={!!termToDelete} onOpenChange={(open) => !open && setTermToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce terme ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action ne peut pas être annulée. Le terme "{termToDelete?.term}" sera définitivement
-              supprimé du glossaire politique.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => termToDelete && deleteMutation.mutate(termToDelete.id)}
-              disabled={deleteMutation.isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+        {/* Confirmation de suppression */}
+        <AlertDialog open={!!termToDelete} onOpenChange={(open) => !open && setTermToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce terme ?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Cette action ne peut pas être annulée. Le terme "{termToDelete?.term}" sera définitivement
+                supprimé du glossaire politique.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => termToDelete && deleteMutation.mutate(termToDelete.id)}
+                disabled={deleteMutation.isPending}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Supprimer
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </AdminLayout>
   );
 }
