@@ -118,30 +118,27 @@ const ContentPage: React.FC = () => {
                 <div 
                   className="prose prose-blue prose-img:rounded-lg prose-img:mx-auto prose-headings:text-primary max-w-none" 
                   ref={(el) => {
-                    // Fonction pour charger et initialiser le script Instagram
+                    // Test avec l'intégration directe de la publication Instagram fournie
                     if (el && content.content.includes('instagram-media')) {
-                      // Créer ou obtenir un script Instagram
-                      let instaScript = document.getElementById('instagram-embed-js') as HTMLScriptElement;
-                      if (!instaScript) {
-                        instaScript = document.createElement('script');
-                        instaScript.id = 'instagram-embed-js';
-                        instaScript.src = 'https://www.instagram.com/embed.js';
-                        instaScript.async = true;
-                        
-                        // Quand le script est chargé, traiter les embeds
-                        instaScript.onload = () => {
-                          if ((window as any).instgrm) {
-                            (window as any).instgrm.Embeds.process();
-                          }
-                        };
-                        
-                        document.body.appendChild(instaScript);
-                      } else if ((window as any).instgrm) {
-                        // Si le script est déjà chargé, traiter les embeds immédiatement
-                        setTimeout(() => {
-                          (window as any).instgrm.Embeds.process();
-                        }, 500);
+                      console.log("Instagram embed détecté, chargement du script...");
+                      
+                      // Insérer le script Instagram s'il n'existe pas déjà
+                      if (!document.getElementById('instagram-embed-js')) {
+                        const script = document.createElement('script');
+                        script.id = 'instagram-embed-js';
+                        script.src = 'https://www.instagram.com/embed.js';
+                        script.async = true;
+                        document.body.appendChild(script);
                       }
+                      
+                      // Attendre que le script soit chargé et traiter les embeds
+                      const checkInsta = setInterval(() => {
+                        if ((window as any).instgrm) {
+                          console.log("Script Instagram chargé, traitement des embeds...");
+                          (window as any).instgrm.Embeds.process();
+                          clearInterval(checkInsta);
+                        }
+                      }, 100);
                     }
                   }}
                   dangerouslySetInnerHTML={{
