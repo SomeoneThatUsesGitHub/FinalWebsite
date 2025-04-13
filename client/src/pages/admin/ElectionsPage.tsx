@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient, apiRequest } from '@/lib/queryClient';
-import { Election, ElectionResult, ElectionResultsData } from '@/components/ElectionResultsChart';
+import { ElectionResultsData, ElectionResult } from '@/components/ElectionResultsChart';
 import AdminLayout from '@/components/admin/AdminLayout';
 
 import {
@@ -84,7 +84,7 @@ type ElectionData = {
   createdAt: string;
 };
 
-const ElectionsAdminPage: React.FC = () => {
+const AdminElectionsPage: React.FC = () => {
   const { toast } = useToast();
   const [selectedElection, setSelectedElection] = useState<ElectionData | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -128,7 +128,7 @@ const ElectionsAdminPage: React.FC = () => {
     onSuccess: () => {
       toast({
         title: "Élection créée avec succès",
-        variant: "success",
+        variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/elections'] });
       setIsCreating(false);
@@ -855,4 +855,4 @@ const getCountryFlag = (countryCode: string): string => {
   return String.fromCodePoint(...codePoints);
 };
 
-export default ElectionsAdminPage;
+export default AdminElectionsPage;
