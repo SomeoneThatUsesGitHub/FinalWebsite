@@ -615,7 +615,97 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
               </Toggle>
               
               <Toggle
-                onPressedChange={handleAddCarousel}
+                onPressedChange={() => {
+                  // Demander directement les URLs des images séparées par une virgule
+                  const imagesInput = prompt("Entrez les URLs des images séparées par des virgules:");
+                  if (!imagesInput || !editor) return;
+                  
+                  // Convertir en tableau d'URL
+                  const imageUrls = imagesInput.split(',').map(url => url.trim()).filter(url => url);
+                  
+                  if (imageUrls.length === 0) {
+                    toast({
+                      title: "Aucune URL valide",
+                      description: "Veuillez entrer au moins une URL d'image valide.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  
+                  // Créer le HTML du carrousel directement
+                  let html = `
+                  <div class="image-carousel-container my-8 relative mx-auto p-0 max-w-3xl rounded-lg shadow-lg overflow-hidden">
+                    <div class="carousel-inner relative">
+                  `;
+                  
+                  // Ajouter chaque image
+                  imageUrls.forEach((url, index) => {
+                    const isActive = index === 0;
+                    html += `
+                      <div class="carousel-item absolute top-0 left-0 w-full h-full transition-opacity duration-300 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'}" data-index="${index}">
+                        <img src="${url}" alt="Image ${index + 1}" class="w-full h-auto object-contain max-h-[500px]">
+                      </div>
+                    `;
+                  });
+                  
+                  // Ajouter les flèches de navigation (seulement si plusieurs images)
+                  if (imageUrls.length > 1) {
+                    html += `
+                      </div>
+                      
+                      <!-- Flèches de navigation -->
+                      <button type="button" onclick="
+                        const container = this.closest('.image-carousel-container');
+                        const items = container.querySelectorAll('.carousel-item');
+                        const active = container.querySelector('.carousel-item.opacity-100');
+                        const currentIndex = parseInt(active.dataset.index);
+                        let prevIndex = currentIndex - 1;
+                        if (prevIndex < 0) prevIndex = items.length - 1;
+                        
+                        active.classList.remove('opacity-100', 'z-10');
+                        active.classList.add('opacity-0', 'z-0');
+                        
+                        items[prevIndex].classList.remove('opacity-0', 'z-0');
+                        items[prevIndex].classList.add('opacity-100', 'z-10');
+                      " class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-20">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                      </button>
+                      
+                      <button type="button" onclick="
+                        const container = this.closest('.image-carousel-container');
+                        const items = container.querySelectorAll('.carousel-item');
+                        const active = container.querySelector('.carousel-item.opacity-100');
+                        const currentIndex = parseInt(active.dataset.index);
+                        let nextIndex = currentIndex + 1;
+                        if (nextIndex >= items.length) nextIndex = 0;
+                        
+                        active.classList.remove('opacity-100', 'z-10');
+                        active.classList.add('opacity-0', 'z-0');
+                        
+                        items[nextIndex].classList.remove('opacity-0', 'z-0');
+                        items[nextIndex].classList.add('opacity-100', 'z-10');
+                      " class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-20">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                      </button>
+                    `;
+                  } else {
+                    html += `
+                      </div>
+                    `;
+                  }
+                  
+                  // Fermer le conteneur
+                  html += `</div>`;
+                  
+                  // Insérer dans l'éditeur
+                  editor.chain().focus().insertContent(html).run();
+                  
+                  // Notification
+                  toast({
+                    title: "Carrousel ajouté",
+                    description: `Carrousel créé avec ${imageUrls.length} image(s).`,
+                  });
+                }}
                 aria-label="Insérer un carrousel d'images"
               >
                 <ImagesIcon className="h-4 w-4" />
