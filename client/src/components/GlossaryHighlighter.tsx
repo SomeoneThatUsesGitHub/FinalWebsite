@@ -4,6 +4,7 @@ import { PoliticalGlossaryTerm } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import DOMPurify from 'dompurify';
 
 /**
@@ -121,78 +122,111 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
     };
   }, [glossaryTerms]);
 
-  // Gérer le clic en dehors pour fermer le tooltip
+  // Bloquer le défilement du body quand le modal est ouvert
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.classList.contains('glossary-term')) {
-        setActiveTerm(null);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
+    if (activeTerm) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
     
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = '';
     };
-  }, []);
+  }, [activeTerm]);
 
   return (
     <div className="relative">
-      <div ref={contentRef} className="glossary-highlighter">
+      <div 
+        ref={contentRef} 
+        className={`glossary-highlighter ${activeTerm ? 'blur-sm' : ''}`}
+      >
         {children}
       </div>
       
-      {/* Tooltip pour afficher la définition */}
+      {/* Modal de définition du glossaire */}
       {activeTerm && (
-        <div
-          className="fixed z-50 w-[calc(100%-32px)] sm:w-80 max-w-md animate-in fade-in zoom-in-95 duration-200"
-          style={{
-            left: isMobile ? '50%' : `${tooltipPosition.x}px`,
-            top: `${tooltipPosition.y + 10}px`,
-            transform: 'translateX(-50%)',
-            maxHeight: 'calc(100vh - 100px)',
-            overflowY: 'auto'
-          }}
-        >
-          <Card className="border-primary/20 shadow-lg">
-            <div className="absolute top-2 right-2 z-10">
-              <button 
-                onClick={() => setActiveTerm(null)}
-                className="rounded-full p-1 bg-gray-50 hover:bg-gray-100 text-gray-500"
-                aria-label="Fermer"
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <CardContent className="pt-4 pb-2">
-              <div className="flex items-center justify-between pr-6 mb-2">
-                <h3 className="font-bold text-lg text-primary">{activeTerm.term}</h3>
-                {activeTerm.category && (
-                  <Badge variant="outline" className="ml-2 hidden sm:inline-flex">
-                    {activeTerm.category}
-                  </Badge>
-                )}
-              </div>
-              {activeTerm.category && (
-                <Badge variant="outline" className="mb-2 sm:hidden">
-                  {activeTerm.category}
-                </Badge>
-              )}
-              <p className="text-sm">{activeTerm.definition}</p>
-              
-              {activeTerm.examples && (
-                <div className="mt-2 text-sm text-muted-foreground">
-                  <strong>Exemple:</strong> {activeTerm.examples}
+        <>
+          {/* Overlay sombre pour le fond */}
+          <div
+            className="fixed inset-0 bg-black/40 z-50"
+            onClick={() => setActiveTerm(null)}
+          />
+          
+          {/* Contenu du modal */}
+          <div className="fixed z-50 inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div 
+              className="w-full max-w-md pointer-events-auto animate-in fade-in zoom-in-95 duration-300"
+              style={{
+                maxHeight: 'calc(100vh - 3rem)',
+              }}
+            >
+              <Card className="border-primary/20 shadow-xl overflow-hidden">
+                <div className="absolute top-3 right-3 z-10">
+                  <Button 
+                    onClick={() => setActiveTerm(null)}
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <X size={16} />
+                  </Button>
                 </div>
-              )}
-            </CardContent>
-            <CardFooter className="pt-0 pb-2">
-              <p className="text-xs text-muted-foreground">
-                — Décodeur politique de Politiquensemble
-              </p>
-            </CardFooter>
-          </Card>
+                
+                <CardContent className="p-6 pt-5">
+                  <div className="flex flex-col mb-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h2 className="font-bold text-xl text-primary">{activeTerm.term}</h2>
+                      
+                      {activeTerm.category && (
+                        <Badge variant="outline" className="ml-2 mt-1">
+                          {activeTerm.category}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <div className="h-1 w-16 bg-primary/20 rounded mb-3" />
+                  
+                    <p className="text-base">{activeTerm.definition}</p>
+                    
+                    {activeTerm.examples && (
+                      <div className="mt-4 text-sm bg-muted p-3 rounded-md">
+                        <strong>Exemple :</strong> {activeTerm.examples}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+                
+                <CardFooter className="p-6 pt-0 flex justify-between items-center">
+                  <p className="text-xs text-muted-foreground">
+                    — Décodeur politique de Politiquensemble
+                  </p>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setActiveTerm(null)}
+                  >
+                    Fermer
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+        </>
+      )}
+      
+      {/* Bouton flottant pour fermer (version mobile) */}
+      {activeTerm && isMobile && (
+        <div className="fixed bottom-4 inset-x-0 z-[60] flex justify-center">
+          <Button 
+            variant="default"
+            size="lg"
+            className="shadow-xl"
+            onClick={() => setActiveTerm(null)}
+          >
+            Fermer
+          </Button>
         </div>
       )}
     </div>
