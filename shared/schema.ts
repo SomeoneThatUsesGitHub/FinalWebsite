@@ -432,3 +432,19 @@ export const insertContactMessageSchema = createInsertSchema(contactMessages).pi
 
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
+
+// Glossaire politique - termes et définitions
+export const politicalGlossary = pgTable('political_glossary', {
+  id: serial('id').primaryKey(),
+  term: text('term').notNull().unique(),
+  definition: text('definition').notNull(),
+  examples: text('examples'),
+  category: text('category'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const insertPoliticalGlossarySchema = createInsertSchema(politicalGlossary);
+
+export type PoliticalGlossaryTerm = typeof politicalGlossary.$inferSelect;
+export type InsertPoliticalGlossaryTerm = z.infer<typeof insertPoliticalGlossarySchema>;
