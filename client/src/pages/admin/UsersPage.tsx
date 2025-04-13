@@ -85,6 +85,7 @@ function UsersPage() {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [confirmRoleChange, setConfirmRoleChange] = useState<{ user: User; newRole: string } | null>(null);
   
   // Récupérer les informations de l'utilisateur connecté
   const { data: currentUser } = useQuery({
@@ -92,10 +93,6 @@ function UsersPage() {
     queryFn: async () => {
       const response = await apiRequest("GET", "/api/auth/me");
       const userData = await response.json();
-      // Stocker le nom d'utilisateur dans le localStorage pour le retrouver facilement
-      if (userData && userData.username) {
-        window.localStorage.setItem("currentUsername", userData.username);
-      }
       return userData;
     },
   });
@@ -358,7 +355,11 @@ function UsersPage() {
                           disabled={user.role === "admin"}
                           onClick={() => {
                             if (user.role !== "admin") {
-                              updateRoleMutation.mutate({ username: user.username, role: "admin" });
+                              if (currentUser?.isAdmin && currentUser?.username === user.username) {
+                                setConfirmRoleChange({ user, newRole: "admin" });
+                              } else {
+                                updateRoleMutation.mutate({ username: user.username, role: "admin" });
+                              }
                             }
                           }}
                           className={user.role === "admin" ? "bg-red-50" : ""}
@@ -370,11 +371,8 @@ function UsersPage() {
                           disabled={user.role === "editor"}
                           onClick={() => {
                             if (user.role !== "editor") {
-                              // Si l'utilisateur est admin et veut changer son propre rôle
-                              if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
-                                if (confirm("En changeant votre rôle d'administrateur à éditeur, vous allez perdre l'accès à certaines fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
-                                  updateRoleMutation.mutate({ username: user.username, role: "editor" });
-                                }
+                              if (user.role === "admin" && currentUser?.username === user.username) {
+                                setConfirmRoleChange({ user, newRole: "editor" });
                               } else {
                                 updateRoleMutation.mutate({ username: user.username, role: "editor" });
                               }
@@ -389,11 +387,8 @@ function UsersPage() {
                           disabled={user.role === "user"}
                           onClick={() => {
                             if (user.role !== "user") {
-                              // Si l'utilisateur est admin et veut changer son propre rôle
-                              if (user.role === "admin" && user.username === window.localStorage.getItem("currentUsername")) {
-                                if (confirm("En changeant votre rôle d'administrateur à utilisateur standard, vous allez perdre l'accès aux fonctionnalités administratives. Êtes-vous sûr de vouloir continuer ?")) {
-                                  updateRoleMutation.mutate({ username: user.username, role: "user" });
-                                }
+                              if (user.role === "admin" && currentUser?.username === user.username) {
+                                setConfirmRoleChange({ user, newRole: "user" });
                               } else {
                                 updateRoleMutation.mutate({ username: user.username, role: "user" });
                               }
@@ -586,6 +581,49 @@ function UsersPage() {
             </form>
           </Form>
         </DialogContent>
+      </Dialog>
+      
+      {/* Dialog de confirmation de changement de rôle */}
+      <Dialog open={!!confirmRoleChange} onOpenChange={(open) => !open && setConfirmRoleChange(null)}>
+        {confirmRoleChange && (
+          <DialogContent className="sm:max-w-[450px]">
+            <DialogHeader>
+              <DialogTitle>Confirmer le changement de rôle</DialogTitle>
+              <DialogDescription>
+                En changeant votre rôle d'administrateur à {confirmRoleChange.newRole === "editor" ? "éditeur" : 
+                confirmRoleChange.newRole === "user" ? "utilisateur standard" : confirmRoleChange.newRole}, 
+                vous allez perdre l'accès à certaines fonctionnalités administratives.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-3">
+              <p className="text-yellow-600 text-sm font-medium">
+                ⚠️ Cette action peut limiter vos permissions dans le système. Êtes-vous sûr de vouloir continuer ?
+              </p>
+            </div>
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => setConfirmRoleChange(null)}
+              >
+                Annuler
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => {
+                  if (confirmRoleChange) {
+                    updateRoleMutation.mutate({ 
+                      username: confirmRoleChange.user.username, 
+                      role: confirmRoleChange.newRole 
+                    });
+                    setConfirmRoleChange(null);
+                  }
+                }}
+              >
+                Confirmer le changement
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
     </AdminLayout>
   );

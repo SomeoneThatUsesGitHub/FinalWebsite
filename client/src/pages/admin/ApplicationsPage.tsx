@@ -50,16 +50,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 
-// Type pour les candidatures
 type TeamApplication = {
   id: number;
   fullName: string;
@@ -82,31 +76,49 @@ export default function ApplicationsPage() {
   const [reviewApplication, setReviewApplication] = useState<TeamApplication | null>(null);
   const [deleteApplication, setDeleteApplication] = useState<TeamApplication | null>(null);
   const [reviewNotes, setReviewNotes] = useState("");
-  const [statusTab, setStatusTab] = useState<"all" | "pending" | "approved" | "rejected">("all");
-
-  // Récupérer toutes les candidatures
-  const { data: applications = [], isLoading, isError } = useQuery<TeamApplication[]>({
-    queryKey: ['/api/admin/team/applications'],
-    refetchOnWindowFocus: false,
+  const [currentTab, setCurrentTab] = useState("pending");
+  
+  // Formater la date
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), "dd MMMM yyyy à HH:mm", { locale: fr });
+  };
+  
+  // Obtenir le texte du poste en français
+  const getPositionText = (position: string) => {
+    const positions: Record<string, string> = {
+      "journalist": "Journaliste",
+      "editor": "Éditeur",
+      "graphic_designer": "Designer graphique",
+      "web_developer": "Développeur web",
+      "social_media_manager": "Gestionnaire de médias sociaux",
+      "other": "Autre poste"
+    };
+    return positions[position] || position;
+  };
+  
+  // Récupérer les candidatures
+  const { data: applications = [], isLoading } = useQuery<TeamApplication[]>({
+    queryKey: ["/api/admin/team/applications"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/admin/team/applications");
+      return await response.json();
+    },
   });
-
-  // Mutations
+  
+  // Mettre à jour le statut d'une candidature
   const updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status, notes }: { id: number; status: string; notes: string }) => {
-      const res = await apiRequest("PATCH", `/api/admin/team/applications/${id}/status`, { status, notes });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Erreur lors de la mise à jour du statut");
-      }
-      return res.json();
+    mutationFn: async ({ id, status, notes }: { id: number; status: string; notes?: string }) => {
+      const response = await apiRequest("PATCH", `/api/admin/team/applications/${id}/status`, { status, notes });
+      return await response.json();
     },
     onSuccess: () => {
       toast({
         title: "Statut mis à jour",
         description: "Le statut de la candidature a été mis à jour avec succès",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/team/applications'] });
       setReviewApplication(null);
+      setReviewNotes("");
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/team/applications"] });
     },
     onError: (error: Error) => {
       toast({
@@ -116,23 +128,20 @@ export default function ApplicationsPage() {
       });
     },
   });
-
+  
+  // Supprimer une candidature
   const deleteApplicationMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await apiRequest("DELETE", `/api/admin/team/applications/${id}`);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Erreur lors de la suppression");
-      }
-      return res.json();
+      const response = await apiRequest("DELETE", `/api/admin/team/applications/${id}`);
+      return await response.json();
     },
     onSuccess: () => {
       toast({
         title: "Candidature supprimée",
         description: "La candidature a été supprimée avec succès",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/team/applications'] });
       setDeleteApplication(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/team/applications"] });
     },
     onError: (error: Error) => {
       toast({
@@ -142,199 +151,360 @@ export default function ApplicationsPage() {
       });
     },
   });
-
+  
   // Filtrer les candidatures selon l'onglet actif
-  const filteredApplications = applications.filter(app => {
-    if (statusTab === "all") return true;
-    return app.status === statusTab;
+  const filteredApplications = applications.filter(application => {
+    if (currentTab === "pending") return application.status === "pending";
+    if (currentTab === "approved") return application.status === "approved";
+    if (currentTab === "rejected") return application.status === "rejected";
+    return true;
   });
-
-  // Formater la date
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "dd MMMM yyyy 'à' HH'h'mm", { locale: fr });
+  
+  // Gérer l'évaluation d'une candidature
+  const handleReview = (status: "approved" | "rejected") => {
+    if (reviewApplication) {
+      updateStatusMutation.mutate({
+        id: reviewApplication.id,
+        status,
+        notes: reviewNotes
+      });
+    }
   };
-
-  // Obtenir la couleur de badge selon le statut
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending":
-        return (
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            En attente
-          </Badge>
-        );
-      case "approved":
-        return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
-            <Check className="h-3 w-3" />
-            Approuvé
-          </Badge>
-        );
-      case "rejected":
-        return (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1">
-            <X className="h-3 w-3" />
-            Refusé
-          </Badge>
-        );
-      default:
-        return <Badge>{status}</Badge>;
+  
+  // Gérer la suppression d'une candidature
+  const handleDelete = () => {
+    if (deleteApplication) {
+      deleteApplicationMutation.mutate(deleteApplication.id);
     }
   };
 
-  // Obtenir le texte du poste
-  const getPositionText = (position: string) => {
-    const positions: Record<string, string> = {
-      "rédacteur": "Rédacteur",
-      "graphiste": "Graphiste",
-      "community-manager": "Community Manager",
-      "vidéaste": "Vidéaste",
-      "analyste-politique": "Analyste politique",
-      "développeur": "Développeur",
-      "autre": "Autre"
-    };
-    return positions[position] || position;
-  };
-
-  // Gérer la revue d'une candidature
-  const handleReview = (status: "approved" | "rejected") => {
-    if (!reviewApplication) return;
-    
-    updateStatusMutation.mutate({
-      id: reviewApplication.id,
-      status,
-      notes: reviewNotes
-    });
-  };
-
-  // Gérer la suppression d'une candidature
-  const handleDelete = () => {
-    if (!deleteApplication) return;
-    deleteApplicationMutation.mutate(deleteApplication.id);
-  };
-
-  // Obtenir le nombre de candidatures par statut
-  const pendingCount = applications.filter(app => app.status === "pending").length;
-  const approvedCount = applications.filter(app => app.status === "approved").length;
-  const rejectedCount = applications.filter(app => app.status === "rejected").length;
-
   return (
     <AdminLayout>
-      <div className="flex flex-col">
-        <div className="flex justify-between items-center mb-6">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-semibold text-primary">Gestion des candidatures</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Candidatures</h1>
             <p className="text-muted-foreground">
-              Gérez les candidatures pour rejoindre l'équipe Politiquensemble
+              Gérez les candidatures pour rejoindre l'équipe de Politiquensemble.
             </p>
           </div>
         </div>
-
-        <Tabs 
-          value={statusTab} 
-          onValueChange={(value) => setStatusTab(value as "all" | "pending" | "approved" | "rejected")}
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+        
+        <Tabs defaultValue="pending" onValueChange={setCurrentTab} className="w-full">
+          <TabsList className="grid grid-cols-4 mb-6">
             <TabsTrigger value="all" className="flex items-center gap-2">
               <ClipboardList className="h-4 w-4" />
-              Toutes ({applications.length})
+              Toutes <Badge variant="outline">{applications.length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="pending" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              En attente ({pendingCount})
+              En attente <Badge variant="outline">{applications.filter(a => a.status === "pending").length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="approved" className="flex items-center gap-2">
               <Check className="h-4 w-4" />
-              Approuvées ({approvedCount})
+              Approuvées <Badge variant="outline">{applications.filter(a => a.status === "approved").length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="rejected" className="flex items-center gap-2">
               <X className="h-4 w-4" />
-              Refusées ({rejectedCount})
+              Refusées <Badge variant="outline">{applications.filter(a => a.status === "rejected").length}</Badge>
             </TabsTrigger>
           </TabsList>
-
-          <TabsContent value={statusTab}>
+          
+          <TabsContent value="all" className="space-y-4">
             {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div className="flex justify-center py-8">
+                <p>Chargement des candidatures...</p>
               </div>
-            ) : isError ? (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center text-destructive">
-                    Erreur lors du chargement des candidatures
-                  </div>
-                </CardContent>
-              </Card>
-            ) : filteredApplications.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center text-muted-foreground">
-                    Aucune candidature {statusTab !== "all" ? `avec le statut "${statusTab}"` : ""} à afficher
-                  </div>
-                </CardContent>
-              </Card>
+            ) : applications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium">Aucune candidature</h3>
+                <p className="text-muted-foreground">
+                  Il n'y a pas encore de candidatures à afficher.
+                </p>
+              </div>
             ) : (
-              <Card>
-                <CardContent className="p-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nom</TableHead>
-                        <TableHead>Poste</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredApplications.map((application) => (
-                        <TableRow key={application.id}>
-                          <TableCell className="font-medium">{application.fullName}</TableCell>
-                          <TableCell>{getPositionText(application.position)}</TableCell>
-                          <TableCell>{formatDate(application.submissionDate)}</TableCell>
-                          <TableCell>{getStatusBadge(application.status)}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setViewApplication(application)}
-                              >
-                                <FileText className="h-4 w-4 mr-1" />
-                                Voir
-                              </Button>
-                              {application.status === "pending" && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    setReviewApplication(application);
-                                    setReviewNotes(application.notes || "");
-                                  }}
-                                >
-                                  <ClipboardList className="h-4 w-4 mr-1" />
-                                  Évaluer
-                                </Button>
-                              )}
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                onClick={() => setDeleteApplication(application)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nom</TableHead>
+                    <TableHead>Poste</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {applications.map((application) => (
+                    <TableRow key={application.id}>
+                      <TableCell className="font-medium">{application.fullName}</TableCell>
+                      <TableCell>{getPositionText(application.position)}</TableCell>
+                      <TableCell>{format(new Date(application.submissionDate), "dd/MM/yyyy")}</TableCell>
+                      <TableCell>
+                        {application.status === "pending" && (
+                          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                            <Clock className="h-3 w-3 mr-1" />
+                            En attente
+                          </Badge>
+                        )}
+                        {application.status === "approved" && (
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                            <Check className="h-3 w-3 mr-1" />
+                            Approuvée
+                          </Badge>
+                        )}
+                        {application.status === "rejected" && (
+                          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                            <X className="h-3 w-3 mr-1" />
+                            Refusée
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setViewApplication(application)}
+                        >
+                          Voir
+                        </Button>
+                        
+                        {application.status === "pending" && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              setReviewApplication(application);
+                              setReviewNotes("");
+                            }}
+                          >
+                            Évaluer
+                          </Button>
+                        )}
+                        
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700" 
+                          onClick={() => setDeleteApplication(application)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="pending" className="space-y-4">
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <p>Chargement des candidatures...</p>
+              </div>
+            ) : filteredApplications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Clock className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium">Aucune candidature en attente</h3>
+                <p className="text-muted-foreground">
+                  Toutes les candidatures ont été traitées.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredApplications.map((application) => (
+                  <Card key={application.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{application.fullName}</CardTitle>
+                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                          <Clock className="h-3 w-3 mr-1" />
+                          En attente
+                        </Badge>
+                      </div>
+                      <CardDescription>
+                        {getPositionText(application.position)}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="flex items-center text-sm text-muted-foreground mb-2">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        <span>{format(new Date(application.submissionDate), "dd MMMM yyyy", { locale: fr })}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Mail className="h-4 w-4 mr-1" />
+                        <a href={`mailto:${application.email}`} className="text-blue-600 hover:underline">
+                          {application.email}
+                        </a>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setViewApplication(application)}
+                      >
+                        Voir détails
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={() => {
+                          setReviewApplication(application);
+                          setReviewNotes("");
+                        }}
+                      >
+                        Évaluer
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="approved" className="space-y-4">
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <p>Chargement des candidatures...</p>
+              </div>
+            ) : filteredApplications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Award className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium">Aucune candidature approuvée</h3>
+                <p className="text-muted-foreground">
+                  Il n'y a pas encore de candidatures approuvées.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredApplications.map((application) => (
+                  <Card key={application.id} className="hover:shadow-md transition-shadow border-l-4 border-l-green-500">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{application.fullName}</CardTitle>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          <Check className="h-3 w-3 mr-1" />
+                          Approuvée
+                        </Badge>
+                      </div>
+                      <CardDescription>
+                        {getPositionText(application.position)}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="flex items-center text-sm text-muted-foreground mb-2">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        <span>{format(new Date(application.submissionDate), "dd MMMM yyyy", { locale: fr })}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Mail className="h-4 w-4 mr-1" />
+                        <a href={`mailto:${application.email}`} className="text-blue-600 hover:underline">
+                          {application.email}
+                        </a>
+                      </div>
+                      {application.reviewedAt && (
+                        <div className="mt-2 pt-2 border-t text-sm">
+                          <p className="text-green-600">
+                            Approuvée le {format(new Date(application.reviewedAt), "dd/MM/yyyy")}
+                            {application.reviewerName && ` par ${application.reviewerName}`}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setViewApplication(application)}
+                      >
+                        Voir détails
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => setDeleteApplication(application)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Supprimer
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="rejected" className="space-y-4">
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <p>Chargement des candidatures...</p>
+              </div>
+            ) : filteredApplications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <X className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium">Aucune candidature refusée</h3>
+                <p className="text-muted-foreground">
+                  Il n'y a pas encore de candidatures refusées.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredApplications.map((application) => (
+                  <Card key={application.id} className="hover:shadow-md transition-shadow border-l-4 border-l-red-500">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{application.fullName}</CardTitle>
+                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                          <X className="h-3 w-3 mr-1" />
+                          Refusée
+                        </Badge>
+                      </div>
+                      <CardDescription>
+                        {getPositionText(application.position)}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="flex items-center text-sm text-muted-foreground mb-2">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        <span>{format(new Date(application.submissionDate), "dd MMMM yyyy", { locale: fr })}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Mail className="h-4 w-4 mr-1" />
+                        <a href={`mailto:${application.email}`} className="text-blue-600 hover:underline">
+                          {application.email}
+                        </a>
+                      </div>
+                      {application.reviewedAt && (
+                        <div className="mt-2 pt-2 border-t text-sm">
+                          <p className="text-red-600">
+                            Refusée le {format(new Date(application.reviewedAt), "dd/MM/yyyy")}
+                            {application.reviewerName && ` par ${application.reviewerName}`}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setViewApplication(application)}
+                      >
+                        Voir détails
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => setDeleteApplication(application)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Supprimer
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
             )}
           </TabsContent>
         </Tabs>
@@ -343,7 +513,7 @@ export default function ApplicationsPage() {
       {/* Dialog de visualisation d'une candidature */}
       <Dialog open={!!viewApplication} onOpenChange={(open) => !open && setViewApplication(null)}>
         {viewApplication && (
-          <DialogContent className="sm:max-w-[800px] max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogContent className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl">Candidature de {viewApplication.fullName}</DialogTitle>
               <DialogDescription>
@@ -351,135 +521,133 @@ export default function ApplicationsPage() {
               </DialogDescription>
             </DialogHeader>
             
-            <ScrollArea className="flex-grow mt-2 pr-4">
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center">
-                        <User className="h-4 w-4 mr-2" />
-                        Informations personnelles
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
+            <div className="mt-2 pr-4 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Informations personnelles
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <span className="font-medium">Nom complet:</span>
+                      <p>{viewApplication.fullName}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium">Email:</span>
+                      <p className="flex items-center">
+                        <Mail className="h-4 w-4 mr-1" />
+                        <a href={`mailto:${viewApplication.email}`} className="text-blue-600 hover:underline">
+                          {viewApplication.email}
+                        </a>
+                      </p>
+                    </div>
+                    {viewApplication.phone && (
                       <div>
-                        <span className="font-medium">Nom complet:</span>
-                        <p>{viewApplication.fullName}</p>
-                      </div>
-                      <div>
-                        <span className="font-medium">Email:</span>
+                        <span className="font-medium">Téléphone:</span>
                         <p className="flex items-center">
-                          <Mail className="h-4 w-4 mr-1" />
-                          <a href={`mailto:${viewApplication.email}`} className="text-blue-600 hover:underline">
-                            {viewApplication.email}
-                          </a>
+                          <Phone className="h-4 w-4 mr-1" />
+                          {viewApplication.phone}
                         </p>
                       </div>
-                      {viewApplication.phone && (
-                        <div>
-                          <span className="font-medium">Téléphone:</span>
-                          <p className="flex items-center">
-                            <Phone className="h-4 w-4 mr-1" />
-                            {viewApplication.phone}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center">
-                        <Briefcase className="h-4 w-4 mr-2" />
-                        Informations professionnelles
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div>
-                        <span className="font-medium">Poste souhaité:</span>
-                        <p>{getPositionText(viewApplication.position)}</p>
-                      </div>
-
-                      {viewApplication.portfolio && (
-                        <div>
-                          <span className="font-medium">Portfolio:</span>
-                          <p className="flex items-center">
-                            <ExternalLink className="h-4 w-4 mr-1" />
-                            <a 
-                              href={viewApplication.portfolio} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline truncate"
-                            >
-                              {viewApplication.portfolio}
-                            </a>
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
+                    )}
+                  </CardContent>
+                </Card>
                 
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center">
-                      <MessageSquareQuote className="h-4 w-4 mr-2" />
-                      Motivation
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      Informations professionnelles
                     </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <span className="font-medium">Poste souhaité:</span>
+                      <p>{getPositionText(viewApplication.position)}</p>
+                    </div>
+
+                    {viewApplication.portfolio && (
+                      <div>
+                        <span className="font-medium">Portfolio:</span>
+                        <p className="flex items-center">
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          <a 
+                            href={viewApplication.portfolio} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline truncate"
+                          >
+                            {viewApplication.portfolio}
+                          </a>
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center">
+                    <MessageSquareQuote className="h-4 w-4 mr-2" />
+                    Motivation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[150px]">
+                    <p className="whitespace-pre-wrap pr-4">{viewApplication.message}</p>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+              
+              {viewApplication.additionalInfo && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Informations supplémentaires</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ScrollArea className="h-[150px]">
-                      <p className="whitespace-pre-wrap pr-4">{viewApplication.message}</p>
+                      <p className="whitespace-pre-wrap pr-4">{viewApplication.additionalInfo}</p>
                     </ScrollArea>
                   </CardContent>
                 </Card>
-                
-                {viewApplication.additionalInfo && (
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Informations supplémentaires</CardTitle>
-                    </CardHeader>
+              )}
+              
+              {viewApplication.status !== "pending" && (
+                <Card className={`border-l-4 ${
+                  viewApplication.status === "approved" ? "border-l-green-500" : "border-l-red-500"
+                }`}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center">
+                      {viewApplication.status === "approved" ? (
+                        <Check className="h-4 w-4 mr-2 text-green-500" />
+                      ) : (
+                        <X className="h-4 w-4 mr-2 text-red-500" />
+                      )}
+                      {viewApplication.status === "approved" ? "Candidature approuvée" : "Candidature refusée"}
+                    </CardTitle>
+                    {viewApplication.reviewedAt && (
+                      <CardDescription>
+                        Revue le {formatDate(viewApplication.reviewedAt)}
+                        {viewApplication.reviewerName && (
+                          <> par <span className="font-medium">{viewApplication.reviewerName}</span></>
+                        )}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  {viewApplication.notes && (
                     <CardContent>
-                      <ScrollArea className="h-[150px]">
-                        <p className="whitespace-pre-wrap pr-4">{viewApplication.additionalInfo}</p>
+                      <ScrollArea className="h-[100px]">
+                        <p className="whitespace-pre-wrap pr-4">{viewApplication.notes}</p>
                       </ScrollArea>
                     </CardContent>
-                  </Card>
-                )}
-                
-                {viewApplication.status !== "pending" && (
-                  <Card className={`border-l-4 ${
-                    viewApplication.status === "approved" ? "border-l-green-500" : "border-l-red-500"
-                  }`}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center">
-                        {viewApplication.status === "approved" ? (
-                          <Check className="h-4 w-4 mr-2 text-green-500" />
-                        ) : (
-                          <X className="h-4 w-4 mr-2 text-red-500" />
-                        )}
-                        {viewApplication.status === "approved" ? "Candidature approuvée" : "Candidature refusée"}
-                      </CardTitle>
-                      {viewApplication.reviewedAt && (
-                        <CardDescription>
-                          Revue le {formatDate(viewApplication.reviewedAt)}
-                          {viewApplication.reviewerName && (
-                            <> par <span className="font-medium">{viewApplication.reviewerName}</span></>
-                          )}
-                        </CardDescription>
-                      )}
-                    </CardHeader>
-                    {viewApplication.notes && (
-                      <CardContent>
-                        <ScrollArea className="h-[100px]">
-                          <p className="whitespace-pre-wrap pr-4">{viewApplication.notes}</p>
-                        </ScrollArea>
-                      </CardContent>
-                    )}
-                  </Card>
-                )}
-              </div>
-            </ScrollArea>
+                  )}
+                </Card>
+              )}
+            </div>
             
             <DialogFooter className="mt-4">
               <Button variant="outline" onClick={() => setViewApplication(null)}>
