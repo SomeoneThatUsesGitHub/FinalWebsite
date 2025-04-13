@@ -17,6 +17,7 @@ import {
   ClipboardList,
   MessageSquareText,
   GraduationCap,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -113,6 +114,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       name: "Candidatures",
       href: "/admin/applications",
       icon: ClipboardList,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+    },
+    {
+      name: "Glossaire politique",
+      href: "/admin/glossaire",
+      icon: BookOpen,
       disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {

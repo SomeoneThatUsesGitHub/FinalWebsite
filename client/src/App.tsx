@@ -35,6 +35,7 @@ import DirectEditorsPage from "@/pages/admin/DirectEditorsPage";
 import DirectUpdatesPage from "@/pages/admin/DirectUpdatesPage";
 import DirectQuestionsPage from "@/pages/admin/DirectQuestionsPage";
 import EducationalContentPage from "@/pages/admin/EducationalContentPage";
+import GlossaryPage from "@/pages/admin/GlossaryPage";
 
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
@@ -111,6 +112,7 @@ function App() {
               <ProtectedRoute path="/admin/applications" component={ApplicationsPage} adminOnly />
               <ProtectedRoute path="/admin/messages" component={ContactMessagesPage} adminOnly />
               <ProtectedRoute path="/admin/contenu-educatif" component={EducationalContentPage} adminOnly />
+              <ProtectedRoute path="/admin/glossaire" component={GlossaryPage} adminOnly />
               
               {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
               <ProtectedRoute path="/admin/directs" component={DirectsPage} />
