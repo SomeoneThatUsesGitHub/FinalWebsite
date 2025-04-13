@@ -140,28 +140,41 @@ const ElectionsPage: React.FC = () => {
         exit="exit"
         variants={pageTransition}
       >
-        {/* Bannière d'en-tête */}
-        <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-16 md:py-24 mb-6 relative -mt-[4.25rem] overflow-hidden w-screen left-1/2 right-1/2 -translate-x-1/2">
-          {/* Éléments décoratifs */}
-          <div className="absolute inset-0 bg-pattern opacity-5"></div>
-          <div className="absolute top-0 right-0 w-72 h-72 md:w-96 md:h-96 bg-blue-500 rounded-full filter blur-3xl opacity-20 -translate-y-24 translate-x-24"></div>
-          <div className="absolute top-20 left-1/4 w-32 h-32 bg-blue-300 rounded-full filter blur-2xl opacity-10"></div>
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto">
+        {/* Bannière d'en-tête similaire à celle de la page Articles */}
+        <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8 -mt-[4.25rem]">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="max-w-3xl mx-auto text-center">
               <motion.h1 
                 initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, ease: [0.175, 0.885, 0.32, 1.5] }}
-                className="text-4xl md:text-5xl font-bold text-white mb-4 text-center"
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  transition: {
+                    duration: 0.7,
+                    ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond accentué
+                    bounce: 0.4,
+                    type: "spring",
+                    stiffness: 120
+                  }
+                }}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-primary mb-4 relative"
               >
                 Élections Internationales
               </motion.h1>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1,
+                  transition: { delay: 0.3, duration: 0.5 } 
+                }}
+                className="h-1 w-20 bg-blue-500 mx-auto rounded-full mb-4"
+              ></motion.div>
               <motion.p 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
-                className="text-xl text-blue-100 text-center mb-8"
+                className="text-xl text-gray-700 text-center max-w-2xl mx-auto"
               >
                 Découvrez les résultats des élections récentes et les prochains scrutins à travers le monde
               </motion.p>
@@ -171,64 +184,71 @@ const ElectionsPage: React.FC = () => {
 
         <div className="container mx-auto px-4 py-8">
           {/* Filtres et recherche */}
-          <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="relative w-full md:w-1/3">
-              <Input
-                type="text"
-                placeholder="Rechercher une élection..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-              <div className="absolute left-3 top-2.5 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
+          <div className="mb-8 flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
+              <div className="relative flex-1 min-w-0">
+                <Input
+                  type="text"
+                  placeholder="Rechercher une élection..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-full"
+                />
+                <div className="absolute left-3 top-2.5 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="flex-shrink-0">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                      <Filter className="h-4 w-4 mr-2" />
+                      Filtrer par type
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="max-h-[200px] overflow-y-auto">
+                    {uniqueElectionTypes.map(type => (
+                      <DropdownMenuItem key={type} onClick={() => setFilterType(type)}>
+                        {type}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             
-            <div className="flex flex-wrap gap-2">
-              {selectedCountry && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setSelectedCountry(null)}
-                  className="flex items-center gap-1"
-                >
-                  <span>Pays: {uniqueCountries.find(c => c.countryCode === selectedCountry)?.country}</span>
-                  <span className="text-xs">✕</span>
-                </Button>
-              )}
-              
-              {filterType && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setFilterType(null)}
-                  className="flex items-center gap-1"
-                >
-                  <span>Type: {filterType}</span>
-                  <span className="text-xs">✕</span>
-                </Button>
-              )}
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filtrer par type
+            {/* Filtres actifs */}
+            {(selectedCountry || filterType) && (
+              <div className="flex flex-wrap gap-2">
+                {selectedCountry && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setSelectedCountry(null)}
+                    className="flex items-center gap-1"
+                  >
+                    <span>Pays: {uniqueCountries.find(c => c.countryCode === selectedCountry)?.country}</span>
+                    <span className="text-xs">✕</span>
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {uniqueElectionTypes.map(type => (
-                    <DropdownMenuItem key={type} onClick={() => setFilterType(type)}>
-                      {type}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                )}
+                
+                {filterType && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setFilterType(null)}
+                    className="flex items-center gap-1"
+                  >
+                    <span>Type: {filterType}</span>
+                    <span className="text-xs">✕</span>
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
           
           {/* Section des pays */}
@@ -416,24 +436,26 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
   return (
     <Card className={`border-l-4 ${upcoming ? 'border-l-amber-500' : isRecent ? 'border-l-green-500' : 'border-l-blue-500'}`}>
       <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="flex items-center mb-1">
-              <span className="text-xl mr-2">{getCountryFlag(countryCode)}</span>
-              <span>{title}</span>
-              {upcoming && (
-                <Badge variant="outline" className="ml-2 bg-amber-50 text-amber-700 border-amber-200">
-                  À venir
-                </Badge>
-              )}
-              {isRecent && !upcoming && (
-                <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-200">
-                  Récente
-                </Badge>
-              )}
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
+          <div className="w-full">
+            <CardTitle className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="text-xl mr-1">{getCountryFlag(countryCode)}</span>
+              <span className="mr-2">{title}</span>
+              <div className="flex flex-wrap gap-1">
+                {upcoming && (
+                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                    À venir
+                  </Badge>
+                )}
+                {isRecent && !upcoming && (
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    Récente
+                  </Badge>
+                )}
+              </div>
             </CardTitle>
             
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               <Badge variant="secondary" className="flex items-center bg-gray-100 text-gray-700">
                 <MapPin className="h-3 w-3 mr-1" />
                 {country}
@@ -457,16 +479,19 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
         )}
         
         {parsedResults && expanded && (
-          <div className="mt-4">
-            <ElectionResultsChart data={electionData} />
+          <div className="mt-4 overflow-x-auto">
+            <div className="min-w-[500px] md:min-w-0">
+              <ElectionResultsChart data={electionData} />
+            </div>
           </div>
         )}
       </CardContent>
       
-      <CardFooter className="flex justify-between pt-0">
+      <CardFooter className="flex flex-col sm:flex-row gap-2 justify-between pt-0">
         <Button 
           variant="outline" 
           size="sm" 
+          className="w-full sm:w-auto"
           onClick={() => setExpanded(!expanded)}
         >
           {expanded ? 'Masquer les résultats' : 'Voir les résultats'}
@@ -475,7 +500,8 @@ const ElectionCard: React.FC<ElectionCardProps> = ({
         {!selectedCountry && (
           <Button 
             variant="ghost" 
-            size="sm" 
+            size="sm"
+            className="w-full sm:w-auto" 
             onClick={(e) => {
               e.stopPropagation();
               onSelectCountry(countryCode);
