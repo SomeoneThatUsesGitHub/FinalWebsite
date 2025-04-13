@@ -52,28 +52,50 @@ const ContentPage: React.FC = () => {
     if (content && !isLoading) {
       // Vérifier si le contenu contient une intégration Instagram
       if (content.content.includes('instagram-embed-container')) {
-        // Créer et charger le script Instagram
-        const instagramScript = document.createElement('script');
-        instagramScript.src = 'https://www.instagram.com/embed.js';
-        instagramScript.async = true;
-        instagramScript.defer = true;
-        
-        // Si un script Instagram existe déjà, on le supprime d'abord
-        const existingScript = document.querySelector('script[src*="instagram.com/embed.js"]');
-        if (existingScript) {
-          existingScript.remove();
-        }
-        
-        document.body.appendChild(instagramScript);
-        
-        // Si 'instgrm' est déjà défini (rechargement), on force le processus d'Instagram
-        if ((window as any).instgrm) {
-          setTimeout(() => {
+        const processEmbeds = () => {
+          if ((window as any).instgrm) {
+            // Force Instagram à traiter les embeds
             (window as any).instgrm.Embeds.process();
-          }, 500);
+          } else {
+            // Si Instagram n'est pas encore chargé, réessayer dans 500ms
+            setTimeout(processEmbeds, 500);
+          }
+        };
+        
+        // Créer et charger le script Instagram
+        let instagramScript = document.querySelector('script[src*="instagram.com/embed.js"]') as HTMLScriptElement;
+        
+        if (!instagramScript) {
+          instagramScript = document.createElement('script');
+          instagramScript.src = 'https://www.instagram.com/embed.js';
+          instagramScript.async = true;
+          instagramScript.defer = true;
+          document.body.appendChild(instagramScript);
         }
+        
+        // Après que le script est chargé, traiter les embeds
+        instagramScript.onload = processEmbeds;
+        
+        // Si le script est déjà chargé, essayer de traiter les embeds
+        setTimeout(processEmbeds, 1000);
       }
     }
+    
+    // Nettoyage au démontage
+    return () => {
+      if ((window as any).instgrm) {
+        // Aucune méthode officielle pour nettoyer, mais on peut essayer
+        const embeds = document.querySelectorAll('.instagram-embed-container');
+        embeds.forEach(embed => {
+          if (embed.parentNode) {
+            const wrapperDiv = embed.parentNode;
+            if (wrapperDiv.parentNode) {
+              wrapperDiv.parentNode.replaceChild(embed, wrapperDiv);
+            }
+          }
+        });
+      }
+    };
   }, [content, isLoading]);
 
   return (
@@ -87,7 +109,7 @@ const ContentPage: React.FC = () => {
         </div>
       ) : content ? (
         <>
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-6">
             <div className="container mx-auto px-4">
               {topic && (
                 <div className="max-w-4xl mx-auto mb-6">
