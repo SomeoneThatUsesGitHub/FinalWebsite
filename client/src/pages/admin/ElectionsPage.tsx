@@ -663,30 +663,32 @@ const AdminElectionsPage: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {/* Formulaire d'ajout de résultat */}
+                    {/* Formulaire d'ajout de résultat avec labels standard au lieu de FormLabel */}
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <FormLabel>Candidat</FormLabel>
+                          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Candidat</label>
                           <Input
                             placeholder="Nom du candidat"
                             value={newResult.candidate}
                             onChange={(e) => setNewResult({ ...newResult, candidate: e.target.value })}
+                            className="mt-1.5"
                           />
                         </div>
                         <div>
-                          <FormLabel>Parti</FormLabel>
+                          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Parti</label>
                           <Input
                             placeholder="Nom du parti"
                             value={newResult.party}
                             onChange={(e) => setNewResult({ ...newResult, party: e.target.value })}
+                            className="mt-1.5"
                           />
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-6 gap-4">
                         <div className="col-span-2">
-                          <FormLabel>Pourcentage (%)</FormLabel>
+                          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Pourcentage (%)</label>
                           <Input
                             type="number"
                             placeholder="0"
@@ -695,21 +697,23 @@ const AdminElectionsPage: React.FC = () => {
                             step="0.01"
                             value={newResult.percentage || ''}
                             onChange={(e) => setNewResult({ ...newResult, percentage: parseFloat(e.target.value) || 0 })}
+                            className="mt-1.5"
                           />
                         </div>
                         <div className="col-span-2">
-                          <FormLabel>Votes (optionnel)</FormLabel>
+                          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Votes (optionnel)</label>
                           <Input
                             type="number"
                             placeholder="0"
                             min="0"
                             value={newResult.votes || ''}
                             onChange={(e) => setNewResult({ ...newResult, votes: parseInt(e.target.value) || undefined })}
+                            className="mt-1.5"
                           />
                         </div>
                         <div className="col-span-2">
-                          <FormLabel>Couleur</FormLabel>
-                          <div className="flex gap-2">
+                          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Couleur</label>
+                          <div className="flex gap-2 mt-1.5">
                             <Input
                               type="color"
                               className="w-16 p-1 h-10"
