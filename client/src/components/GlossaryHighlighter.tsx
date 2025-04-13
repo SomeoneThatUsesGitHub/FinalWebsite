@@ -154,12 +154,13 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
           />
           
           {/* Contenu du modal */}
-          <div className="fixed z-50 inset-0 flex items-center justify-center p-4 pointer-events-none overflow-y-auto">
+          <div className="fixed z-50 inset-0 flex items-center justify-center p-4 pointer-events-none">
             <div 
-              className="w-full max-w-md pointer-events-auto animate-in fade-in zoom-in-95 duration-300 mx-auto"
+              className="w-full sm:w-auto pointer-events-auto animate-in fade-in zoom-in-95 duration-300"
               style={{
-                maxHeight: 'calc(100vh - 3rem)',
-                maxWidth: 'calc(100vw - 2rem)',
+                maxHeight: '90vh',
+                width: '90vw',
+                maxWidth: '450px',
               }}
             >
               <Card className="border-primary/20 shadow-xl overflow-hidden w-full">
@@ -174,13 +175,13 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
                   </Button>
                 </div>
                 
-                <CardContent className="p-4 pt-6 sm:p-6 sm:pt-5">
+                <CardContent className="p-4 pt-6 sm:p-6 sm:pt-5 overflow-auto max-h-[50vh]">
                   <div className="flex flex-col mb-2 sm:mb-4">
-                    <div className="flex items-start mb-2 pr-6">
-                      <h2 className="font-bold text-xl text-primary flex-1 break-words">{activeTerm.term}</h2>
+                    <div className="flex flex-col sm:flex-row sm:items-start mb-2">
+                      <h2 className="font-bold text-xl text-primary break-words pr-6">{activeTerm.term}</h2>
                       
                       {activeTerm.category && (
-                        <Badge variant="outline" className="ml-2 mt-1 shrink-0">
+                        <Badge variant="outline" className="mt-1 sm:ml-2 w-fit">
                           {activeTerm.category}
                         </Badge>
                       )}
@@ -188,29 +189,29 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
                     
                     <div className="h-1 w-16 bg-primary/20 rounded mb-3" />
                   
-                    <p className="text-sm sm:text-base">{activeTerm.definition}</p>
+                    <p className="text-sm sm:text-base break-words">{activeTerm.definition}</p>
                     
                     {activeTerm.examples && (
                       <div className="mt-3 sm:mt-4 text-xs sm:text-sm bg-muted p-2 sm:p-3 rounded-md">
-                        <strong>Exemple :</strong> {activeTerm.examples}
+                        <strong>Exemple :</strong> <span className="break-words">{activeTerm.examples}</span>
                       </div>
                     )}
                   </div>
                 </CardContent>
                 
-                <CardFooter className="p-4 sm:p-6 pt-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                  <p className="text-xs text-muted-foreground order-2 sm:order-1">
-                    — Décodeur politique de Politiquensemble
-                  </p>
-                  
+                <CardFooter className="p-4 sm:p-6 pt-0 text-center">
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="ml-auto sm:ml-0 order-1 sm:order-2"
+                    className="w-full"
                     onClick={() => setActiveTerm(null)}
                   >
                     Fermer
                   </Button>
+
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Décodeur politique de Politiquensemble
+                  </p>
                 </CardFooter>
               </Card>
             </div>
