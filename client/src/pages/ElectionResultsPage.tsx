@@ -1,16 +1,16 @@
 import { Link, useLocation, useRoute } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
 import { ArrowLeft, Award, Calendar, Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { getCountryFlagUrl } from "@/lib/helpers";
-import { ElectionResultsData } from "@/components/ElectionResultsChart";
-import ElectionResultsChart from "@/components/ElectionResultsChart";
-import MainLayout from "@/components/layout/MainLayout";
+import { getCountryFlagUrl } from "../lib/helpers";
+import { ElectionResultsData } from "../components/ElectionResultsChart";
+import ElectionResultsChart from "../components/ElectionResultsChart";
+import MainLayout from "../components/layout/MainLayout";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "../components/ui/skeleton";
 
 interface Election {
   id: number;
