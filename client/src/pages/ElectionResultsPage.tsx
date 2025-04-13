@@ -44,17 +44,23 @@ const fadeInWithBounce = {
 };
 
 const ElectionResultsPage: React.FC = () => {
-  const [_, params] = useRoute('/elections/:countryCode/resultats');
+  const [routeMatched, params] = useRoute('/elections/:countryCode/resultats');
   const countryCode = params?.countryCode.toUpperCase();
   const [location] = useLocation();
   
   // Extraire l'ID de l'élection à partir des paramètres d'URL
   const getElectionId = useCallback(() => {
-    if (!location.includes('?')) return null;
-    const searchParams = new URLSearchParams(location.split('?')[1]);
-    const id = searchParams.get('id');
-    return id ? parseInt(id) : null;
-  }, [location]);
+    try {
+      // Utiliser l'API URL pour analyser correctement l'URL
+      const url = new URL(window.location.href);
+      const id = url.searchParams.get('id');
+      console.log("ID d'élection trouvé:", id);
+      return id ? parseInt(id) : null;
+    } catch (error) {
+      console.error("Erreur lors de l'extraction de l'ID:", error);
+      return null;
+    }
+  }, []);
   
   const electionId = getElectionId();
   
@@ -70,16 +76,19 @@ const ElectionResultsPage: React.FC = () => {
   }, [allElections, electionId]);
   
   // Si l'ID d'élection est invalide ou non trouvé
+  const [locationPath, setLocation] = useLocation();
+
   useEffect(() => {
     if (!isLoading && (!electionId || !currentElection)) {
+      console.log("Redirection nécessaire. ID non valide:", electionId, "Election trouvée:", !!currentElection);
       // Rediriger vers la page du pays si l'élection n'est pas trouvée
       if (countryCode) {
-        window.location.href = `/elections/${countryCode.toLowerCase()}`;
+        setLocation(`/elections/${countryCode.toLowerCase()}`);
       } else {
-        window.location.href = "/elections";
+        setLocation("/elections");
       }
     }
-  }, [isLoading, electionId, currentElection, countryCode]);
+  }, [isLoading, electionId, currentElection, countryCode, setLocation]);
   
   if (isLoading) {
     return (
