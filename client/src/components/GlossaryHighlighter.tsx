@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PoliticalGlossaryTerm } from "@shared/schema";
 import DOMPurify from 'dompurify';
+import './GlossaryModal.css';
 
 /**
  * Composant qui surligne automatiquement les termes du glossaire dans le contenu
@@ -10,7 +11,6 @@ import DOMPurify from 'dompurify';
 export default function GlossaryHighlighter({ children }: { children: React.ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [activeTerm, setActiveTerm] = useState<PoliticalGlossaryTerm | null>(null);
-  const [dialogPosition, setDialogPosition] = useState({ top: 0, left: 0 });
 
   // Récupérer tous les termes du glossaire
   const { data: glossaryTerms } = useQuery<PoliticalGlossaryTerm[]>({
@@ -21,112 +21,6 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
   // Surligner les termes du glossaire dans le contenu HTML
   useEffect(() => {
     if (!contentRef.current || !glossaryTerms || glossaryTerms.length === 0) return;
-
-    // Créer une feuille de style pour les termes du glossaire
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .glossary-term {
-        position: relative;
-        display: inline;
-        background-color: rgba(59, 130, 246, 0.1);
-        border-bottom: 1px dashed rgba(59, 130, 246, 0.5);
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-      }
-      .glossary-term:hover {
-        background-color: rgba(59, 130, 246, 0.2);
-      }
-      .glossary-dialog {
-        position: fixed;
-        z-index: 50;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 300px;
-        max-width: 90vw;
-        margin: 0 auto;
-        right: auto;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        padding: 1rem;
-        border: 1px solid #e2e8f0;
-      }
-      .glossary-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.4);
-        z-index: 40;
-      }
-      .glossary-close {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: #f1f5f9;
-        border: none;
-        color: #64748b;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-      }
-      .glossary-title {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #3b82f6;
-        margin: 0 0 0.5rem 0;
-        padding-right: 1.5rem;
-        word-break: break-word;
-      }
-      .glossary-category {
-        display: inline-block;
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-        background: #f1f5f9;
-        border-radius: 4px;
-        margin-bottom: 0.5rem;
-      }
-      .glossary-definition {
-        font-size: 0.9rem;
-        margin-bottom: 0.75rem;
-        word-break: break-word;
-      }
-      .glossary-examples {
-        font-size: 0.8rem;
-        padding: 0.5rem;
-        background: #f8fafc;
-        border-radius: 4px;
-        margin-bottom: 0.75rem;
-      }
-      .glossary-footer {
-        font-size: 0.7rem;
-        color: #64748b;
-        text-align: center;
-        margin-bottom: 0.5rem;
-      }
-      .glossary-btn {
-        display: block;
-        width: 100%;
-        padding: 0.5rem;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        cursor: pointer;
-        text-align: center;
-      }
-      .glossary-btn:hover {
-        background: #e2e8f0;
-      }
-    `;
-    document.head.appendChild(style);
 
     // Attendre que le contenu soit rendu
     setTimeout(() => {
@@ -183,9 +77,8 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
       });
     }, 100);
 
-    // Nettoyer les styles lors du démontage
     return () => {
-      document.head.removeChild(style);
+      // Réactiver le défilement au démontage
       document.body.style.overflow = '';
     };
   }, [glossaryTerms]);
@@ -214,18 +107,7 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
       {activeTerm && (
         <>
           <div className="glossary-overlay" onClick={handleClose}></div>
-          <div 
-            className="glossary-dialog"
-            style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)', 
-              width: '300px',
-              maxWidth: '85%',
-              boxSizing: 'border-box'
-            }}
-          >
+          <div className="glossary-dialog">
             <button className="glossary-close" onClick={handleClose}>×</button>
             
             <h3 className="glossary-title">{activeTerm.term}</h3>
