@@ -485,7 +485,7 @@ const AdminElectionsPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <Form {...form}>
-                  <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+                  <form className="space-y-6" id="election-form" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
