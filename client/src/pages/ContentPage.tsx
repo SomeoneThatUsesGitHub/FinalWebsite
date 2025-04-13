@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'wouter';
-import { BookOpen, ChevronLeft, GraduationCap, Calendar, RefreshCw, BookOpenText } from 'lucide-react';
+import { BookOpen, ChevronLeft, GraduationCap, Calendar, RefreshCw, BookOpenText, BrainCircuit } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import MainLayout from '@/components/layout/MainLayout';
 import { pageTransition } from '@/lib/animations';
 import GlossaryHighlighter from '@/components/GlossaryHighlighter';
+import QuizDisplay from '@/components/QuizDisplay';
 
 // Animation avec effet de rebond
 const fadeInWithBounce = {
@@ -203,6 +204,11 @@ const ContentPage: React.FC = () => {
                     }}
                   />
                 </GlossaryHighlighter>
+
+                {/* Intégration des quiz */}
+                {content && (
+                  <QuizDisplay contentId={content.id} />
+                )}
               </CardContent>
             </Card>
           ) : (
