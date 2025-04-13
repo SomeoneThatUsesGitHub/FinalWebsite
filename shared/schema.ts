@@ -151,7 +151,8 @@ export const elections = pgTable("elections", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const insertElectionSchema = createInsertSchema(elections).pick({
+// Création du schéma de base
+const baseInsertElectionSchema = createInsertSchema(elections).pick({
   country: true,
   countryCode: true,
   title: true,
@@ -160,6 +161,15 @@ export const insertElectionSchema = createInsertSchema(elections).pick({
   results: true,
   description: true,
   upcoming: true,
+});
+
+// Modification du schéma pour transformer automatiquement la date
+export const insertElectionSchema = baseInsertElectionSchema.extend({
+  // Accepter une date sous forme de chaîne et la convertir en objet Date
+  date: z.union([
+    z.date(),
+    z.string().transform((str) => new Date(str)),
+  ]),
 });
 
 // Educational Topics schema - for main topics in the "Learn" section
