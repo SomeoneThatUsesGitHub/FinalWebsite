@@ -116,6 +116,8 @@ export interface IStorage {
   getRecentElections(limit?: number): Promise<Election[]>;
   getElectionById(id: number): Promise<Election | undefined>;
   createElection(election: InsertElection): Promise<Election>;
+  updateElection(id: number, data: Partial<InsertElection>): Promise<Election | undefined>;
+  deleteElection(id: number): Promise<boolean>;
   
   // Educational Topics operations
   getAllEducationalTopics(): Promise<EducationalTopic[]>;
@@ -753,12 +755,25 @@ export class DatabaseStorage implements IStorage {
   async createElection(insertElection: InsertElection): Promise<Election> {
     const [election] = await db
       .insert(elections)
-      .values({
-        ...insertElection,
-        imageUrl: insertElection.imageUrl || null
-      })
+      .values(insertElection)
       .returning();
     return election;
+  }
+
+  async updateElection(id: number, data: Partial<InsertElection>): Promise<Election | undefined> {
+    const [updatedElection] = await db
+      .update(elections)
+      .set(data)
+      .where(eq(elections.id, id))
+      .returning();
+    return updatedElection;
+  }
+
+  async deleteElection(id: number): Promise<boolean> {
+    const result = await db
+      .delete(elections)
+      .where(eq(elections.id, id));
+    return result.rowCount > 0;
   }
 
   // Gestion des sujets éducatifs

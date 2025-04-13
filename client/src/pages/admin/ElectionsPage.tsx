@@ -154,7 +154,7 @@ const AdminElectionsPage: React.FC = () => {
     onSuccess: () => {
       toast({
         title: "Élection mise à jour avec succès",
-        variant: "success",
+        variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/elections'] });
       setSelectedElection(null);
@@ -180,7 +180,7 @@ const AdminElectionsPage: React.FC = () => {
     onSuccess: () => {
       toast({
         title: "Élection supprimée avec succès",
-        variant: "success",
+        variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/elections'] });
     },
