@@ -637,81 +637,26 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
                   // Générer un ID unique pour ce carrousel
                   const carouselId = `carousel-${Date.now()}`;
                   
-                  // Créer le HTML du carrousel en utilisant le modèle Flowbite
+                  // Créer une galerie d'images simple sans JavaScript
                   let html = `
-                  <div id="${carouselId}" class="relative w-full max-w-3xl mx-auto my-8 z-0">
-                    <!-- Indicateurs de slides -->
-                    <div class="relative h-56 overflow-hidden rounded-lg md:h-96">
+                  <div class="image-gallery max-w-2xl mx-auto my-8">
+                    <div class="grid grid-cols-1 md:grid-cols-${Math.min(imageUrls.length, 3)} gap-4">
                   `;
                   
-                  // Ajouter les slides
+                  // Ajouter les images comme une grille simple
                   imageUrls.forEach((url, index) => {
                     html += `
-                      <!-- Slide ${index + 1} -->
-                      <div class="${index === 0 ? 'block' : 'hidden'} duration-700 ease-in-out" data-carousel-item>
-                        <img src="${url}" class="absolute block max-w-full h-auto -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Image ${index + 1}">
+                      <div class="image-item rounded-lg shadow-lg overflow-hidden">
+                        <img src="${url}" alt="Image ${index + 1}" class="w-full h-auto object-cover" style="max-height: 300px;">
                       </div>
                     `;
                   });
                   
-                  // Fermer le conteneur des slides et ajouter les contrôles
+                  // Fermer les divs
                   html += `
                     </div>
-                    
-                    <!-- Boutons de navigation -->
-                    <button type="button" class="absolute top-0 left-0 z-20 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
-                      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                        <svg class="w-4 h-4 text-white dark:text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
-                        </svg>
-                        <span class="sr-only">Précédent</span>
-                      </span>
-                    </button>
-                    <button type="button" class="absolute top-0 right-0 z-20 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next>
-                      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                        <svg class="w-4 h-4 text-white dark:text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                        </svg>
-                        <span class="sr-only">Suivant</span>
-                      </span>
-                    </button>
+                    <div class="text-center text-sm text-gray-500 mt-2">Galerie d'images (${imageUrls.length})</div>
                   </div>
-                  
-                  <script>
-                    // Initialiser le carrousel
-                    document.addEventListener('DOMContentLoaded', function() {
-                      // Obtenir toutes les slides
-                      const items = document.querySelectorAll('#${carouselId} [data-carousel-item]');
-                      const prevButton = document.querySelector('#${carouselId} [data-carousel-prev]');
-                      const nextButton = document.querySelector('#${carouselId} [data-carousel-next]');
-                      
-                      if (!items.length) return;
-                      
-                      let activeIndex = 0;
-                      
-                      // Fonction pour afficher une slide
-                      function showSlide(index) {
-                        // Cacher toutes les slides
-                        items.forEach(item => item.classList.add('hidden'));
-                        
-                        // Afficher la slide active
-                        items[index].classList.remove('hidden');
-                        activeIndex = index;
-                      }
-                      
-                      // Gestionnaire pour le bouton précédent
-                      prevButton.addEventListener('click', function() {
-                        activeIndex = (activeIndex - 1 + items.length) % items.length;
-                        showSlide(activeIndex);
-                      });
-                      
-                      // Gestionnaire pour le bouton suivant
-                      nextButton.addEventListener('click', function() {
-                        activeIndex = (activeIndex + 1) % items.length;
-                        showSlide(activeIndex);
-                      });
-                    });
-                  </script>
                   `;
                   
                   // Insérer dans l'éditeur
