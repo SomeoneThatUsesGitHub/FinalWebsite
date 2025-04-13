@@ -154,14 +154,15 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
           />
           
           {/* Contenu du modal */}
-          <div className="fixed z-50 inset-0 flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed z-50 inset-0 flex items-center justify-center p-4 pointer-events-none overflow-y-auto">
             <div 
-              className="w-full max-w-md pointer-events-auto animate-in fade-in zoom-in-95 duration-300"
+              className="w-full max-w-md pointer-events-auto animate-in fade-in zoom-in-95 duration-300 mx-auto"
               style={{
                 maxHeight: 'calc(100vh - 3rem)',
+                maxWidth: 'calc(100vw - 2rem)',
               }}
             >
-              <Card className="border-primary/20 shadow-xl overflow-hidden">
+              <Card className="border-primary/20 shadow-xl overflow-hidden w-full">
                 <div className="absolute top-3 right-3 z-10">
                   <Button 
                     onClick={() => setActiveTerm(null)}
@@ -173,13 +174,13 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
                   </Button>
                 </div>
                 
-                <CardContent className="p-6 pt-5">
-                  <div className="flex flex-col mb-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <h2 className="font-bold text-xl text-primary">{activeTerm.term}</h2>
+                <CardContent className="p-4 pt-6 sm:p-6 sm:pt-5">
+                  <div className="flex flex-col mb-2 sm:mb-4">
+                    <div className="flex items-start mb-2 pr-6">
+                      <h2 className="font-bold text-xl text-primary flex-1 break-words">{activeTerm.term}</h2>
                       
                       {activeTerm.category && (
-                        <Badge variant="outline" className="ml-2 mt-1">
+                        <Badge variant="outline" className="ml-2 mt-1 shrink-0">
                           {activeTerm.category}
                         </Badge>
                       )}
@@ -187,24 +188,25 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
                     
                     <div className="h-1 w-16 bg-primary/20 rounded mb-3" />
                   
-                    <p className="text-base">{activeTerm.definition}</p>
+                    <p className="text-sm sm:text-base">{activeTerm.definition}</p>
                     
                     {activeTerm.examples && (
-                      <div className="mt-4 text-sm bg-muted p-3 rounded-md">
+                      <div className="mt-3 sm:mt-4 text-xs sm:text-sm bg-muted p-2 sm:p-3 rounded-md">
                         <strong>Exemple :</strong> {activeTerm.examples}
                       </div>
                     )}
                   </div>
                 </CardContent>
                 
-                <CardFooter className="p-6 pt-0 flex justify-between items-center">
-                  <p className="text-xs text-muted-foreground">
+                <CardFooter className="p-4 sm:p-6 pt-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                  <p className="text-xs text-muted-foreground order-2 sm:order-1">
                     — Décodeur politique de Politiquensemble
                   </p>
                   
                   <Button 
                     variant="outline" 
-                    size="sm" 
+                    size="sm"
+                    className="ml-auto sm:ml-0 order-1 sm:order-2"
                     onClick={() => setActiveTerm(null)}
                   >
                     Fermer
@@ -215,20 +217,7 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
           </div>
         </>
       )}
-      
-      {/* Bouton flottant pour fermer (version mobile) */}
-      {activeTerm && isMobile && (
-        <div className="fixed bottom-4 inset-x-0 z-[60] flex justify-center">
-          <Button 
-            variant="default"
-            size="lg"
-            className="shadow-xl"
-            onClick={() => setActiveTerm(null)}
-          >
-            Fermer
-          </Button>
-        </div>
-      )}
+
     </div>
   );
 }
