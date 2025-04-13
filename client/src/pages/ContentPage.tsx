@@ -54,7 +54,7 @@ const ContentPage: React.FC = () => {
       if (content.content.includes('instagram-embed-container')) {
         // Créer et charger le script Instagram
         const instagramScript = document.createElement('script');
-        instagramScript.src = '//www.instagram.com/embed.js';
+        instagramScript.src = 'https://www.instagram.com/embed.js';
         instagramScript.async = true;
         instagramScript.defer = true;
         
@@ -67,9 +67,9 @@ const ContentPage: React.FC = () => {
         document.body.appendChild(instagramScript);
         
         // Si 'instgrm' est déjà défini (rechargement), on force le processus d'Instagram
-        if (window.instgrm) {
+        if ((window as any).instgrm) {
           setTimeout(() => {
-            window.instgrm.Embeds.process();
+            (window as any).instgrm.Embeds.process();
           }, 500);
         }
       }
@@ -87,7 +87,7 @@ const ContentPage: React.FC = () => {
         </div>
       ) : content ? (
         <>
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative -mt-6 -mx-4 md:-mx-6 lg:-mx-8">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-16 mb-6 relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
             <div className="container mx-auto px-4">
               {topic && (
                 <div className="max-w-4xl mx-auto mb-6">
