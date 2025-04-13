@@ -79,7 +79,7 @@ const ContentPage: React.FC = () => {
         </div>
       ) : content ? (
         <>
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-16 md:py-24 mb-6 relative -mt-[4.25rem] w-[100vw] left-[calc(-50vw+50%)]">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 py-16 md:py-24 mb-6 relative -mt-[4.25rem] w-screen -mx-4 md:-mx-6 lg:-mx-8">
             <div className="absolute inset-0 bg-pattern opacity-5"></div>
             <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-20 -translate-y-24 translate-x-24"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400 rounded-full filter blur-3xl opacity-20 translate-y-24 -translate-x-24"></div>
