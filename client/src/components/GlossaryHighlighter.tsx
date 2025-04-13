@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PoliticalGlossaryTerm } from "@shared/schema";
 import DOMPurify from 'dompurify';
-import './GlossaryModal.css';
 
 /**
  * Composant qui surligne automatiquement les termes du glossaire dans le contenu
@@ -10,6 +9,7 @@ import './GlossaryModal.css';
  */
 export default function GlossaryHighlighter({ children }: { children: React.ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const [activeTerm, setActiveTerm] = useState<PoliticalGlossaryTerm | null>(null);
 
   // Récupérer tous les termes du glossaire
@@ -18,9 +18,50 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
     refetchOnWindowFocus: false,
   });
 
+  // Gérer l'ouverture et la fermeture du dialog
+  useEffect(() => {
+    if (!dialogRef.current) return;
+    
+    if (activeTerm) {
+      dialogRef.current.showModal();
+    } else {
+      dialogRef.current.close();
+    }
+  }, [activeTerm]);
+
   // Surligner les termes du glossaire dans le contenu HTML
   useEffect(() => {
     if (!contentRef.current || !glossaryTerms || glossaryTerms.length === 0) return;
+
+    // Créer une feuille de style pour les termes du glossaire
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .glossary-term {
+        position: relative;
+        display: inline;
+        background-color: rgba(59, 130, 246, 0.1);
+        border-bottom: 1px dashed rgba(59, 130, 246, 0.5);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+      .glossary-term:hover {
+        background-color: rgba(59, 130, 246, 0.2);
+      }
+      
+      dialog {
+        padding: 1rem;
+        width: 300px;
+        max-width: 90%;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+      
+      dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+    `;
+    document.head.appendChild(style);
 
     // Attendre que le contenu soit rendu
     setTimeout(() => {
@@ -69,26 +110,16 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
           
           if (term) {
             setActiveTerm(term);
-            
-            // Bloquer le défilement
-            document.body.style.overflow = 'hidden';
           }
         });
       });
     }, 100);
 
+    // Nettoyer les styles lors du démontage
     return () => {
-      // Réactiver le défilement au démontage
-      document.body.style.overflow = '';
+      document.head.removeChild(style);
     };
   }, [glossaryTerms]);
-
-  // Réinitialiser le défilement lorsque le modal est fermé
-  useEffect(() => {
-    if (!activeTerm) {
-      document.body.style.overflow = '';
-    }
-  }, [activeTerm]);
 
   const handleClose = () => {
     setActiveTerm(null);
@@ -103,37 +134,103 @@ export default function GlossaryHighlighter({ children }: { children: React.Reac
         {children}
       </div>
       
-      {/* Modal de définition du glossaire */}
-      {activeTerm && (
-        <>
-          <div className="glossary-overlay" onClick={handleClose}></div>
-          <div className="glossary-dialog">
-            <button className="glossary-close" onClick={handleClose}>×</button>
+      {/* Modal natif utilisant l'élément dialog HTML5 */}
+      <dialog ref={dialogRef} onClose={handleClose}>
+        {activeTerm && (
+          <>
+            <div style={{ position: 'absolute', top: '8px', right: '8px' }}>
+              <button 
+                onClick={handleClose}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  background: '#f1f5f9',
+                  border: 'none',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ×
+              </button>
+            </div>
             
-            <h3 className="glossary-title">{activeTerm.term}</h3>
+            <h3 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: 'bold', 
+              color: '#3b82f6', 
+              marginTop: 0,
+              marginBottom: '0.5rem',
+              paddingRight: '1.5rem',
+              wordBreak: 'break-word'
+            }}>
+              {activeTerm.term}
+            </h3>
             
             {activeTerm.category && (
-              <div className="glossary-category">{activeTerm.category}</div>
+              <div style={{
+                display: 'inline-block',
+                fontSize: '0.75rem',
+                padding: '0.25rem 0.5rem',
+                background: '#f1f5f9',
+                borderRadius: '4px',
+                marginBottom: '0.5rem'
+              }}>
+                {activeTerm.category}
+              </div>
             )}
             
-            <p className="glossary-definition">{activeTerm.definition}</p>
+            <p style={{
+              fontSize: '0.9rem',
+              marginBottom: '0.75rem',
+              wordBreak: 'break-word'
+            }}>
+              {activeTerm.definition}
+            </p>
             
             {activeTerm.examples && (
-              <div className="glossary-examples">
+              <div style={{
+                fontSize: '0.8rem',
+                padding: '0.5rem',
+                background: '#f8fafc',
+                borderRadius: '4px',
+                marginBottom: '0.75rem'
+              }}>
                 <strong>Exemple : </strong>{activeTerm.examples}
               </div>
             )}
             
-            <div className="glossary-footer">
+            <div style={{
+              fontSize: '0.7rem',
+              color: '#64748b',
+              textAlign: 'center',
+              marginBottom: '0.5rem'
+            }}>
               Décodeur politique de Politiquensemble
             </div>
             
-            <button className="glossary-btn" onClick={handleClose}>
+            <button 
+              onClick={handleClose}
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '0.5rem',
+                background: '#f1f5f9',
+                border: '1px solid #e2e8f0',
+                borderRadius: '4px',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                textAlign: 'center'
+              }}
+            >
               Fermer
             </button>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </dialog>
     </div>
   );
 }
