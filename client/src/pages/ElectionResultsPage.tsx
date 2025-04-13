@@ -44,25 +44,12 @@ const fadeInWithBounce = {
 };
 
 const ElectionResultsPage: React.FC = () => {
-  const [routeMatched, params] = useRoute('/elections/:countryCode/resultats');
+  const [routeMatched, params] = useRoute('/elections/:countryCode/resultats/:id');
   const countryCode = params?.countryCode.toUpperCase();
   const [location] = useLocation();
   
   // Extraire l'ID de l'élection à partir des paramètres d'URL
-  const getElectionId = useCallback(() => {
-    try {
-      // Utiliser l'API URL pour analyser correctement l'URL
-      const url = new URL(window.location.href);
-      const id = url.searchParams.get('id');
-      console.log("ID d'élection trouvé:", id);
-      return id ? parseInt(id) : null;
-    } catch (error) {
-      console.error("Erreur lors de l'extraction de l'ID:", error);
-      return null;
-    }
-  }, []);
-  
-  const electionId = getElectionId();
+  const electionId = params?.id ? parseInt(params.id) : null;
   
   // Récupérer toutes les élections
   const { data: allElections, isLoading } = useQuery<Election[]>({
@@ -222,8 +209,8 @@ const ElectionResultsPage: React.FC = () => {
           {!upcoming && electionData.results.length > 0 ? (
             <div className="space-y-4">
               <div>
-                <h2 className="text-2xl font-bold mb-4">Résultats des élections</h2>
-                <div className="h-[450px] mb-4">
+                <h2 className="text-2xl font-bold mb-2">Résultats des élections</h2>
+                <div className="h-[400px] mb-2">
                   <ElectionResultsChart data={{...electionData, title: '', date: '', type: ''}} />
                 </div>
               </div>
@@ -266,6 +253,54 @@ const ElectionResultsPage: React.FC = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Section des réactions */}
+              <Card className="mt-8">
+                <CardHeader>
+                  <CardTitle>Réactions</CardTitle>
+                  <CardDescription>Partagez votre opinion sur les résultats de cette élection</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex flex-col gap-2">
+                      <textarea 
+                        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Partagez votre réaction..."
+                        rows={4}
+                      />
+                      <div className="flex justify-end">
+                        <Button>Publier</Button>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-8 space-y-4">
+                      <h3 className="font-semibold text-lg mb-2">Commentaires récents</h3>
+                      
+                      <div className="space-y-4">
+                        {/* Liste des réactions (simulée pour le moment) */}
+                        {[1, 2, 3].map((_, i) => (
+                          <div key={i} className="p-4 border rounded-lg bg-gray-50">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
+                                {String.fromCharCode(65 + i)}
+                              </div>
+                              <div>
+                                <p className="font-medium">Utilisateur {i + 1}</p>
+                                <p className="text-xs text-gray-500">il y a {i + 1} heure{i !== 0 ? 's' : ''}</p>
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-700">
+                              {i === 0 && "Ces résultats sont très intéressants, je suis surpris par la performance du candidat en tête."}
+                              {i === 1 && "Je m'attendais à un résultat plus serré. Les chiffres sont éloquents !"}
+                              {i === 2 && "Une élection historique qui marque un tournant important."}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
