@@ -20,6 +20,7 @@ import LiveCoveragePage from "@/pages/LiveCoveragePage";
 import LearnPage from "@/pages/LearnPage";
 import TopicPage from "@/pages/TopicPage";
 import ContentPage from "@/pages/ContentPage";
+import ElectionsPage from "@/pages/ElectionsPage";
 
 // Pages admin
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -94,6 +95,7 @@ function App() {
               <Route path="/apprendre" component={LearnPage} />
               <Route path="/apprendre/:slug" component={TopicPage} />
               <Route path="/apprendre/:topicSlug/:contentSlug" component={ContentPage} />
+              <Route path="/elections" component={ElectionsPage} />
               
               {/* Routes admin protégées - accessibles aux admins et éditeurs */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
