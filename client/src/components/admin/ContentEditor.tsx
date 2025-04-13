@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo, Heading1, Heading2, Heading3, Minus, Image as ImageIcon, ImagesIcon } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo, Heading1, Heading2, Heading3, Minus, Image as ImageIcon, Images as ImagesIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
@@ -219,142 +219,172 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
   
   const insertCarousel = () => {
     if (carouselImages.length > 0 && editor) {
-      // Créer un conteneur de carrousel
+      // Créer un conteneur principal pour le carrousel
+      const wrapper = document.createElement('div');
+      wrapper.className = 'image-carousel-wrapper my-8 relative w-full max-w-3xl mx-auto';
+      
+      // Conteneur principal du carrousel avec position relative pour positionner les contrôles
       const carouselContainer = document.createElement('div');
-      carouselContainer.className = 'carousel-container my-8 overflow-hidden rounded-lg shadow-lg';
+      carouselContainer.className = 'relative overflow-hidden rounded-lg shadow-lg';
+      carouselContainer.style.minHeight = '300px';
       
-      // Ajouter une classe CSS spéciale pour le styling du carrousel
-      carouselContainer.classList.add('image-carousel');
+      // Conteneur pour les slides
+      const slidesContainer = document.createElement('div');
+      slidesContainer.className = 'flex transition-transform duration-500';
+      slidesContainer.id = `carousel-${uuidv4().substring(0, 8)}`;
+      slidesContainer.dataset.currentSlide = '0';
+      slidesContainer.dataset.totalSlides = carouselImages.length.toString();
       
-      // Conteneur pour les images du carrousel
-      const carouselInner = document.createElement('div');
-      carouselInner.className = 'carousel-inner flex flex-nowrap';
-      carouselInner.setAttribute('data-carousel', 'true');
-      
-      // Ajouter chaque image au carrousel
+      // Ajouter les images au carrousel
       carouselImages.forEach((image, index) => {
         const slide = document.createElement('div');
-        slide.className = 'carousel-item flex-shrink-0 w-full';
-        slide.setAttribute('data-slide-index', index.toString());
-        
-        const imgContainer = document.createElement('div');
-        imgContainer.className = 'relative aspect-video';
+        slide.className = 'w-full flex-shrink-0';
+        slide.style.minWidth = '100%';
         
         const img = document.createElement('img');
         img.src = image.url;
-        img.alt = `Image ${index + 1} du carrousel`;
-        img.className = 'w-full h-full object-cover';
+        img.alt = image.caption || `Image ${index + 1}`;
+        img.className = 'w-full h-auto object-contain';
+        img.style.maxHeight = '500px';
         
+        slide.appendChild(img);
+        
+        // Ajouter une légende si elle existe
         if (image.caption) {
-          const captionDiv = document.createElement('div');
-          captionDiv.className = 'absolute bottom-0 left-0 right-0 bg-black/60 text-white p-2 text-sm';
-          captionDiv.textContent = image.caption;
-          imgContainer.appendChild(captionDiv);
+          const caption = document.createElement('div');
+          caption.className = 'absolute bottom-0 left-0 right-0 bg-black/60 text-white p-3 text-sm';
+          caption.textContent = image.caption;
+          slide.appendChild(caption);
         }
         
-        imgContainer.appendChild(img);
-        slide.appendChild(imgContainer);
-        carouselInner.appendChild(slide);
+        slidesContainer.appendChild(slide);
       });
       
-      carouselContainer.appendChild(carouselInner);
+      carouselContainer.appendChild(slidesContainer);
       
-      // Ajouter les contrôles de navigation du carrousel
-      const controls = document.createElement('div');
-      controls.className = 'carousel-controls flex justify-between absolute top-1/2 left-0 right-0 -translate-y-1/2 px-4';
-      
+      // Boutons de navigation (précédent/suivant)
       const prevButton = document.createElement('button');
-      prevButton.className = 'carousel-prev bg-white/80 hover:bg-white rounded-full p-2 shadow-md';
+      prevButton.className = 'absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-2 shadow-md z-10';
       prevButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
-      prevButton.setAttribute('data-carousel-prev', 'true');
+      prevButton.dataset.action = 'prev';
       
       const nextButton = document.createElement('button');
-      nextButton.className = 'carousel-next bg-white/80 hover:bg-white rounded-full p-2 shadow-md';
+      nextButton.className = 'absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-2 shadow-md z-10';
       nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-      nextButton.setAttribute('data-carousel-next', 'true');
+      nextButton.dataset.action = 'next';
       
-      controls.appendChild(prevButton);
-      controls.appendChild(nextButton);
+      carouselContainer.appendChild(prevButton);
+      carouselContainer.appendChild(nextButton);
       
-      carouselContainer.appendChild(controls);
-      
-      // Ajouter des indicateurs
+      // Indicateurs de position
       const indicators = document.createElement('div');
-      indicators.className = 'carousel-indicators flex justify-center mt-2 gap-1';
+      indicators.className = 'absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10';
       
-      carouselImages.forEach((_, index) => {
+      for (let i = 0; i < carouselImages.length; i++) {
         const dot = document.createElement('button');
-        dot.className = 'w-2 h-2 rounded-full bg-gray-300';
-        dot.setAttribute('data-carousel-indicator', index.toString());
-        if (index === 0) dot.classList.add('bg-primary');
+        dot.className = i === 0 
+          ? 'w-3 h-3 rounded-full bg-primary transition-all' 
+          : 'w-3 h-3 rounded-full bg-gray-300 transition-all';
+        dot.dataset.index = i.toString();
+        dot.dataset.action = 'goto';
         indicators.appendChild(dot);
-      });
+      }
       
-      carouselContainer.appendChild(indicators);
+      if (carouselImages.length > 1) {
+        carouselContainer.appendChild(indicators);
+      }
       
-      // Ajouter un petit script qui sera inclus dans le HTML pour faire fonctionner le carrousel
-      const carouselScript = document.createElement('script');
-      carouselScript.setAttribute('type', 'text/javascript');
-      carouselScript.textContent = `
-        document.addEventListener('DOMContentLoaded', function() {
-          const carousels = document.querySelectorAll('[data-carousel="true"]');
+      wrapper.appendChild(carouselContainer);
+      
+      // Script pour faire fonctionner le carrousel
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.textContent = `
+      document.addEventListener('DOMContentLoaded', function() {
+        const carouselId = '${slidesContainer.id}';
+        const slidesContainer = document.getElementById(carouselId);
+        
+        if (!slidesContainer) return;
+        
+        const carousel = slidesContainer.closest('.image-carousel-wrapper');
+        const slides = slidesContainer.children;
+        const totalSlides = parseInt(slidesContainer.dataset.totalSlides || '0');
+        
+        if (!carousel || totalSlides <= 0) return;
+        
+        let currentIndex = 0;
+        
+        // Fonction pour afficher un slide spécifique
+        function goToSlide(index) {
+          if (index < 0) index = totalSlides - 1;
+          if (index >= totalSlides) index = 0;
           
-          carousels.forEach(carousel => {
-            const container = carousel.closest('.carousel-container');
-            const slides = carousel.querySelectorAll('[data-slide-index]');
-            const prevBtn = container.querySelector('[data-carousel-prev]');
-            const nextBtn = container.querySelector('[data-carousel-next]');
-            const indicators = container.querySelectorAll('[data-carousel-indicator]');
-            
-            let currentIndex = 0;
-            
-            function showSlide(index) {
-              if (index < 0) index = slides.length - 1;
-              if (index >= slides.length) index = 0;
-              
-              currentIndex = index;
-              
-              slides.forEach((slide, i) => {
-                slide.style.transform = \`translateX(\${(i - currentIndex) * 100}%)\`;
-              });
-              
-              indicators.forEach((dot, i) => {
-                dot.classList.toggle('bg-primary', i === currentIndex);
-                dot.classList.toggle('bg-gray-300', i !== currentIndex);
-              });
+          currentIndex = index;
+          slidesContainer.style.transform = \`translateX(-\${currentIndex * 100}%)\`;
+          
+          // Mettre à jour les indicateurs
+          const dots = carousel.querySelectorAll('[data-action="goto"]');
+          dots.forEach((dot, i) => {
+            if (i === currentIndex) {
+              dot.classList.remove('bg-gray-300');
+              dot.classList.add('bg-primary');
+            } else {
+              dot.classList.remove('bg-primary');
+              dot.classList.add('bg-gray-300');
             }
-            
-            // Initialize
-            slides.forEach((slide, i) => {
-              slide.style.transform = \`translateX(\${(i - currentIndex) * 100}%)\`;
-            });
-            
-            // Add event listeners
-            prevBtn.addEventListener('click', () => showSlide(currentIndex - 1));
-            nextBtn.addEventListener('click', () => showSlide(currentIndex + 1));
-            
-            indicators.forEach((dot, i) => {
-              dot.addEventListener('click', () => showSlide(i));
-            });
+          });
+        }
+        
+        // Ajouter les écouteurs d'événements
+        const prevBtn = carousel.querySelector('[data-action="prev"]');
+        const nextBtn = carousel.querySelector('[data-action="next"]');
+        
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            goToSlide(currentIndex - 1);
+          });
+        }
+        
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            goToSlide(currentIndex + 1);
+          });
+        }
+        
+        // Ajouter les écouteurs sur les indicateurs
+        const dots = carousel.querySelectorAll('[data-action="goto"]');
+        dots.forEach((dot) => {
+          dot.addEventListener('click', function() {
+            const index = parseInt(this.dataset.index || '0');
+            goToSlide(index);
           });
         });
+        
+        // Initialiser le premier slide
+        goToSlide(0);
+      });
       `;
       
-      const carouselStyle = document.createElement('style');
-      carouselStyle.textContent = `
-        .carousel-container { position: relative; }
-        .carousel-inner { transition: transform 0.5s ease; }
-        .carousel-item { transition: transform 0.5s ease; position: relative; }
+      // Créer un style spécifique pour ce carrousel
+      const style = document.createElement('style');
+      style.textContent = `
+        .image-carousel-wrapper {
+          position: relative;
+          margin: 2rem auto;
+        }
+        
+        .image-carousel-wrapper img {
+          display: block;
+          max-width: 100%;
+          height: auto;
+          margin: 0 auto;
+        }
       `;
       
-      // Créer un wrapper pour contenir tout
-      const wrapper = document.createElement('div');
-      wrapper.className = 'carousel-wrapper mb-8';
-      wrapper.appendChild(carouselContainer);
-      wrapper.appendChild(carouselScript);
-      wrapper.appendChild(carouselStyle);
+      wrapper.appendChild(script);
+      wrapper.appendChild(style);
       
-      // Insérer dans l'éditeur
+      // Insérer le carrousel dans l'éditeur
       editor.chain().focus().insertContent(wrapper.outerHTML).run();
       
       // Fermer le dialogue
