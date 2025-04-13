@@ -49,6 +49,60 @@
   z-index: 1;
 }
 
+/* Styles pour le carrousel d'images */
+.image-carousel {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  max-width: 100%;
+  margin: 2rem auto;
+}
+
+.carousel-inner {
+  display: flex;
+  flex-wrap: nowrap;
+  transition: transform 0.5s ease;
+}
+
+.carousel-item {
+  flex: 0 0 100%;
+  max-width: 100%;
+  position: relative;
+  transition: transform 0.5s ease;
+}
+
+.carousel-controls button {
+  opacity: 0.8;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.carousel-controls button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.carousel-indicators button {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.carousel-indicators button:hover {
+  transform: scale(1.2);
+}
+
+/* Animation pour améliorer la transition entre les diapositives */
+@keyframes fadeSlide {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+.carousel-item img {
+  animation: fadeSlide 0.5s ease-in-out;
+}
+
 .milestone-card {
   position: relative;
   background-color: white;
