@@ -54,6 +54,8 @@ const electionFormSchema = z.object({
   date: z.string().min(1, "La date est requise"),
   type: z.string().min(1, "Le type d'élection est requis"),
   description: z.string().optional(),
+  // Option "upcoming" supprimée de l'interface utilisateur mais maintenue
+  // dans le schéma pour rétrocompatibilité avec l'API existante
   upcoming: z.boolean().default(false),
 });
 
@@ -590,27 +592,7 @@ const AdminElectionsPage: React.FC = () => {
                       )}
                     />
                     
-                    <FormField
-                      control={form.control}
-                      name="upcoming"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                          <div className="space-y-0.5">
-                            <FormLabel>Élection à venir</FormLabel>
-                            <FormDescription>
-                              Activez cette option si l'élection n'a pas encore eu lieu
-                            </FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {/* L'option "Élection à venir" a été supprimée conformément à la nouvelle structure */}
                     
                     <div className="flex justify-end">
                       <Button type="submit" disabled={createElectionMutation.isPending || updateElectionMutation.isPending}>
