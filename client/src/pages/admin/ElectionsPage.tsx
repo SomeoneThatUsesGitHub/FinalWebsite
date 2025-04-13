@@ -112,7 +112,7 @@ const AdminElectionsPage: React.FC = () => {
       country: '',
       countryCode: '',
       title: '',
-      date: new Date(),
+      date: format(new Date(), 'dd MMMM yyyy'),
       type: '',
       description: '',
       upcoming: false,
@@ -254,7 +254,7 @@ const AdminElectionsPage: React.FC = () => {
       country: election.country,
       countryCode: election.countryCode,
       title: election.title,
-      date: new Date(election.date),
+      date: election.date, // Maintenant une chaîne de caractères
       type: election.type,
       description: election.description || '',
       upcoming: election.upcoming,
@@ -545,33 +545,14 @@ const AdminElectionsPage: React.FC = () => {
                         control={form.control}
                         name="date"
                         render={({ field }) => (
-                          <FormItem className="flex flex-col">
+                          <FormItem>
                             <FormLabel>Date de l'élection</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={"outline"}
-                                    className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {field.value ? (
-                                      format(field.value, "d MMMM yyyy", { locale: fr })
-                                    ) : (
-                                      <span>Sélectionner une date</span>
-                                    )}
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  locale={fr}
-                                />
-                              </PopoverContent>
-                            </Popover>
+                            <FormControl>
+                              <Input placeholder="12 mai 2023" {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              Format libre (ex: 12 mai 2023)
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}

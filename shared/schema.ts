@@ -143,7 +143,7 @@ export const elections = pgTable("elections", {
   country: text("country").notNull(),
   countryCode: text("country_code").notNull(),
   title: text("title").notNull(),
-  date: timestamp("date").notNull(),
+  date: text("date").notNull(), // Maintenant une chaîne de caractères
   type: text("type").notNull(), // presidential, legislative, local, etc.
   results: json("results").notNull(),
   description: text("description"),
@@ -163,26 +163,10 @@ const baseInsertElectionSchema = createInsertSchema(elections).pick({
   upcoming: true,
 });
 
-// Modification du schéma pour transformer automatiquement la date
+// Modification du schéma pour accepter une chaîne de texte
 export const insertElectionSchema = baseInsertElectionSchema.extend({
-  // Accepter différents formats de date et les convertir en objet Date
-  date: z.preprocess((val) => {
-    // Si c'est déjà une date, retourner directement
-    if (val instanceof Date) return val;
-    
-    // Si c'est une chaîne de caractères, essayer de la convertir
-    if (typeof val === 'string') {
-      const date = new Date(val);
-      // Vérifier si la date est valide
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    }
-    
-    // Si la conversion a échoué, retourner la valeur d'origine
-    // (elle sera rejetée par le validateur de date)
-    return val;
-  }, z.date()),
+  // Accepter une chaîne de caractères pour la date
+  date: z.string().min(1, "La date est requise"),
 });
 
 // Educational Topics schema - for main topics in the "Learn" section
