@@ -755,13 +755,13 @@ export default function EditArticlePage() {
   // Récupération des catégories pour les sélecteurs
   const { data: categories, isLoading: isCategoriesLoading, error: categoriesError } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
   });
   
   // Récupération de l'article à modifier, si on est en mode édition
   const { data: article, isLoading: isArticleLoading, error: articleError } = useQuery<Article>({
     queryKey: ["/api/admin/articles", articleId],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!articleId, // Ne pas exécuter la requête si on est en mode création
   });
   
