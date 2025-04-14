@@ -1,0 +1,15 @@
+              <div className="space-y-2">
+                <Label htmlFor="sources">Sources consultées</Label>
+                <Textarea
+                  id="sources"
+                  placeholder="Par exemple: Le Monde (https://www.lemonde.fr/article), INSEE (https://www.insee.fr/donnees)..."
+                  rows={3}
+                  {...form.register("sources")}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Ces sources seront affichées en bas de l'article. Séparez chaque source par une nouvelle ligne.
+                </p>
+                {form.formState.errors.sources && (
+                  <p className="text-sm text-red-500">{form.formState.errors.sources.message}</p>
+                )}
+              </div>
