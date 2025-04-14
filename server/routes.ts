@@ -971,11 +971,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         featured: req.body.featured === true || req.body.featured === "true"
       };
       
-      // Préserver l'authorId de l'article original s'il n'est pas fourni dans la requête
-      if (!updateData.authorId && currentArticle.authorId) {
-        updateData.authorId = currentArticle.authorId;
-      }
-      
       console.log("Données validées pour mise à jour:", updateData);
       
       const updatedArticle = await storage.updateArticle(Number(id), updateData);

@@ -28,6 +28,7 @@ const articleFormSchema = insertArticleSchema
       .regex(/^[a-z0-9-]+$/, "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets"),
     content: z.string().min(20, "Le contenu doit contenir au moins 20 caractères"),
     imageUrl: z.string().url("Veuillez fournir une URL d'image valide").nullable().optional(),
+    sources: z.string().optional(), // Ajout du champ sources comme optionnel
     categoryId: z.number().or(z.string().transform(val => parseInt(val, 10))),
     published: z.boolean().default(false),
     featured: z.boolean().default(false),
@@ -50,6 +51,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
       excerpt: "",
       content: "",
       imageUrl: "",
+      sources: "",
       categoryId: 1,
       published: false,
       featured: false,
@@ -232,6 +234,20 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                 )}
               </div>
               
+
+              <div className="space-y-2">
+                <Label htmlFor="sources">Sources</Label>
+                <Textarea
+                  id="sources"
+                  placeholder="Sources et références utilisées pour la rédaction de l'article (ex: AFP, Le Monde, etc.)"
+                  rows={2}
+                  {...form.register("sources")}
+                />
+                {form.formState.errors.sources && (
+                  <p className="text-sm text-red-500">{form.formState.errors.sources.message}</p>
+                )}
+              </div>
+
               <Tabs defaultValue="editor" className="w-full">
                 <TabsList className="w-full grid grid-cols-2">
                   <TabsTrigger value="editor">Éditeur</TabsTrigger>
@@ -405,6 +421,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       excerpt: article.excerpt || "",
       content: article.content || "",
       imageUrl: article.imageUrl || "",
+      sources: article.sources || "",
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
@@ -421,6 +438,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       excerpt: article.excerpt || "",
       content: article.content || "",
       imageUrl: article.imageUrl || "",
+      sources: article.sources || "",
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
@@ -579,6 +597,20 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 {form.formState.errors.excerpt && (
                   <p className="text-sm text-red-500">{form.formState.errors.excerpt.message}</p>
                 )}
+
+              <div className="space-y-2">
+                <Label htmlFor="sources">Sources</Label>
+                <Textarea
+                  id="sources"
+                  placeholder="Sources et références utilisées pour la rédaction de l'article (ex: AFP, Le Monde, etc.)"
+                  rows={2}
+                  {...form.register("sources")}
+                />
+                {form.formState.errors.sources && (
+                  <p className="text-sm text-red-500">{form.formState.errors.sources.message}</p>
+                )}
+              </div>
+
               </div>
               
               <div className="space-y-2">
