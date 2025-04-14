@@ -4,6 +4,7 @@ import { pageTransition } from "@/lib/animations";
 import HeroSection from "@/components/home/HeroSection";
 import NewsWall from "@/components/home/NewsWall";
 import VideosSection from "@/components/home/VideosSection";
+import SiteAlerts from "@/components/home/SiteAlerts";
 
 import { Helmet } from "react-helmet";
 import { Link } from "wouter";
@@ -21,6 +22,9 @@ const Home: React.FC = () => {
         <meta name="description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans." />
       </Helmet>
       
+      <div className="container mx-auto px-4 md:px-6 pt-4">
+        <SiteAlerts />
+      </div>
       <HeroSection />
       <NewsWall />
       <VideosSection />
