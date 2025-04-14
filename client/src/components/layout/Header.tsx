@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { mobileMenu } from "@/lib/animations";
-import { Menu, X, MessageCircle } from "lucide-react";
+import { Menu, X, MessageCircle, Mail } from "lucide-react";
 
 const NavItem: React.FC<{ href: string; label: string; active: boolean; highlighted?: boolean }> = ({ 
   href, 
@@ -92,19 +92,39 @@ const Header: React.FC = () => {
             animate="visible"
             exit="exit"
           >
-            <nav className="flex flex-col space-y-3 py-4 px-6">
-              {navItems.map((item) => (
+            <nav className="flex flex-col space-y-1 py-2 px-4">
+              {/* Autres liens de navigation */}
+              {navItems.slice(0, 6).map((item) => (
                 <Link key={item.href} href={item.href}>
                   <div 
-                    className={`py-2 px-4 rounded-md cursor-pointer ${item.active ? "bg-blue-50 text-blue-600" : "text-gray-700"}`}
+                    className={`py-1.5 px-3 rounded-md cursor-pointer flex items-center ${
+                      item.active 
+                        ? "bg-blue-50 text-blue-600 font-medium" 
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.label}
+                    {item.active && <span className="ml-2 h-1.5 w-1.5 rounded-full bg-blue-600"></span>}
                   </div>
                 </Link>
               ))}
               
-
+              {/* Séparateur */}
+              <div className="border-t border-gray-200 my-1"></div>
+              
+              {/* Bouton Contact spécial */}
+              <div className="mt-1 px-1">
+                <Link href="/contact">
+                  <div 
+                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors cursor-pointer shadow-sm"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Mail size={18} />
+                    <span className="font-medium">Contact</span>
+                  </div>
+                </Link>
+              </div>
             </nav>
           </motion.div>
         )}
