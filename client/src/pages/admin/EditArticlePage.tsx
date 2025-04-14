@@ -467,6 +467,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
         published: Boolean(data.published),
         featured: Boolean(data.featured),
         imageUrl: data.imageUrl || null,
+        authorId: article.authorId, // Conserver l'ID de l'auteur original
       };
       console.log("Données pour mise à jour:", formattedData);
       
