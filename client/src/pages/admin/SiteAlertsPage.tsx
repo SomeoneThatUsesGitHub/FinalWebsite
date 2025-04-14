@@ -38,7 +38,7 @@ const siteAlertSchema = z.object({
 
 type SiteAlert = {
   id: number;
-  message: string;
+  content: string;
   active: boolean;
   priority: number;
   backgroundColor: string;
@@ -71,7 +71,7 @@ const SiteAlertsPage = () => {
   const createForm = useForm<z.infer<typeof siteAlertSchema>>({
     resolver: zodResolver(siteAlertSchema),
     defaultValues: {
-      message: "",
+      content: "",
       backgroundColor: "#dc2626",
       textColor: "#ffffff",
       url: "",
@@ -84,7 +84,7 @@ const SiteAlertsPage = () => {
   const editForm = useForm<z.infer<typeof siteAlertSchema>>({
     resolver: zodResolver(siteAlertSchema),
     defaultValues: {
-      message: "",
+      content: "",
       backgroundColor: "#dc2626",
       textColor: "#ffffff",
       url: "",
@@ -211,7 +211,7 @@ const SiteAlertsPage = () => {
   const openEditDialog = (alert: SiteAlert) => {
     setSelectedAlert(alert);
     editForm.reset({
-      message: alert.message,
+      content: alert.content,
       backgroundColor: alert.backgroundColor,
       textColor: alert.textColor,
       url: alert.url || "",
@@ -329,7 +329,7 @@ const SiteAlertsPage = () => {
                 <form onSubmit={createForm.handleSubmit(onCreateSubmit)} className="space-y-6">
                   <FormField
                     control={createForm.control}
-                    name="message"
+                    name="content"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Message</FormLabel>
@@ -474,7 +474,7 @@ const SiteAlertsPage = () => {
         </div>
 
         {/* Prévisualisation d'une alerte */}
-        {createForm.watch("message") && (
+        {createForm.watch("content") && (
           <div className="mb-6">
             <p className="text-sm text-muted-foreground mb-2">Prévisualisation :</p>
             <div 
@@ -486,7 +486,7 @@ const SiteAlertsPage = () => {
             >
               <div className="flex items-center justify-center gap-2">
                 <BellRing className="h-4 w-4" />
-                <span>{createForm.watch("message")}</span>
+                <span>{createForm.watch("content")}</span>
                 {createForm.watch("url") && (
                   <span className="text-xs underline">En savoir plus</span>
                 )}
@@ -547,7 +547,7 @@ const SiteAlertsPage = () => {
                   >
                     <div className="flex items-center justify-center gap-2">
                       <BellRing className="h-4 w-4" />
-                      <span>{alert.message}</span>
+                      <span>{alert.content}</span>
                       {alert.url && (
                         <span className="text-xs underline">En savoir plus</span>
                       )}
@@ -632,7 +632,7 @@ const SiteAlertsPage = () => {
             <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-6">
               <FormField
                 control={editForm.control}
-                name="message"
+                name="content"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Message</FormLabel>
@@ -768,7 +768,7 @@ const SiteAlertsPage = () => {
                 >
                   <div className="flex items-center justify-center gap-2">
                     <BellRing className="h-4 w-4" />
-                    <span>{editForm.watch("message")}</span>
+                    <span>{editForm.watch("content")}</span>
                     {editForm.watch("url") && (
                       <span className="text-xs underline">En savoir plus</span>
                     )}
