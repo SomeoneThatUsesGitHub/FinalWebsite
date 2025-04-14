@@ -234,6 +234,20 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                 )}
               </div>
               
+
+              <div className="space-y-2">
+                <Label htmlFor="sources">Sources</Label>
+                <Textarea
+                  id="sources"
+                  placeholder="Sources et références utilisées pour la rédaction de l'article (ex: AFP, Le Monde, etc.)"
+                  rows={2}
+                  {...form.register("sources")}
+                />
+                {form.formState.errors.sources && (
+                  <p className="text-sm text-red-500">{form.formState.errors.sources.message}</p>
+                )}
+              </div>
+
               <Tabs defaultValue="editor" className="w-full">
                 <TabsList className="w-full grid grid-cols-2">
                   <TabsTrigger value="editor">Éditeur</TabsTrigger>
@@ -583,6 +597,20 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 {form.formState.errors.excerpt && (
                   <p className="text-sm text-red-500">{form.formState.errors.excerpt.message}</p>
                 )}
+
+              <div className="space-y-2">
+                <Label htmlFor="sources">Sources</Label>
+                <Textarea
+                  id="sources"
+                  placeholder="Sources et références utilisées pour la rédaction de l'article (ex: AFP, Le Monde, etc.)"
+                  rows={2}
+                  {...form.register("sources")}
+                />
+                {form.formState.errors.sources && (
+                  <p className="text-sm text-red-500">{form.formState.errors.sources.message}</p>
+                )}
+              </div>
+
               </div>
               
               <div className="space-y-2">
