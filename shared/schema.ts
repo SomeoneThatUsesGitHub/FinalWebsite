@@ -502,3 +502,27 @@ export const insertElectionReactionSchema = createInsertSchema(electionReactions
 
 export type InsertElectionReaction = z.infer<typeof insertElectionReactionSchema>;
 export type ElectionReaction = typeof electionReactions.$inferSelect;
+
+// Alertes pour la bannière d'en-tête de la page d'accueil
+export const siteAlerts = pgTable("site_alerts", {
+  id: serial("id").primaryKey(),
+  content: text("content").notNull(),
+  active: boolean("active").notNull().default(true),
+  priority: integer("priority").notNull().default(1), // Plus la valeur est élevée, plus l'alerte est prioritaire
+  backgroundColor: text("background_color").notNull().default("#dc2626"), // Couleur d'arrière-plan par défaut (rouge)
+  textColor: text("text_color").notNull().default("#ffffff"), // Couleur de texte par défaut (blanc)
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdBy: integer("created_by").references(() => users.id),
+});
+
+export const insertSiteAlertSchema = createInsertSchema(siteAlerts).pick({
+  content: true,
+  active: true,
+  priority: true,
+  backgroundColor: true,
+  textColor: true,
+  createdBy: true,
+});
+
+export type SiteAlert = typeof siteAlerts.$inferSelect;
+export type InsertSiteAlert = z.infer<typeof insertSiteAlertSchema>;
