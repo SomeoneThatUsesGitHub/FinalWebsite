@@ -41,7 +41,7 @@ const LegalPage: React.FC = () => {
               <h2 className="text-xl font-semibold">Données personnelles :</h2>
               <p>
                 Ce site peut collecter et utiliser des données personnelles conformément à notre politique de confidentialité, 
-                que vous pouvez consulter <a href="/privacy" className="text-blue-600 hover:underline">ici</a>.
+                que vous pouvez consulter <a href="/confidentialite" className="text-blue-600 hover:underline">ici</a>.
               </p>
             </div>
             
@@ -50,7 +50,7 @@ const LegalPage: React.FC = () => {
               <p>
                 Ce site peut utiliser des cookies pour améliorer l'expérience de l'utilisateur. 
                 Pour en savoir plus sur l'utilisation des cookies, veuillez consulter notre politique en matière de cookies 
-                en cliquant <a href="/privacy" className="text-blue-600 hover:underline">ici</a>.
+                en cliquant <a href="/confidentialite" className="text-blue-600 hover:underline">ici</a>.
               </p>
             </div>
             

@@ -100,11 +100,11 @@ export const Footer: React.FC = () => {
             <h3 className="text-lg font-bold mb-3">Menu</h3>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
               <Link href="/" className="text-gray-400 hover:text-white transition-colors duration-300">Accueil</Link>
-              <Link href="/about" className="text-gray-400 hover:text-white transition-colors duration-300">À propos</Link>
+              <Link href="/a-propos" className="text-gray-400 hover:text-white transition-colors duration-300">À propos</Link>
               <Link href="/team" className="text-gray-400 hover:text-white transition-colors duration-300">Notre équipe</Link>
               <Link href="/articles" className="text-gray-400 hover:text-white transition-colors duration-300">Articles</Link>
               <Link href="/elections" className="text-gray-400 hover:text-white transition-colors duration-300">Élections</Link>
-              <Link href="/learn" className="text-gray-400 hover:text-white transition-colors duration-300">Apprentissage</Link>
+              <Link href="/apprendre" className="text-gray-400 hover:text-white transition-colors duration-300">Apprentissage</Link>
             </div>
           </div>
           
