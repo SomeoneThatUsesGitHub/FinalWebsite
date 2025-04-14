@@ -10,7 +10,7 @@ import {
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
   insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema, insertTeamApplicationSchema,
   insertContactMessageSchema, insertEducationalTopicSchema, insertEducationalContentSchema,
-  insertEducationalQuizSchema, insertElectionSchema
+  insertEducationalQuizSchema, insertElectionSchema, electionReactions, insertElectionReactionSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -2524,6 +2524,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erreur lors de la suppression du terme:", error);
       res.status(500).json({ message: "Erreur lors de la suppression du terme" });
+    }
+  });
+
+  // API pour les réactions aux élections
+  app.get("/api/elections/:electionId/reactions", async (req: Request, res: Response) => {
+    try {
+      const { electionId } = req.params;
+      
+      if (isNaN(Number(electionId))) {
+        return res.status(400).json({ message: "ID d'élection invalide" });
+      }
+      
+      const reactions = await db.select().from(electionReactions)
+        .where(eq(electionReactions.electionId, Number(electionId)))
+        .orderBy(electionReactions.createdAt, 'desc');
+      
+      res.json(reactions);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des réactions:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des réactions" });
+    }
+  });
+  
+  app.post("/api/elections/:electionId/reactions", async (req: Request, res: Response) => {
+    try {
+      const { electionId } = req.params;
+      
+      if (isNaN(Number(electionId))) {
+        return res.status(400).json({ message: "ID d'élection invalide" });
+      }
+      
+      const reactionData = insertElectionReactionSchema.parse({
+        ...req.body,
+        electionId: Number(electionId)
+      });
+      
+      const [reaction] = await db.insert(electionReactions)
+        .values(reactionData)
+        .returning();
+      
+      res.status(201).json(reaction);
+    } catch (error) {
+      console.error("Erreur lors de la création d'une réaction:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Données invalides", errors: error.errors });
+      }
+      res.status(500).json({ error: "Erreur lors de la création d'une réaction" });
     }
   });
 
