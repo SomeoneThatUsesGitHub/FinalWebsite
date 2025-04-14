@@ -2738,6 +2738,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Routes pour les événements historiques (rétrospective)
+  app.get("/api/historical-events", async (req: Request, res: Response) => {
+    try {
+      const filters = {
+        year: req.query.year ? parseInt(req.query.year as string) : undefined,
+        category: req.query.category as string | undefined
+      };
+      
+      const events = await storage.getHistoricalEvents(filters);
+      res.status(200).json(events);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des événements historiques:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des événements historiques" });
+    }
+  });
+  
+  app.get("/api/historical-events/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'événement invalide" });
+      }
+      
+      const event = await storage.getHistoricalEventById(Number(id));
+      
+      if (event) {
+        res.status(200).json(event);
+      } else {
+        res.status(404).json({ message: "Événement historique non trouvé" });
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'événement historique:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération de l'événement historique" });
+    }
+  });
+  
+  app.post("/api/historical-events", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const eventData = {
+        ...req.body,
+        createdBy: req.user?.id
+      };
+      
+      const newEvent = await storage.createHistoricalEvent(eventData);
+      res.status(201).json(newEvent);
+    } catch (error) {
+      console.error("Erreur lors de la création de l'événement historique:", error);
+      res.status(500).json({ error: "Erreur lors de la création de l'événement historique" });
+    }
+  });
+  
+  app.put("/api/historical-events/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'événement invalide" });
+      }
+      
+      const eventData = req.body;
+      const updatedEvent = await storage.updateHistoricalEvent(Number(id), eventData);
+      
+      if (updatedEvent) {
+        res.status(200).json(updatedEvent);
+      } else {
+        res.status(404).json({ message: "Événement historique non trouvé" });
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'événement historique:", error);
+      res.status(500).json({ error: "Erreur lors de la mise à jour de l'événement historique" });
+    }
+  });
+  
+  app.delete("/api/historical-events/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'événement invalide" });
+      }
+      
+      const success = await storage.deleteHistoricalEvent(Number(id));
+      
+      if (success) {
+        res.status(200).json({ message: "Événement historique supprimé avec succès" });
+      } else {
+        res.status(404).json({ message: "Événement historique non trouvé" });
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'événement historique:", error);
+      res.status(500).json({ error: "Erreur lors de la suppression de l'événement historique" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

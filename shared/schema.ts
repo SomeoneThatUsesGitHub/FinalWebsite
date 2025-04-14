@@ -528,3 +528,34 @@ export const insertSiteAlertSchema = createInsertSchema(siteAlerts).pick({
 
 export type SiteAlert = typeof siteAlerts.$inferSelect;
 export type InsertSiteAlert = z.infer<typeof insertSiteAlertSchema>;
+
+// Table pour les événements historiques (retrospective)
+export const historicalEvents = pgTable("historical_events", {
+  id: serial("id").primaryKey(),
+  year: integer("year").notNull(),
+  month: integer("month"),
+  day: integer("day"),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  imageUrl: text("image_url"),
+  category: text("category").notNull().default("politique"), // politique, economie, international, social, culture
+  importance: integer("importance").notNull().default(1), // 1-5, 5 étant le plus important
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdBy: integer("created_by").references(() => users.id),
+});
+
+export const insertHistoricalEventSchema = createInsertSchema(historicalEvents).pick({
+  year: true,
+  month: true,
+  day: true,
+  title: true,
+  description: true,
+  imageUrl: true,
+  category: true,
+  importance: true,
+  createdBy: true,
+});
+
+export type HistoricalEvent = typeof historicalEvents.$inferSelect;
+export type InsertHistoricalEvent = z.infer<typeof insertHistoricalEventSchema>;

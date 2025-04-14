@@ -23,6 +23,7 @@ import ContentPage from "@/pages/ContentPage";
 import ElectionsPage from "@/pages/ElectionsPage";
 import CountryElectionsPage from "@/pages/CountryElectionsPage";
 import ElectionResultsPage from "@/pages/ElectionResultsPage";
+import RetrospectivePage from "@/pages/RetrospectivePage";
 import LegalPage from "@/pages/LegalPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 
@@ -105,6 +106,7 @@ function App() {
               <Route path="/elections" component={ElectionsPage} />
               <Route path="/elections/:countryCode" component={CountryElectionsPage} />
               <Route path="/elections/:countryCode/resultats/:id" component={ElectionResultsPage} />
+              <Route path="/retrospective" component={RetrospectivePage} />
               <Route path="/mentions-legales" component={LegalPage} />
               <Route path="/confidentialite" component={PrivacyPage} />
               

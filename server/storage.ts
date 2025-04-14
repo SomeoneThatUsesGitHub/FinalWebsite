@@ -1142,6 +1142,58 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount > 0;
   }
 
+  // Méthodes pour la gestion des événements historiques (rétrospective)
+  async getHistoricalEvents(filters: { year?: number; category?: string; } = {}): Promise<HistoricalEvent[]> {
+    let query = db.select().from(historicalEvents);
+    
+    if (filters.year) {
+      query = query.where(eq(historicalEvents.year, filters.year));
+    }
+    
+    if (filters.category) {
+      query = query.where(eq(historicalEvents.category, filters.category));
+    }
+    
+    return query.orderBy(
+      desc(historicalEvents.importance),
+      desc(historicalEvents.year),
+      desc(historicalEvents.month),
+      desc(historicalEvents.day)
+    );
+  }
+  
+  async getHistoricalEventById(id: number): Promise<HistoricalEvent | undefined> {
+    const [event] = await db
+      .select()
+      .from(historicalEvents)
+      .where(eq(historicalEvents.id, id));
+    return event;
+  }
+  
+  async createHistoricalEvent(data: InsertHistoricalEvent): Promise<HistoricalEvent> {
+    const [event] = await db
+      .insert(historicalEvents)
+      .values(data)
+      .returning();
+    return event;
+  }
+  
+  async updateHistoricalEvent(id: number, data: Partial<InsertHistoricalEvent>): Promise<HistoricalEvent | undefined> {
+    const [event] = await db
+      .update(historicalEvents)
+      .set(data)
+      .where(eq(historicalEvents.id, id))
+      .returning();
+    return event;
+  }
+  
+  async deleteHistoricalEvent(id: number): Promise<boolean> {
+    const result = await db
+      .delete(historicalEvents)
+      .where(eq(historicalEvents.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+
   // Contact Messages operations
   async getAllContactMessages(): Promise<(ContactMessage & { assignedToAdmin?: { username: string, displayName: string } })[]> {
     const messagesWithAdmins = await db.select({
