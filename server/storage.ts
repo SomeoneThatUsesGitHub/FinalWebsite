@@ -16,8 +16,7 @@ import {
   liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion,
   newsletterSubscribers, type NewsletterSubscriber, type InsertNewsletterSubscriber,
   teamApplications, type TeamApplication, type InsertTeamApplication,
-  contactMessages, type ContactMessage, type InsertContactMessage,
-  siteAlerts, type SiteAlert, type InsertSiteAlert
+  contactMessages, type ContactMessage, type InsertContactMessage
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte, sql, lt } from "drizzle-orm";
@@ -149,15 +148,6 @@ export interface IStorage {
   getVideoById(id: number): Promise<Video | undefined>;
   createVideo(video: InsertVideo): Promise<Video>;
   updateVideoViews(id: number): Promise<void>;
-  
-  // Site Alerts operations
-  getActiveAlerts(): Promise<SiteAlert[]>;
-  getAllAlerts(): Promise<SiteAlert[]>;
-  getAlertById(id: number): Promise<SiteAlert | undefined>;
-  createAlert(alert: InsertSiteAlert): Promise<SiteAlert>;
-  updateAlert(id: number, data: Partial<InsertSiteAlert>): Promise<SiteAlert | undefined>;
-  toggleAlertStatus(id: number, active: boolean): Promise<SiteAlert | undefined>;
-  deleteAlert(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1078,120 +1068,9 @@ export class DatabaseStorage implements IStorage {
   async updateVideoViews(id: number): Promise<void> {
     await db.update(videos)
       .set({
-        views: sql`${videos.views} + 1`
+        viewCount: sql`${videos.viewCount} + 1`
       })
       .where(eq(videos.id, id));
-  }
-  
-  // Site Alerts operations
-  async getActiveAlerts(): Promise<SiteAlert[]> {
-    return db.select()
-      .from(siteAlerts)
-      .where(eq(siteAlerts.active, true))
-      .orderBy(desc(siteAlerts.priority))
-      .orderBy(desc(siteAlerts.createdAt));
-  }
-  
-  async getAllAlerts(): Promise<SiteAlert[]> {
-    return db.select()
-      .from(siteAlerts)
-      .orderBy(desc(siteAlerts.createdAt));
-  }
-  
-  async getAlertById(id: number): Promise<SiteAlert | undefined> {
-    const [alert] = await db.select()
-      .from(siteAlerts)
-      .where(eq(siteAlerts.id, id));
-    return alert;
-  }
-  
-  async createAlert(alert: InsertSiteAlert): Promise<SiteAlert> {
-    const [newAlert] = await db
-      .insert(siteAlerts)
-      .values({
-        ...alert,
-        active: alert.active ?? true,
-        priority: alert.priority ?? 1,
-        backgroundColor: alert.backgroundColor ?? "#dc2626",
-        textColor: alert.textColor ?? "#ffffff"
-      })
-      .returning();
-    return newAlert;
-  }
-  
-  async updateAlert(id: number, data: Partial<InsertSiteAlert>): Promise<SiteAlert | undefined> {
-    const [updatedAlert] = await db
-      .update(siteAlerts)
-      .set(data)
-      .where(eq(siteAlerts.id, id))
-      .returning();
-    return updatedAlert;
-  }
-  
-  async toggleAlertStatus(id: number, active: boolean): Promise<SiteAlert | undefined> {
-    const [updatedAlert] = await db
-      .update(siteAlerts)
-      .set({ active })
-      .where(eq(siteAlerts.id, id))
-      .returning();
-    return updatedAlert;
-  }
-  
-  async deleteAlert(id: number): Promise<boolean> {
-    const result = await db.delete(siteAlerts).where(eq(siteAlerts.id, id));
-    return result.rowCount > 0;
-  }
-
-  // Méthodes pour la gestion des événements historiques (rétrospective)
-  async getHistoricalEvents(filters: { year?: number; category?: string; } = {}): Promise<HistoricalEvent[]> {
-    let query = db.select().from(historicalEvents);
-    
-    if (filters.year) {
-      query = query.where(eq(historicalEvents.year, filters.year));
-    }
-    
-    if (filters.category) {
-      query = query.where(eq(historicalEvents.category, filters.category));
-    }
-    
-    return query.orderBy(
-      desc(historicalEvents.importance),
-      desc(historicalEvents.year),
-      desc(historicalEvents.month),
-      desc(historicalEvents.day)
-    );
-  }
-  
-  async getHistoricalEventById(id: number): Promise<HistoricalEvent | undefined> {
-    const [event] = await db
-      .select()
-      .from(historicalEvents)
-      .where(eq(historicalEvents.id, id));
-    return event;
-  }
-  
-  async createHistoricalEvent(data: InsertHistoricalEvent): Promise<HistoricalEvent> {
-    const [event] = await db
-      .insert(historicalEvents)
-      .values(data)
-      .returning();
-    return event;
-  }
-  
-  async updateHistoricalEvent(id: number, data: Partial<InsertHistoricalEvent>): Promise<HistoricalEvent | undefined> {
-    const [event] = await db
-      .update(historicalEvents)
-      .set(data)
-      .where(eq(historicalEvents.id, id))
-      .returning();
-    return event;
-  }
-  
-  async deleteHistoricalEvent(id: number): Promise<boolean> {
-    const result = await db
-      .delete(historicalEvents)
-      .where(eq(historicalEvents.id, id));
-    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Contact Messages operations

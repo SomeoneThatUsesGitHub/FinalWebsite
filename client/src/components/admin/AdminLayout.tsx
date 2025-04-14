@@ -20,7 +20,6 @@ import {
   BookOpen,
   BarChart4,
   MessageCircle,
-  BellRing,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -147,12 +146,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       name: "Réactions aux élections",
       href: "/admin/election-reactions",
       icon: MessageCircle,
-      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
-    },
-    {
-      name: "Alertes du site",
-      href: "/admin/site-alerts",
-      icon: BellRing,
       disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {

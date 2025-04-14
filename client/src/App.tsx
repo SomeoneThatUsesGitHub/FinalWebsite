@@ -23,7 +23,6 @@ import ContentPage from "@/pages/ContentPage";
 import ElectionsPage from "@/pages/ElectionsPage";
 import CountryElectionsPage from "@/pages/CountryElectionsPage";
 import ElectionResultsPage from "@/pages/ElectionResultsPage";
-import RetrospectivePage from "@/pages/RetrospectivePage";
 import LegalPage from "@/pages/LegalPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 
@@ -44,7 +43,6 @@ import EducationalContentPage from "@/pages/admin/EducationalContentPage";
 import GlossaryPage from "@/pages/admin/GlossaryPage";
 import AdminElectionsPage from "@/pages/admin/ElectionsPage";
 import ElectionReactionsPage from "@/pages/admin/ElectionReactionsPage";
-import SiteAlertsPage from "@/pages/admin/SiteAlertsPage";
 
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
@@ -106,7 +104,6 @@ function App() {
               <Route path="/elections" component={ElectionsPage} />
               <Route path="/elections/:countryCode" component={CountryElectionsPage} />
               <Route path="/elections/:countryCode/resultats/:id" component={ElectionResultsPage} />
-              <Route path="/retrospective" component={RetrospectivePage} />
               <Route path="/mentions-legales" component={LegalPage} />
               <Route path="/confidentialite" component={PrivacyPage} />
               
@@ -130,7 +127,6 @@ function App() {
               <ProtectedRoute path="/admin/glossaire" component={GlossaryPage} adminOnly />
               <ProtectedRoute path="/admin/elections" component={AdminElectionsPage} adminOnly />
               <ProtectedRoute path="/admin/election-reactions" component={ElectionReactionsPage} adminOnly />
-              <ProtectedRoute path="/admin/site-alerts" component={SiteAlertsPage} adminOnly />
               
               {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
               <ProtectedRoute path="/admin/directs" component={DirectsPage} />

@@ -54,7 +54,7 @@ const VideosSection: React.FC = () => {
         visible: { opacity: 1, y: 0 }
       }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full py-6 pb-32 bg-background"
+      className="w-full py-6 pb-16 bg-background"
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-6">
