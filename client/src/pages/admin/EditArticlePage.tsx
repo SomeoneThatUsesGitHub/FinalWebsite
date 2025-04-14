@@ -19,7 +19,6 @@ import { Loader2, Save, ArrowLeft, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { ArticlePreview } from "@/components/admin/ArticlePreview";
-import { SourcesInput } from "@/components/admin/SourcesInput";
 
 // Schéma de validation étendu pour le formulaire
 const articleFormSchema = insertArticleSchema
@@ -235,11 +234,14 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                 )}
               </div>
               
+
               <div className="space-y-2">
                 <Label htmlFor="sources">Sources</Label>
-                <SourcesInput
-                  value={form.watch("sources") || ""}
-                  onChange={(value) => form.setValue("sources", value)}
+                <Textarea
+                  id="sources"
+                  placeholder="Sources et références utilisées pour la rédaction de l'article (ex: AFP, Le Monde, etc.)"
+                  rows={2}
+                  {...form.register("sources")}
                 />
                 {form.formState.errors.sources && (
                   <p className="text-sm text-red-500">{form.formState.errors.sources.message}</p>
@@ -299,7 +301,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                         />
                       ) : (
                         <p className="text-muted-foreground text-center py-10">
-                          Remplissez au moins le titre de l'article pour voir la prévisualisation.
+                          Remplissez au moins le titre de l article pour voir la prévisualisation.
                         </p>
                       )}
                     </div>
@@ -389,10 +391,28 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   const params = useParams();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewHtml, setPreviewHtml] = useState<string>("");
+  const [editorKey, setEditorKey] = useState<number>(article.id); // Utiliser l'ID comme clé unique
   
-  console.log("Article data in EditArticleForm:", article);
+  // Log détaillé pour le débogage
+  console.log("EditArticleForm - Article reçu:", {
+    id: article.id,
+    title: article.title,
+    content_length: article.content ? article.content.length : 0,
+    content_type: typeof article.content,
+    content_preview: article.content ? article.content.substring(0, 50) + "..." : "CONTENU VIDE"
+  });
   
+  // Force une initialisation du contenu et de la prévisualisation
+  useEffect(() => {
+    console.log("EditArticleForm - Initialisation avec article ID:", article.id);
+    setPreviewHtml(article.content || "");
+    
+    // Forcer la recréation de l'éditeur
+    setEditorKey(prev => prev + 1);
+  }, [article.id]);
+  
+  // Initialiser le formulaire avec les données de l'article
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
     defaultValues: {
@@ -402,19 +422,43 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       content: article.content || "",
       imageUrl: article.imageUrl || "",
       sources: article.sources || "",
-      categoryId: article.categoryId || 1, // Fallback to category 1 if not defined
+      categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
     }
   });
   
-  // Observer les changements de contenu pour la prévisualisation
-  form.watch((value) => {
-    if (value.content) {
-      setPreviewHtml(value.content as string);
-    }
-  });
+  // Force une réinitialisation du formulaire quand l'article change
+  useEffect(() => {
+    console.log("EditArticleForm - RESET du formulaire pour article ID:", article.id);
+    
+    form.reset({
+      title: article.title || "",
+      slug: article.slug || "",
+      excerpt: article.excerpt || "",
+      content: article.content || "",
+      imageUrl: article.imageUrl || "",
+      sources: article.sources || "",
+      categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
+      published: Boolean(article.published),
+      featured: Boolean(article.featured),
+    });
+  }, [article.id]);
   
+  // Observer les changements de contenu pour la prévisualisation
+  const contentWatch = form.watch("content");
+  
+  // Synchroniser la prévisualisation avec le contenu
+  useEffect(() => {
+    if (contentWatch) {
+      console.log("EditArticleForm - Mise à jour prévisualisation:", {
+        content_length: contentWatch.length
+      });
+      setPreviewHtml(contentWatch);
+    }
+  }, [contentWatch]);
+  
+  // Mutation pour mettre à jour l'article
   const updateArticleMutation = useMutation({
     mutationFn: async (data: ArticleFormValues) => {
       const formattedData = {
@@ -424,10 +468,9 @@ function EditArticleForm({ article, categories }: { article: Article, categories
         featured: Boolean(data.featured),
         imageUrl: data.imageUrl || null,
       };
-      console.log("Données validées pour mise à jour:", formattedData);
+      console.log("Données pour mise à jour:", formattedData);
       
-      // Utiliser fetch directement au lieu d'apiRequest qui peut avoir des problèmes avec les booléens
-      const res = await fetch(`/api/admin/articles/${article.id}`, {
+      const res = await fetch(`/api/admin/articles/${params.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formattedData),
@@ -442,8 +485,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       
       return await res.json();
     },
-    onSuccess: (data) => {
-      // Invalider à la fois les requêtes publiques et admin
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
       
@@ -465,7 +507,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   const onSubmit = (data: ArticleFormValues) => {
     updateArticleMutation.mutate(data);
   };
-
+  
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="space-y-6">
@@ -486,35 +528,25 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 Modifier l'article
               </h1>
               <p className="text-muted-foreground mt-2">
-                Modifiez les informations de l'article
+                Modifiez les détails de l'article
               </p>
             </div>
           </div>
           
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => window.open(`/articles/${article.slug}`, "_blank")}
-            >
-              <Eye className="mr-2 h-4 w-4" /> Voir
-            </Button>
-            
-            <Button
-              type="submit"
-              disabled={updateArticleMutation.isPending}
-            >
-              {updateArticleMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Mise à jour...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" /> Mettre à jour
-                </>
-              )}
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            disabled={updateArticleMutation.isPending}
+          >
+            {updateArticleMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enregistrement...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" /> Enregistrer
+              </>
+            )}
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -550,7 +582,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                   <p className="text-sm text-red-500">{form.formState.errors.slug.message}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  L'URL de l'article sera : /articles/<span className="font-mono">{form.watch("slug") || article.slug}</span>
+                  L'URL de l'article sera : /articles/<span className="font-mono">{form.watch("slug") || "slug-de-article"}</span>
                 </p>
               </div>
               
@@ -565,17 +597,20 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 {form.formState.errors.excerpt && (
                   <p className="text-sm text-red-500">{form.formState.errors.excerpt.message}</p>
                 )}
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="sources">Sources</Label>
-                <SourcesInput
-                  value={form.watch("sources") || ""}
-                  onChange={(value) => form.setValue("sources", value)}
+                <Textarea
+                  id="sources"
+                  placeholder="Sources et références utilisées pour la rédaction de l'article (ex: AFP, Le Monde, etc.)"
+                  rows={2}
+                  {...form.register("sources")}
                 />
                 {form.formState.errors.sources && (
                   <p className="text-sm text-red-500">{form.formState.errors.sources.message}</p>
                 )}
+              </div>
+
               </div>
               
               <div className="space-y-2">
@@ -598,15 +633,22 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 <TabsContent value="editor" className="space-y-2">
                   <Label htmlFor="content">Contenu de l'article</Label>
                   <div className="relative">
-                    {/* Indicateur de longueur */}
-                    <div className="absolute top-0 right-0 z-10 text-xs p-1 bg-amber-100 text-amber-900 rounded">
-                      Contenu: {(form.watch("content") || "").length} caractères
+                    {/* Indicateur de longueur et debugging */}
+                    <div className="absolute top-0 right-0 z-10 text-xs p-1 bg-amber-100 text-amber-900 rounded flex gap-1">
+                      <span>ID: {article.id}</span>
+                      <span>•</span>
+                      <span>Contenu: {(form.watch("content") || "").length} caractères</span>
                     </div>
+                    
                     <RichTextEditor
-                      key={`edit-article-${article.id}`}
+                      key={`editor-${editorKey}`} // Forcer la recréation de l'éditeur
                       value={form.watch("content") || ""}
                       onChange={(value) => {
-                        form.setValue("content", value);
+                        console.log("RichTextEditor onChange:", {
+                          value_length: value.length,
+                          prev_length: (form.watch("content") || "").length
+                        });
+                        form.setValue("content", value, { shouldDirty: true, shouldTouch: true });
                       }}
                       placeholder="Commencez à rédiger votre article..."
                     />
@@ -617,7 +659,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 </TabsContent>
                 <TabsContent value="preview">
                   <div className="border rounded-md overflow-hidden">
-                    {/* Utiliser le nouveau composant de prévisualisation d'article */}
+                    {/* Utiliser le nouveau composant de prévisualisation d article */}
                     <div className="bg-background relative">
                       {/* Badge "Prévisualisation" */}
                       <div className="absolute top-2 right-2 z-50 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-medium">
@@ -625,20 +667,26 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                       </div>
                       
                       {/* Importer le composant ArticlePreview */}
-                      <ArticlePreview 
-                        article={{
-                          title: form.watch("title"),
-                          slug: form.watch("slug"),
-                          excerpt: form.watch("excerpt"),
-                          content: form.watch("content"),
-                          imageUrl: form.watch("imageUrl"),
-                          categoryId: form.watch("categoryId"),
-                          published: form.watch("published"),
-                          featured: form.watch("featured"),
-                          createdAt: article.createdAt,
-                        }}
-                        category={categories.find(c => c.id === Number(form.watch("categoryId")))}
-                      />
+                      {form.watch("title") ? (
+                        <ArticlePreview 
+                          article={{
+                            title: form.watch("title"),
+                            slug: form.watch("slug"),
+                            excerpt: form.watch("excerpt"),
+                            content: form.watch("content"),
+                            imageUrl: form.watch("imageUrl"),
+                            categoryId: form.watch("categoryId"),
+                            published: form.watch("published"),
+                            featured: form.watch("featured"),
+                            createdAt: article?.createdAt || new Date().toISOString(),
+                          }}
+                          category={categories.find(c => c.id === Number(form.watch("categoryId")))}
+                        />
+                      ) : (
+                        <p className="text-muted-foreground text-center py-10">
+                          Remplissez au moins le titre de l article pour voir la prévisualisation.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </TabsContent>
@@ -714,32 +762,6 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 </div>
               </CardContent>
             </Card>
-            
-            <Card>
-              <CardHeader className="bg-muted/50">
-                <CardTitle>Informations</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="text-sm space-y-4">
-                  <div>
-                    <span className="text-muted-foreground">ID:</span> {article.id}
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Créé le:</span> {new Date(article.createdAt).toLocaleString("fr-FR")}
-                  </div>
-                  {article.updatedAt && (
-                    <div>
-                      <span className="text-muted-foreground">Mis à jour le:</span> {new Date(article.updatedAt).toLocaleString("fr-FR")}
-                    </div>
-                  )}
-                  {article.viewCount !== undefined && (
-                    <div>
-                      <span className="text-muted-foreground">Vues:</span> {article.viewCount || 0}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
@@ -747,110 +769,113 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   );
 }
 
-// Récupération des catégories et affichage de la page de création ou de modification d'article
+// Page d'édition d'article (composant principal)
 export default function EditArticlePage() {
   const params = useParams();
-  const [location, setLocation] = useLocation();
-  const { toast } = useToast();
-  const articleId = params.id ? parseInt(params.id, 10) : null;
   
-  // Récupération des catégories pour les sélecteurs
-  const { data: categories, isLoading: isCategoriesLoading, error: categoriesError } = useQuery<Category[]>({
+  // Récupérer les catégories pour les listes déroulantes
+  const categoriesQuery = useQuery({
     queryKey: ["/api/categories"],
     queryFn: getQueryFn({ on401: "throw" }),
   });
   
-  // Récupération de l'article à modifier, si on est en mode édition
-  const { data: article, isLoading: isArticleLoading, error: articleError } = useQuery<Article>({
-    queryKey: ["/api/admin/articles", articleId],
-    queryFn: async ({ queryKey }) => {
-      console.log("Fetching article with ID:", articleId);
-      const res = await fetch(`/api/admin/articles/${articleId}`, {
-        credentials: "include",
-      });
-      
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error(`Error fetching article: ${res.status}`, errorText);
-        throw new Error(`Error ${res.status}: ${errorText || res.statusText}`);
+  // Récupérer l'article à modifier (si ID présent)
+  const articleQuery = useQuery({
+    queryKey: ["/api/admin/articles", params.id],
+    queryFn: async () => {
+      console.log("Fetching article with ID:", params.id);
+      try {
+        const response = await fetch(`/api/admin/articles/${params.id}`, {
+          credentials: 'include' // Important pour envoyer les cookies d'authentification
+        });
+        
+        if (!response.ok) {
+          console.error("Error response:", response.status, response.statusText);
+          const errorText = await response.text();
+          console.error("Error fetching article:", errorText);
+          throw new Error(`Failed to fetch article: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log("Article data received:", {
+          id: data.id,
+          title: data.title,
+          content_length: data.content ? data.content.length : 0,
+          content_preview: data.content ? data.content.substring(0, 50) + "..." : "EMPTY CONTENT"
+        });
+        return data;
+      } catch (error) {
+        console.error("Error in custom query function:", error);
+        throw error;
       }
-      
-      const data = await res.json();
-      console.log("Article data received:", data);
-      return data;
     },
-    enabled: !!articleId, // Ne pas exécuter la requête si on est en mode création
+    // Ne pas exécuter la requête si pas d'ID
+    enabled: !!params.id,
   });
   
-  // Gestion des états de chargement et d'erreur
-  if (isCategoriesLoading || (articleId && isArticleLoading)) {
+  // Affichage - Chargement en cours
+  if ((params.id && articleQuery.isLoading) || categoriesQuery.isLoading) {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center min-h-[50vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </AdminLayout>
     );
   }
   
-  if (categoriesError) {
+  // Affichage - Erreur
+  if (categoriesQuery.error || (params.id && articleQuery.error)) {
     return (
       <AdminLayout>
-        <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-          <div className="text-xl font-bold text-destructive">
-            Erreur lors du chargement des catégories
-          </div>
-          <p className="text-muted-foreground">
-            {(categoriesError as Error).message || "Une erreur est survenue"}
+        <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
+          <h2 className="text-xl font-bold text-destructive">Erreur</h2>
+          <p>
+            {categoriesQuery.error?.message || articleQuery.error?.message || "Une erreur est survenue lors du chargement des données."}
           </p>
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.reload()}
-          >
-            Réessayer
-          </Button>
         </div>
       </AdminLayout>
     );
   }
   
-  if (articleId && articleError) {
+  // Mode édition - Article non trouvé
+  if (params.id && !articleQuery.isLoading && !articleQuery.data) {
     return (
       <AdminLayout>
-        <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-          <div className="text-xl font-bold text-destructive">
-            Erreur lors du chargement de l'article
-          </div>
-          <p className="text-muted-foreground">
-            {(articleError as Error).message || "Une erreur est survenue"}
+        <div className="p-6 bg-destructive/10 border border-destructive rounded-md max-w-2xl mx-auto my-4">
+          <h2 className="text-xl font-bold text-destructive">Article non trouvé</h2>
+          <p>
+            L'article avec l'identifiant {params.id} n'a pas été trouvé ou vous n'avez pas les droits d'accès nécessaires.
           </p>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => window.location.reload()}
-            >
-              Réessayer
-            </Button>
-            <Button 
-              onClick={() => setLocation("/admin/articles")}
-            >
-              Retour à la liste
-            </Button>
-          </div>
         </div>
       </AdminLayout>
     );
   }
   
+  // Mode édition - Article trouvé
+  if (params.id && articleQuery.data) {
+    // Afficher les données complètes de l'article pour débogage
+    console.log("Données de l'article à modifier:", articleQuery.data);
+    console.log("Contenu de l'article à modifier:", {
+      content: articleQuery.data.content, 
+      content_length: articleQuery.data.content ? articleQuery.data.content.length : 0,
+      content_sample: articleQuery.data.content ? articleQuery.data.content.substring(0, 100) : "VIDE"
+    });
+    
+    return (
+      <AdminLayout>
+        <EditArticleForm 
+          article={articleQuery.data} 
+          categories={categoriesQuery.data || []} 
+        />
+      </AdminLayout>
+    );
+  }
+  
+  // Mode création
   return (
     <AdminLayout>
-      <div className="p-6">
-        {articleId && article ? (
-          <EditArticleForm article={article} categories={categories || []} />
-        ) : (
-          <NewArticleForm categories={categories || []} />
-        )}
-      </div>
+      <NewArticleForm categories={categoriesQuery.data || []} />
     </AdminLayout>
   );
 }
