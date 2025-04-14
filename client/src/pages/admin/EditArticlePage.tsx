@@ -28,6 +28,7 @@ const articleFormSchema = insertArticleSchema
       .regex(/^[a-z0-9-]+$/, "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets"),
     content: z.string().min(20, "Le contenu doit contenir au moins 20 caractères"),
     imageUrl: z.string().url("Veuillez fournir une URL d'image valide").nullable().optional(),
+    sources: z.string().optional(), // Ajout du champ sources comme optionnel
     categoryId: z.number().or(z.string().transform(val => parseInt(val, 10))),
     published: z.boolean().default(false),
     featured: z.boolean().default(false),
@@ -50,6 +51,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
       excerpt: "",
       content: "",
       imageUrl: "",
+      sources: "",
       categoryId: 1,
       published: false,
       featured: false,
