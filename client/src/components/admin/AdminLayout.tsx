@@ -19,6 +19,7 @@ import {
   GraduationCap,
   BookOpen,
   BarChart4,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -139,6 +140,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       name: "Élections",
       href: "/admin/elections",
       icon: BarChart4,
+      disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
+    },
+    {
+      name: "Réactions aux élections",
+      href: "/admin/election-reactions",
+      icon: MessageCircle,
       disabled: user ? (!user.isAdmin && user.role !== "admin") : false,
     },
     {

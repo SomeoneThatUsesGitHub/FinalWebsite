@@ -2573,6 +2573,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Erreur lors de la création d'une réaction" });
     }
   });
+  
+  // Route pour supprimer une réaction
+  app.delete("/api/elections/reactions/:reactionId", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { reactionId } = req.params;
+      
+      if (isNaN(Number(reactionId))) {
+        return res.status(400).json({ message: "ID de réaction invalide" });
+      }
+      
+      // Vérifier si la réaction existe
+      const existingReactions = await db.select()
+        .from(electionReactions)
+        .where(eq(electionReactions.id, Number(reactionId)));
+      
+      if (existingReactions.length === 0) {
+        return res.status(404).json({ message: "Réaction non trouvée" });
+      }
+      
+      // Supprimer la réaction
+      await db.delete(electionReactions)
+        .where(eq(electionReactions.id, Number(reactionId)));
+      
+      res.status(200).json({ message: "Réaction supprimée avec succès" });
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la réaction:", error);
+      res.status(500).json({ error: "Erreur lors de la suppression de la réaction" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
