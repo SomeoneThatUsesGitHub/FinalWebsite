@@ -31,6 +31,7 @@ const articleFormSchema = insertArticleSchema
     categoryId: z.number().or(z.string().transform(val => parseInt(val, 10))),
     published: z.boolean().default(false),
     featured: z.boolean().default(false),
+    sources: z.string().optional(),
   })
   .omit({ createdAt: true, updatedAt: true, viewCount: true, commentCount: true });
 
