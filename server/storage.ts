@@ -265,7 +265,9 @@ export class DatabaseStorage implements IStorage {
   
   // Category operations
   async getAllCategories(): Promise<Category[]> {
-    return db.select().from(categories).orderBy(categories.order);
+    return db.select()
+      .from(categories)
+      .orderBy(categories.name);
   }
   
   async getCategoryBySlug(slug: string): Promise<Category | undefined> {
@@ -352,13 +354,8 @@ export class DatabaseStorage implements IStorage {
   async getFeaturedArticles(limit: number = 3): Promise<Article[]> {
     return db.select()
       .from(articles)
-      .where(
-        and(
-          eq(articles.featured, true),
-          not(isNull(articles.publishedAt))
-        )
-      )
-      .orderBy(desc(articles.publishedAt))
+      .where(eq(articles.featured, true))
+      .orderBy(desc(articles.createdAt))
       .limit(limit);
   }
   
