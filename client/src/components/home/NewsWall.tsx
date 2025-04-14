@@ -329,11 +329,6 @@ const NewsWall: React.FC = () => {
                         </h2>
                         <p className="text-dark/70 text-base mb-6">
                           {(featuredContent.data as Article).excerpt}
-                          <span className="hidden xl:inline"> 
-                            Cette analyse approfondie explore les implications politiques, économiques et sociales de cet enjeu majeur.
-                            Découvrez comment les différents acteurs politiques se positionnent et quelles pourraient être les conséquences 
-                            à moyen et long terme pour notre société.
-                          </span>
                         </p>
                       </div>
                       <div className="flex items-center justify-between">
