@@ -4,8 +4,6 @@ import { pageTransition } from "@/lib/animations";
 import HeroSection from "@/components/home/HeroSection";
 import NewsWall from "@/components/home/NewsWall";
 import VideosSection from "@/components/home/VideosSection";
-import LearnSection from "@/components/home/LearnSection";
-import ElectionsSection from "@/components/home/ElectionsSection";
 
 import { Helmet } from "react-helmet";
 import { Link } from "wouter";
@@ -26,8 +24,6 @@ const Home: React.FC = () => {
       <HeroSection />
       <NewsWall />
       <VideosSection />
-      <LearnSection />
-      <ElectionsSection />
     </motion.div>
   );
 };
