@@ -8,7 +8,6 @@ import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Share2, Calendar } from "lucide-react";
-import { ArticleSources } from "@/components/article/ArticleSources";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
 import ArticleContent from "@/components/ArticleContent";
@@ -213,7 +212,6 @@ const Article: React.FC = () => {
                 >
                   <p className="text-xl font-medium text-dark/80 mb-8 leading-relaxed">{article.excerpt}</p>
                   <ArticleContent content={article.content} />
-                  <ArticleSources sources={article.sources} />
                 </motion.div>
                 
                 {/* Social sharing */}
