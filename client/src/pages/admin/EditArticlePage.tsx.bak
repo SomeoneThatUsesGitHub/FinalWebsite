@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getQueryFn, queryClient, apiRequest } from "@/lib/queryClient";
-import { insertArticleSchema, Article, Category } from "@shared/schema";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
+import { Article, Category, insertArticleSchema } from "@shared/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,14 +13,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
+import { Loader2, Save, ArrowLeft, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { ArticlePreview } from "@/components/admin/ArticlePreview";
 
-// Schéma de validation pour le formulaire d'article
+// Schéma de validation étendu pour le formulaire
 const articleFormSchema = insertArticleSchema
   .extend({
     // Renforcer la validation du slug pour qu'il ait au moins 3 caractères
@@ -32,7 +32,8 @@ const articleFormSchema = insertArticleSchema
     categoryId: z.number().or(z.string().transform(val => parseInt(val, 10))),
     published: z.boolean().default(false),
     featured: z.boolean().default(false),
-  });
+  })
+  .omit({ createdAt: true, updatedAt: true, viewCount: true, commentCount: true });
 
 type ArticleFormValues = z.infer<typeof articleFormSchema>;
 
@@ -57,85 +58,130 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
     }
   });
   
-  const [editorKey, setEditorKey] = useState(0);
+  // Observer les changements de contenu pour la prévisualisation
+  form.watch((value) => {
+    if (value.content) {
+      setPreviewHtml(value.content as string);
+    }
+  });
   
-  // Génération automatique du slug à partir du titre
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === "title" && value.title && !form.getValues("slug")) {
-        // Simple version sans bibliothèque
-        const slug = value.title
-          .toLowerCase()
-          .replace(/[àáâãäå]/g, 'a')
-          .replace(/[èéêë]/g, 'e')
-          .replace(/[ìíîï]/g, 'i')
-          .replace(/[òóôõö]/g, 'o')
-          .replace(/[ùúûü]/g, 'u')
-          .replace(/[ç]/g, 'c')
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '');
-        
-        form.setValue("slug", slug, { shouldDirty: true });
-      }
-    });
-    
-    return () => subscription.unsubscribe();
-  }, [form]);
+  // Génération auto du slug depuis le titre
+  form.watch((value, { name }) => {
+    if (name === "title" && value.title && !form.getValues("slug")) {
+      const slug = value.title
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      form.setValue("slug", slug);
+    }
+  });
   
-  // Mutation pour créer un article
   const createArticleMutation = useMutation({
     mutationFn: async (data: ArticleFormValues) => {
-      const response = await apiRequest("POST", "/api/admin/articles", data);
-      const result = await response.json();
-      return result;
-    },
-    onSuccess: (savedArticle) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/articles/recent"] });
-      toast({
-        title: "Article créé avec succès",
-        description: "L'article a été créé dans la base de données.",
+      const formattedData = {
+        ...data,
+        categoryId: Number(data.categoryId),
+        published: Boolean(data.published),
+        featured: Boolean(data.featured),
+        imageUrl: data.imageUrl || null,
+      };
+      console.log("Données pour création:", formattedData);
+      
+      // Utiliser fetch directement au lieu d'apiRequest qui peut avoir des problèmes avec les booléens
+      const res = await fetch("/api/admin/articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData),
+        credentials: "include"
       });
       
-      // Redirection vers la page d'édition
-      setLocation(`/admin/articles/edit/${savedArticle.id}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erreur de création:", errorText);
+        throw new Error(`Erreur ${res.status}: ${errorText || res.statusText}`);
+      }
+      
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      // Invalider à la fois les requêtes publiques et admin
+      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
+      
+      toast({
+        title: "Article créé",
+        description: "L'article a été créé avec succès"
+      });
+      
+      setLocation(`/admin/articles/${data.id}`);
     },
     onError: (error: Error) => {
+      console.error("Erreur de mutation:", error);
       toast({
-        title: "Erreur lors de la création",
-        description: error.message,
-        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la création",
+        variant: "destructive"
       });
     }
   });
   
   const onSubmit = (data: ArticleFormValues) => {
-    console.log("Soumission du formulaire article", data);
     createArticleMutation.mutate(data);
   };
-  
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="grid">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Créer un nouvel article</h1>
-          <div className="flex gap-2">
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
             <Button 
-              type="submit" 
-              disabled={createArticleMutation.isPending}
+              type="button"
+              variant="outline" 
+              size="icon"
+              onClick={() => setLocation("/admin/articles")}
             >
-              {createArticleMutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Créer l'article
+              <ArrowLeft className="h-4 w-4" />
+              <span className="sr-only">Retour</span>
             </Button>
+            
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Nouvel article
+              </h1>
+              <p className="text-muted-foreground mt-2">
+                Créez un nouvel article pour le site
+              </p>
+            </div>
           </div>
+          
+          <Button
+            type="submit"
+            disabled={createArticleMutation.isPending}
+          >
+            {createArticleMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Création...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" /> Créer
+              </>
+            )}
+          </Button>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Contenu principal */}
+          {/* Formulaire principal */}
           <Card className="lg:col-span-2">
-            <CardContent className="pt-6 space-y-4">
+            <CardHeader>
+              <CardTitle>Informations de l'article</CardTitle>
+              <CardDescription>
+                Renseignez les informations principales de l'article
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Titre</Label>
                 <Input
@@ -149,17 +195,17 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
+                <Label htmlFor="slug">Slug (URL)</Label>
                 <Input
                   id="slug"
-                  placeholder="slug-de-l-article"
+                  placeholder="slug-de-article"
                   {...form.register("slug")}
                 />
                 {form.formState.errors.slug && (
                   <p className="text-sm text-red-500">{form.formState.errors.slug.message}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Le slug est utilisé dans l'URL: https://politiquensemble.fr/articles/{form.watch("slug")}
+                  L'URL de l'article sera : /articles/<span className="font-mono">{form.watch("slug") || "slug-de-article"}</span>
                 </p>
               </div>
               
@@ -177,6 +223,16 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
               </div>
               
               <div className="space-y-2">
+                <Label htmlFor="imageUrl">URL de l'image principale</Label>
+                <Input
+                  id="imageUrl"
+                  placeholder="https://example.com/image.jpg"
+                  {...form.register("imageUrl")}
+                />
+                {form.formState.errors.imageUrl && (
+                  <p className="text-sm text-red-500">{form.formState.errors.imageUrl.message}</p>
+                )}
+              <div className="space-y-2">
                 <Label htmlFor="sources">Sources</Label>
                 <Textarea
                   id="sources"
@@ -191,17 +247,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                   Séparez les différentes sources par des sauts de ligne ou des virgules
                 </p>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">URL de l'image principale</Label>
-                <Input
-                  id="imageUrl"
-                  placeholder="https://example.com/image.jpg"
-                  {...form.register("imageUrl")}
-                />
-                {form.formState.errors.imageUrl && (
-                  <p className="text-sm text-red-500">{form.formState.errors.imageUrl.message}</p>
-                )}
+
               </div>
               
               <Tabs defaultValue="editor" className="w-full">
@@ -212,20 +258,16 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
                 <TabsContent value="editor" className="space-y-2">
                   <Label htmlFor="content">Contenu de l'article</Label>
                   <div className="relative">
-                    {/* Indicateur de longueur et debugging */}
-                    <div className="absolute top-0 right-0 z-10 text-xs p-1 bg-amber-100 text-amber-900 rounded flex gap-1">
-                      <span>Contenu: {(form.watch("content") || "").length} caractères</span>
+                    {/* Indicateur de longueur */}
+                    <div className="absolute top-0 right-0 z-10 text-xs p-1 bg-amber-100 text-amber-900 rounded">
+                      Contenu: {(form.watch("content") || "").length} caractères
                     </div>
-                    
                     <RichTextEditor
-                      key={`editor-${editorKey}`} // Forcer la recréation de l'éditeur
+                      key="new-article-editor"
                       value={form.watch("content") || ""}
                       onChange={(value) => {
-                        console.log("RichTextEditor onChange:", {
-                          value_length: value.length,
-                          prev_length: (form.watch("content") || "").length
-                        });
-                        form.setValue("content", value, { shouldDirty: true, shouldTouch: true });
+                        console.log("RichTextEditor onChange - Nouveau contenu:", value.length);
+                        form.setValue("content", value);
                       }}
                       placeholder="Commencez à rédiger votre article..."
                     />
@@ -346,13 +388,33 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
   );
 }
 
-// Formulaire d'édition d'article (existant)
+// Formulaire de modification d'article
 function EditArticleForm({ article, categories }: { article: Article, categories: Category[] }) {
+  const params = useParams();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const [previewHtml, setPreviewHtml] = useState("");
-  const [editorKey, setEditorKey] = useState(0); // Pour forcer le remontage de l'éditeur
+  const [previewHtml, setPreviewHtml] = useState<string>("");
+  const [editorKey, setEditorKey] = useState<number>(article.id); // Utiliser l'ID comme clé unique
   
+  // Log détaillé pour le débogage
+  console.log("EditArticleForm - Article reçu:", {
+    id: article.id,
+    title: article.title,
+    content_length: article.content ? article.content.length : 0,
+    content_type: typeof article.content,
+    content_preview: article.content ? article.content.substring(0, 50) + "..." : "CONTENU VIDE"
+  });
+  
+  // Force une initialisation du contenu et de la prévisualisation
+  useEffect(() => {
+    console.log("EditArticleForm - Initialisation avec article ID:", article.id);
+    setPreviewHtml(article.content || "");
+    
+    // Forcer la recréation de l'éditeur
+    setEditorKey(prev => prev + 1);
+  }, [article.id]);
+  
+  // Initialiser le formulaire avec les données de l'article
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
     defaultValues: {
@@ -368,64 +430,137 @@ function EditArticleForm({ article, categories }: { article: Article, categories
     }
   });
   
-  // Mutation pour mettre à jour un article
+  // Force une réinitialisation du formulaire quand l'article change
+  useEffect(() => {
+    console.log("EditArticleForm - RESET du formulaire pour article ID:", article.id);
+    
+    form.reset({
+      title: article.title || "",
+      slug: article.slug || "",
+      excerpt: article.excerpt || "",
+      content: article.content || "",
+      imageUrl: article.imageUrl || "",
+      sources: article.sources || "",
+      categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
+      published: Boolean(article.published),
+      featured: Boolean(article.featured),
+    });
+  }, [article.id]);
+  
+  // Observer les changements de contenu pour la prévisualisation
+  const contentWatch = form.watch("content");
+  
+  // Synchroniser la prévisualisation avec le contenu
+  useEffect(() => {
+    if (contentWatch) {
+      console.log("EditArticleForm - Mise à jour prévisualisation:", {
+        content_length: contentWatch.length
+      });
+      setPreviewHtml(contentWatch);
+    }
+  }, [contentWatch]);
+  
+  // Mutation pour mettre à jour l'article
   const updateArticleMutation = useMutation({
     mutationFn: async (data: ArticleFormValues) => {
-      const response = await apiRequest("PATCH", `/api/admin/articles/${article.id}`, data);
-      const result = await response.json();
-      return result;
+      const formattedData = {
+        ...data,
+        categoryId: Number(data.categoryId),
+        published: Boolean(data.published),
+        featured: Boolean(data.featured),
+        imageUrl: data.imageUrl || null,
+      };
+      console.log("Données pour mise à jour:", formattedData);
+      
+      const res = await fetch(`/api/admin/articles/${params.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData),
+        credentials: "include"
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erreur de mise à jour:", errorText);
+        throw new Error(`Erreur ${res.status}: ${errorText || res.statusText}`);
+      }
+      
+      return await res.json();
     },
-    onSuccess: (updatedArticle) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/articles/recent"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/articles/featured"] });
-      queryClient.invalidateQueries({ queryKey: [`/api/articles/${form.getValues("slug")}`] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/articles", article.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
       
       toast({
         title: "Article mis à jour",
-        description: "Les modifications ont été enregistrées avec succès.",
+        description: "L'article a été mis à jour avec succès"
       });
-      
-      // Réinitialiser le formulaire pour réduire les différences d'état
-      setEditorKey(prev => prev + 1);
     },
     onError: (error: Error) => {
+      console.error("Erreur de mutation:", error);
       toast({
-        title: "Erreur lors de la mise à jour",
-        description: error.message,
-        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la mise à jour",
+        variant: "destructive"
       });
     }
   });
   
   const onSubmit = (data: ArticleFormValues) => {
-    console.log("Mise à jour de l'article", article.id, data);
     updateArticleMutation.mutate(data);
   };
   
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="grid">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Modifier l'article #{article.id}</h1>
-          <div className="flex gap-2">
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
             <Button 
-              type="submit" 
-              disabled={updateArticleMutation.isPending}
+              type="button"
+              variant="outline" 
+              size="icon"
+              onClick={() => setLocation("/admin/articles")}
             >
-              {updateArticleMutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Mettre à jour
+              <ArrowLeft className="h-4 w-4" />
+              <span className="sr-only">Retour</span>
             </Button>
+            
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Modifier l'article
+              </h1>
+              <p className="text-muted-foreground mt-2">
+                Modifiez les détails de l'article
+              </p>
+            </div>
           </div>
+          
+          <Button
+            type="submit"
+            disabled={updateArticleMutation.isPending}
+          >
+            {updateArticleMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enregistrement...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" /> Enregistrer
+              </>
+            )}
+          </Button>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Contenu principal */}
+          {/* Formulaire principal */}
           <Card className="lg:col-span-2">
-            <CardContent className="pt-6 space-y-4">
+            <CardHeader>
+              <CardTitle>Informations de l'article</CardTitle>
+              <CardDescription>
+                Modifiez les informations principales de l'article
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Titre</Label>
                 <Input
@@ -439,17 +574,17 @@ function EditArticleForm({ article, categories }: { article: Article, categories
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
+                <Label htmlFor="slug">Slug (URL)</Label>
                 <Input
                   id="slug"
-                  placeholder="slug-de-l-article"
+                  placeholder="slug-de-article"
                   {...form.register("slug")}
                 />
                 {form.formState.errors.slug && (
                   <p className="text-sm text-red-500">{form.formState.errors.slug.message}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Le slug est utilisé dans l'URL: https://politiquensemble.fr/articles/{form.watch("slug")}
+                  L'URL de l'article sera : /articles/<span className="font-mono">{form.watch("slug") || "slug-de-article"}</span>
                 </p>
               </div>
               
@@ -461,9 +596,6 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                   rows={3}
                   {...form.register("excerpt")}
                 />
-                {form.formState.errors.excerpt && (
-                  <p className="text-sm text-red-500">{form.formState.errors.excerpt.message}</p>
-                )}
               </div>
               
               <div className="space-y-2">
@@ -480,6 +612,10 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 <p className="text-xs text-muted-foreground">
                   Séparez les différentes sources par des sauts de ligne ou des virgules
                 </p>
+              </div>
+                {form.formState.errors.excerpt && (
+                  <p className="text-sm text-red-500">{form.formState.errors.excerpt.message}</p>
+                )}
               </div>
               
               <div className="space-y-2">
