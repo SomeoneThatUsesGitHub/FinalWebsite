@@ -391,18 +391,20 @@ function EditArticleForm({ article, categories }: { article: Article, categories
   const { toast } = useToast();
   const [previewHtml, setPreviewHtml] = useState("");
   
+  console.log("Article data in EditArticleForm:", article);
+  
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
     defaultValues: {
-      title: article.title,
-      slug: article.slug,
+      title: article.title || "",
+      slug: article.slug || "",
       excerpt: article.excerpt || "",
       content: article.content || "",
       imageUrl: article.imageUrl || "",
       sources: article.sources || "",
-      categoryId: article.categoryId,
-      published: article.published || false,
-      featured: article.featured || false,
+      categoryId: article.categoryId || 1, // Fallback to category 1 if not defined
+      published: Boolean(article.published),
+      featured: Boolean(article.featured),
     }
   });
   
@@ -761,7 +763,22 @@ export default function EditArticlePage() {
   // Récupération de l'article à modifier, si on est en mode édition
   const { data: article, isLoading: isArticleLoading, error: articleError } = useQuery<Article>({
     queryKey: ["/api/admin/articles", articleId],
-    queryFn: getQueryFn({ on401: "throw" }),
+    queryFn: async ({ queryKey }) => {
+      console.log("Fetching article with ID:", articleId);
+      const res = await fetch(`/api/admin/articles/${articleId}`, {
+        credentials: "include",
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`Error fetching article: ${res.status}`, errorText);
+        throw new Error(`Error ${res.status}: ${errorText || res.statusText}`);
+      }
+      
+      const data = await res.json();
+      console.log("Article data received:", data);
+      return data;
+    },
     enabled: !!articleId, // Ne pas exécuter la requête si on est en mode création
   });
   
