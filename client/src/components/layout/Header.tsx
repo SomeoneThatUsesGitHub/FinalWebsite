@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { mobileMenu } from "@/lib/animations";
-import { Menu, X, MessageCircle, Mail, ChevronDown } from "lucide-react";
+import { Menu, X, MessageCircle, Mail, ChevronDown, ChevronRight } from "lucide-react";
 
 const NavItem: React.FC<{ href: string; label: string; active: boolean; highlighted?: boolean }> = ({ 
   href, 
@@ -77,6 +77,55 @@ const DropdownMenu: React.FC<{ label: string; items: { href: string; label: stri
   );
 };
 
+const MobileDropdownMenu: React.FC<{ 
+  label: string; 
+  items: { href: string; label: string }[]; 
+  active: boolean;
+  onItemClick: () => void;
+}> = ({
+  label,
+  items,
+  active,
+  onItemClick
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <div>
+      <div 
+        className={`py-1.5 px-3 rounded-md cursor-pointer flex items-center justify-between ${
+          active 
+            ? "bg-blue-50 text-blue-600 font-medium" 
+            : "text-gray-700 hover:bg-gray-50"
+        }`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{label}</span>
+        <ChevronDown size={16} className={`ml-1 transition-transform ${isOpen ? 'transform rotate-180' : ''}`} />
+      </div>
+      
+      {isOpen && (
+        <div className="mt-1 ml-3 border-l-2 border-gray-200 pl-2">
+          {items.map((item) => (
+            <Link key={item.href} href={item.href}>
+              <div 
+                className="py-1.5 px-3 rounded-md cursor-pointer text-sm flex items-center text-gray-700 hover:bg-gray-50"
+                onClick={() => {
+                  setIsOpen(false);
+                  onItemClick();
+                }}
+              >
+                <ChevronRight size={14} className="mr-1 text-gray-400" />
+                {item.label}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Header: React.FC = () => {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -120,7 +169,7 @@ const Header: React.FC = () => {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
+            {navItems.slice(0, 6).map((item) => (
               <NavItem 
                 key={item.href}
                 href={item.href}
@@ -133,6 +182,13 @@ const Header: React.FC = () => {
               label="Outils"
               items={outilsItems}
               active={isOutilsActive}
+            />
+            <NavItem 
+              key={navItems[6].href}
+              href={navItems[6].href}
+              label={navItems[6].label}
+              active={navItems[6].active}
+              highlighted={navItems[6].highlighted}
             />
           </nav>
           
@@ -176,18 +232,13 @@ const Header: React.FC = () => {
               ))}
               
               {/* Menu Outils */}
-              <div className="py-1.5 px-3 text-gray-700">
-                <div className="font-medium mb-1">Outils</div>
-                {outilsItems.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <div 
-                      className="py-1.5 px-3 ml-2 rounded-md cursor-pointer text-sm flex items-center text-gray-700 hover:bg-gray-50"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {item.label}
-                    </div>
-                  </Link>
-                ))}
+              <div className="py-1.5 px-3">
+                <MobileDropdownMenu 
+                  label="Outils" 
+                  items={outilsItems} 
+                  active={isOutilsActive}
+                  onItemClick={() => setIsMenuOpen(false)}
+                />
               </div>
               
               {/* Séparateur */}
