@@ -51,6 +51,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
       excerpt: "",
       content: "",
       imageUrl: "",
+      sources: "",  // Champ pour les sources
       categoryId: 1,
       published: false,
       featured: false,
@@ -406,6 +407,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       excerpt: article.excerpt || "",
       content: article.content || "",
       imageUrl: article.imageUrl || "",
+      sources: article.sources || "",
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
@@ -422,6 +424,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       excerpt: article.excerpt || "",
       content: article.content || "",
       imageUrl: article.imageUrl || "",
+      sources: article.sources || "",
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
