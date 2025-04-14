@@ -43,6 +43,7 @@ import EducationalContentPage from "@/pages/admin/EducationalContentPage";
 import GlossaryPage from "@/pages/admin/GlossaryPage";
 import AdminElectionsPage from "@/pages/admin/ElectionsPage";
 import ElectionReactionsPage from "@/pages/admin/ElectionReactionsPage";
+import SiteAlertsPage from "@/pages/admin/SiteAlertsPage";
 
 // Team admin page
 import AdminTeamPage from "@/pages/admin/TeamPage";
@@ -127,6 +128,7 @@ function App() {
               <ProtectedRoute path="/admin/glossaire" component={GlossaryPage} adminOnly />
               <ProtectedRoute path="/admin/elections" component={AdminElectionsPage} adminOnly />
               <ProtectedRoute path="/admin/election-reactions" component={ElectionReactionsPage} adminOnly />
+              <ProtectedRoute path="/admin/site-alerts" component={SiteAlertsPage} adminOnly />
               
               {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
               <ProtectedRoute path="/admin/directs" component={DirectsPage} />

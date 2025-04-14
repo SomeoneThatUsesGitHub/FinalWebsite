@@ -10,7 +10,8 @@ import {
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
   insertLiveCoverageUpdateSchema, insertNewsletterSubscriberSchema, insertTeamApplicationSchema,
   insertContactMessageSchema, insertEducationalTopicSchema, insertEducationalContentSchema,
-  insertEducationalQuizSchema, insertElectionSchema, electionReactions, insertElectionReactionSchema
+  insertEducationalQuizSchema, insertElectionSchema, electionReactions, insertElectionReactionSchema,
+  insertSiteAlertSchema, siteAlerts
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -2600,6 +2601,140 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erreur lors de la suppression de la réaction:", error);
       res.status(500).json({ error: "Erreur lors de la suppression de la réaction" });
+    }
+  });
+
+  // Alertes de site
+  app.get("/api/site-alerts/active", async (_req: Request, res: Response) => {
+    try {
+      const alerts = await storage.getActiveAlerts();
+      res.json(alerts);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des alertes actives:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des alertes actives" });
+    }
+  });
+  
+  app.get("/api/site-alerts", isAuthenticated, isAdmin, async (_req: Request, res: Response) => {
+    try {
+      const alerts = await storage.getAllAlerts();
+      res.json(alerts);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des alertes:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des alertes" });
+    }
+  });
+  
+  app.get("/api/site-alerts/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'alerte invalide" });
+      }
+      
+      const alert = await storage.getAlertById(Number(id));
+      
+      if (!alert) {
+        return res.status(404).json({ message: "Alerte non trouvée" });
+      }
+      
+      res.json(alert);
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'alerte:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération de l'alerte" });
+    }
+  });
+  
+  app.post("/api/site-alerts", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const alertData = insertSiteAlertSchema.parse(req.body);
+      
+      // Ajouter l'ID de l'utilisateur créateur si disponible
+      if (req.user && (req.user as any).id) {
+        alertData.createdBy = (req.user as any).id;
+      }
+      
+      const newAlert = await storage.createAlert(alertData);
+      res.status(201).json(newAlert);
+    } catch (error) {
+      console.error("Erreur lors de la création de l'alerte:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Données invalides", errors: error.errors });
+      }
+      res.status(500).json({ error: "Erreur lors de la création de l'alerte" });
+    }
+  });
+  
+  app.put("/api/site-alerts/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'alerte invalide" });
+      }
+      
+      const alertData = req.body;
+      const updatedAlert = await storage.updateAlert(Number(id), alertData);
+      
+      if (!updatedAlert) {
+        return res.status(404).json({ message: "Alerte non trouvée" });
+      }
+      
+      res.json(updatedAlert);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'alerte:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Données invalides", errors: error.errors });
+      }
+      res.status(500).json({ error: "Erreur lors de la mise à jour de l'alerte" });
+    }
+  });
+  
+  app.patch("/api/site-alerts/:id/toggle", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { active } = req.body;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'alerte invalide" });
+      }
+      
+      if (typeof active !== 'boolean') {
+        return res.status(400).json({ message: "Le paramètre 'active' doit être un booléen" });
+      }
+      
+      const updatedAlert = await storage.toggleAlertStatus(Number(id), active);
+      
+      if (!updatedAlert) {
+        return res.status(404).json({ message: "Alerte non trouvée" });
+      }
+      
+      res.json(updatedAlert);
+    } catch (error) {
+      console.error("Erreur lors de la modification du statut de l'alerte:", error);
+      res.status(500).json({ error: "Erreur lors de la modification du statut de l'alerte" });
+    }
+  });
+  
+  app.delete("/api/site-alerts/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID d'alerte invalide" });
+      }
+      
+      const success = await storage.deleteAlert(Number(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "Alerte non trouvée" });
+      }
+      
+      res.status(200).json({ message: "Alerte supprimée avec succès" });
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'alerte:", error);
+      res.status(500).json({ error: "Erreur lors de la suppression de l'alerte" });
     }
   });
 
