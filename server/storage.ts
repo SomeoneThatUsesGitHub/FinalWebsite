@@ -16,7 +16,8 @@ import {
   liveCoverageQuestions, type LiveCoverageQuestion, type InsertLiveCoverageQuestion,
   newsletterSubscribers, type NewsletterSubscriber, type InsertNewsletterSubscriber,
   teamApplications, type TeamApplication, type InsertTeamApplication,
-  contactMessages, type ContactMessage, type InsertContactMessage
+  contactMessages, type ContactMessage, type InsertContactMessage,
+  articleSubmissions, type ArticleSubmission, type InsertArticleSubmission
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, or, isNull, not, gte, lte, sql, lt } from "drizzle-orm";
@@ -148,6 +149,20 @@ export interface IStorage {
   getVideoById(id: number): Promise<Video | undefined>;
   createVideo(video: InsertVideo): Promise<Video>;
   updateVideoViews(id: number): Promise<void>;
+  
+  // Article Submissions operations
+  getAllArticleSubmissions(): Promise<(ArticleSubmission & { 
+    submitter?: { displayName: string }, 
+    assignedEditor?: { displayName: string }
+  })[]>;
+  getArticleSubmissionsByUser(userId: number): Promise<ArticleSubmission[]>;
+  getArticleSubmissionById(id: number): Promise<(ArticleSubmission & { 
+    submitter?: { displayName: string }, 
+    assignedEditor?: { displayName: string } 
+  }) | undefined>;
+  createArticleSubmission(submission: InsertArticleSubmission): Promise<ArticleSubmission>;
+  updateArticleSubmissionStatus(id: number, status: string, editorComments?: string, assignedTo?: number): Promise<ArticleSubmission | undefined>;
+  deleteArticleSubmission(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {

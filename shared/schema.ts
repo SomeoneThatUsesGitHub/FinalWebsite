@@ -492,6 +492,22 @@ export const electionReactions = pgTable("election_reactions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Schéma pour les soumissions d'articles
+export const articleSubmissions = pgTable("article_submissions", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  authorName: text("author_name").notNull(),
+  authorEmail: text("author_email").notNull(),
+  documentLink: text("document_link").notNull(),
+  additionalComments: text("additional_comments"),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected
+  editorComments: text("editor_comments"),
+  submittedBy: integer("submitted_by").references(() => users.id).notNull(),
+  assignedTo: integer("assigned_to").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const insertElectionReactionSchema = createInsertSchema(electionReactions).pick({
   electionId: true,
   author: true,
@@ -500,3 +516,16 @@ export const insertElectionReactionSchema = createInsertSchema(electionReactions
 
 export type InsertElectionReaction = z.infer<typeof insertElectionReactionSchema>;
 export type ElectionReaction = typeof electionReactions.$inferSelect;
+
+// Schéma d'insertion pour les soumissions d'articles
+export const insertArticleSubmissionSchema = createInsertSchema(articleSubmissions).pick({
+  title: true,
+  authorName: true,
+  authorEmail: true,
+  documentLink: true,
+  additionalComments: true,
+  submittedBy: true,
+});
+
+export type ArticleSubmission = typeof articleSubmissions.$inferSelect;
+export type InsertArticleSubmission = z.infer<typeof insertArticleSubmissionSchema>;
