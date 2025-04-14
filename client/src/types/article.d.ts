@@ -5,6 +5,7 @@ export interface Article {
   content: string;
   excerpt: string;
   imageUrl: string | null;
+  sources?: string | null;
   authorId: number;
   categoryId: number;
   published: boolean;
