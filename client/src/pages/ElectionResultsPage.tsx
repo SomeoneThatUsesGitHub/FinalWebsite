@@ -9,8 +9,11 @@ import { ElectionResultsData } from "../components/ElectionResultsChart";
 import ElectionResultsChart from "../components/ElectionResultsChart";
 import MainLayout from "../components/layout/MainLayout";
 import { motion } from "framer-motion";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface Election {
   id: number;
@@ -207,7 +210,7 @@ const ElectionResultsPage: React.FC = () => {
           )}
           
           {!upcoming && electionData.results.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div>
                 <h2 className="text-2xl font-bold mb-2">Résultats des élections</h2>
                 <div className="h-[400px] mb-2">
@@ -216,7 +219,7 @@ const ElectionResultsPage: React.FC = () => {
               </div>
               
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle>Détail des candidats</CardTitle>
                   <CardDescription>Liste complète des candidats et leurs performances</CardDescription>
                 </CardHeader>

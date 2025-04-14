@@ -482,3 +482,21 @@ export type InsertEducationalQuiz = z.infer<typeof insertEducationalQuizSchema>;
 
 export type PoliticalGlossaryTerm = typeof politicalGlossary.$inferSelect;
 export type InsertPoliticalGlossaryTerm = z.infer<typeof insertPoliticalGlossarySchema>;
+
+// Schema pour les réactions d'élections
+export const electionReactions = pgTable("election_reactions", {
+  id: serial("id").primaryKey(),
+  electionId: integer("election_id").notNull(),
+  username: text("username").notNull().default("Anonyme"),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertElectionReactionSchema = createInsertSchema(electionReactions).pick({
+  electionId: true,
+  username: true,
+  content: true,
+});
+
+export type InsertElectionReaction = z.infer<typeof insertElectionReactionSchema>;
+export type ElectionReaction = typeof electionReactions.$inferSelect;
