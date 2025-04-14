@@ -487,14 +487,14 @@ export type InsertPoliticalGlossaryTerm = z.infer<typeof insertPoliticalGlossary
 export const electionReactions = pgTable("election_reactions", {
   id: serial("id").primaryKey(),
   electionId: integer("election_id").notNull(),
-  username: text("username").notNull().default("Anonyme"),
+  author: text("author").notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const insertElectionReactionSchema = createInsertSchema(electionReactions).pick({
   electionId: true,
-  username: true,
+  author: true,
   content: true,
 });
 
