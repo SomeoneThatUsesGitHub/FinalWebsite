@@ -511,6 +511,7 @@ export const siteAlerts = pgTable("site_alerts", {
   priority: integer("priority").notNull().default(1), // Plus la valeur est élevée, plus l'alerte est prioritaire
   backgroundColor: text("background_color").notNull().default("#dc2626"), // Couleur d'arrière-plan par défaut (rouge)
   textColor: text("text_color").notNull().default("#ffffff"), // Couleur de texte par défaut (blanc)
+  url: text("url"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   createdBy: integer("created_by").references(() => users.id),
 });
@@ -521,6 +522,7 @@ export const insertSiteAlertSchema = createInsertSchema(siteAlerts).pick({
   priority: true,
   backgroundColor: true,
   textColor: true,
+  url: true,
   createdBy: true,
 });
 
