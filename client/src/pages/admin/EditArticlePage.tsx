@@ -597,7 +597,8 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 {form.formState.errors.excerpt && (
                   <p className="text-sm text-red-500">{form.formState.errors.excerpt.message}</p>
                 )}
-
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="sources">Sources</Label>
                 <Textarea
@@ -609,8 +610,6 @@ function EditArticleForm({ article, categories }: { article: Article, categories
                 {form.formState.errors.sources && (
                   <p className="text-sm text-red-500">{form.formState.errors.sources.message}</p>
                 )}
-              </div>
-
               </div>
               
               <div className="space-y-2">
