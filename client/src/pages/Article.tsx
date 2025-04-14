@@ -212,6 +212,17 @@ const Article: React.FC = () => {
                 >
                   <p className="text-xl font-medium text-dark/80 mb-8 leading-relaxed">{article.excerpt}</p>
                   <ArticleContent content={article.content} />
+                  
+                  {article.sources && (
+                    <div className="mt-8 pt-6 border-t">
+                      <h3 className="text-lg font-medium mb-2">Sources consultées</h3>
+                      <div className="space-y-1 text-sm text-dark/70">
+                        {article.sources.split("\n").map((source, index) => (
+                          <p key={index}>{source}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
                 
                 {/* Social sharing */}
