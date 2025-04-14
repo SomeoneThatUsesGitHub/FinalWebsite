@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import passport from "passport";
-import { isAuthenticated, isAdmin, isAdminOnly, loginSchema, hashPassword } from "./auth";
+import { isAuthenticated, isAdmin, isAdminOnly, isEditorOrAdmin, loginSchema, hashPassword } from "./auth";
 import * as schema from "@shared/schema";
 import { 
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
