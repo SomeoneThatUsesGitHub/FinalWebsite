@@ -54,7 +54,6 @@ export const articles = pgTable("articles", {
   categoryId: integer("category_id").references(() => categories.id),
   published: boolean("published").notNull().default(true),
   featured: boolean("featured").notNull().default(false),
-  sources: text("sources"),
   viewCount: integer("view_count").notNull().default(0),
   commentCount: integer("comment_count").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -71,7 +70,6 @@ export const insertArticleSchema = createInsertSchema(articles).pick({
   categoryId: true,
   published: true,
   featured: true,
-  sources: true,
 });
 
 // News Updates schema - for breaking news and ticker items

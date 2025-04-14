@@ -31,7 +31,6 @@ const articleFormSchema = insertArticleSchema
     categoryId: z.number().or(z.string().transform(val => parseInt(val, 10))),
     published: z.boolean().default(false),
     featured: z.boolean().default(false),
-    sources: z.string().optional(),
   })
   .omit({ createdAt: true, updatedAt: true, viewCount: true, commentCount: true });
 
@@ -54,7 +53,6 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
       categoryId: 1,
       published: false,
       featured: false,
-      sources: "",
     }
   });
   
@@ -410,7 +408,6 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
-      sources: article.sources || "",
     }
   });
   
@@ -427,7 +424,6 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
-      sources: article.sources || "",
     });
   }, [article.id]);
   
