@@ -54,6 +54,7 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
       categoryId: 1,
       published: false,
       featured: false,
+      sources: "",
     }
   });
   
@@ -409,6 +410,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
+      sources: article.sources || "",
     }
   });
   
@@ -425,6 +427,7 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       categoryId: typeof article.categoryId === 'number' ? article.categoryId : 1,
       published: Boolean(article.published),
       featured: Boolean(article.featured),
+      sources: article.sources || "",
     });
   }, [article.id]);
   
