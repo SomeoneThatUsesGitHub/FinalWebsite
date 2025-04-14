@@ -33,7 +33,7 @@ const siteAlertSchema = z.object({
   priority: z.coerce.number().int().min(1).max(10).default(1),
   backgroundColor: z.string().min(1, "La couleur de fond est requise").default("#dc2626"),
   textColor: z.string().min(1, "La couleur du texte est requise").default("#ffffff"),
-  url: z.string().url("L'URL doit être valide").optional().or(z.literal("")),
+  url: z.string().url("L'URL doit être valide").nullish().or(z.literal("")),
 });
 
 type SiteAlert = {
@@ -187,25 +187,15 @@ const SiteAlertsPage = () => {
   });
 
   const onCreateSubmit = (data: z.infer<typeof siteAlertSchema>) => {
-    // Si l'URL est vide, on met null
-    const submissionData = {
-      ...data,
-      url: data.url === "" ? null : data.url,
-    };
-    
-    createMutation.mutate(submissionData);
+    // Si l'URL est vide, on met null (mais c'est déjà géré par le schéma Zod)
+    createMutation.mutate(data);
   };
 
   const onEditSubmit = (data: z.infer<typeof siteAlertSchema>) => {
     if (!selectedAlert) return;
     
-    // Si l'URL est vide, on met null
-    const submissionData = {
-      ...data,
-      url: data.url === "" ? null : data.url,
-    };
-    
-    updateMutation.mutate({ id: selectedAlert.id, data: submissionData });
+    // URL est déjà gérée par le schéma Zod
+    updateMutation.mutate({ id: selectedAlert.id, data });
   };
 
   const openEditDialog = (alert: SiteAlert) => {
