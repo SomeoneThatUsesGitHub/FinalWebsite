@@ -111,10 +111,10 @@ const Header: React.FC = () => {
               ))}
               
               {/* Séparateur */}
-              <div className="border-t border-gray-200 my-1"></div>
+              <div className="border-t border-gray-200 my-2.5"></div>
               
               {/* Bouton Contact spécial */}
-              <div className="mt-1 px-1">
+              <div className="mt-2 px-1">
                 <Link href="/contact">
                   <div 
                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors cursor-pointer shadow-sm"
