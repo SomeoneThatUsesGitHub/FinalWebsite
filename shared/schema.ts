@@ -50,7 +50,6 @@ export const articles = pgTable("articles", {
   content: text("content").notNull(),
   excerpt: text("excerpt").notNull(),
   imageUrl: text("image_url"),
-  sources: text("sources"),  // Champ pour stocker des liens vers les sources
   authorId: integer("author_id").references(() => users.id),
   categoryId: integer("category_id").references(() => categories.id),
   published: boolean("published").notNull().default(true),
@@ -67,7 +66,6 @@ export const insertArticleSchema = createInsertSchema(articles).pick({
   content: true,
   excerpt: true,
   imageUrl: true,
-  sources: true,  // Ajout du champ sources
   authorId: true,
   categoryId: true,
   published: true,
