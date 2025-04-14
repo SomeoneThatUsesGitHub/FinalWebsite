@@ -28,6 +28,14 @@ interface Election {
   createdAt: string;
 }
 
+interface ElectionReaction {
+  id: number;
+  electionId: number;
+  author: string;
+  content: string;
+  createdAt: string;
+}
+
 const pageTransition = {
   initial: { opacity: 0 },
   animate: { opacity: 1, transition: { duration: 0.5 } },
@@ -50,6 +58,11 @@ const ElectionResultsPage: React.FC = () => {
   const [routeMatched, params] = useRoute('/elections/:countryCode/resultats/:id');
   const countryCode = params?.countryCode.toUpperCase();
   const [location] = useLocation();
+  const { toast } = useToast();
+  
+  // État pour le formulaire de réaction
+  const [reactionText, setReactionText] = useState("");
+  const [reactionAuthor, setReactionAuthor] = useState("");
   
   // Extraire l'ID de l'élection à partir des paramètres d'URL
   const electionId = params?.id ? parseInt(params.id) : null;
@@ -58,6 +71,89 @@ const ElectionResultsPage: React.FC = () => {
   const { data: allElections, isLoading } = useQuery<Election[]>({
     queryKey: ['/api/elections'],
   });
+  
+  // Récupérer les réactions pour cette élection
+  const { data: reactions, isLoading: reactionsLoading } = useQuery<ElectionReaction[]>({
+    queryKey: ['/api/elections', electionId, 'reactions'],
+    queryFn: async () => {
+      if (!electionId) return [];
+      const response = await fetch(`/api/elections/${electionId}/reactions`);
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des réactions');
+      }
+      return response.json();
+    },
+    enabled: !!electionId,
+  });
+  
+  // Mutation pour ajouter une réaction
+  const addReactionMutation = useMutation({
+    mutationFn: async (data: { author: string; content: string }) => {
+      if (!electionId) throw new Error("ID d'élection invalide");
+      
+      const response = await fetch(`/api/elections/${electionId}/reactions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'ajout de la réaction');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      // Réinitialiser le formulaire
+      setReactionText("");
+      setReactionAuthor("");
+      
+      // Notifier l'utilisateur
+      toast({
+        title: "Réaction publiée",
+        description: "Votre réaction a été publiée avec succès.",
+        variant: "default",
+      });
+      
+      // Actualiser la liste des réactions
+      queryClient.invalidateQueries({ queryKey: ['/api/elections', electionId, 'reactions'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Gérer la soumission du formulaire
+  const handleSubmitReaction = () => {
+    if (!reactionText.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez saisir un commentaire.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!reactionAuthor.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez saisir votre nom.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    addReactionMutation.mutate({
+      author: reactionAuthor,
+      content: reactionText
+    });
+  };
   
   // Trouver l'élection actuelle par son ID
   const currentElection = useMemo(() => {
@@ -269,40 +365,100 @@ const ElectionResultsPage: React.FC = () => {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex flex-col gap-2">
+                      <div className="mb-2">
+                        <input
+                          type="text"
+                          value={reactionAuthor}
+                          onChange={(e) => setReactionAuthor(e.target.value)}
+                          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                          placeholder="Votre nom"
+                        />
+                      </div>
                       <textarea 
+                        value={reactionText}
+                        onChange={(e) => setReactionText(e.target.value)}
                         className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Partagez votre réaction..."
                         rows={4}
                       />
                       <div className="flex justify-end">
-                        <Button>Publier</Button>
+                        <Button 
+                          onClick={handleSubmitReaction}
+                          disabled={addReactionMutation.isPending}
+                        >
+                          {addReactionMutation.isPending ? 'Publication...' : 'Publier'}
+                        </Button>
                       </div>
                     </div>
                     
                     <div className="mt-8 space-y-4">
                       <h3 className="font-semibold text-lg mb-2">Commentaires récents</h3>
                       
-                      <div className="space-y-4">
-                        {/* Liste des réactions (simulée pour le moment) */}
-                        {[1, 2, 3].map((_, i) => (
-                          <div key={i} className="p-4 border rounded-lg bg-gray-50">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
-                                {String.fromCharCode(65 + i)}
+                      {reactionsLoading ? (
+                        <div className="space-y-4">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="p-4 border rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Skeleton className="w-8 h-8 rounded-full" />
+                                <div>
+                                  <Skeleton className="h-4 w-32 mb-1" />
+                                  <Skeleton className="h-3 w-24" />
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-medium">Utilisateur {i + 1}</p>
-                                <p className="text-xs text-gray-500">il y a {i + 1} heure{i !== 0 ? 's' : ''}</p>
-                              </div>
+                              <Skeleton className="h-4 w-full mt-2" />
+                              <Skeleton className="h-4 w-3/4 mt-1" />
                             </div>
-                            <p className="text-sm text-gray-700">
-                              {i === 0 && "Ces résultats sont très intéressants, je suis surpris par la performance du candidat en tête."}
-                              {i === 1 && "Je m'attendais à un résultat plus serré. Les chiffres sont éloquents !"}
-                              {i === 2 && "Une élection historique qui marque un tournant important."}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      ) : reactions && reactions.length > 0 ? (
+                        <div className="space-y-4">
+                          {reactions.map((reaction) => {
+                            // Calculer la date relative
+                            const createdDate = new Date(reaction.createdAt);
+                            const now = new Date();
+                            const diffInMinutes = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60));
+                            
+                            let relativeTime;
+                            if (diffInMinutes < 1) {
+                              relativeTime = "à l'instant";
+                            } else if (diffInMinutes < 60) {
+                              relativeTime = `il y a ${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''}`;
+                            } else if (diffInMinutes < 1440) {
+                              const hours = Math.floor(diffInMinutes / 60);
+                              relativeTime = `il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+                            } else {
+                              const days = Math.floor(diffInMinutes / 1440);
+                              relativeTime = `il y a ${days} jour${days > 1 ? 's' : ''}`;
+                            }
+                            
+                            const initials = reaction.author
+                              .split(' ')
+                              .map(part => part[0])
+                              .join('')
+                              .toUpperCase()
+                              .substring(0, 2);
+                              
+                            return (
+                              <div key={reaction.id} className="p-4 border rounded-lg bg-gray-50">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
+                                    {initials}
+                                  </div>
+                                  <div>
+                                    <p className="font-medium">{reaction.author}</p>
+                                    <p className="text-xs text-gray-500">{relativeTime}</p>
+                                  </div>
+                                </div>
+                                <p className="text-sm text-gray-700">{reaction.content}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-center py-10 border rounded-lg bg-gray-50">
+                          <p className="text-muted-foreground">Aucune réaction pour le moment. Soyez le premier à partager votre opinion!</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
