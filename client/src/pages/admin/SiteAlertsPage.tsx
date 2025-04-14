@@ -28,7 +28,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 // Définition du schéma de validation pour les Alertes de site
 const siteAlertSchema = z.object({
-  message: z.string().min(3, "Le message doit contenir au moins 3 caractères"),
+  content: z.string().min(3, "Le message doit contenir au moins 3 caractères"),
   active: z.boolean().default(true),
   priority: z.coerce.number().int().min(1).max(10).default(1),
   backgroundColor: z.string().min(1, "La couleur de fond est requise").default("#dc2626"),
