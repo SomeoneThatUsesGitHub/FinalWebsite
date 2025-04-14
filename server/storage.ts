@@ -1522,6 +1522,116 @@ async function initializeEducationalTopics() {
       }
     }
   }
+  
+  // Article Submissions operations
+  async getAllArticleSubmissions(): Promise<(ArticleSubmission & { 
+    submitter?: { displayName: string }, 
+    assignedEditor?: { displayName: string }
+  })[]> {
+    const results = await db.select({
+      submission: articleSubmissions,
+      submitter: {
+        displayName: users.displayName,
+      },
+      assignedEditor: {
+        displayName: users.displayName,
+      }
+    })
+    .from(articleSubmissions)
+    .leftJoin(users.as('submitter'), eq(articleSubmissions.submittedBy, users.as('submitter').id))
+    .leftJoin(users.as('assignedEditor'), eq(articleSubmissions.assignedTo, users.as('assignedEditor').id))
+    .orderBy(desc(articleSubmissions.createdAt));
+    
+    return results.map(row => {
+      const submitterData = row.submitter && row.submitter.displayName ? { displayName: row.submitter.displayName } : undefined;
+      const assignedEditorData = row.assignedEditor && row.assignedEditor.displayName ? { displayName: row.assignedEditor.displayName } : undefined;
+      
+      return {
+        ...row.submission,
+        submitter: submitterData,
+        assignedEditor: assignedEditorData
+      };
+    });
+  }
+
+  async getArticleSubmissionsByUser(userId: number): Promise<ArticleSubmission[]> {
+    return db.select()
+      .from(articleSubmissions)
+      .where(eq(articleSubmissions.submittedBy, userId))
+      .orderBy(desc(articleSubmissions.createdAt));
+  }
+
+  async getArticleSubmissionById(id: number): Promise<(ArticleSubmission & { 
+    submitter?: { displayName: string }, 
+    assignedEditor?: { displayName: string } 
+  }) | undefined> {
+    const [result] = await db.select({
+      submission: articleSubmissions,
+      submitter: {
+        displayName: users.displayName,
+      },
+      assignedEditor: {
+        displayName: users.displayName,
+      }
+    })
+    .from(articleSubmissions)
+    .leftJoin(users.as('submitter'), eq(articleSubmissions.submittedBy, users.as('submitter').id))
+    .leftJoin(users.as('assignedEditor'), eq(articleSubmissions.assignedTo, users.as('assignedEditor').id))
+    .where(eq(articleSubmissions.id, id));
+    
+    if (!result) return undefined;
+    
+    const submitterData = result.submitter && result.submitter.displayName ? { displayName: result.submitter.displayName } : undefined;
+    const assignedEditorData = result.assignedEditor && result.assignedEditor.displayName ? { displayName: result.assignedEditor.displayName } : undefined;
+    
+    return {
+      ...result.submission,
+      submitter: submitterData,
+      assignedEditor: assignedEditorData
+    };
+  }
+
+  async createArticleSubmission(submission: InsertArticleSubmission): Promise<ArticleSubmission> {
+    const [newSubmission] = await db
+      .insert(articleSubmissions)
+      .values({
+        ...submission,
+        status: "pending",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+      
+    return newSubmission;
+  }
+
+  async updateArticleSubmissionStatus(id: number, status: string, editorComments?: string, assignedTo?: number): Promise<ArticleSubmission | undefined> {
+    const updateData: any = { 
+      status,
+      updatedAt: new Date()
+    };
+    
+    if (editorComments !== undefined) {
+      updateData.editorComments = editorComments;
+    }
+    
+    if (assignedTo !== undefined) {
+      updateData.assignedTo = assignedTo;
+    }
+    
+    const [updatedSubmission] = await db
+      .update(articleSubmissions)
+      .set(updateData)
+      .where(eq(articleSubmissions.id, id))
+      .returning();
+      
+    return updatedSubmission;
+  }
+
+  async deleteArticleSubmission(id: number): Promise<boolean> {
+    const result = await db.delete(articleSubmissions).where(eq(articleSubmissions.id, id));
+    return result.rowCount > 0;
+  }
 }
 
 // Initialize the database

@@ -177,6 +177,165 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(election);
   });
   
+  // Routes pour les soumissions d'articles
+
+  // Obtenir toutes les soumissions d'articles (admin/chef éditorial)
+  app.get("/api/article-submissions", isEditorOrAdmin, async (req: Request, res: Response) => {
+    try {
+      const submissions = await storage.getAllArticleSubmissions();
+      res.json(submissions);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des soumissions d'articles:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la récupération des soumissions d'articles"
+      });
+    }
+  });
+  
+  // Obtenir les soumissions d'articles par utilisateur (pour éditeurs)
+  app.get("/api/article-submissions/user", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Non authentifié" });
+      }
+      
+      const submissions = await storage.getArticleSubmissionsByUser(req.user.id);
+      res.json(submissions);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des soumissions d'articles:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la récupération des soumissions d'articles"
+      });
+    }
+  });
+  
+  // Obtenir une soumission d'article par son ID
+  app.get("/api/article-submissions/:id", isEditorOrAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de soumission invalide" });
+      }
+      
+      const submission = await storage.getArticleSubmissionById(Number(id));
+      
+      if (!submission) {
+        return res.status(404).json({ message: "Soumission d'article non trouvée" });
+      }
+      
+      // Vérifier si l'utilisateur a le droit d'accéder à cette soumission
+      // Les admins peuvent voir toutes les soumissions, les éditeurs seulement les leurs
+      if (req.user && req.user.role !== "admin" && submission.submittedBy !== req.user.id) {
+        return res.status(403).json({ message: "Accès non autorisé à cette soumission" });
+      }
+      
+      res.json(submission);
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la soumission d'article:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la récupération de la soumission d'article"
+      });
+    }
+  });
+  
+  // Créer une nouvelle soumission d'article
+  app.post("/api/article-submissions", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Non authentifié" });
+      }
+      
+      // Valider les données d'entrée
+      const validation = insertArticleSubmissionSchema
+        .extend({
+          title: z.string().min(5, "Le titre doit contenir au moins 5 caractères"),
+          authorName: z.string().min(3, "Le nom de l'auteur doit contenir au moins 3 caractères"),
+          authorEmail: z.string().email("L'email n'est pas valide"),
+          documentLink: z.string().url("Le lien du document n'est pas valide"),
+        })
+        .safeParse({
+          ...req.body,
+          submittedBy: req.user.id
+        });
+      
+      if (!validation.success) {
+        return res.status(400).json({ errors: validation.error.errors });
+      }
+      
+      const newSubmission = await storage.createArticleSubmission(validation.data);
+      res.status(201).json(newSubmission);
+    } catch (error) {
+      console.error("Erreur lors de la création de la soumission d'article:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la création de la soumission d'article"
+      });
+    }
+  });
+  
+  // Mettre à jour le statut d'une soumission d'article (admin uniquement)
+  app.patch("/api/article-submissions/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de soumission invalide" });
+      }
+      
+      const { status, editorComments, assignedTo } = req.body;
+      
+      // Valider le statut
+      if (!["pending", "approved", "rejected"].includes(status)) {
+        return res.status(400).json({ message: "Statut invalide. Doit être 'pending', 'approved' ou 'rejected'" });
+      }
+      
+      // Vérifier que la soumission existe
+      const submission = await storage.getArticleSubmissionById(Number(id));
+      if (!submission) {
+        return res.status(404).json({ message: "Soumission d'article non trouvée" });
+      }
+      
+      // Mettre à jour le statut
+      const updatedSubmission = await storage.updateArticleSubmissionStatus(
+        Number(id),
+        status,
+        editorComments,
+        assignedTo ? Number(assignedTo) : undefined
+      );
+      
+      res.json(updatedSubmission);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la soumission d'article:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la mise à jour de la soumission d'article"
+      });
+    }
+  });
+  
+  // Supprimer une soumission d'article (admin uniquement)
+  app.delete("/api/article-submissions/:id", isAdminOnly, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ message: "ID de soumission invalide" });
+      }
+      
+      const success = await storage.deleteArticleSubmission(Number(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "Soumission d'article non trouvée" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la soumission d'article:", error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la suppression de la soumission d'article"
+      });
+    }
+  });
+  
   // Crée une nouvelle élection (requiert authentification admin)
   app.post("/api/elections", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
