@@ -5,6 +5,7 @@ import { queryClient } from "@/lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
+import { Helmet } from "react-helmet";
 
 // Pages publiques
 import Home from "@/pages/Home";
@@ -83,6 +84,22 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <div className="flex flex-col min-h-screen">
+          {/* Balises SEO globales */}
+          <Helmet>
+            <html lang="fr" />
+            <meta charSet="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Politiquensemble - L'actualité politique simplifiée pour les 16-30 ans</title>
+            <meta name="description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Un média par et pour les jeunes citoyens." />
+            
+            {/* Balises hreflang pour indiquer la langue principale */}
+            <link rel="alternate" hrefLang="fr" href="https://politiquensemble.fr" />
+            <link rel="alternate" hrefLang="x-default" href="https://politiquensemble.fr" />
+            
+            {/* Balises de site vérifié pour les moteurs de recherche */}
+            <meta name="google-site-verification" content="REMPLACER_PAR_CODE_VERIFICATION" />
+          </Helmet>
+
           {/* N'afficher le header et le footer que sur les pages publiques */}
           {!isAdminPage && <Header />}
           <main className={`flex-grow ${!isAdminPage ? "" : "bg-background"}`}>
