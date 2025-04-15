@@ -301,12 +301,14 @@ const ListArticleCard: React.FC<{
 };
 
 const ArticlesSection: React.FC = () => {
+  // États pour les filtres et la recherche
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOrder, setSortOrder] = useState("recent");
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
   
+  // Récupération des catégories pour les filtres
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
   });
