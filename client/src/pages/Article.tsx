@@ -59,8 +59,61 @@ const Article: React.FC = () => {
     >
       {article && (
         <Helmet>
-          <title>{article.title} | Politique Jeune</title>
+          <title>{article.title} | Politiquensemble</title>
           <meta name="description" content={article.excerpt} />
+          
+          {/* SEO Open Graph Tags */}
+          <meta property="og:title" content={article.title} />
+          <meta property="og:description" content={article.excerpt} />
+          <meta property="og:image" content={article.imageUrl || '/logo-share.png'} />
+          <meta property="og:url" content={`https://politiquensemble.fr/articles/${article.slug}`} />
+          <meta property="og:type" content="article" />
+          <meta property="og:site_name" content="Politiquensemble" />
+          
+          {/* Twitter Card */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={article.title} />
+          <meta name="twitter:description" content={article.excerpt} />
+          <meta name="twitter:image" content={article.imageUrl || '/logo-share.png'} />
+          
+          {/* Google News Tags */}
+          <meta name="news_keywords" content={`politique, ${category?.name || ''}, actualité, France, Europe`} />
+          <meta property="article:published_time" content={article.createdAt} />
+          {article.updatedAt && <meta property="article:modified_time" content={article.updatedAt} />}
+          <meta property="article:section" content={category?.name || 'Politique'} />
+          <meta property="article:author" content={article.author?.displayName || 'Politiquensemble'} />
+          
+          {/* Schema.org structured data for news articles */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "NewsArticle",
+              "headline": article.title,
+              "image": [article.imageUrl || 'https://politiquensemble.fr/logo-share.png'],
+              "datePublished": article.createdAt,
+              "dateModified": article.updatedAt || article.createdAt,
+              "author": {
+                "@type": "Person",
+                "name": article.author?.displayName || 'Politiquensemble'
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Politiquensemble",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://politiquensemble.fr/logo.png"
+                }
+              },
+              "description": article.excerpt,
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": `https://politiquensemble.fr/articles/${article.slug}`
+              }
+            })}
+          </script>
+          
+          {/* Canonical URL */}
+          <link rel="canonical" href={`https://politiquensemble.fr/articles/${article.slug}`} />
         </Helmet>
       )}
       
