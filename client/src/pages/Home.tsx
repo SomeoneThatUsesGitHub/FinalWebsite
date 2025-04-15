@@ -23,15 +23,15 @@ const Home: React.FC = () => {
         {/* Balises Open Graph */}
         <meta property="og:title" content="Politiquensemble - L'actualité politique pour les 16-30 ans" />
         <meta property="og:description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans." />
-        <meta property="og:url" content="https://politiquensemble.fr" />
+        <meta property="og:url" content="https://politiquensemble.be" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://politiquensemble.fr/logo-share.png" />
+        <meta property="og:image" content="https://politiquensemble.be/logo-share.png" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Politiquensemble - L'actualité politique pour les 16-30 ans" />
         <meta name="twitter:description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans." />
-        <meta name="twitter:image" content="https://politiquensemble.fr/logo-share.png" />
+        <meta name="twitter:image" content="https://politiquensemble.be/logo-share.png" />
         
         {/* Balises Google News pour la page d'accueil */}
         <meta name="news_keywords" content="politique, actualité, jeunesse, démocratie, élections, Europe, France, éducation" />
