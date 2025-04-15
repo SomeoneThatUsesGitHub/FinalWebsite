@@ -5,6 +5,7 @@ import session from "express-session";
 import passport from "passport";
 import { configurePassport } from "./auth";
 import MemoryStore from "memorystore";
+import { setupSitemapRoutes } from "./sitemaps";
 
 const app = express();
 app.use(express.json());
@@ -69,6 +70,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Configurer les routes pour les sitemaps
+  setupSitemapRoutes(app);
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
