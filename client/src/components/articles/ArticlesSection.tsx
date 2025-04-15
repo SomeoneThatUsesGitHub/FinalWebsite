@@ -65,9 +65,11 @@ const CompactArticleCard: React.FC<{
   onCategoryClick: (categoryId: number) => void;
 }> = ({ article, categories, onCategoryClick }) => {
   return (
-    <motion.div 
+    <motion.article 
       className="flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
       variants={staggerItem}
+      itemScope
+      itemType="https://schema.org/NewsArticle"
     >
       <div className="flex-shrink-0 hidden sm:block">
         <div className="h-20 w-28 overflow-hidden rounded-md">
@@ -113,7 +115,7 @@ const CompactArticleCard: React.FC<{
           </span>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 };
 
@@ -225,9 +227,11 @@ const ListArticleCard: React.FC<{
   onCategoryClick: (categoryId: number) => void;
 }> = ({ article, categories, onCategoryClick }) => {
   return (
-    <motion.div 
+    <motion.article 
       className="flex flex-col md:flex-row gap-6 p-6 border-b border-gray-200 hover:bg-gray-50 transition-colors"
       variants={staggerItem}
+      itemScope
+      itemType="https://schema.org/NewsArticle"
     >
       <div className="flex-shrink-0">
         <div className="h-48 md:h-40 md:w-60 overflow-hidden rounded-lg">
@@ -292,7 +296,7 @@ const ListArticleCard: React.FC<{
           </div>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 };
 
