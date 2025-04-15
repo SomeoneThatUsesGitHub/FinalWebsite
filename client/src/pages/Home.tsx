@@ -42,19 +42,19 @@ const Home: React.FC = () => {
             "@context": "https://schema.org",
             "@type": "WebSite",
             "name": "Politiquensemble",
-            "url": "https://politiquensemble.fr",
+            "url": "https://politiquensemble.be",
             "description": "Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans.",
             "publisher": {
               "@type": "Organization",
               "name": "Politiquensemble",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://politiquensemble.fr/logo.png"
+                "url": "https://politiquensemble.be/logo.png"
               }
             },
             "potentialAction": {
               "@type": "SearchAction",
-              "target": "https://politiquensemble.fr/articles?search={search_term_string}",
+              "target": "https://politiquensemble.be/articles?search={search_term_string}",
               "query-input": "required name=search_term_string"
             }
           })}
@@ -66,16 +66,16 @@ const Home: React.FC = () => {
             "@context": "https://schema.org",
             "@type": "NewsMediaOrganization",
             "name": "Politiquensemble",
-            "url": "https://politiquensemble.fr",
-            "logo": "https://politiquensemble.fr/logo.png",
+            "url": "https://politiquensemble.be",
+            "logo": "https://politiquensemble.be/logo.png",
             "sameAs": [
               "https://www.instagram.com/politiquensemble",
               "https://twitter.com/politiquensemble",
               "https://www.tiktok.com/@politiquensemble"
             ],
-            "diversityPolicy": "https://politiquensemble.fr/a-propos",
-            "ethicsPolicy": "https://politiquensemble.fr/mentions-legales",
-            "masthead": "https://politiquensemble.fr/team",
+            "diversityPolicy": "https://politiquensemble.be/a-propos",
+            "ethicsPolicy": "https://politiquensemble.be/mentions-legales",
+            "masthead": "https://politiquensemble.be/team",
             "foundingDate": "2023-01-01",
             "foundingLocation": {
               "@type": "Place",
@@ -85,7 +85,7 @@ const Home: React.FC = () => {
         </script>
         
         {/* Canonical URL */}
-        <link rel="canonical" href="https://politiquensemble.fr" />
+        <link rel="canonical" href="https://politiquensemble.be" />
       </Helmet>
       
       <HeroSection />

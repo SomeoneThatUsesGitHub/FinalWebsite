@@ -242,15 +242,15 @@ const ElectionResultsPage: React.FC = () => {
         {/* Balises Open Graph */}
         <meta property="og:title" content={`${title} - Résultats | Politiquensemble`} />
         <meta property="og:description" content={`Découvrez les résultats détaillés de l'élection ${title} en ${country}. ${description || 'Analyse des données électorales'}.`} />
-        <meta property="og:url" content={`https://politiquensemble.fr/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`} />
+        <meta property="og:url" content={`https://politiquensemble.be/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`} />
         <meta property="og:type" content="article" />
-        <meta property="og:image" content="https://politiquensemble.fr/logo-share.png" />
+        <meta property="og:image" content="https://politiquensemble.be/logo-share.png" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content={`${title} - Résultats | Politiquensemble`} />
         <meta name="twitter:description" content={`Découvrez les résultats détaillés de l'élection ${title} en ${country}. ${description || 'Analyse des données électorales'}.`} />
-        <meta name="twitter:image" content="https://politiquensemble.fr/logo-share.png" />
+        <meta name="twitter:image" content="https://politiquensemble.be/logo-share.png" />
         
         {/* Schema.org pour les résultats électoraux */}
         <script type="application/ld+json">
@@ -260,14 +260,14 @@ const ElectionResultsPage: React.FC = () => {
             "name": `Résultats de l'élection ${title}`,
             "description": `Résultats détaillés de l'élection ${title} en ${country}. ${description || 'Analyse des données électorales'}.`,
             "keywords": ["élections", "résultats électoraux", "politique", country, type],
-            "url": `https://politiquensemble.fr/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`,
+            "url": `https://politiquensemble.be/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`,
             "datePublished": date,
             "publisher": {
               "@type": "Organization",
               "name": "Politiquensemble",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://politiquensemble.fr/logo.png"
+                "url": "https://politiquensemble.be/logo.png"
               }
             },
             "contentLocation": {
@@ -278,7 +278,7 @@ const ElectionResultsPage: React.FC = () => {
         </script>
         
         {/* Canonical URL */}
-        <link rel="canonical" href={`https://politiquensemble.fr/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`} />
+        <link rel="canonical" href={`https://politiquensemble.be/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`} />
       </Helmet>
 
       <motion.div
