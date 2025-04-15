@@ -71,7 +71,7 @@ app.use((req, res, next) => {
 
 (async () => {
   // Configurer les routes pour les sitemaps
-  setupSitemapRoutes(app);
+  await setupSitemapRoutes(app);
 
   const server = await registerRoutes(app);
 

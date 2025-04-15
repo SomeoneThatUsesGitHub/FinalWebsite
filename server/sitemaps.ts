@@ -149,7 +149,7 @@ function escapeXml(unsafe: string): string {
 }
 
 // Fonction pour configurer les routes de sitemap
-export function setupSitemapRoutes(app: express.Express) {
+export async function setupSitemapRoutes(app: express.Express) {
   // Route pour le sitemap standard
   app.get('/sitemap.xml', async (req, res) => {
     try {
@@ -175,6 +175,9 @@ export function setupSitemapRoutes(app: express.Express) {
   });
   
   // Générer les sitemaps initiaux au démarrage
-  generateSitemap().catch(err => console.error('Erreur lors de la génération du sitemap initial:', err));
-  generateNewsSitemap().catch(err => console.error('Erreur lors de la génération du sitemap news initial:', err));
+  // Régénérer immédiatement pour s'assurer que les dernières modifications sont prises en compte
+  console.log('Génération des sitemaps initiaux...');
+  await generateSitemap().catch(err => console.error('Erreur lors de la génération du sitemap initial:', err));
+  await generateNewsSitemap().catch(err => console.error('Erreur lors de la génération du sitemap news initial:', err));
+  console.log('Sitemaps générés avec succès.');
 }

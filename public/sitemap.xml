@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://politiquensemble.fr/</loc>
+    <loc>https://politiquensemble.be/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.fr/articles</loc>
+    <loc>https://politiquensemble.be/articles</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.fr/elections</loc>
+    <loc>https://politiquensemble.be/elections</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.fr/apprendre</loc>
+    <loc>https://politiquensemble.be/apprendre</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.fr/team</loc>
+    <loc>https://politiquensemble.be/team</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.fr/a-propos</loc>
+    <loc>https://politiquensemble.be/a-propos</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.fr/contact</loc>
+    <loc>https://politiquensemble.be/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
