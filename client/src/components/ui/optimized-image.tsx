@@ -61,23 +61,39 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     const getOptimizedImage = async () => {
       try {
         setIsLoading(true);
-        // Cette route REST n'existe pas encore, mais on simule pour le moment
+        // Utiliser notre nouvelle API d'optimisation d'images
         const imgPath = src.startsWith('/') ? src : `/images/${src}`;
         
-        // Pour le moment, retourner un objet simulé avec l'image originale
-        // Dans une vraie implémentation, on appellerait l'API côté serveur
+        // Appeler l'API d'optimisation
+        const response = await fetch(`/api/images/optimize?path=${encodeURIComponent(imgPath)}`);
+        
+        if (!response.ok) {
+          throw new Error(`Erreur d'optimisation: ${response.status} ${response.statusText}`);
+        }
+        
+        const optimizedData = await response.json();
+        
+        // Mettre à jour les sources d'images avec les données optimisées
         setImageSources({
-          original: imgPath,
-          webp: imgPath.replace(/\.(jpe?g|png|gif)$/i, '.webp'),
-          avif: imgPath.replace(/\.(jpe?g|png|gif)$/i, '.avif'),
-          responsive: {
+          original: optimizedData.original || imgPath,
+          webp: optimizedData.webp || '',
+          avif: optimizedData.avif || '',
+          responsive: optimizedData.responsive || {
             webp: [],
             avif: []
           }
         });
       } catch (error) {
         console.error('Erreur lors du chargement des images optimisées:', error);
-        setIsFailed(true);
+        // Fallback à l'image originale en cas d'erreur
+        const imgPath = src.startsWith('/') ? src : `/images/${src}`;
+        setImageSources({
+          original: imgPath,
+          responsive: {
+            webp: [],
+            avif: []
+          }
+        });
       } finally {
         setIsLoading(false);
       }
@@ -108,8 +124,21 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       return undefined;
     }
     
-    // Pour l'instant, puisque nous n'avons pas de tailles responsives, 
-    // on retourne simplement la source WebP et l'original
+    // Gérer les images responsives pour différentes résolutions
+    if (imageSources.responsive && imageSources.responsive.webp && imageSources.responsive.webp.length > 0) {
+      // Créer un srcSet à partir des images responsives
+      // Format: "url width, url2 width2, ..."
+      return imageSources.responsive.webp
+        .map((url, index) => {
+          // Les largeurs courantes en pixels: 320, 640, 1024, 1280, 1920
+          const widths = [320, 640, 1024, 1280, 1920];
+          const width = index < widths.length ? widths[index] : widths[0];
+          return `${url} ${width}w`;
+        })
+        .join(', ');
+    }
+    
+    // Fallback à la version WebP standard si pas de responsive
     if (imageSources.webp) {
       return imageSources.webp;
     }
@@ -127,7 +156,19 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       {fetchSizes && imageSources && !isFailed ? (
         <picture>
           {/* Source AVIF pour navigateurs modernes */}
-          {imageSources.avif && (
+          {imageSources.responsive && imageSources.responsive.avif && imageSources.responsive.avif.length > 0 ? (
+            <source
+              type="image/avif"
+              sizes={sizes}
+              srcSet={imageSources.responsive.avif
+                .map((url, index) => {
+                  const widths = [320, 640, 1024, 1280, 1920];
+                  const width = index < widths.length ? widths[index] : widths[0];
+                  return `${url} ${width}w`;
+                })
+                .join(', ')}
+            />
+          ) : imageSources.avif && (
             <source
               type="image/avif"
               srcSet={imageSources.avif}
@@ -135,7 +176,19 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           )}
           
           {/* Source WebP pour compatibilité large */}
-          {imageSources.webp && (
+          {imageSources.responsive && imageSources.responsive.webp && imageSources.responsive.webp.length > 0 ? (
+            <source
+              type="image/webp"
+              sizes={sizes}
+              srcSet={imageSources.responsive.webp
+                .map((url, index) => {
+                  const widths = [320, 640, 1024, 1280, 1920];
+                  const width = index < widths.length ? widths[index] : widths[0];
+                  return `${url} ${width}w`;
+                })
+                .join(', ')}
+            />
+          ) : imageSources.webp && (
             <source
               type="image/webp"
               srcSet={imageSources.webp}

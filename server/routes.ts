@@ -2604,6 +2604,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Erreur lors de la suppression de la réaction" });
     }
   });
+  
+  // API d'optimisation d'images
+  app.get("/api/images/optimize", cacheMiddleware(60 * 60), async (req: Request, res: Response) => {
+    try {
+      const { path } = req.query;
+      
+      if (!path || typeof path !== 'string') {
+        return res.status(400).json({ 
+          error: "Paramètre 'path' requis", 
+          message: "Veuillez fournir le chemin de l'image à optimiser" 
+        });
+      }
+      
+      // Normaliser le chemin (enlever les '/' au début si nécessaire)
+      const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      
+      // Optimiser l'image
+      const optimizedImage = await optimizeImage(normalizedPath);
+      
+      res.json(optimizedImage);
+    } catch (error) {
+      console.error("Erreur lors de l'optimisation de l'image:", error);
+      res.status(500).json({ 
+        error: "Erreur lors de l'optimisation", 
+        message: error instanceof Error ? error.message : "Erreur inconnue"
+      });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
