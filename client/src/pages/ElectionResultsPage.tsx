@@ -14,6 +14,7 @@ import { Skeleton } from "../components/ui/skeleton";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Helmet } from "react-helmet";
 
 interface Election {
   id: number;
@@ -234,6 +235,52 @@ const ElectionResultsPage: React.FC = () => {
   
   return (
     <MainLayout>
+      <Helmet>
+        <title>{title} - Résultats | Politiquensemble</title>
+        <meta name="description" content={`Découvrez les résultats détaillés de l'élection ${title} en ${country}. ${description || 'Analyse des données électorales'}.`} />
+        
+        {/* Balises Open Graph */}
+        <meta property="og:title" content={`${title} - Résultats | Politiquensemble`} />
+        <meta property="og:description" content={`Découvrez les résultats détaillés de l'élection ${title} en ${country}. ${description || 'Analyse des données électorales'}.`} />
+        <meta property="og:url" content={`https://politiquensemble.fr/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`} />
+        <meta property="og:type" content="article" />
+        <meta property="og:image" content="https://politiquensemble.fr/logo-share.png" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={`${title} - Résultats | Politiquensemble`} />
+        <meta name="twitter:description" content={`Découvrez les résultats détaillés de l'élection ${title} en ${country}. ${description || 'Analyse des données électorales'}.`} />
+        <meta name="twitter:image" content="https://politiquensemble.fr/logo-share.png" />
+        
+        {/* Schema.org pour les résultats électoraux */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            "name": `Résultats de l'élection ${title}`,
+            "description": `Résultats détaillés de l'élection ${title} en ${country}. ${description || 'Analyse des données électorales'}.`,
+            "keywords": ["élections", "résultats électoraux", "politique", country, type],
+            "url": `https://politiquensemble.fr/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`,
+            "datePublished": date,
+            "publisher": {
+              "@type": "Organization",
+              "name": "Politiquensemble",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://politiquensemble.fr/logo.png"
+              }
+            },
+            "contentLocation": {
+              "@type": "Place",
+              "name": country
+            }
+          })}
+        </script>
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href={`https://politiquensemble.fr/elections/${countryCode?.toLowerCase()}/resultats/${electionId}`} />
+      </Helmet>
+
       <motion.div
         initial="initial"
         animate="animate"

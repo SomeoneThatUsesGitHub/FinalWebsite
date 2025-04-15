@@ -6,6 +6,7 @@ import { Calendar, MapPin, VoteIcon, Filter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import MainLayout from '@/components/layout/MainLayout';
 import { pageTransition } from '@/lib/animations';
+import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -149,6 +150,49 @@ const ElectionsPage: React.FC = () => {
 
   return (
     <MainLayout>
+      <Helmet>
+        <title>Élections Internationales | Politiquensemble</title>
+        <meta name="description" content="Suivez les résultats des élections dans le monde entier. Analyses et données électorales pour comprendre les enjeux politiques internationaux." />
+        
+        {/* Balises Open Graph */}
+        <meta property="og:title" content="Élections Internationales | Politiquensemble" />
+        <meta property="og:description" content="Suivez les résultats des élections dans le monde entier. Analyses et données électorales pour comprendre les enjeux politiques internationaux." />
+        <meta property="og:url" content="https://politiquensemble.fr/elections" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://politiquensemble.fr/logo-share.png" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Élections Internationales | Politiquensemble" />
+        <meta name="twitter:description" content="Suivez les résultats des élections dans le monde entier. Analyses et données électorales pour comprendre les enjeux politiques internationaux." />
+        <meta name="twitter:image" content="https://politiquensemble.fr/logo-share.png" />
+        
+        {/* Balises Google News pour la section élections */}
+        <meta name="news_keywords" content="élections, politique, résultats électoraux, vote, démocratie, international" />
+        
+        {/* Schema.org pour la page des élections */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "headline": "Élections Internationales | Politiquensemble",
+            "description": "Suivez les résultats des élections dans le monde entier. Analyses et données électorales pour comprendre les enjeux politiques internationaux.",
+            "url": "https://politiquensemble.fr/elections",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Politiquensemble",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://politiquensemble.fr/logo.png"
+              }
+            }
+          })}
+        </script>
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://politiquensemble.fr/elections" />
+      </Helmet>
+
       <motion.div
         initial="initial"
         animate="animate"
