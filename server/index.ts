@@ -7,6 +7,7 @@ import { configurePassport } from "./auth";
 import MemoryStore from "memorystore";
 import { setupSitemapRoutes } from "./sitemaps";
 import { setupSecurity } from "./security";
+import { setupCacheControl } from "./cache";
 
 const app = express();
 app.use(express.json());
@@ -14,6 +15,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // Configuration des en-têtes de sécurité
 setupSecurity(app);
+
+// Configuration du cache pour les réponses HTTP
+app.use(setupCacheControl());
 
 // Configure session
 const MemoryStoreSession = MemoryStore(session);

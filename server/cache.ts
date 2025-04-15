@@ -51,7 +51,7 @@ export const invalidateCache = (key: string) => {
 // Fonction pour invalider plusieurs clés de cache qui commencent par un préfixe
 export const invalidateCacheByPrefix = (prefix: string) => {
   const keys = mcache.keys();
-  keys.forEach(key => {
+  keys.forEach((key: string) => {
     if (key.startsWith(`__express__${prefix}`)) {
       mcache.del(key);
     }

@@ -5,6 +5,7 @@ import { z } from "zod";
 import passport from "passport";
 import { isAuthenticated, isAdmin, isAdminOnly, loginSchema, hashPassword } from "./auth";
 import * as schema from "@shared/schema";
+import { cacheMiddleware } from "./cache";
 import { 
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
@@ -20,7 +21,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes - prefix all with /api
   
   // Categories
-  app.get("/api/categories", async (req: Request, res: Response) => {
+  app.get("/api/categories", cacheMiddleware(10 * 60), async (req: Request, res: Response) => {
     const categories = await storage.getAllCategories();
     res.json(categories);
   });
@@ -87,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(filteredArticles);
   });
   
-  app.get("/api/articles/featured", async (req: Request, res: Response) => {
+  app.get("/api/articles/featured", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
     const { limit } = req.query;
     const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 3;
     
@@ -95,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(articles);
   });
   
-  app.get("/api/articles/recent", async (req: Request, res: Response) => {
+  app.get("/api/articles/recent", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
     const { limit } = req.query;
     const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 9;
     
