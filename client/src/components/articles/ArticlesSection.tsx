@@ -215,7 +215,7 @@ const GridArticleCard: React.FC<{
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              <span itemProp="datePublished" dateTime={article.createdAt}>{getTimeAgo(article.createdAt)}</span>
+              <time itemProp="datePublished" dateTime={article.createdAt}>{getTimeAgo(article.createdAt)}</time>
             </div>
           </div>
         </div>
