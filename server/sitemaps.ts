@@ -41,7 +41,7 @@ export async function generateNewsSitemap(): Promise<string> {
     const formattedDate = format(publicationDate, "yyyy-MM-dd'T'HH:mm:ssxxx");
     
     sitemap += `  <url>
-    <loc>https://politiquensemble.fr/articles/${article.slug}</loc>
+    <loc>https://politiquensemble.be/articles/${article.slug}</loc>
     <news:news>
       <news:publication>
         <news:name>Politiquensemble</news:name>
@@ -117,7 +117,7 @@ export async function generateSitemap(): Promise<string> {
   publishedArticles.forEach(article => {
     const lastMod = article.updatedAt || article.createdAt;
     sitemap += `  <url>
-    <loc>https://politiquensemble.fr/articles/${article.slug}</loc>
+    <loc>https://politiquensemble.be/articles/${article.slug}</loc>
     <lastmod>${new Date(lastMod).toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
