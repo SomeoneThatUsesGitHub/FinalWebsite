@@ -71,7 +71,7 @@ const ArticlesList: React.FC = () => {
         <link rel="canonical" href="https://politiquensemble.be/articles" />
       </Helmet>
       
-      <div className="bg-blue-50 py-12 md:py-20 shadow-md mb-8">
+      <header className="bg-blue-50 py-12 md:py-20 shadow-md mb-8">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <motion.h1 
@@ -90,12 +90,15 @@ const ArticlesList: React.FC = () => {
                 transition: { delay: 0.3, duration: 0.5 } 
               }}
               className="h-1 w-20 bg-blue-500 mx-auto rounded-full"
+              aria-hidden="true"
             ></motion.div>
           </div>
         </div>
-      </div>
+      </header>
       
-      <ArticlesSection />
+      <main>
+        <ArticlesSection />
+      </main>
     </motion.div>
   );
 };
