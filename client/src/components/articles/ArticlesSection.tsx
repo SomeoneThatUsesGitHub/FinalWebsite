@@ -146,6 +146,8 @@ const GridArticleCard: React.FC<{
         transition: { duration: 0.2 }
       }}
       className="rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col bg-white group cursor-pointer"
+      itemScope
+      itemType="https://schema.org/NewsArticle"
     >
       <Link href={`/articles/${article.slug}`} className="flex flex-col flex-1">
         <div className="relative overflow-hidden h-48">
@@ -155,6 +157,7 @@ const GridArticleCard: React.FC<{
               src={article.imageUrl}
               alt={article.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              itemProp="image"
             />
           ) : (
             <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -193,10 +196,11 @@ const GridArticleCard: React.FC<{
                 }
               }
             }}
+            itemProp="headline"
           >
             {article.title}
           </motion.h3>
-          <p className="text-dark/70 text-sm mb-4 line-clamp-2 flex-1">{article.excerpt}</p>
+          <p className="text-dark/70 text-sm mb-4 line-clamp-2 flex-1" itemProp="description">{article.excerpt}</p>
           <div className="flex items-center justify-between text-dark/60 text-xs pt-3 border-t border-gray-100">
             <div className="flex items-center">
               <img 
@@ -211,7 +215,7 @@ const GridArticleCard: React.FC<{
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              <span>{getTimeAgo(article.createdAt)}</span>
+              <span itemProp="datePublished" dateTime={article.createdAt}>{getTimeAgo(article.createdAt)}</span>
             </div>
           </div>
         </div>
