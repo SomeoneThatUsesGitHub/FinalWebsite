@@ -234,7 +234,7 @@ const Article: React.FC = () => {
                   animate="visible"
                 >
                   <motion.div variants={staggerItem} className="flex items-center mb-4 md:mb-0">
-                    <div className="flex-shrink-0 mr-4">
+                    <div className="flex-shrink-0 mr-4" itemProp="author" itemScope itemType="https://schema.org/Person">
                       <img 
                         src={article.author?.avatarUrl || '/assets/default-avatar.svg'} 
                         alt={article.author?.displayName || "Auteur"} 
@@ -243,6 +243,7 @@ const Article: React.FC = () => {
                           (e.target as HTMLImageElement).src = '/assets/default-avatar.svg';
                         }}
                       />
+                      <meta itemProp="name" content={article.author?.displayName || "Auteur inconnu"} />
                     </div>
                     <div>
                       <div className="font-semibold text-dark">{article.author?.displayName || "Auteur inconnu"}</div>
@@ -253,22 +254,30 @@ const Article: React.FC = () => {
                   <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-4 text-sm text-dark/60">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      <span>{formatDate(article.createdAt, "d MMMM yyyy")}</span>
+                      <time dateTime={new Date(article.createdAt).toISOString()} itemProp="datePublished">
+                        {formatDate(article.createdAt, "d MMMM yyyy")}
+                      </time>
+                      {article.updatedAt && article.updatedAt !== article.createdAt && (
+                        <meta itemProp="dateModified" content={new Date(article.updatedAt).toISOString()} />
+                      )}
                     </div>
                   </motion.div>
                 </motion.div>
                 
                 {/* Article content */}
-                <motion.div 
+                <motion.section 
                   className="prose prose-lg max-w-none mb-12"
                   variants={fadeIn}
                   initial="hidden"
                   animate="visible"
+                  itemProp="articleBody"
                 >
-                  <p className="text-xl font-medium text-dark/80 mb-8 leading-relaxed">{article.excerpt}</p>
+                  <p className="text-xl font-medium text-dark/80 mb-8 leading-relaxed" itemProp="description">{article.excerpt}</p>
                   <ArticleContent content={article.content} />
-                  <ArticleSources sources={article.sources} />
-                </motion.div>
+                  <footer>
+                    <ArticleSources sources={article.sources} />
+                  </footer>
+                </motion.section>
                 
                 {/* Social sharing */}
                 <motion.div 
