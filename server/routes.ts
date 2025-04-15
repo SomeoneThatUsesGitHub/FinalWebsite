@@ -6,6 +6,7 @@ import passport from "passport";
 import { isAuthenticated, isAdmin, isAdminOnly, loginSchema, hashPassword } from "./auth";
 import * as schema from "@shared/schema";
 import { cacheMiddleware } from "./cache";
+import { optimizeImage } from "./imageOptimizer";
 import { 
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
@@ -135,7 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // News Updates for ticker
-  app.get("/api/news-updates", async (req: Request, res: Response) => {
+  app.get("/api/news-updates", cacheMiddleware(3 * 60), async (req: Request, res: Response) => {
     const newsUpdates = await storage.getActiveNewsUpdates();
     res.json(newsUpdates);
   });
@@ -548,7 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Videos
-  app.get("/api/videos", async (req: Request, res: Response) => {
+  app.get("/api/videos", cacheMiddleware(15 * 60), async (req: Request, res: Response) => {
     try {
       const { limit } = req.query;
       const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 8;
@@ -586,7 +587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Flash Info (Breaking News) routes
-  app.get("/api/flash-infos", async (req: Request, res: Response) => {
+  app.get("/api/flash-infos", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
     try {
       const flashInfos = await storage.getActiveFlashInfos();
       res.json(flashInfos);
@@ -618,7 +619,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Live Event routes
-  app.get("/api/live-event", async (req: Request, res: Response) => {
+  app.get("/api/live-event", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
     try {
       const liveEvent = await storage.getActiveLiveEvent();
       

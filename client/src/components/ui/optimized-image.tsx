@@ -1,142 +1,176 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 
-interface OptimizedImageProps {
+interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
   className?: string;
+  fallbackSrc?: string;
+  loading?: 'lazy' | 'eager';
+  fetchSizes?: boolean;
+  sizes?: string;
   width?: number;
   height?: number;
-  priority?: boolean;
-  onLoad?: () => void;
-  onError?: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
-  itemProp?: string; // Pour le support Schema.org
 }
 
+type ImageFormats = {
+  original: string;
+  webp?: string;
+  avif?: string;
+  responsive: {
+    webp: string[];
+    avif: string[];
+  };
+};
+
 /**
- * Composant d'image optimisé avec support lazy loading avancé et formats WebP/AVIF
+ * Composant OptimizedImage amélioré qui supporte:
+ * - Formats modernes (WebP/AVIF) avec fallback automatique
+ * - Lazy loading et tailles responsives
+ * - Attributs pour SEO
  */
-export function OptimizedImage({
+export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   src,
   alt,
   className,
+  fallbackSrc,
+  loading = 'lazy',
+  fetchSizes = false,
+  sizes = '100vw',
   width,
   height,
-  priority = false,
-  onLoad,
-  onError,
-  itemProp,
   ...props
-}: OptimizedImageProps & React.ImgHTMLAttributes<HTMLImageElement>) {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
-
-  // Fonction pour déterminer si l'URL est externe
-  const isExternalUrl = (url: string) => {
-    return url.startsWith('http://') || url.startsWith('https://');
-  };
-
-  // Générer les chemins d'images optimisés (uniquement pour les images internes)
-  const getOptimizedPaths = (originalSrc: string) => {
-    if (isExternalUrl(originalSrc)) {
-      return {
-        original: originalSrc,
-        webp: originalSrc,
-        avif: originalSrc
-      };
-    }
-
-    // Extraire le nom du fichier et le chemin
-    const parts = originalSrc.split('/');
-    const filename = parts[parts.length - 1];
-    const filenameWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
-
-    if (originalSrc.includes('/uploads/')) {
-      return {
-        original: originalSrc,
-        webp: `/optimized/webp/${filenameWithoutExt}.webp`,
-        avif: `/optimized/avif/${filenameWithoutExt}.avif`
-      };
-    }
-
-    return {
-      original: originalSrc,
-      webp: originalSrc,
-      avif: originalSrc
-    };
-  };
-
-  const paths = src ? getOptimizedPaths(src) : { original: '', webp: '', avif: '' };
-
-  // Gérer le chargement de l'image avec Intersection Observer
+}) => {
+  const [imageSources, setImageSources] = useState<ImageFormats | null>(null);
+  const [isFailed, setIsFailed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Fonction pour vérifier si l'image est déjà optimisée
+  const isOptimizedPath = (path: string) => 
+    path.includes('/optimized/') || 
+    path.includes('webp') || 
+    path.includes('avif');
+  
+  // Récupérer les sources d'images optimisées si nécessaire
   useEffect(() => {
-    // Si l'image est prioritaire, la charger immédiatement
-    if (priority) {
-      setIsLoaded(true);
+    if (!src || isOptimizedPath(src) || !fetchSizes) {
+      setIsLoading(false);
       return;
     }
-
-    if (!imgRef.current) return;
-
-    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setIsLoaded(true);
-          if (observerRef.current && imgRef.current) {
-            observerRef.current.unobserve(imgRef.current);
+    
+    const getOptimizedImage = async () => {
+      try {
+        setIsLoading(true);
+        // Cette route REST n'existe pas encore, mais on simule pour le moment
+        const imgPath = src.startsWith('/') ? src : `/images/${src}`;
+        
+        // Pour le moment, retourner un objet simulé avec l'image originale
+        // Dans une vraie implémentation, on appellerait l'API côté serveur
+        setImageSources({
+          original: imgPath,
+          webp: imgPath.replace(/\.(jpe?g|png|gif)$/i, '.webp'),
+          avif: imgPath.replace(/\.(jpe?g|png|gif)$/i, '.avif'),
+          responsive: {
+            webp: [],
+            avif: []
           }
-        }
-      });
-    };
-
-    observerRef.current = new IntersectionObserver(handleIntersection, {
-      rootMargin: '200px', // Précharger l'image quand elle est à 200px du viewport
-      threshold: 0.01
-    });
-
-    observerRef.current.observe(imgRef.current);
-
-    return () => {
-      if (observerRef.current && imgRef.current) {
-        observerRef.current.unobserve(imgRef.current);
+        });
+      } catch (error) {
+        console.error('Erreur lors du chargement des images optimisées:', error);
+        setIsFailed(true);
+      } finally {
+        setIsLoading(false);
       }
     };
-  }, [priority]);
-
-  // Fonction qui gère les erreurs de chargement d'image
-  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.warn(`Erreur de chargement d'image: ${src}`);
-    if (onError) onError(e);
+    
+    getOptimizedImage();
+  }, [src, fetchSizes]);
+  
+  // Gérer les erreurs et afficher l'image de fallback si nécessaire
+  const handleImageError = () => {
+    setIsFailed(true);
   };
-
-  // Fonction de gestion du chargement réussi
-  const handleLoad = () => {
-    if (onLoad) onLoad();
+  
+  const getActualSrc = () => {
+    if (isFailed && fallbackSrc) {
+      return fallbackSrc;
+    }
+    
+    if (imageSources && fetchSizes) {
+      return imageSources.original;
+    }
+    
+    return src;
   };
-
+  
+  const getSourceSet = () => {
+    if (!imageSources || !fetchSizes || isFailed) {
+      return undefined;
+    }
+    
+    // Pour l'instant, puisque nous n'avons pas de tailles responsives, 
+    // on retourne simplement la source WebP et l'original
+    if (imageSources.webp) {
+      return imageSources.webp;
+    }
+    
+    return undefined;
+  };
+  
   return (
-    <picture>
-      {/* Format AVIF pour les navigateurs qui le supportent */}
-      {isLoaded && <source type="image/avif" srcSet={paths.avif} />}
+    <div className={cn("relative overflow-hidden", className)}>
+      {/* Afficher un placeholder pendant le chargement */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+      )}
       
-      {/* Format WebP pour les navigateurs qui le supportent */}
-      {isLoaded && <source type="image/webp" srcSet={paths.webp} />}
-      
-      {/* Image de secours pour les autres navigateurs */}
-      <img
-        ref={imgRef}
-        src={isLoaded ? paths.original : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} // Placeholder transparent
-        alt={alt}
-        className={`${className || ''} ${!isLoaded ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
-        width={width}
-        height={height}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding={priority ? 'sync' : 'async'}
-        onError={handleError}
-        onLoad={handleLoad}
-        itemProp={itemProp}
-        {...props}
-      />
-    </picture>
+      {fetchSizes && imageSources && !isFailed ? (
+        <picture>
+          {/* Source AVIF pour navigateurs modernes */}
+          {imageSources.avif && (
+            <source
+              type="image/avif"
+              srcSet={imageSources.avif}
+            />
+          )}
+          
+          {/* Source WebP pour compatibilité large */}
+          {imageSources.webp && (
+            <source
+              type="image/webp"
+              srcSet={imageSources.webp}
+            />
+          )}
+          
+          {/* Image de base pour fallback */}
+          <img
+            src={imageSources.original}
+            alt={alt}
+            loading={loading}
+            width={width}
+            height={height}
+            onError={handleImageError}
+            className={cn("w-full h-auto", isLoading && "opacity-0")}
+            sizes={sizes}
+            {...props}
+          />
+        </picture>
+      ) : (
+        <img
+          src={getActualSrc()}
+          alt={alt}
+          loading={loading}
+          onError={handleImageError}
+          className={cn("w-full h-auto", isLoading && "opacity-0")}
+          width={width}
+          height={height}
+          sizes={sizes}
+          srcSet={getSourceSet()}
+          {...props}
+        />
+      )}
+    </div>
   );
-}
+};
+
+export default OptimizedImage;
