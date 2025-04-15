@@ -173,7 +173,7 @@ const Article: React.FC = () => {
             </div>
           </div>
         ) : article ? (
-          <>
+          <article itemScope itemType="https://schema.org/NewsArticle">
             {/* Article hero */}
             {article.imageUrl && (
               <div className="relative w-full h-[50vh] bg-gray-900">
@@ -182,9 +182,10 @@ const Article: React.FC = () => {
                   src={article.imageUrl} 
                   alt={article.title} 
                   className="w-full h-full object-cover"
+                  itemProp="image"
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-6 z-20 container mx-auto">
-                  <motion.div 
+                  <motion.header 
                     className="max-w-4xl mx-auto"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -195,13 +196,13 @@ const Article: React.FC = () => {
                         className="mb-4 text-white px-3 py-1"
                         style={{ backgroundColor: category.color }}
                       >
-                        {category.name}
+                        <span itemProp="articleSection">{category.name}</span>
                       </Badge>
                     )}
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-md">
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-md" itemProp="headline">
                       {article.title}
                     </h1>
-                  </motion.div>
+                  </motion.header>
                 </div>
               </div>
             )}
@@ -210,19 +211,19 @@ const Article: React.FC = () => {
               <div className="max-w-3xl mx-auto">
                 {/* Article header - only shown if no image */}
                 {!article.imageUrl && (
-                  <div className="mb-8">
+                  <header className="mb-8">
                     {category && (
                       <Badge
                         className="mb-4 text-white px-3 py-1"
                         style={{ backgroundColor: category.color }}
                       >
-                        {category.name}
+                        <span itemProp="articleSection">{category.name}</span>
                       </Badge>
                     )}
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-dark mb-4">
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-dark mb-4" itemProp="headline">
                       {article.title}
                     </h1>
-                  </div>
+                  </header>
                 )}
 
                 {/* Author and meta */}
@@ -356,7 +357,7 @@ const Article: React.FC = () => {
                 )}
               </div>
             </div>
-          </>
+          </article>
         ) : (
           <div className="container mx-auto px-4 md:px-6 pt-16">
             <div className="text-center py-16 max-w-md mx-auto">
