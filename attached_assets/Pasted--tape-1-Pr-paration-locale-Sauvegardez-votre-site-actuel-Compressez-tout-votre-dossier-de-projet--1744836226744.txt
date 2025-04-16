@@ -1,0 +1,117 @@
+Étape 1: Préparation locale
+Sauvegardez votre site actuel
+Compressez tout votre dossier de projet en fichier ZIP
+Exportez la base de données en fichier SQL avec npx tsx scripts/export-database.ts ou via pgAdmin
+Étape 2: Se connecter au VPS Hostinger
+Utilisez le terminal SSH de Hostinger dans votre navigateur
+Connectez-vous à votre compte Hostinger
+Allez dans VPS → Votre VPS → Onglet "Terminal"
+C'est plus simple que d'utiliser un programme séparé
+Étape 3: Installation des logiciels (copiez-collez ces commandes)
+# Installation en une seule commande
+apt update && apt upgrade -y && apt install -y curl git nginx postgresql postgresql-contrib certbot python3-certbot-nginx unzip
+Étape 4: Installer NodeJS 20 (version la plus récente)
+# Installation de NodeJS moderne
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs
+npm install -g pm2
+Étape 5: Préparer le dossier pour votre site
+# Création du dossier
+mkdir -p /var/www/politiquensemble
+cd /var/www/politiquensemble
+Étape 6: Transférer vos fichiers
+Option 1 - Directement via URL (la plus simple)
+
+# Si vous avez un lien de téléchargement pour votre fichier ZIP:
+cd /var/www/politiquensemble
+wget URL_DE_VOTRE_FICHIER_ZIP -O site.zip
+unzip site.zip
+mv politiquensemble/* .  # Si le contenu est dans un sous-dossier
+Option 2 - Via l'interface Hostinger
+
+Utilisez le gestionnaire de fichiers dans le panneau Hostinger pour téléverser votre fichier ZIP
+Puis dans le terminal:
+cd /var/www/politiquensemble
+unzip /chemin/vers/votre/fichier.zip
+Étape 7: Configurer la base de données
+# Activer PostgreSQL
+systemctl enable postgresql
+systemctl start postgresql
+# Créer utilisateur et base de données
+sudo -u postgres psql -c "CREATE USER politiqueuser WITH PASSWORD 'MotDePasseSecurise123';"
+sudo -u postgres psql -c "CREATE DATABASE politiquedb OWNER politiqueuser;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE politiquedb TO politiqueuser;"
+# Importer votre base de données (si vous avez un fichier backup.sql)
+sudo -u postgres psql politiquedb < /var/www/politiquensemble/backup.sql
+Étape 8: Configurer les variables d'environnement
+# Créer le fichier .env
+cat > /var/www/politiquensemble/.env << 'EOL'
+DATABASE_URL=postgresql://politiqueuser:MotDePasseSecurise123@localhost:5432/politiquedb
+NODE_ENV=production
+PORT=5000
+EOL
+Étape 9: Créer les dossiers nécessaires
+# Dossiers pour les images
+mkdir -p /var/www/politiquensemble/public/images
+mkdir -p /var/www/politiquensemble/public/optimized/webp
+mkdir -p /var/www/politiquensemble/public/optimized/avif
+chmod -R 755 /var/www/politiquensemble/public
+Étape 10: Installer les dépendances et démarrer le site
+# Installation des dépendances
+cd /var/www/politiquensemble
+npm install
+# Démarrer l'application avec PM2
+pm2 start "npm run dev" --name politiquensemble
+# Configurer le démarrage automatique
+pm2 save
+pm2 startup
+# Exécutez la commande que PM2 vous donne
+Étape 11: Configurer Nginx
+# Créer la configuration Nginx
+cat > /etc/nginx/sites-available/politiquensemble << 'EOL'
+server {
+    listen 80;
+    server_name votre-domaine.be;
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+    location /optimized/ {
+        root /var/www/politiquensemble/public;
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000";
+    }
+}
+EOL
+# Remplacer le domaine (remplacez par votre vrai domaine)
+sed -i 's/votre-domaine.be/VOTRE-VRAI-DOMAINE.be/g' /etc/nginx/sites-available/politiquensemble
+# Activer le site
+ln -s /etc/nginx/sites-available/politiquensemble /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl restart nginx
+Étape 12: Configurer HTTPS
+# Installation du certificat SSL
+certbot --nginx -d VOTRE-VRAI-DOMAINE.be
+# Suivez les instructions à l'écran
+Étape 13: Vérification finale
+# Vérifier que tout fonctionne
+pm2 status
+curl http://localhost:5000
+Étape 14: Configuration DNS
+Dans le panneau de Hostinger:
+
+Allez dans "Domaines" → votre domaine → "Zone DNS"
+Ajoutez un enregistrement de type A:
+Nom: @ (ou laissez vide)
+Valeur: L'adresse IP de votre VPS
+TTL: Automatique
+Conseils de dépannage simples
+Si le site ne fonctionne pas: pm2 logs pour voir les erreurs
+Pour redémarrer le site: pm2 restart politiquensemble
+Si Nginx ne fonctionne pas: systemctl status nginx
+Pour vérifier votre base de données: sudo -u postgres psql -c "\\l"
+Voilà! Cette méthode est la plus simple possible, avec un minimum d'étapes techniques. Votre site devrait être en ligne en 30 minutes environ.
