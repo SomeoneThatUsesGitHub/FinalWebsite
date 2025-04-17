@@ -40,7 +40,7 @@ const HeroSection: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
-    <section className="relative text-white h-[70vh] md:h-screen mb-8 md:mb-4">
+    <section className="relative text-white h-screen mb-8 md:mb-4 fixed-height-on-mobile">
       {/* Image de fond avec effet parallaxe - pas d'overflow pour éviter les problèmes sur mobile */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Dégradé amélioré, plus dynamique */}
@@ -51,19 +51,19 @@ const HeroSection: React.FC = () => {
           style={{
             backgroundImage:
               "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
-            backgroundPosition: isMobile ? "center top" : "center center",
+            backgroundPosition: "center center",
             backgroundSize: "cover",
-            backgroundAttachment: "scroll",
+            backgroundAttachment: "fixed",
             filter: "contrast(1.05) brightness(0.95)",
-            height: "100%" /* Garantit que l'image reste à la bonne taille */,
+            height: "100vh", /* Force hauteur fixe */
           }}
         ></div>
       </div>
 
-      {/* Contenu */}
-      <div className="container mx-auto px-4 py-40 md:py-[calc(50vh-10rem)] lg:py-[calc(50vh-8rem)] relative z-10">
+      {/* Contenu centré verticalement */}
+      <div className="container mx-auto px-4 flex items-center justify-center h-full relative z-10">
         <div
-          className={`max-w-4xl ${isMobile ? "text-left mx-0 pt-16" : "mx-auto text-center md:text-left md:mx-0"}`}
+          className={`max-w-4xl ${isMobile ? "text-center mx-auto" : "mx-auto text-center md:text-left md:mx-0"}`}
         >
           <motion.h1
             variants={fadeInWithBounce}
