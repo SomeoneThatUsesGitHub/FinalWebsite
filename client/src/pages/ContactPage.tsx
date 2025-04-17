@@ -167,7 +167,7 @@ const ContactPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-start space-x-4">
+                  <div className="flex items-start space-x-4 md:block hidden">
                     <Phone className="h-6 w-6 flex-shrink-0 text-blue-200" />
                     <div>
                       <h3 className="font-semibold mb-1">Téléphone</h3>
