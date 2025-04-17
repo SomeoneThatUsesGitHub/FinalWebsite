@@ -304,7 +304,7 @@ const AboutPage: React.FC = () => {
       <section className="py-2 bg-blue-800"></section>
 
       {/* Nos valeurs - Style asymétrique */}
-      <section className="pt-20 pb-40 bg-gradient-to-r from-blue-50 to-white" id="valeurs">
+      <section className="pt-20 pb-40 bg-gradient-to-r from-blue-50 to-white overflow-visible" id="valeurs">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             {/* Cards à gauche */}

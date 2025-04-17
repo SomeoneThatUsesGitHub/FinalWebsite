@@ -155,7 +155,7 @@ const ContactPage: React.FC = () => {
               animate="visible"
               custom={0.1}
             >
-              <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl p-8 shadow-xl h-full">
+              <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl p-8 shadow-xl h-full overflow-visible">
                 <h2 className="text-2xl font-bold mb-6">Nos coordonnées</h2>
                 
                 <div className="space-y-6">
