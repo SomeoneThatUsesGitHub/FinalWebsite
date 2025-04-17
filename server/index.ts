@@ -6,14 +6,10 @@ import passport from "passport";
 import { configurePassport } from "./auth";
 import MemoryStore from "memorystore";
 import { setupSitemapRoutes } from "./sitemaps";
-import { setupSecurity } from "./security";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// Configuration des en-têtes de sécurité
-setupSecurity(app);
 
 // Configure session
 const MemoryStoreSession = MemoryStore(session);
