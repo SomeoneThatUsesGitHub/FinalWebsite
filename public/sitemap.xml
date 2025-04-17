@@ -35,16 +35,4 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
-  <url>
-    <loc>https://politiquensemble.be/articles/weerwe</loc>
-    <lastmod>2025-04-17T21:12:51.093Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://politiquensemble.be/articles/re22</loc>
-    <lastmod>2025-04-17T21:12:20.334Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
 </urlset>

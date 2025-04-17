@@ -65,3 +65,9 @@ export const refreshArticlesData = () => {
   queryClient.invalidateQueries({ queryKey: ['/api/articles/featured'] });
   queryClient.invalidateQueries({ queryKey: ['/api/articles/recent'] });
 };
+
+// Fonction utilitaire pour forcer le rafraîchissement des données de suivi en direct
+export const refreshLiveEventData = () => {
+  // Invalider les requêtes liées aux suivis en direct
+  queryClient.invalidateQueries({ queryKey: ['/api/live-event'] });
+};
