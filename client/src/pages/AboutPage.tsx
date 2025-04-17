@@ -309,7 +309,7 @@ const AboutPage: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center">
             {/* Cards à gauche */}
             <div className="md:w-3/5 lg:w-3/5 order-2 md:order-1">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative" style={{ overflow: 'visible' }}>
                 {/* Élément décoratif */}
                 <div className="hidden md:block absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full opacity-50 z-0"></div>
                 
