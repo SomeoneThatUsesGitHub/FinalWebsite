@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Masquer les indicateurs de HMR (les nombres jaunes) */
+.vite-admin-bar, 
+.vite-hmr-indicator {
+  display: none !important;
+}
+
 /* Règles spécifiques pour la bannière hero */
 .fixed-height-on-mobile {
   min-height: 100vh;
