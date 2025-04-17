@@ -6,23 +6,23 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 // Animations améliorées avec effet de rebond plus accentué
 const fadeInWithBounce = {
   hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.7,
       ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond plus accentué
       bounce: 0.4,
       type: "spring",
-      stiffness: 120
-    }
-  }
+      stiffness: 120,
+    },
+  },
 };
 
 const slideUpWithBounce = {
   hidden: { opacity: 0, y: 40 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.8,
@@ -30,15 +30,15 @@ const slideUpWithBounce = {
       ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond plus accentué
       bounce: 0.5,
       type: "spring",
-      stiffness: 100
-    }
-  }
+      stiffness: 100,
+    },
+  },
 };
 
 const HeroSection: React.FC = () => {
   // Utilisez un media query pour détecter les mobiles
   const isMobile = useMediaQuery("(max-width: 768px)");
-  
+
   return (
     <section className="relative text-white h-[70vh] md:h-screen mb-8 md:mb-4">
       {/* Image de fond avec effet parallaxe - pas d'overflow pour éviter les problèmes sur mobile */}
@@ -55,23 +55,25 @@ const HeroSection: React.FC = () => {
             backgroundSize: "cover",
             backgroundAttachment: "scroll",
             filter: "contrast(1.05) brightness(0.95)",
-            height: "100%", /* Garantit que l'image reste à la bonne taille */
+            height: "100%" /* Garantit que l'image reste à la bonne taille */,
           }}
         ></div>
       </div>
 
       {/* Contenu */}
       <div className="container mx-auto px-4 py-40 md:py-[calc(50vh-10rem)] lg:py-[calc(50vh-8rem)] relative z-10">
-        <div className={`max-w-4xl ${isMobile ? 'text-left mx-0 pt-16' : 'mx-auto text-center md:text-left md:mx-0'}`}>
+        <div
+          className={`max-w-4xl ${isMobile ? "text-left mx-0 pt-16" : "mx-auto text-center md:text-left md:mx-0"}`}
+        >
           <motion.h1
             variants={fadeInWithBounce}
             initial="hidden"
             animate="visible"
-            className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-3 md:mb-5"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 md:mb-5"
           >
-            <span className="block text-white/90">L'actualité politique</span>
-            <span className="block mt-1 sm:mt-2 text-white">
-              simplifiée et accessible
+            <span className="block text-white drop-shadow-lg">Politiquensemble</span>
+            <span className="block mt-2 sm:mt-3 text-white bg-gradient-to-r from-blue-500 to-indigo-600 inline-block text-transparent bg-clip-text drop-shadow-sm">
+              LA POLITIQUE SIMPLIFIÉE
             </span>
           </motion.h1>
 
@@ -79,11 +81,13 @@ const HeroSection: React.FC = () => {
             variants={slideUpWithBounce}
             initial="hidden"
             animate="visible"
-            className="text-sm sm:text-base md:text-lg mb-6 md:mb-8 text-white/90 max-w-xl"
+            className="text-base sm:text-lg md:text-xl mb-8 md:mb-10 text-white/95 max-w-xl font-medium leading-relaxed backdrop-blur-sm bg-black/10 p-3 rounded-lg shadow-inner"
           >
-            Comprendre les enjeux politiques d'aujourd'hui pour construire le
-            monde de demain.
+            <span className="md:text-xl font-semibold">Comprendre les enjeux politiques d'aujourd'hui</span>
             <span className="block mt-1">
+              pour construire le monde de demain.
+            </span>
+            <span className="block mt-2 text-blue-200 font-medium">
               Pour tous les citoyens de 16 à 30 ans.
             </span>
           </motion.p>
