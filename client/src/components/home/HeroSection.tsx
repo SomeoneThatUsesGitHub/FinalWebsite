@@ -41,39 +41,23 @@ const HeroSection: React.FC = () => {
   
   return (
     <section className="relative text-white h-[70vh] md:h-screen mb-8 md:mb-4">
-      {/* Image de fond statique sur mobile, légèrement dynamique sur desktop */}
+      {/* Image de fond avec effet parallaxe - pas d'overflow pour éviter les problèmes sur mobile */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Dégradé amélioré, plus dynamique */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10 backdrop-blur-[0px] z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 z-10"></div>
-        
-        {/* Deux versions distinctes pour mobile et desktop pour éviter tout problème */}
-        {isMobile ? (
-          // Version mobile simple et statique sans aucun effet
-          <div
-            className="absolute inset-0 w-full h-full"
-            style={{
-              backgroundImage:
-                "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
-              backgroundPosition: "center top",
-              backgroundSize: "cover",
-              filter: "contrast(1.05) brightness(0.95)",
-            }}
-          ></div>
-        ) : (
-          // Version desktop qui peut avoir un effet léger
-          <div
-            className="absolute inset-0 w-full h-full"
-            style={{
-              backgroundImage:
-                "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
-              backgroundPosition: "center center",
-              backgroundSize: "cover",
-              backgroundAttachment: "scroll",
-              filter: "contrast(1.05) brightness(0.95)",
-            }}
-          ></div>
-        )}
+        <div
+          className="absolute inset-0 w-full h-full"
+          style={{
+            backgroundImage:
+              "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
+            backgroundPosition: isMobile ? "center top" : "center center",
+            backgroundSize: "cover",
+            backgroundAttachment: "scroll",
+            filter: "contrast(1.05) brightness(0.95)",
+            height: "100%", /* Garantit que l'image reste à la bonne taille */
+          }}
+        ></div>
       </div>
 
       {/* Contenu */}
