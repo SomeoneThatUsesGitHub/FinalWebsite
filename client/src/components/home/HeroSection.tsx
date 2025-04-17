@@ -49,19 +49,14 @@ const HeroSection: React.FC = () => {
         {/* Dégradé amélioré, plus dynamique - moins sombre sur mobile */}
         <div className={`absolute inset-0 bg-gradient-to-t ${isMobile ? 'from-black/70 via-black/50 to-black/10' : 'from-black via-black/80 to-black/10'} backdrop-blur-[0px] z-10`}></div>
         <div className={`absolute inset-0 bg-gradient-to-r ${isMobile ? 'from-black/30 via-transparent to-black/30' : 'from-black/40 via-transparent to-black/40'} z-10`}></div>
-        {/* Image pour mobile - affichée en tant qu'élément img avec import direct et léger effet sombre */}
+        {/* Image pour mobile - 100% statique, sans effet de parallaxe */}
         <div className="absolute inset-0 w-full h-full block md:hidden z-0 bg-gray-800">
           <div className="absolute inset-0 bg-black/20 z-1"></div> {/* Effet sombre léger sur l'image */}
-          <div className="fixed top-0 left-0 w-full h-[100vh]"> {/* Fixed position pour éviter le zoom au scroll */}
-            <img 
-              src={parlamentMobile} 
-              alt="Parlement européen avec drapeau UE" 
-              className="w-full h-full object-cover"
-              style={{
-                objectPosition: "center",
-              }}
-            />
-          </div>
+          <img 
+            src={parlamentMobile} 
+            alt="Parlement européen avec drapeau UE" 
+            className="static-mobile-image"
+          />
         </div>
         
         {/* Image pour desktop - cachée sur mobile */}
