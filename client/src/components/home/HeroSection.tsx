@@ -69,11 +69,11 @@ const HeroSection: React.FC = () => {
             variants={fadeInWithBounce}
             initial="hidden"
             animate="visible"
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-4 md:mb-6 drop-shadow-xl"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-3 md:mb-5 drop-shadow-md"
           >
             <span className="block text-white">Politiquensemble</span>
-            <span className="block mt-2 sm:mt-3 bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600 text-transparent bg-clip-text">
-              LA POLITIQUE SIMPLIFIÉE
+            <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600 text-transparent bg-clip-text">
+              La politique simplifiée
             </span>
           </motion.h1>
 
@@ -81,13 +81,13 @@ const HeroSection: React.FC = () => {
             variants={slideUpWithBounce}
             initial="hidden"
             animate="visible"
-            className="text-lg sm:text-xl md:text-2xl mb-8 md:mb-10 text-white font-medium leading-relaxed drop-shadow-lg"
+            className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 text-white/95 font-medium leading-relaxed drop-shadow-md"
           >
-            <span className="font-bold">Comprendre les enjeux politiques d'aujourd'hui</span>
+            <span className="font-semibold">Comprendre les enjeux politiques d'aujourd'hui</span>
             <span className="block mt-1">
               pour construire le monde de demain.
             </span>
-            <span className="block mt-2 text-blue-200 font-semibold">
+            <span className="block mt-2 text-blue-200">
               Pour tous les citoyens de 16 à 30 ans.
             </span>
           </motion.p>
