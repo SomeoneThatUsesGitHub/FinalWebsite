@@ -46,14 +46,27 @@ const HeroSection: React.FC = () => {
         {/* Dégradé amélioré, plus dynamique */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10 backdrop-blur-[0px] z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 z-10"></div>
+        {/* Image pour mobile - cachée sur desktop */}
+        {isMobile && (
+          <div
+            className="absolute inset-0 w-full h-full block md:hidden"
+            style={{
+              backgroundImage: "url('/parlement-europeen.png')",
+              backgroundPosition: "center center",
+              backgroundSize: "cover",
+              backgroundAttachment: "scroll",
+              filter: "contrast(1.05) brightness(0.95)",
+              height: "100vh", /* Force hauteur fixe */
+            }}
+          ></div>
+        )}
+        
+        {/* Image pour desktop - cachée sur mobile */}
         <div
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full hidden md:block"
           style={{
-            backgroundImage:
-              isMobile 
-                ? "url('/parlement-europeen.png')" 
-                : "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
-            backgroundPosition: isMobile ? "center center" : "center center",
+            backgroundImage: "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
+            backgroundPosition: "center center",
             backgroundSize: "cover",
             backgroundAttachment: "scroll",
             filter: "contrast(1.05) brightness(0.95)",
