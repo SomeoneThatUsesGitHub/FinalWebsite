@@ -93,8 +93,8 @@ function App() {
             <meta name="description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Un média par et pour les jeunes citoyens." />
             
             {/* Balises hreflang pour indiquer la langue principale */}
-            <link rel="alternate" hrefLang="fr" href="https://politiquensemble.be" />
-            <link rel="alternate" hrefLang="x-default" href="https://politiquensemble.be" />
+            <link rel="alternate" hrefLang="fr" href="https://politiquensemble.com" />
+            <link rel="alternate" hrefLang="x-default" href="https://politiquensemble.com" />
             
             {/* Balises de site vérifié pour les moteurs de recherche */}
             <meta name="google-site-verification" content="REMPLACER_PAR_CODE_VERIFICATION" />

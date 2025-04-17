@@ -98,7 +98,7 @@ const PrivacyPage: React.FC = () => {
                 <li>Droit d'opposition au traitement</li>
               </ul>
               <p>
-                Pour exercer ces droits, veuillez nous contacter à l'adresse : info@politiquensemble.be
+                Pour exercer ces droits, veuillez nous contacter à l'adresse : info@politiquensemble.com
               </p>
             </div>
             
@@ -116,7 +116,7 @@ const PrivacyPage: React.FC = () => {
               <h2 className="text-xl font-semibold">Contact</h2>
               <p>
                 Si vous avez des questions concernant cette politique de confidentialité, 
-                veuillez nous contacter à : info@politiquensemble.be
+                veuillez nous contacter à : info@politiquensemble.com
               </p>
             </div>
           </div>

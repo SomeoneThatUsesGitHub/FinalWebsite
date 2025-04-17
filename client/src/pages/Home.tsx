@@ -23,15 +23,15 @@ const Home: React.FC = () => {
         {/* Balises Open Graph */}
         <meta property="og:title" content="Politiquensemble - L'actualité politique pour les 16-30 ans" />
         <meta property="og:description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans." />
-        <meta property="og:url" content="https://politiquensemble.be" />
+        <meta property="og:url" content="https://politiquensemble.com" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://politiquensemble.be/logo-share.png" />
+        <meta property="og:image" content="https://politiquensemble.com/logo-share.png" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Politiquensemble - L'actualité politique pour les 16-30 ans" />
         <meta name="twitter:description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans." />
-        <meta name="twitter:image" content="https://politiquensemble.be/logo-share.png" />
+        <meta name="twitter:image" content="https://politiquensemble.com/logo-share.png" />
         
         {/* Balises Google News pour la page d'accueil */}
         <meta name="news_keywords" content="politique, actualité, jeunesse, démocratie, élections, Europe, France, éducation" />
@@ -42,19 +42,19 @@ const Home: React.FC = () => {
             "@context": "https://schema.org",
             "@type": "WebSite",
             "name": "Politiquensemble",
-            "url": "https://politiquensemble.be",
+            "url": "https://politiquensemble.com",
             "description": "Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Pour tous les citoyens de 16 à 30 ans.",
             "publisher": {
               "@type": "Organization",
               "name": "Politiquensemble",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://politiquensemble.be/logo.png"
+                "url": "https://politiquensemble.com/logo.png"
               }
             },
             "potentialAction": {
               "@type": "SearchAction",
-              "target": "https://politiquensemble.be/articles?search={search_term_string}",
+              "target": "https://politiquensemble.com/articles?search={search_term_string}",
               "query-input": "required name=search_term_string"
             }
           })}
@@ -66,16 +66,16 @@ const Home: React.FC = () => {
             "@context": "https://schema.org",
             "@type": "NewsMediaOrganization",
             "name": "Politiquensemble",
-            "url": "https://politiquensemble.be",
-            "logo": "https://politiquensemble.be/logo.png",
+            "url": "https://politiquensemble.com",
+            "logo": "https://politiquensemble.com/logo.png",
             "sameAs": [
               "https://www.instagram.com/politiquensemble",
               "https://twitter.com/politiquensemble",
               "https://www.tiktok.com/@politiquensemble"
             ],
-            "diversityPolicy": "https://politiquensemble.be/a-propos",
-            "ethicsPolicy": "https://politiquensemble.be/mentions-legales",
-            "masthead": "https://politiquensemble.be/team",
+            "diversityPolicy": "https://politiquensemble.com/a-propos",
+            "ethicsPolicy": "https://politiquensemble.com/mentions-legales",
+            "masthead": "https://politiquensemble.com/team",
             "foundingDate": "2023-01-01",
             "foundingLocation": {
               "@type": "Place",
@@ -85,7 +85,7 @@ const Home: React.FC = () => {
         </script>
         
         {/* Canonical URL */}
-        <link rel="canonical" href="https://politiquensemble.be" />
+        <link rel="canonical" href="https://politiquensemble.com" />
       </Helmet>
       
       <HeroSection />

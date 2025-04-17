@@ -1398,7 +1398,7 @@ async function initializeDb() {
     await db.insert(users).values({
       username: "admin",
       password: await hashPassword("admin"),
-      email: "admin@politiquensemble.be",
+      email: "admin@politiquensemble.com",
       displayName: "Administrateur",
       role: "admin",
       title: "Administrateur du site",

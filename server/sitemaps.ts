@@ -41,7 +41,7 @@ export async function generateNewsSitemap(): Promise<string> {
     const formattedDate = format(publicationDate, "yyyy-MM-dd'T'HH:mm:ssxxx");
     
     sitemap += `  <url>
-    <loc>https://politiquensemble.be/articles/${article.slug}</loc>
+    <loc>https://politiquensemble.com/articles/${article.slug}</loc>
     <news:news>
       <news:publication>
         <news:name>Politiquensemble</news:name>
@@ -77,37 +77,37 @@ export async function generateSitemap(): Promise<string> {
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://politiquensemble.be/</loc>
+    <loc>https://politiquensemble.com/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.be/articles</loc>
+    <loc>https://politiquensemble.com/articles</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.be/elections</loc>
+    <loc>https://politiquensemble.com/elections</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.be/apprendre</loc>
+    <loc>https://politiquensemble.com/apprendre</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.be/team</loc>
+    <loc>https://politiquensemble.com/team</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.be/a-propos</loc>
+    <loc>https://politiquensemble.com/a-propos</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://politiquensemble.be/contact</loc>
+    <loc>https://politiquensemble.com/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -117,7 +117,7 @@ export async function generateSitemap(): Promise<string> {
   publishedArticles.forEach(article => {
     const lastMod = article.updatedAt || article.createdAt;
     sitemap += `  <url>
-    <loc>https://politiquensemble.be/articles/${article.slug}</loc>
+    <loc>https://politiquensemble.com/articles/${article.slug}</loc>
     <lastmod>${new Date(lastMod).toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

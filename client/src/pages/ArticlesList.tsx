@@ -35,15 +35,15 @@ const ArticlesList: React.FC = () => {
         {/* Balises Open Graph */}
         <meta property="og:title" content="Articles et Analyses | Politiquensemble" />
         <meta property="og:description" content="Découvrez tous nos articles sur l'actualité politique, économique et historique pour les jeunes de 16 à 30 ans." />
-        <meta property="og:url" content="https://politiquensemble.be/articles" />
+        <meta property="og:url" content="https://politiquensemble.com/articles" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://politiquensemble.be/logo-share.png" />
+        <meta property="og:image" content="https://politiquensemble.com/logo-share.png" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="Articles et Analyses | Politiquensemble" />
         <meta name="twitter:description" content="Découvrez tous nos articles sur l'actualité politique, économique et historique pour les jeunes de 16 à 30 ans." />
-        <meta name="twitter:image" content="https://politiquensemble.be/logo-share.png" />
+        <meta name="twitter:image" content="https://politiquensemble.com/logo-share.png" />
         
         {/* Balises Google News pour la section articles */}
         <meta name="news_keywords" content="politique, articles, analyses, actualité, jeunes, Europe, France" />
@@ -55,20 +55,20 @@ const ArticlesList: React.FC = () => {
             "@type": "CollectionPage",
             "headline": "Articles et Analyses | Politiquensemble",
             "description": "Découvrez tous nos articles sur l'actualité politique, économique et historique pour les jeunes de 16 à 30 ans.",
-            "url": "https://politiquensemble.be/articles",
+            "url": "https://politiquensemble.com/articles",
             "publisher": {
               "@type": "Organization",
               "name": "Politiquensemble",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://politiquensemble.be/logo.png"
+                "url": "https://politiquensemble.com/logo.png"
               }
             }
           })}
         </script>
         
         {/* Canonical URL */}
-        <link rel="canonical" href="https://politiquensemble.be/articles" />
+        <link rel="canonical" href="https://politiquensemble.com/articles" />
       </Helmet>
       
       <header className="bg-blue-50 py-12 md:py-20 shadow-md mb-8">

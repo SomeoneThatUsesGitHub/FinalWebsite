@@ -163,7 +163,7 @@ const ContactPage: React.FC = () => {
                     <Mail className="h-6 w-6 flex-shrink-0 text-blue-200" />
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <p className="text-blue-100">contact@politiquensemble.be</p>
+                      <p className="text-blue-100">contact@politiquensemble.com</p>
                     </div>
                   </div>
                   
