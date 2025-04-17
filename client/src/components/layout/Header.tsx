@@ -125,6 +125,8 @@ const Header: React.FC = () => {
                   </div>
                 </Link>
               </div>
+              {/* Espace supplémentaire en bas du menu */}
+              <div className="py-3"></div>
             </nav>
           </motion.div>
         )}
