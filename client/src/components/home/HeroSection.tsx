@@ -3,34 +3,34 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
-// Animations améliorées avec effet de rebond plus accentué
+// Animations plus légères pour de meilleures performances
 const fadeInWithBounce = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.7,
-      ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond plus accentué
-      bounce: 0.4,
+      duration: 0.6,
+      ease: [0.175, 0.885, 0.32, 1.25], // Effet de rebond plus subtil
+      bounce: 0.3,
       type: "spring",
-      stiffness: 120,
+      stiffness: 90,
     },
   },
 };
 
 const slideUpWithBounce = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 25 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.8,
-      delay: 0.3,
-      ease: [0.175, 0.885, 0.32, 1.5], // Effet de rebond plus accentué
-      bounce: 0.5,
+      duration: 0.6,
+      delay: 0.2,
+      ease: [0.175, 0.885, 0.32, 1.25], // Effet de rebond plus subtil
+      bounce: 0.3,
       type: "spring",
-      stiffness: 100,
+      stiffness: 80,
     },
   },
 };
@@ -81,13 +81,13 @@ const HeroSection: React.FC = () => {
             variants={slideUpWithBounce}
             initial="hidden"
             animate="visible"
-            className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 text-white/95 font-medium leading-relaxed drop-shadow-md"
+            className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 text-white/95 font-medium leading-tight sm:leading-normal md:leading-relaxed drop-shadow-md"
           >
             <span className="font-semibold">Comprendre les enjeux politiques d'aujourd'hui</span>
-            <span className="block mt-1">
+            <span className="block mt-0.5 sm:mt-1">
               pour construire le monde de demain.
             </span>
-            <span className="block mt-2 text-blue-200">
+            <span className="block mt-1 sm:mt-2 text-blue-200">
               Pour tous les citoyens de 16 à 30 ans.
             </span>
           </motion.p>

@@ -50,20 +50,20 @@ export const scaleUp: Variants = {
   }
 };
 
-// Animation for page transitions
+// Animation pour transitions de page optimisée pour mobile
 export const pageTransition: Variants = {
   hidden: { opacity: 0 },
   visible: { 
     opacity: 1,
     transition: { 
-      duration: 0.5,
+      duration: 0.3,
       when: "beforeChildren",
-      staggerChildren: 0.1
+      staggerChildren: 0.05 // Réduit le délai entre les animations des enfants
     }
   },
   exit: {
     opacity: 0,
-    transition: { duration: 0.3 }
+    transition: { duration: 0.2 }
   }
 };
 
@@ -117,15 +117,16 @@ export const pulse: Variants = {
   }
 };
 
-// News ticker animation
+// News ticker animation avec vitesse réduite pour de meilleures performances
 export const ticker: Variants = {
   hidden: { x: "100%" },
   visible: { 
     x: "-100%",
     transition: { 
-      duration: 20,
+      duration: 30, // Ralenti pour moins solliciter le CPU
       repeat: Infinity,
-      ease: "linear"
+      ease: "linear",
+      repeatType: "loop"
     }
   }
 };
