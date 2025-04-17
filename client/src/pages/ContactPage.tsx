@@ -143,9 +143,9 @@ const ContactPage: React.FC = () => {
       </div>
 
       {/* Contenu principal - Informations de contact et formulaire */}
-      <section className="py-12 md:py-16 mb-16 md:mb-24" id="contactez-nous">
-        <div className="container mx-auto px-4 md:px-6" style={{ overflow: 'visible' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12" style={{ overflow: 'visible' }}>
+      <section className="py-12 md:py-16 mb-16 md:mb-24">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
             
             {/* Informations de contact */}
             <motion.div 
