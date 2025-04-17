@@ -119,8 +119,8 @@ const AboutPage: React.FC = () => {
                     Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui transforme l'accès à l'information politique pour les jeunes.
                   </p>
                   
-                  {/* Téléphone avec Instagram (incliné sur desktop, animation popup sur mobile) */}
-                  <div className="mt-16 relative flex justify-center md:justify-start max-w-full lg:max-w-[280px]">
+                  {/* Téléphone avec Instagram (incliné sur desktop, caché sur mobile) */}
+                  <div className="mt-16 relative hidden md:flex justify-center md:justify-start max-w-full lg:max-w-[280px]">
                     <div className="phone-mockup">
                       <div className="relative border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform md:-rotate-3 animate-in fade-in-50 zoom-in-95 duration-1000">
                         <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
