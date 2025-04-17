@@ -46,12 +46,24 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
+      refetchOnWindowFocus: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes
       retry: false,
     },
     mutations: {
       retry: false,
+      onSuccess: (data, variables, context) => {
+        // Invalidate related queries after mutations
+        queryClient.invalidateQueries();
+      }
     },
   },
 });
+
+// Fonction utilitaire pour forcer le rafraîchissement des données d'articles
+export const refreshArticlesData = () => {
+  // Invalider toutes les requêtes liées aux articles
+  queryClient.invalidateQueries({ queryKey: ['/api/articles'] });
+  queryClient.invalidateQueries({ queryKey: ['/api/articles/featured'] });
+  queryClient.invalidateQueries({ queryKey: ['/api/articles/recent'] });
+};
