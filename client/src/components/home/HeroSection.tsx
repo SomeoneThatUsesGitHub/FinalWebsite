@@ -43,56 +43,39 @@ const HeroSection: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
-    <section className="relative text-white h-screen mb-8 md:mb-4">
-      {/* Hero section avec image de fond statique */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative text-white h-screen mb-8 md:mb-4 fixed-height-on-mobile">
+      {/* Image de fond avec effet parallaxe - pas d'overflow pour éviter les problèmes sur mobile */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Dégradé amélioré, plus dynamique - moins sombre sur mobile */}
-        <div className={`absolute inset-0 bg-gradient-to-t ${isMobile ? 'from-black/70 via-black/50 to-black/10' : 'from-black via-black/80 to-black/10'} z-10`}></div>
+        <div className={`absolute inset-0 bg-gradient-to-t ${isMobile ? 'from-black/70 via-black/50 to-black/10' : 'from-black via-black/80 to-black/10'} backdrop-blur-[0px] z-10`}></div>
         <div className={`absolute inset-0 bg-gradient-to-r ${isMobile ? 'from-black/30 via-transparent to-black/30' : 'from-black/40 via-transparent to-black/40'} z-10`}></div>
-        
-        {/* Image pour mobile */}
-        {isMobile && (
-          <div 
-            className="absolute inset-0 z-0 bg-gray-800"
-            style={{
-              position: "fixed", /* Force l'image à rester fixe pendant le défilement */
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-            }}
-          >
-            <div className="absolute inset-0 bg-black/20 z-1"></div>
+        {/* Image pour mobile - affichée en tant qu'élément img avec import direct et léger effet sombre */}
+        <div className="absolute inset-0 w-full h-full block md:hidden z-0 bg-gray-800">
+          <div className="absolute inset-0 bg-black/20 z-1"></div> {/* Effet sombre léger sur l'image */}
+          <div className="fixed top-0 left-0 w-full h-[100vh]"> {/* Fixed position pour éviter le zoom au scroll */}
             <img 
               src={parlamentMobile} 
               alt="Parlement européen avec drapeau UE" 
-              className="h-full w-full object-cover"
+              className="w-full h-full object-cover"
               style={{
                 objectPosition: "center",
-                position: "fixed", /* Position fixe pour éviter le zoom */
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
               }}
             />
           </div>
-        )}
+        </div>
         
         {/* Image pour desktop - cachée sur mobile */}
-        {!isMobile && (
-          <div
-            className="absolute inset-0 w-full h-full"
-            style={{
-              backgroundImage: "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
-              backgroundPosition: "center center",
-              backgroundSize: "cover",
-              backgroundAttachment: "scroll",
-              filter: "contrast(1.05) brightness(0.95)",
-              height: "100vh",
-            }}
-          ></div>
-        )}
+        <div
+          className="absolute inset-0 w-full h-full hidden md:block"
+          style={{
+            backgroundImage: "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
+            backgroundPosition: "center center",
+            backgroundSize: "cover",
+            backgroundAttachment: "scroll",
+            filter: "contrast(1.05) brightness(0.95)",
+            height: "100vh", /* Force hauteur fixe */
+          }}
+        ></div>
       </div>
 
       {/* Contenu centré verticalement */}
