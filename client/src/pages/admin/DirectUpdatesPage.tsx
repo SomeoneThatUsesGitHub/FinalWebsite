@@ -47,13 +47,34 @@ const electionResultSchema = z.object({
 
 // Schéma de validation pour les mises à jour
 const updateSchema = z.object({
-  content: z.string().min(3, "Le contenu est requis (minimum 3 caractères)"),
+  content: z.string().min(3, "Le contenu est requis (minimum 3 caractères)").optional(),
   imageUrl: z.string().optional(),
   important: z.boolean().default(false),
   youtubeUrl: z.string().optional(),
   articleId: z.number().optional(),
   updateType: z.enum(["normal", "youtube", "article", "election"]).default("normal"),
   electionResults: z.string().optional(), // On stocke les données JSON sous forme de chaîne
+}).refine((data) => {
+  // Si c'est une mise à jour de type texte normal, le contenu est requis
+  if (data.updateType === "normal") {
+    return !!data.content && data.content.length >= 3;
+  }
+  // Si c'est une mise à jour de type YouTube, l'URL YouTube est requise
+  if (data.updateType === "youtube") {
+    return !!data.youtubeUrl;
+  }
+  // Si c'est une mise à jour de type article, l'ID d'article est requis
+  if (data.updateType === "article") {
+    return !!data.articleId;
+  }
+  // Si c'est une mise à jour de type élection, les résultats sont requis
+  if (data.updateType === "election") {
+    return !!data.electionResults;
+  }
+  return true;
+}, {
+  message: "Veuillez remplir les champs requis pour ce type de mise à jour",
+  path: ["updateType"]
 });
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
@@ -121,6 +142,14 @@ export default function DirectUpdatesPage() {
   // Mutation pour ajouter une mise à jour
   const addUpdateMutation = useMutation({
     mutationFn: async (data: UpdateFormValues) => {
+      // Log pour déboguer
+      console.log("Envoi des données de mise à jour au serveur:", data);
+      console.log("Type de mise à jour:", data.updateType);
+      if (data.updateType === 'election' && data.electionResults) {
+        console.log("Données d'élection:", data.electionResults);
+        console.log("Type des données d'élection:", typeof data.electionResults);
+      }
+      
       const response = await fetch(`/api/admin/live-coverages/${id}/updates`, {
         method: "POST",
         headers: {
@@ -131,6 +160,7 @@ export default function DirectUpdatesPage() {
 
       if (!response.ok) {
         const error = await response.json();
+        console.error("Erreur serveur:", error);
         throw new Error(error.message || "Erreur lors de l'ajout de la mise à jour");
       }
 
@@ -142,6 +172,8 @@ export default function DirectUpdatesPage() {
         title: "Mise à jour publiée",
         description: "Votre mise à jour a été publiée avec succès",
       });
+      
+      // Réinitialiser le formulaire
       form.reset({
         content: "",
         imageUrl: "",
@@ -149,6 +181,21 @@ export default function DirectUpdatesPage() {
         youtubeUrl: "",
         articleId: undefined,
         updateType: "normal",
+        electionResults: undefined,
+      });
+      
+      // Réinitialiser également l'état du constructeur graphique
+      setElectionData({
+        title: "Résultats des élections",
+        date: new Date().toLocaleDateString(),
+        type: "Élections législatives",
+        results: [
+          { candidate: "Candidat 1", party: "Parti A", percentage: 35.8, color: "#FF4D4D" },
+          { candidate: "Candidat 2", party: "Parti B", percentage: 28.4, color: "#2D95BF" },
+          { candidate: "Candidat 3", party: "Parti C", percentage: 20.1, color: "#4CAF50" },
+          { candidate: "Candidat 4", party: "Parti D", percentage: 15.7, color: "#FFA726" }
+        ],
+        displayType: "bar"
       });
     },
     onError: (error: Error) => {
@@ -233,7 +280,14 @@ export default function DirectUpdatesPage() {
     }
     
     // Convertir les données en chaîne JSON et les ajouter au formulaire
-    form.setValue("electionResults", JSON.stringify(electionData));
+    const jsonData = JSON.stringify(electionData);
+    form.setValue("electionResults", jsonData);
+    
+    // Ajouter un petit contenu explicite pour éviter les problèmes de validation
+    form.setValue("content", `Résultats des élections : ${electionData.title}`);
+    
+    console.log("Données d'élection appliquées:", jsonData);
+    console.log("Contenu ajouté au formulaire:", `Résultats des élections : ${electionData.title}`);
     
     toast({
       title: "Graphique appliqué",
@@ -252,6 +306,25 @@ export default function DirectUpdatesPage() {
       return;
     }
     
+    // Vérifier qu'on a bien les données au format attendu
+    if (data.updateType === 'election') {
+      try {
+        // S'assurer que electionResults est bien une chaîne JSON valide
+        if (typeof data.electionResults === 'string') {
+          JSON.parse(data.electionResults);
+        }
+      } catch (error) {
+        console.error("Erreur de parsing JSON:", error);
+        toast({
+          title: "Erreur de données",
+          description: "Les données du graphique sont invalides. Veuillez réappliquer le graphique.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+    
+    console.log("Soumission du formulaire avec les données:", data);
     addUpdateMutation.mutate(data);
   };
 
