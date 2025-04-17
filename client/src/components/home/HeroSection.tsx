@@ -40,9 +40,9 @@ const HeroSection: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   
   return (
-    <section className="relative text-white overflow-hidden h-[70vh] md:h-screen mb-8 md:mb-4">
-      {/* Image de fond avec effet parallaxe */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative text-white h-[70vh] md:h-screen mb-8 md:mb-4">
+      {/* Image de fond avec effet parallaxe - pas d'overflow pour éviter les problèmes sur mobile */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Dégradé amélioré, plus dynamique */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10 backdrop-blur-[0px] z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 z-10"></div>
@@ -55,6 +55,7 @@ const HeroSection: React.FC = () => {
             backgroundSize: "cover",
             backgroundAttachment: "scroll",
             filter: "contrast(1.05) brightness(0.95)",
+            height: "100%", /* Garantit que l'image reste à la bonne taille */
           }}
         ></div>
       </div>

@@ -106,7 +106,7 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Notre histoire - Avec fond plus foncé et téléphone affichant Instagram */}
-      <section className="py-20 bg-gradient-to-b from-gray-100 to-gray-50 overflow-hidden" id="histoire">
+      <section className="py-20 bg-gradient-to-b from-gray-100 to-gray-50" id="histoire">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row">
             {/* Titre et introduction à gauche */}
@@ -216,7 +216,7 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Politiquensemble en chiffres - Style décalé et dynamique avec animation de comptage */}
-      <section className="pt-20 pb-32 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
+      <section className="pt-20 pb-32 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative" id="chiffres">
         {/* Élément décoratif */}
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500 opacity-30 rounded-full"></div>
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-blue-400 opacity-20 rounded-full"></div>
