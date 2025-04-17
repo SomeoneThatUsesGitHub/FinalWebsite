@@ -50,9 +50,11 @@ const HeroSection: React.FC = () => {
           className="absolute inset-0 w-full h-full"
           style={{
             backgroundImage:
-              "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
-            backgroundPosition: "center center",
-            backgroundSize: isMobile ? "100% auto" : "cover",
+              isMobile 
+                ? "url('/parlement-europeen.png')" 
+                : "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
+            backgroundPosition: isMobile ? "center center" : "center center",
+            backgroundSize: "cover",
             backgroundAttachment: "scroll",
             filter: "contrast(1.05) brightness(0.95)",
             height: "100vh", /* Force hauteur fixe */
