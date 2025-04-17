@@ -43,9 +43,9 @@ const HeroSection: React.FC = () => {
     <section className="relative text-white h-screen mb-8 md:mb-4 fixed-height-on-mobile">
       {/* Image de fond avec effet parallaxe - pas d'overflow pour éviter les problèmes sur mobile */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {/* Dégradé amélioré, plus dynamique */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10 backdrop-blur-[0px] z-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 z-10"></div>
+        {/* Dégradé amélioré, plus dynamique - moins sombre sur mobile */}
+        <div className={`absolute inset-0 bg-gradient-to-t ${isMobile ? 'from-black/70 via-black/50 to-black/10' : 'from-black via-black/80 to-black/10'} backdrop-blur-[0px] z-10`}></div>
+        <div className={`absolute inset-0 bg-gradient-to-r ${isMobile ? 'from-black/30 via-transparent to-black/30' : 'from-black/40 via-transparent to-black/40'} z-10`}></div>
         {/* Image pour mobile - cachée sur desktop */}
         {isMobile && (
           <div
@@ -55,7 +55,7 @@ const HeroSection: React.FC = () => {
               backgroundPosition: "center center",
               backgroundSize: "cover",
               backgroundAttachment: "scroll",
-              filter: "contrast(1.05) brightness(0.95)",
+              filter: "contrast(1.2) brightness(1.2)",
               height: "100vh", /* Force hauteur fixe */
             }}
           ></div>
