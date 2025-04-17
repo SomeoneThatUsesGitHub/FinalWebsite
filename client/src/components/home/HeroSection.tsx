@@ -69,10 +69,10 @@ const HeroSection: React.FC = () => {
             variants={fadeInWithBounce}
             initial="hidden"
             animate="visible"
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 md:mb-5"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-4 md:mb-6 drop-shadow-xl"
           >
-            <span className="block text-white drop-shadow-lg">Politiquensemble</span>
-            <span className="block mt-2 sm:mt-3 text-white bg-gradient-to-r from-blue-500 to-indigo-600 inline-block text-transparent bg-clip-text drop-shadow-sm">
+            <span className="block text-white">Politiquensemble</span>
+            <span className="block mt-2 sm:mt-3 bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600 text-transparent bg-clip-text">
               LA POLITIQUE SIMPLIFIÉE
             </span>
           </motion.h1>
@@ -81,13 +81,13 @@ const HeroSection: React.FC = () => {
             variants={slideUpWithBounce}
             initial="hidden"
             animate="visible"
-            className="text-base sm:text-lg md:text-xl mb-8 md:mb-10 text-white/95 max-w-xl font-medium leading-relaxed backdrop-blur-sm bg-black/10 p-3 rounded-lg shadow-inner"
+            className="text-lg sm:text-xl md:text-2xl mb-8 md:mb-10 text-white font-medium leading-relaxed drop-shadow-lg"
           >
-            <span className="md:text-xl font-semibold">Comprendre les enjeux politiques d'aujourd'hui</span>
+            <span className="font-bold">Comprendre les enjeux politiques d'aujourd'hui</span>
             <span className="block mt-1">
               pour construire le monde de demain.
             </span>
-            <span className="block mt-2 text-blue-200 font-medium">
+            <span className="block mt-2 text-blue-200 font-semibold">
               Pour tous les citoyens de 16 à 30 ans.
             </span>
           </motion.p>
