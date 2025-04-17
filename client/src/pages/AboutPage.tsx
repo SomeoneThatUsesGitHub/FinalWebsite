@@ -77,7 +77,7 @@ const AboutPage: React.FC = () => {
       </Helmet>
 
       {/* Hero Section avec effet carnet quadrillé qui s'estompe et collages politiques */}
-      <section className="pattern-grid-fade pt-16 pb-12 md:pt-24 md:pb-16 min-h-[50vh] flex items-center">
+      <section className="pattern-grid-fade pt-16 pb-12 md:pt-24 md:pb-16 min-h-[50vh] flex items-center overflow-visible">
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <ScrollAnimation threshold={0.1}>
@@ -216,7 +216,7 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Politiquensemble en chiffres - Style décalé et dynamique avec animation de comptage */}
-      <section className="pt-20 pb-32 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative" id="chiffres">
+      <section className="pt-20 pb-32 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-visible" id="chiffres">
         {/* Élément décoratif */}
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500 opacity-30 rounded-full"></div>
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-blue-400 opacity-20 rounded-full"></div>
