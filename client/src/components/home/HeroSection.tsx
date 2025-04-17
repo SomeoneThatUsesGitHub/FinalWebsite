@@ -52,8 +52,8 @@ const HeroSection: React.FC = () => {
             backgroundImage:
               "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
             backgroundPosition: "center center",
-            backgroundSize: "cover",
-            backgroundAttachment: "fixed",
+            backgroundSize: isMobile ? "100% auto" : "cover",
+            backgroundAttachment: "scroll",
             filter: "contrast(1.05) brightness(0.95)",
             height: "100vh", /* Force hauteur fixe */
           }}
@@ -61,9 +61,9 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Contenu centré verticalement */}
-      <div className="container mx-auto px-4 flex items-center justify-center h-full relative z-10">
+      <div className="container mx-auto px-4 flex items-center h-full relative z-10">
         <div
-          className={`max-w-4xl ${isMobile ? "text-center mx-auto" : "mx-auto text-center md:text-left md:mx-0"}`}
+          className={`max-w-4xl ${isMobile ? "text-left mx-0" : "mx-auto text-center md:text-left md:mx-0"}`}
         >
           <motion.h1
             variants={fadeInWithBounce}
