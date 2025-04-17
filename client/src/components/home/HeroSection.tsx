@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
+// Import direct de l'image
+import parlamentMobile from "@assets/image_1744916173295.png";
+
 // Animations plus légères pour de meilleures performances
 const fadeInWithBounce = {
   hidden: { opacity: 0, y: 20 },
@@ -46,20 +49,18 @@ const HeroSection: React.FC = () => {
         {/* Dégradé amélioré, plus dynamique - moins sombre sur mobile */}
         <div className={`absolute inset-0 bg-gradient-to-t ${isMobile ? 'from-black/70 via-black/50 to-black/10' : 'from-black via-black/80 to-black/10'} backdrop-blur-[0px] z-10`}></div>
         <div className={`absolute inset-0 bg-gradient-to-r ${isMobile ? 'from-black/30 via-transparent to-black/30' : 'from-black/40 via-transparent to-black/40'} z-10`}></div>
-        {/* Image pour mobile - cachée sur desktop */}
-        {isMobile && (
-          <div
-            className="absolute inset-0 w-full h-full block md:hidden"
+        {/* Image pour mobile - affichée en tant qu'élément img avec import direct */}
+        <div className="absolute inset-0 w-full h-full block md:hidden z-0 bg-gray-800">
+          <img 
+            src={parlamentMobile} 
+            alt="Parlement européen avec drapeau UE" 
+            className="w-full h-full object-cover"
             style={{
-              backgroundImage: "url('/parlement-europeen.png')",
-              backgroundPosition: "center center",
-              backgroundSize: "cover",
-              backgroundAttachment: "scroll",
-              filter: "contrast(1.2) brightness(1.2)",
+              objectPosition: "center",
               height: "100vh", /* Force hauteur fixe */
             }}
-          ></div>
-        )}
+          />
+        </div>
         
         {/* Image pour desktop - cachée sur mobile */}
         <div
