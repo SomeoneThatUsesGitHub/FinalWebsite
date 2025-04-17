@@ -46,16 +46,14 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
-      refetchOnWindowFocus: true,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
       retry: false,
     },
     mutations: {
       retry: false,
-      onSuccess: (data, variables, context) => {
-        // Invalidate related queries after mutations
-        queryClient.invalidateQueries();
-      }
+      // Nous ne voulons pas invalider automatiquement toutes les requêtes
+      // car cela cause des problèmes avec l'authentification et d'autres fonctionnalités
     },
   },
 });

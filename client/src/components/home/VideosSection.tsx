@@ -7,13 +7,30 @@ import { AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
+// Fonction pour extraire l'ID YouTube d'une URL
+const extractYouTubeID = (url: string): string => {
+  // Vérifier si c'est déjà un ID simple (11 caractères)
+  if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
+    return url;
+  }
+  
+  // Regex pour extraire l'ID YouTube à partir d'une URL complète
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+  const match = url.match(regex);
+  
+  return match ? match[1] : url; // Retourner l'ID ou l'URL originale si pas de correspondance
+};
+
 // Composant pour l'iframe YouTube Shorts
 const YouTubeShort = ({ videoId, title }: { videoId: string; title: string }) => {
+  // Extraire l'ID YouTube si c'est une URL complète
+  const youtubeID = extractYouTubeID(videoId);
+  
   return (
     <div className="flex-shrink-0 w-full sm:w-[280px] md:w-[320px] overflow-hidden">
       <div className="aspect-[9/16] relative">
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?rel=0&amp;controls=1&amp;showinfo=0`}
+          src={`https://www.youtube.com/embed/${youtubeID}?rel=0&amp;controls=1&amp;showinfo=0`}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
