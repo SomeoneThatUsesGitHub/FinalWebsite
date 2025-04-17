@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, ChevronLeft, Radio } from "lucide-react";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, refreshLiveEventData } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { slugify } from "@/lib/utils";
 
@@ -81,6 +81,8 @@ export default function DirectForm() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/live-coverages"] });
+      // Rafraîchir les données de suivi en direct sur la page d'accueil
+      refreshLiveEventData();
       toast({
         title: "Suivi en direct créé",
         description: "Le suivi en direct a été créé avec succès",
@@ -122,6 +124,8 @@ export default function DirectForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/live-coverages"] });
       queryClient.invalidateQueries({ queryKey: [`/api/admin/live-coverages/${id}`] });
+      // Rafraîchir les données de suivi en direct sur la page d'accueil
+      refreshLiveEventData();
       toast({
         title: "Suivi en direct mis à jour",
         description: "Le suivi en direct a été mis à jour avec succès",
