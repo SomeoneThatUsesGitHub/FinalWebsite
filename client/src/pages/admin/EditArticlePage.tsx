@@ -106,8 +106,10 @@ function NewArticleForm({ categories }: { categories: Category[] }) {
       return await res.json();
     },
     onSuccess: (data) => {
-      // Invalider à la fois les requêtes publiques et admin
-      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      // Utiliser la fonction spécifique pour rafraîchir toutes les données d'articles
+      refreshArticlesData();
+      
+      // Maintenir aussi l'invalidation des requêtes admin
       queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
       
       toast({
@@ -487,7 +489,10 @@ function EditArticleForm({ article, categories }: { article: Article, categories
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      // Utiliser la fonction spécifique pour rafraîchir toutes les données d'articles
+      refreshArticlesData();
+      
+      // Maintenir aussi l'invalidation des requêtes admin
       queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
       
       toast({
