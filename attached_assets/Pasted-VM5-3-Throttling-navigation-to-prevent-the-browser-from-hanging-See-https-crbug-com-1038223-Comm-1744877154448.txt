@@ -1,0 +1,63 @@
+VM5:3 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+(anonymous) @ VM5:3Understand this warning
+api/auth/me:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+api/articles/featured:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+api/articles/recent:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+api/live-event:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+api/videos?limit=4:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+api/videos?limit=3:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+api/elections:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+index-DMyOXd3n.js:851 Erreur lors du chargement des élections: Error: 502: <html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>nginx/1.18.0 (Ubuntu)</center>
+</body>
+</html>
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+
+    at r9 (index-DMyOXd3n.js:48:42947)
+    at async index-DMyOXd3n.js:48:43302
+jtt @ index-DMyOXd3n.js:851Understand this error
+api/articles/featured:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+api/live-event:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+api/articles/recent:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+api/videos?limit=4:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)

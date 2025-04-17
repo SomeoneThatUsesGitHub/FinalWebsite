@@ -1,0 +1,180 @@
+0|politiquensemble  | Node.js v20.19.0
+0|politiquensemble  | > rest-express@1.0.0 dev
+0|politiquensemble  | > tsx server/index.ts
+0|politiquensemble  | Génération des sitemaps initiaux...
+0|politiquensemble  | Error initializing database: ErrorEvent {
+0|politiquensemble  |   [Symbol(kTarget)]: WebSocket {
+0|politiquensemble  |     _events: [Object: null prototype] {
+0|politiquensemble  |       error: [Function],
+0|politiquensemble  |       message: [Function],
+0|politiquensemble  |       close: [Function],
+0|politiquensemble  |       open: [Function]
+0|politiquensemble  |     },
+0|politiquensemble  |     _eventsCount: 4,
+0|politiquensemble  |     _maxListeners: undefined,
+0|politiquensemble  |     _binaryType: 'arraybuffer',
+0|politiquensemble  |     _closeCode: 1006,
+0|politiquensemble  |     _closeFrameReceived: false,
+0|politiquensemble  |     _closeFrameSent: false,
+0|politiquensemble  |     _closeMessage: <Buffer >,
+0|politiquensemble  |     _closeTimer: null,
+0|politiquensemble  |     _errorEmitted: true,
+0|politiquensemble  |     _extensions: {},
+0|politiquensemble  |     _paused: false,
+0|politiquensemble  |     _protocol: '',
+0|politiquensemble  |     _readyState: 3,
+0|politiquensemble  |     _receiver: null,
+0|politiquensemble  |     _sender: null,
+0|politiquensemble  |     _socket: null,
+0|politiquensemble  |     _bufferedAmount: 0,
+0|politiquensemble  |     _isServer: false,
+0|politiquensemble  |     _redirects: 0,
+0|politiquensemble  |     _autoPong: true,
+0|politiquensemble  |     _url: 'wss://localhost/v2',
+0|politiquensemble  |     _req: null,
+0|politiquensemble  |     [Symbol(shapeMode)]: false,
+0|politiquensemble  |     [Symbol(kCapture)]: false
+0|politiquensemble  |   },
+0|politiquensemble  |   [Symbol(kType)]: 'error',
+0|politiquensemble  |   [Symbol(kError)]: AggregateError [ECONNREFUSED]: 
+0|politiquensemble  |       at internalConnectMultiple (node:net:1122:18)
+0|politiquensemble  |       at afterConnectMultiple (node:net:1689:7) {
+0|politiquensemble  |     code: 'ECONNREFUSED',
+0|politiquensemble  |     [errors]: [ [Error], [Error] ]
+0|politiquensemble  |   },
+0|politiquensemble  |   [Symbol(kMessage)]: ''
+0|politiquensemble  | }
+0|politiquensemble  | Error initializing videos: ErrorEvent {
+0|politiquensemble  |   [Symbol(kTarget)]: WebSocket {
+0|politiquensemble  |     _events: [Object: null prototype] {
+0|politiquensemble  |       error: [Function],
+0|politiquensemble  |       message: [Function],
+0|politiquensemble  |       close: [Function],
+0|politiquensemble  |       open: [Function]
+0|politiquensemble  |     },
+0|politiquensemble  |     _eventsCount: 4,
+0|politiquensemble  |     _maxListeners: undefined,
+0|politiquensemble  |     _binaryType: 'arraybuffer',
+0|politiquensemble  |     _closeCode: 1006,
+0|politiquensemble  |     _closeFrameReceived: false,
+0|politiquensemble  |     _closeFrameSent: false,
+0|politiquensemble  |     _closeMessage: <Buffer >,
+0|politiquensemble  |     _closeTimer: null,
+0|politiquensemble  |     _errorEmitted: true,
+0|politiquensemble  |     _extensions: {},
+0|politiquensemble  |     _paused: false,
+0|politiquensemble  |     _protocol: '',
+0|politiquensemble  |     _readyState: 3,
+0|politiquensemble  |     _receiver: null,
+0|politiquensemble  |     _sender: null,
+0|politiquensemble  |     _socket: null,
+0|politiquensemble  |     _bufferedAmount: 0,
+0|politiquensemble  |     _isServer: false,
+0|politiquensemble  |     _redirects: 0,
+0|politiquensemble  |     _autoPong: true,
+0|politiquensemble  |     _url: 'wss://localhost/v2',
+0|politiquensemble  |     _req: null,
+0|politiquensemble  |     [Symbol(shapeMode)]: false,
+0|politiquensemble  |     [Symbol(kCapture)]: false
+0|politiquensemble  |   },
+0|politiquensemble  |   [Symbol(kType)]: 'error',
+0|politiquensemble  |   [Symbol(kError)]: AggregateError [ECONNREFUSED]: 
+0|politiquensemble  |       at internalConnectMultiple (node:net:1122:18)
+0|politiquensemble  |       at afterConnectMultiple (node:net:1689:7) {
+0|politiquensemble  |     code: 'ECONNREFUSED',
+0|politiquensemble  |     [errors]: [ [Error], [Error] ]
+0|politiquensemble  |   },
+0|politiquensemble  |   [Symbol(kMessage)]: ''
+0|politiquensemble  | }
+0|politiquensemble  | Erreur lors de la génération du sitemap initial: ErrorEvent {
+0|politiquensemble  |   [Symbol(kTarget)]: WebSocket {
+0|politiquensemble  |     _events: [Object: null prototype] {
+0|politiquensemble  |       error: [Function],
+0|politiquensemble  |       message: [Function],
+0|politiquensemble  |       close: [Function],
+0|politiquensemble  |       open: [Function]
+0|politiquensemble  |     },
+0|politiquensemble  |     _eventsCount: 4,
+0|politiquensemble  |     _maxListeners: undefined,
+0|politiquensemble  |     _binaryType: 'arraybuffer',
+0|politiquensemble  |     _closeCode: 1006,
+0|politiquensemble  |     _closeFrameReceived: false,
+0|politiquensemble  |     _closeFrameSent: false,
+0|politiquensemble  |     _closeMessage: <Buffer >,
+0|politiquensemble  |     _closeTimer: null,
+0|politiquensemble  |     _errorEmitted: true,
+0|politiquensemble  |     _extensions: {},
+0|politiquensemble  |     _paused: false,
+0|politiquensemble  |     _protocol: '',
+0|politiquensemble  |     _readyState: 3,
+0|politiquensemble  |     _receiver: null,
+0|politiquensemble  |     _sender: null,
+0|politiquensemble  |     _socket: null,
+0|politiquensemble  |     _bufferedAmount: 0,
+0|politiquensemble  |     _isServer: false,
+0|politiquensemble  |     _redirects: 0,
+0|politiquensemble  |     _autoPong: true,
+0|politiquensemble  |     _url: 'wss://localhost/v2',
+0|politiquensemble  |     _req: null,
+0|politiquensemble  |     [Symbol(shapeMode)]: false,
+0|politiquensemble  |     [Symbol(kCapture)]: false
+0|politiquensemble  |   },
+0|politiquensemble  |   [Symbol(kType)]: 'error',
+0|politiquensemble  |   [Symbol(kError)]: AggregateError [ECONNREFUSED]: 
+0|politiquensemble  |       at internalConnectMultiple (node:net:1122:18)
+0|politiquensemble  |       at afterConnectMultiple (node:net:1689:7) {
+0|politiquensemble  |     code: 'ECONNREFUSED',
+0|politiquensemble  |     [errors]: [ [Error], [Error] ]
+0|politiquensemble  |   },
+0|politiquensemble  |   [Symbol(kMessage)]: ''
+0|politiquensemble  | }
+0|politiquensemble  | Erreur lors de la génération du sitemap news initial: ErrorEvent {
+0|politiquensemble  |   [Symbol(kTarget)]: WebSocket {
+0|politiquensemble  |     _events: [Object: null prototype] {
+0|politiquensemble  |       error: [Function],
+0|politiquensemble  |       message: [Function],
+0|politiquensemble  |       close: [Function],
+0|politiquensemble  |       open: [Function]
+0|politiquensemble  |     },
+0|politiquensemble  |     _eventsCount: 4,
+0|politiquensemble  |     _maxListeners: undefined,
+0|politiquensemble  |     _binaryType: 'arraybuffer',
+0|politiquensemble  |     _closeCode: 1006,
+0|politiquensemble  |     _closeFrameReceived: false,
+0|politiquensemble  |     _closeFrameSent: false,
+0|politiquensemble  |     _closeMessage: <Buffer >,
+0|politiquensemble  |     _closeTimer: null,
+0|politiquensemble  |     _errorEmitted: true,
+0|politiquensemble  |     _extensions: {},
+0|politiquensemble  |     _paused: false,
+0|politiquensemble  |     _protocol: '',
+0|politiquensemble  |     _readyState: 3,
+0|politiquensemble  |     _receiver: null,
+0|politiquensemble  |     _sender: null,
+0|politiquensemble  |     _socket: null,
+0|politiquensemble  |     _bufferedAmount: 0,
+0|politiquensemble  |     _isServer: false,
+0|politiquensemble  |     _redirects: 0,
+0|politiquensemble  |     _autoPong: true,
+0|politiquensemble  |     _url: 'wss://localhost/v2',
+0|politiquensemble  |     _req: null,
+0|politiquensemble  |     [Symbol(shapeMode)]: false,
+0|politiquensemble  |     [Symbol(kCapture)]: false
+0|politiquensemble  |   },
+0|politiquensemble  |   [Symbol(kType)]: 'error',
+0|politiquensemble  |   [Symbol(kError)]: AggregateError [ECONNREFUSED]: 
+0|politiquensemble  |       at internalConnectMultiple (node:net:1122:18)
+0|politiquensemble  |       at afterConnectMultiple (node:net:1689:7) {
+0|politiquensemble  |     code: 'ECONNREFUSED',
+0|politiquensemble  |     [errors]: [ [Error], [Error] ]
+0|politiquensemble  |   },
+0|politiquensemble  |   [Symbol(kMessage)]: ''
+0|politiquensemble  | }
+0|politiquensemble  | Sitemaps générés avec succès.
+0|politiquensemble  | /var/www/politiquensemble/server/vite.ts:74
+0|politiquensemble  |     throw new Error(
+0|politiquensemble  |           ^
+0|politiquensemble  | Error: Could not find the build directory: /var/www/politiquensemble/server/public, make sure to build the client first
+0|politiquensemble  |     at serveStatic (/var/www/politiquensemble/server/vite.ts:74:11)
+0|politiquensemble  |     at <anonymous> (/var/www/politiquensemble/server/index.ts:100:5)
+0|politiquensemble  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
