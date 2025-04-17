@@ -12,13 +12,13 @@ const LegalPage: React.FC = () => {
             <div>
               <h2 className="text-xl font-semibold">Éditeur :</h2>
               <p>Politiquensemble</p>
-              <p>info@politiquensemble.com</p>
+              <p>info@politiquensemble.be</p>
             </div>
             
             <div>
               <h2 className="text-xl font-semibold">Directeur de production :</h2>
               <p>Heine Noah</p>
-              <p>noah@politiquensemble.com</p>
+              <p>noah@politiquensemble.be</p>
             </div>
             
             <div>
@@ -85,7 +85,7 @@ const LegalPage: React.FC = () => {
               <h2 className="text-xl font-semibold">Contact :</h2>
               <p>
                 Si vous avez des questions ou des préoccupations concernant ces mentions légales, 
-                veuillez nous contacter à l'adresse suivante : info@politiquensemble.com
+                veuillez nous contacter à l'adresse suivante : info@politiquensemble.be
               </p>
             </div>
             

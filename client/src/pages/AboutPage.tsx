@@ -106,7 +106,7 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Notre histoire - Avec fond plus foncé et téléphone affichant Instagram */}
-      <section className="py-20 bg-gradient-to-b from-gray-100 to-gray-50" id="histoire">
+      <section className="py-20 bg-gradient-to-b from-gray-100 to-gray-50 overflow-hidden" id="histoire">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row">
             {/* Titre et introduction à gauche */}
@@ -119,8 +119,8 @@ const AboutPage: React.FC = () => {
                     Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui transforme l'accès à l'information politique pour les jeunes.
                   </p>
                   
-                  {/* Téléphone avec Instagram (incliné sur desktop, caché sur mobile) */}
-                  <div className="mt-16 relative hidden md:flex justify-center md:justify-start max-w-full lg:max-w-[280px]">
+                  {/* Téléphone avec Instagram (incliné sur desktop, animation popup sur mobile) */}
+                  <div className="mt-16 relative flex justify-center md:justify-start max-w-full lg:max-w-[280px]">
                     <div className="phone-mockup">
                       <div className="relative border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl transform md:-rotate-3 animate-in fade-in-50 zoom-in-95 duration-1000">
                         <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
@@ -216,7 +216,7 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Politiquensemble en chiffres - Style décalé et dynamique avec animation de comptage */}
-      <section className="pt-20 pb-32 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative" id="chiffres">
+      <section className="pt-20 pb-32 bg-gradient-to-br from-blue-700 to-blue-900 text-white stats-section relative overflow-hidden" id="chiffres">
         {/* Élément décoratif */}
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500 opacity-30 rounded-full"></div>
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-blue-400 opacity-20 rounded-full"></div>

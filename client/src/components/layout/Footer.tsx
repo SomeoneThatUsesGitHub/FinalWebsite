@@ -136,7 +136,7 @@ export const Footer: React.FC = () => {
                 )}
               </button>
             </form>
-            <p className="text-gray-500 mt-2 text-xs">contact@politiquensemble.com</p>
+            <p className="text-gray-500 mt-2 text-xs">contact@politiquensemble.be</p>
           </div>
         </div>
         

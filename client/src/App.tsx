@@ -81,87 +81,85 @@ function App() {
   const isAdminPage = location.startsWith("/admin");
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <div className="flex flex-col min-h-screen">
-          {/* Balises SEO globales */}
-          <Helmet>
-            <html lang="fr" />
-            <meta charSet="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Politiquensemble - L'actualité politique simplifiée pour les 16-30 ans</title>
-            <meta name="description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Un média par et pour les jeunes citoyens." />
-            
-            {/* Balises hreflang pour indiquer la langue principale */}
-            <link rel="alternate" hrefLang="fr" href="https://politiquensemble.com" />
-            <link rel="alternate" hrefLang="x-default" href="https://politiquensemble.com" />
-            
-            {/* Balises de site vérifié pour les moteurs de recherche */}
-            <meta name="google-site-verification" content="REMPLACER_PAR_CODE_VERIFICATION" />
-          </Helmet>
+    <AuthProvider>
+      <div className="flex flex-col min-h-screen">
+        {/* Balises SEO globales */}
+        <Helmet>
+          <html lang="fr" />
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Politiquensemble - L'actualité politique simplifiée pour les 16-30 ans</title>
+          <meta name="description" content="Comprendre les enjeux politiques d'aujourd'hui pour construire le monde de demain. Un média par et pour les jeunes citoyens." />
+          
+          {/* Balises hreflang pour indiquer la langue principale */}
+          <link rel="alternate" hrefLang="fr" href="https://politiquensemble.be" />
+          <link rel="alternate" hrefLang="x-default" href="https://politiquensemble.be" />
+          
+          {/* Balises de site vérifié pour les moteurs de recherche */}
+          <meta name="google-site-verification" content="REMPLACER_PAR_CODE_VERIFICATION" />
+        </Helmet>
 
-          {/* N'afficher le header et le footer que sur les pages publiques */}
-          {!isAdminPage && <Header />}
-          <main className={`flex-grow ${!isAdminPage ? "" : "bg-background"}`}>
-            <Switch>
-              {/* Routes publiques */}
-              <Route path="/" component={() => <Redirector to="/home" />} />
-              <Route path="/home" component={Home} />
-              <Route path="/articles" component={ArticlesList} />
-              <Route path="/articles/:slug" component={Article} />
-              <Route path="/team" component={TeamPage} />
-              <Route path="/a-propos" component={AboutPage} />
-              <Route path="/contact" component={ContactPage} />
-              <Route path="/auth" component={AuthPage} />
-              <Route path="/test-editor" component={TestEditor} />
-              <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
-              <Route path="/apprendre" component={LearnPage} />
-              <Route path="/apprendre/:slug" component={TopicPage} />
-              <Route path="/apprendre/:topicSlug/:contentSlug" component={ContentPage} />
-              <Route path="/elections" component={ElectionsPage} />
-              <Route path="/elections/:countryCode" component={CountryElectionsPage} />
-              <Route path="/elections/:countryCode/resultats/:id" component={ElectionResultsPage} />
-              <Route path="/mentions-legales" component={LegalPage} />
-              <Route path="/confidentialite" component={PrivacyPage} />
-              
-              {/* Routes admin protégées - accessibles aux admins et éditeurs */}
-              <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
-              <ProtectedRoute path="/admin/articles" component={ArticlesPage} adminOnly />
-              <ProtectedRoute path="/admin/articles/new" component={EditArticlePage} adminOnly />
-              <ProtectedRoute path="/admin/articles/:id" component={EditArticlePage} adminOnly />
-              <ProtectedRoute path="/admin/flash-infos" component={FlashInfosPage} adminOnly />
-              <ProtectedRoute path="/admin/videos" component={VideosPage} adminOnly />
+        {/* N'afficher le header et le footer que sur les pages publiques */}
+        {!isAdminPage && <Header />}
+        <main className={`flex-grow ${!isAdminPage ? "" : "bg-background"}`}>
+          <Switch>
+            {/* Routes publiques */}
+            <Route path="/" component={() => <Redirector to="/home" />} />
+            <Route path="/home" component={Home} />
+            <Route path="/articles" component={ArticlesList} />
+            <Route path="/articles/:slug" component={Article} />
+            <Route path="/team" component={TeamPage} />
+            <Route path="/a-propos" component={AboutPage} />
+            <Route path="/contact" component={ContactPage} />
+            <Route path="/auth" component={AuthPage} />
+            <Route path="/test-editor" component={TestEditor} />
+            <Route path="/suivis-en-direct/:slug" component={LiveCoveragePage} />
+            <Route path="/apprendre" component={LearnPage} />
+            <Route path="/apprendre/:slug" component={TopicPage} />
+            <Route path="/apprendre/:topicSlug/:contentSlug" component={ContentPage} />
+            <Route path="/elections" component={ElectionsPage} />
+            <Route path="/elections/:countryCode" component={CountryElectionsPage} />
+            <Route path="/elections/:countryCode/resultats/:id" component={ElectionResultsPage} />
+            <Route path="/mentions-legales" component={LegalPage} />
+            <Route path="/confidentialite" component={PrivacyPage} />
+            
+            {/* Routes admin protégées - accessibles aux admins et éditeurs */}
+            <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
+            <ProtectedRoute path="/admin/articles" component={ArticlesPage} adminOnly />
+            <ProtectedRoute path="/admin/articles/new" component={EditArticlePage} adminOnly />
+            <ProtectedRoute path="/admin/articles/:id" component={EditArticlePage} adminOnly />
+            <ProtectedRoute path="/admin/flash-infos" component={FlashInfosPage} adminOnly />
+            <ProtectedRoute path="/admin/videos" component={VideosPage} adminOnly />
 
-              
-              {/* Routes admin protégées - accessibles uniquement aux admins */}
-              <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
-              <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
-              <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
-              <ProtectedRoute path="/admin/newsletter" component={NewsletterSubscribersPage} adminOnly />
-              <ProtectedRoute path="/admin/applications" component={ApplicationsPage} adminOnly />
-              <ProtectedRoute path="/admin/messages" component={ContactMessagesPage} adminOnly />
-              <ProtectedRoute path="/admin/contenu-educatif" component={EducationalContentPage} adminOnly />
-              <ProtectedRoute path="/admin/glossaire" component={GlossaryPage} adminOnly />
-              <ProtectedRoute path="/admin/elections" component={AdminElectionsPage} adminOnly />
-              <ProtectedRoute path="/admin/election-reactions" component={ElectionReactionsPage} adminOnly />
-              
-              {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
-              <ProtectedRoute path="/admin/directs" component={DirectsPage} />
-              <ProtectedRoute path="/admin/directs/nouveau" component={DirectForm} adminOnly />
-              <ProtectedRoute path="/admin/directs/editer/:id" component={DirectForm} adminOnly />
-              <ProtectedRoute path="/admin/directs/:id/editeurs" component={DirectEditorsPage} adminOnly />
-              <ProtectedRoute path="/admin/directs/:id/questions" component={DirectQuestionsPage} />
-              <ProtectedRoute path="/admin/directs/:id/mises-a-jour" component={DirectUpdatesPage} />
-              
-              {/* Fallback */}
-              <Route path="/:rest*" component={NotFound} />
-            </Switch>
-          </main>
-          {!isAdminPage && <Footer />}
-        </div>
-        <Toaster />
-      </AuthProvider>
-    </QueryClientProvider>
+            
+            {/* Routes admin protégées - accessibles uniquement aux admins */}
+            <ProtectedRoute path="/admin/categories" component={CategoriesPage} adminOnly />
+            <ProtectedRoute path="/admin/users" component={UsersPage} adminOnly />
+            <ProtectedRoute path="/admin/team" component={AdminTeamPage} adminOnly />
+            <ProtectedRoute path="/admin/newsletter" component={NewsletterSubscribersPage} adminOnly />
+            <ProtectedRoute path="/admin/applications" component={ApplicationsPage} adminOnly />
+            <ProtectedRoute path="/admin/messages" component={ContactMessagesPage} adminOnly />
+            <ProtectedRoute path="/admin/contenu-educatif" component={EducationalContentPage} adminOnly />
+            <ProtectedRoute path="/admin/glossaire" component={GlossaryPage} adminOnly />
+            <ProtectedRoute path="/admin/elections" component={AdminElectionsPage} adminOnly />
+            <ProtectedRoute path="/admin/election-reactions" component={ElectionReactionsPage} adminOnly />
+            
+            {/* Routes pour les suivis en direct - accessibles aux éditeurs */}
+            <ProtectedRoute path="/admin/directs" component={DirectsPage} />
+            <ProtectedRoute path="/admin/directs/nouveau" component={DirectForm} adminOnly />
+            <ProtectedRoute path="/admin/directs/editer/:id" component={DirectForm} adminOnly />
+            <ProtectedRoute path="/admin/directs/:id/editeurs" component={DirectEditorsPage} adminOnly />
+            <ProtectedRoute path="/admin/directs/:id/questions" component={DirectQuestionsPage} />
+            <ProtectedRoute path="/admin/directs/:id/mises-a-jour" component={DirectUpdatesPage} />
+            
+            {/* Fallback */}
+            <Route path="/:rest*" component={NotFound} />
+          </Switch>
+        </main>
+        {!isAdminPage && <Footer />}
+      </div>
+      <Toaster />
+    </AuthProvider>
   );
 }
 

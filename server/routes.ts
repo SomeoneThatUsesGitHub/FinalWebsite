@@ -5,8 +5,6 @@ import { z } from "zod";
 import passport from "passport";
 import { isAuthenticated, isAdmin, isAdminOnly, loginSchema, hashPassword } from "./auth";
 import * as schema from "@shared/schema";
-import { cacheMiddleware } from "./cache";
-import { optimizeImage } from "./imageOptimizer";
 import { 
   insertArticleSchema, insertCategorySchema, insertFlashInfoSchema, flashInfos, 
   insertVideoSchema, videos, insertLiveCoverageSchema, insertLiveCoverageEditorSchema, 
@@ -22,7 +20,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes - prefix all with /api
   
   // Categories
-  app.get("/api/categories", cacheMiddleware(10 * 60), async (req: Request, res: Response) => {
+  app.get("/api/categories", async (req: Request, res: Response) => {
     const categories = await storage.getAllCategories();
     res.json(categories);
   });
@@ -89,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(filteredArticles);
   });
   
-  app.get("/api/articles/featured", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
+  app.get("/api/articles/featured", async (req: Request, res: Response) => {
     const { limit } = req.query;
     const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 3;
     
@@ -97,7 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(articles);
   });
   
-  app.get("/api/articles/recent", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
+  app.get("/api/articles/recent", async (req: Request, res: Response) => {
     const { limit } = req.query;
     const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 9;
     
@@ -136,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // News Updates for ticker
-  app.get("/api/news-updates", cacheMiddleware(3 * 60), async (req: Request, res: Response) => {
+  app.get("/api/news-updates", async (req: Request, res: Response) => {
     const newsUpdates = await storage.getActiveNewsUpdates();
     res.json(newsUpdates);
   });
@@ -549,7 +547,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Videos
-  app.get("/api/videos", cacheMiddleware(15 * 60), async (req: Request, res: Response) => {
+  app.get("/api/videos", async (req: Request, res: Response) => {
     try {
       const { limit } = req.query;
       const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 8;
@@ -587,7 +585,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Flash Info (Breaking News) routes
-  app.get("/api/flash-infos", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
+  app.get("/api/flash-infos", async (req: Request, res: Response) => {
     try {
       const flashInfos = await storage.getActiveFlashInfos();
       res.json(flashInfos);
@@ -619,7 +617,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Live Event routes
-  app.get("/api/live-event", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
+  app.get("/api/live-event", async (req: Request, res: Response) => {
     try {
       const liveEvent = await storage.getActiveLiveEvent();
       
@@ -2602,34 +2600,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erreur lors de la suppression de la réaction:", error);
       res.status(500).json({ error: "Erreur lors de la suppression de la réaction" });
-    }
-  });
-  
-  // API d'optimisation d'images
-  app.get("/api/images/optimize", cacheMiddleware(60 * 60), async (req: Request, res: Response) => {
-    try {
-      const { path } = req.query;
-      
-      if (!path || typeof path !== 'string') {
-        return res.status(400).json({ 
-          error: "Paramètre 'path' requis", 
-          message: "Veuillez fournir le chemin de l'image à optimiser" 
-        });
-      }
-      
-      // Normaliser le chemin (enlever les '/' au début si nécessaire)
-      const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
-      
-      // Optimiser l'image
-      const optimizedImage = await optimizeImage(normalizedPath);
-      
-      res.json(optimizedImage);
-    } catch (error) {
-      console.error("Erreur lors de l'optimisation de l'image:", error);
-      res.status(500).json({ 
-        error: "Erreur lors de l'optimisation", 
-        message: error instanceof Error ? error.message : "Erreur inconnue"
-      });
     }
   });
 

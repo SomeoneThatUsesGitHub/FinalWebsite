@@ -157,15 +157,15 @@ const ElectionsPage: React.FC = () => {
         {/* Balises Open Graph */}
         <meta property="og:title" content="Élections Internationales | Politiquensemble" />
         <meta property="og:description" content="Suivez les résultats des élections dans le monde entier. Analyses et données électorales pour comprendre les enjeux politiques internationaux." />
-        <meta property="og:url" content="https://politiquensemble.com/elections" />
+        <meta property="og:url" content="https://politiquensemble.be/elections" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://politiquensemble.com/logo-share.png" />
+        <meta property="og:image" content="https://politiquensemble.be/logo-share.png" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="Élections Internationales | Politiquensemble" />
         <meta name="twitter:description" content="Suivez les résultats des élections dans le monde entier. Analyses et données électorales pour comprendre les enjeux politiques internationaux." />
-        <meta name="twitter:image" content="https://politiquensemble.com/logo-share.png" />
+        <meta name="twitter:image" content="https://politiquensemble.be/logo-share.png" />
         
         {/* Balises Google News pour la section élections */}
         <meta name="news_keywords" content="élections, politique, résultats électoraux, vote, démocratie, international" />
@@ -177,20 +177,20 @@ const ElectionsPage: React.FC = () => {
             "@type": "CollectionPage",
             "headline": "Élections Internationales | Politiquensemble",
             "description": "Suivez les résultats des élections dans le monde entier. Analyses et données électorales pour comprendre les enjeux politiques internationaux.",
-            "url": "https://politiquensemble.com/elections",
+            "url": "https://politiquensemble.be/elections",
             "publisher": {
               "@type": "Organization",
               "name": "Politiquensemble",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://politiquensemble.com/logo.png"
+                "url": "https://politiquensemble.be/logo.png"
               }
             }
           })}
         </script>
         
         {/* Canonical URL */}
-        <link rel="canonical" href="https://politiquensemble.com/elections" />
+        <link rel="canonical" href="https://politiquensemble.be/elections" />
       </Helmet>
 
       <motion.div

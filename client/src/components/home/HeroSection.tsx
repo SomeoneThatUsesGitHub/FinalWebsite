@@ -40,22 +40,21 @@ const HeroSection: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   
   return (
-    <section className="relative text-white h-[70vh] md:h-screen mb-8 md:mb-4">
-      {/* Image de fond avec effet parallaxe - pas d'overflow pour éviter les problèmes sur mobile */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+    <section className="relative text-white overflow-hidden h-[70vh] md:h-screen mb-8 md:mb-4">
+      {/* Image de fond avec effet parallaxe */}
+      <div className="absolute inset-0 z-0">
         {/* Dégradé amélioré, plus dynamique */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10 backdrop-blur-[0px] z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 z-10"></div>
         <div
-          className="absolute inset-0 w-full h-full"
+          className={`absolute inset-0 ${isMobile ? '' : 'bg-fixed'}`}
           style={{
             backgroundImage:
               "url('https://www.lightzoomlumiere.fr/wp-content/uploads/2024/05/Hemicycle-du-Parlement-Europeen-Strasbourg-France-Eclairage-fluorescent-Photo-Mathieu-Cugnot-Copyright-European-Union-2018-Source-EP-2.jpg')",
             backgroundPosition: isMobile ? "center top" : "center center",
             backgroundSize: "cover",
-            backgroundAttachment: "scroll",
+            backgroundAttachment: isMobile ? "scroll" : "fixed",
             filter: "contrast(1.05) brightness(0.95)",
-            height: "100%", /* Garantit que l'image reste à la bonne taille */
           }}
         ></div>
       </div>

@@ -66,7 +66,7 @@ const Article: React.FC = () => {
           <meta property="og:title" content={article.title} />
           <meta property="og:description" content={article.excerpt} />
           <meta property="og:image" content={article.imageUrl || '/logo-share.png'} />
-          <meta property="og:url" content={`https://politiquensemble.com/articles/${article.slug}`} />
+          <meta property="og:url" content={`https://politiquensemble.be/articles/${article.slug}`} />
           <meta property="og:type" content="article" />
           <meta property="og:site_name" content="Politiquensemble" />
           
@@ -89,7 +89,7 @@ const Article: React.FC = () => {
               "@context": "https://schema.org",
               "@type": "NewsArticle",
               "headline": article.title,
-              "image": [article.imageUrl || 'https://politiquensemble.com/logo-share.png'],
+              "image": [article.imageUrl || 'https://politiquensemble.be/logo-share.png'],
               "datePublished": article.createdAt,
               "dateModified": article.updatedAt || article.createdAt,
               "author": {
@@ -101,19 +101,19 @@ const Article: React.FC = () => {
                 "name": "Politiquensemble",
                 "logo": {
                   "@type": "ImageObject",
-                  "url": "https://politiquensemble.com/logo.png"
+                  "url": "https://politiquensemble.be/logo.png"
                 }
               },
               "description": article.excerpt,
               "mainEntityOfPage": {
                 "@type": "WebPage",
-                "@id": `https://politiquensemble.com/articles/${article.slug}`
+                "@id": `https://politiquensemble.be/articles/${article.slug}`
               }
             })}
           </script>
           
           {/* Canonical URL */}
-          <link rel="canonical" href={`https://politiquensemble.com/articles/${article.slug}`} />
+          <link rel="canonical" href={`https://politiquensemble.be/articles/${article.slug}`} />
         </Helmet>
       )}
       
