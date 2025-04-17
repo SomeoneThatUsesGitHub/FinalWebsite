@@ -136,7 +136,7 @@ const AboutPage: React.FC = () => {
                           </div>
                           
                           {/* Contenu simulé */}
-                          <div className="flex-1 bg-gray-50 p-2 overflow-y-auto">
+                          <div className="flex-1 bg-gray-50 p-2 overflow-hidden">
                             <div className="bg-white rounded-lg mb-3 shadow-sm border border-gray-100">
                               <div className="p-3 flex items-center space-x-2 border-b border-gray-100">
                                 <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
@@ -225,9 +225,9 @@ const AboutPage: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center">
             {/* Stats à droite */}
             <div className="md:w-3/5 order-2 md:order-2">
-              <div className="grid grid-cols-2 gap-6 relative">
+              <div className="grid grid-cols-2 gap-6 relative h-auto max-h-full">
                 <ScrollAnimation threshold={0.1} delay={0.1}>
-                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform overflow-hidden">
                     <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
                         <CountUp end={10} suffix="K+" duration={2.5} />
@@ -238,7 +238,7 @@ const AboutPage: React.FC = () => {
                 </ScrollAnimation>
                 
                 <ScrollAnimation threshold={0.1} delay={0.2}>
-                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-6 hover:translate-y-1 transition-transform">
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-6 hover:translate-y-1 transition-transform overflow-hidden">
                     <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
                         <CountUp end={250} suffix="+" duration={2.5} />
@@ -249,7 +249,7 @@ const AboutPage: React.FC = () => {
                 </ScrollAnimation>
                 
                 <ScrollAnimation threshold={0.1} delay={0.3}>
-                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-[-24px] hover:translate-y-[-29px] transition-transform">
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-[-24px] hover:translate-y-[-29px] transition-transform overflow-hidden">
                     <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
                         <CountUp end={50} suffix="+" duration={2.5} />
@@ -260,7 +260,7 @@ const AboutPage: React.FC = () => {
                 </ScrollAnimation>
                 
                 <ScrollAnimation threshold={0.1} delay={0.4}>
-                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
+                  <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform overflow-hidden">
                     <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
                         <CountUp end={15} suffix="+" duration={2.5} />
@@ -309,7 +309,7 @@ const AboutPage: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center">
             {/* Cards à gauche */}
             <div className="md:w-3/5 lg:w-3/5 order-2 md:order-1">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative h-auto max-h-full">
                 {/* Élément décoratif */}
                 <div className="hidden md:block absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full opacity-50 z-0"></div>
                 
