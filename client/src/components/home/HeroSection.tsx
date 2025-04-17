@@ -49,8 +49,9 @@ const HeroSection: React.FC = () => {
         {/* Dégradé amélioré, plus dynamique - moins sombre sur mobile */}
         <div className={`absolute inset-0 bg-gradient-to-t ${isMobile ? 'from-black/70 via-black/50 to-black/10' : 'from-black via-black/80 to-black/10'} backdrop-blur-[0px] z-10`}></div>
         <div className={`absolute inset-0 bg-gradient-to-r ${isMobile ? 'from-black/30 via-transparent to-black/30' : 'from-black/40 via-transparent to-black/40'} z-10`}></div>
-        {/* Image pour mobile - affichée en tant qu'élément img avec import direct */}
+        {/* Image pour mobile - affichée en tant qu'élément img avec import direct et léger effet sombre */}
         <div className="absolute inset-0 w-full h-full block md:hidden z-0 bg-gray-800">
+          <div className="absolute inset-0 bg-black/20 z-1"></div> {/* Effet sombre léger sur l'image */}
           <img 
             src={parlamentMobile} 
             alt="Parlement européen avec drapeau UE" 
@@ -88,7 +89,7 @@ const HeroSection: React.FC = () => {
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-3 md:mb-5 drop-shadow-md"
           >
             <span className="block text-white">Politiquensemble</span>
-            <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600 text-transparent bg-clip-text">
+            <span className="block mt-0.5 sm:mt-1 text-blue-400">
               La politique simplifiée
             </span>
           </motion.h1>
@@ -100,10 +101,10 @@ const HeroSection: React.FC = () => {
             className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 text-white/95 font-medium leading-tight sm:leading-normal md:leading-relaxed drop-shadow-md"
           >
             <span className="font-semibold">Comprendre les enjeux politiques d'aujourd'hui</span>
-            <span className="block mt-0.5 sm:mt-1">
+            <span className="block mt-0.5">
               pour construire le monde de demain.
             </span>
-            <span className="block mt-1 sm:mt-2 text-blue-200">
+            <span className="block mt-0.5 sm:mt-1 text-blue-200">
               Pour tous les citoyens de 16 à 30 ans.
             </span>
           </motion.p>
