@@ -35,4 +35,10 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://politiquensemble.com/articles/e213</loc>
+    <lastmod>2025-04-17T20:30:03.118Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>

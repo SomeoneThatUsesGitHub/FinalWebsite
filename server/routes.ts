@@ -587,7 +587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Flash Info (Breaking News) routes
-  app.get("/api/flash-infos", cacheMiddleware(5 * 60), async (req: Request, res: Response) => {
+  app.get("/api/flash-infos", cacheMiddleware(10), async (req: Request, res: Response) => {
     try {
       const flashInfos = await storage.getActiveFlashInfos();
       res.json(flashInfos);
@@ -1209,6 +1209,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Flash info validé, création
       console.log("Données validées pour création:", validation.data);
       const newFlashInfo = await storage.createFlashInfo(validation.data);
+      
+      // Invalider le cache pour que les nouveaux flash infos apparaissent immédiatement
+      invalidateCache("/api/flash-infos");
+      
       res.status(201).json(newFlashInfo);
       
     } catch (error) {

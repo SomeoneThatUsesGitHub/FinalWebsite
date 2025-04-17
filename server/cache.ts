@@ -45,7 +45,10 @@ export const cacheMiddleware = (duration: number = DEFAULT_CACHE_DURATION) => {
 
 // Fonction pour invalider le cache pour une clé spécifique
 export const invalidateCache = (key: string) => {
-  mcache.del(`__express__${key}`);
+  const cacheKey = `__express__${key}`;
+  console.log(`Invalidation du cache pour la clé: ${cacheKey}`);
+  mcache.del(cacheKey);
+  console.log(`Clés restantes dans le cache: ${mcache.keys().length}`);
 };
 
 // Fonction pour invalider plusieurs clés de cache qui commencent par un préfixe
