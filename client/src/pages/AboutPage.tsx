@@ -135,8 +135,8 @@ const AboutPage: React.FC = () => {
                             </div>
                           </div>
                           
-                          {/* Contenu simulé */}
-                          <div className="flex-1 bg-gray-50 p-2 overflow-y-auto">
+                          {/* Contenu simulé - sans défilement */}
+                          <div className="flex-1 bg-gray-50 p-2">
                             <div className="bg-white rounded-lg mb-3 shadow-sm border border-gray-100">
                               <div className="p-3 flex items-center space-x-2 border-b border-gray-100">
                                 <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
