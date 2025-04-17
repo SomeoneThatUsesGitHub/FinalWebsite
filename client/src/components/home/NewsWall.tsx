@@ -371,6 +371,11 @@ const NewsWall: React.FC = () => {
                         src={flashInfo.imageUrl}
                         alt={flashInfo.title}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = "https://via.placeholder.com/300x150?text=Image+non+disponible";
+                          target.style.objectFit = "contain";
+                        }}
                       />
                     </div>
                   )}
