@@ -13,22 +13,22 @@ const AboutPage: React.FC = () => {
     {
       icon: "objective",
       title: "Objectivité",
-      description: "Notre engagement : une information factuelle, vérifiée et impartiale. Pas de discours biaisé, juste de quoi te permettre de te forger ton propre point de vue",
+      description: "Nous nous engageons à fournir une information factuelle, vérifiée et impartiale pour vous permettre de former votre propre opinion.",
     },
     {
       icon: "pedagogy",
       title: "Pédagogie",
-      description: "Que tu sois expert ou que tu débutes, on simplifie l’actualité politique pour tout le monde. C'est le plus important si tu veux apprendre !",
+      description: "Nous rendons l'actualité politique accessible à tous, quelle que soit votre niveau de connaissance préalable.",
     },
     {
       icon: "transparency",
       title: "Transparence",
-      description: "On cite toujours nos sources et on veille à ce qu’elles soient vérifiables. Et si on fait une erreur, on l’assume et on le dit clairement",
+      description: "Nos sources sont toujours citées et vérifiables, et nous reconnaissons ouvertement nos erreurs lorsqu'elles surviennent.",
     },
     {
       icon: "independence",
       title: "Indépendance",
-      description: "On cite toujours nos sources et on veille à ce qu’elles soient vérifiables. Et si on fait une erreur, on l’assume et on le dit clairement",
+      description: "Nous ne sommes affiliés à aucun parti politique ou groupe d'intérêt, garantissant une couverture équilibrée de l'actualité.",
     },
     {
       icon: "innovation",
@@ -45,34 +45,34 @@ const AboutPage: React.FC = () => {
   const keyMilestones = [
     {
       icon: <Calendar className="h-8 w-8 text-blue-600" />,
-      year: "2023",
-      title: "Création du Média",
-      description: "Politiquensemble est né d’un constat : beaucoup de jeunes décrochent face à l’actu politique. On s’est dit qu’il était temps de la rendre plus compréhensible, plus vivante, et surtout plus accessible"
+      year: "2022",
+      title: "Naissance du concept",
+      description: "Politiquensemble est né de la volonté de rendre l'actualité politique accessible aux 16-30 ans, souvent éloignés des médias traditionnels."
     },
     {
       icon: <Users className="h-8 w-8 text-blue-600" />,
-      year: "2024",
-      title: "Lancement sur les Réseaux Sociaux",
-      description: "On a lancé notre contenu sur les élections et, en un rien de temps, on a atteint plusieurs centaines d’abonnés"
+      year: "2023",
+      title: "Lancement sur les réseaux sociaux",
+      description: "Nous avons commencé à publier du contenu sur les principales plateformes sociales, touchant rapidement plusieurs milliers d'abonnés."
     },
     {
       icon: <MapPin className="h-8 w-8 text-blue-600" />,
-      year: "2025",
-      title: "Création d'un Site Internet",
-      description: "Avec le lancement de notre site, on a franchit une nouvelle étape, en offrant un espace spécial avec des fonctionnalités avancées pour les plus curieux"
+      year: "2024",
+      title: "Développement de notre plateforme",
+      description: "Le lancement de notre site web marque une nouvelle étape, offrant un espace dédié à notre contenu et à nos formats innovants."
     },
     {
       icon: <TrendingUp className="h-8 w-8 text-blue-600" />,
-      year: "2025-2026",
-      title: "Expansion de nos Formats",
-      description: "On va développer de nouvelles façons d’informer : directs pour les grands événements, données électorales interactives, contenus éducatifs… et, des vidéos !"
+      year: "2025",
+      title: "Expansion de nos formats",
+      description: "Développement de nouvelles façons d'informer: directs pour les grands événements, données électorales interactives, et contenus éducatifs."
     }
   ];
 
   return (
     <>
       <Helmet>
-        <title>À propos | Politiquensemble</title>
+        <title>À propos de Politiquensemble - Notre mission</title>
         <meta name="description" content="Découvrez la mission de Politiquensemble, média indépendant qui rend l'actualité politique, économique et historique accessible aux 16-30 ans." />
       </Helmet>
 
@@ -82,21 +82,21 @@ const AboutPage: React.FC = () => {
           <div className="max-w-4xl mx-auto text-center">
             <ScrollAnimation threshold={0.1}>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-dark mb-6">
-                Notre mission: rendre la politique <span className="text-blue-600">accessible à toutes et à tous</span>
+                Notre mission: rendre la politique <span className="text-blue-600">accessible à tous</span>
               </h1>
               <p className="text-lg md:text-xl text-dark/70 mb-8 max-w-3xl mx-auto">
-                Politiquensemble est un média indépendant qui rend l'info politique, économique et historique accessible aux jeunes adultes (mais pas que), avec une approche pédagogique et innovante
+                Politiquensemble est un média indépendant qui démocratise l'information politique, économique et historique pour les 16-30 ans, avec une approche pédagogique et innovante.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link href="/contact">
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    Nous Contacter
+                    Nous contacter
                   </Button>
                 </Link>
                 <a href="https://www.instagram.com/politiquensemble/" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
                     <Instagram className="h-4 w-4 mr-2" />
-                    Abonne-toi !
+                    Nous suivre
                   </Button>
                 </a>
               </div>
@@ -113,12 +113,12 @@ const AboutPage: React.FC = () => {
             <div className="md:w-2/5 lg:w-1/3 md:pr-8 lg:pr-16 mb-12 md:mb-0 relative z-10">
               <ScrollAnimation threshold={0.1}>
                 <div className="md:sticky md:top-10">
-                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 md:text-left">Notre Histoire</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 md:text-left">Notre histoire</h2>
                   <div className="w-24 h-1 bg-blue-600 mb-6 md:mx-0"></div>
                   <p className="text-dark/80 mb-8 md:text-left">
-                    Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui cherche à révolutionner l’accès à l’info politique pour les jeunes
+                    Découvrez comment Politiquensemble est passé d'une simple idée à un média digital innovant qui transforme l'accès à l'information politique pour les jeunes.
                   </p>
-
+                  
                   {/* Téléphone avec Instagram (incliné sur desktop, caché sur mobile) */}
                   <div className="mt-16 relative hidden md:flex justify-center md:justify-start max-w-full lg:max-w-[280px]">
                     <div className="phone-mockup">
@@ -134,9 +134,9 @@ const AboutPage: React.FC = () => {
                               politiquensemble
                             </div>
                           </div>
-
-                          {/* Contenu simulé - sans défilement */}
-                          <div className="flex-1 bg-gray-50 p-2">
+                          
+                          {/* Contenu simulé */}
+                          <div className="flex-1 bg-gray-50 p-2 overflow-y-auto">
                             <div className="bg-white rounded-lg mb-3 shadow-sm border border-gray-100">
                               <div className="p-3 flex items-center space-x-2 border-b border-gray-100">
                                 <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
@@ -161,7 +161,7 @@ const AboutPage: React.FC = () => {
                                 </div>
                               </div>
                             </div>
-
+                            
                             <div className="bg-white rounded-lg shadow-sm border border-gray-100">
                               <div className="p-3 flex items-center space-x-2 border-b border-gray-100">
                                 <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
@@ -174,7 +174,7 @@ const AboutPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-
+                  
                   <div className="hidden md:block relative">
                     <div className="absolute -left-12 -bottom-12 w-24 h-24 bg-blue-100 rounded-full opacity-70"></div>
                     <div className="absolute -right-12 top-10 w-16 h-16 bg-blue-200 rounded-full opacity-50"></div>
@@ -182,11 +182,11 @@ const AboutPage: React.FC = () => {
                 </div>
               </ScrollAnimation>
             </div>
-
+            
             {/* Timeline à droite avec nouveau design sans effet carnet */}
             <div className="md:w-3/5 lg:w-2/3 relative">
               <div className="hidden md:block absolute top-0 bottom-0 left-12 w-1 bg-blue-200"></div>
-
+              
               {keyMilestones.map((milestone, index) => (
                 <ScrollAnimation 
                   key={index} 
@@ -220,7 +220,7 @@ const AboutPage: React.FC = () => {
         {/* Élément décoratif */}
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500 opacity-30 rounded-full"></div>
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-blue-400 opacity-20 rounded-full"></div>
-
+        
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
             {/* Stats à droite */}
@@ -230,58 +230,58 @@ const AboutPage: React.FC = () => {
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
                     <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
-                        <CountUp end={3} suffix="K+" duration={2.5} />
+                        <CountUp end={10} suffix="K+" duration={2.5} />
                       </div>
                     </div>
-                    <div className="text-lg text-white/80">Abonnés cumulés sur nos réseaux</div>
+                    <div className="text-lg text-white/80">Abonnés sur nos réseaux sociaux</div>
                   </div>
                 </ScrollAnimation>
-
+                
                 <ScrollAnimation threshold={0.1} delay={0.2}>
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-6 hover:translate-y-1 transition-transform">
                     <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
-                        <CountUp end={800} suffix="+" duration={2.5} />
+                        <CountUp end={250} suffix="+" duration={2.5} />
                       </div>
                     </div>
                     <div className="text-lg text-white/80">Articles et analyses publiés</div>
                   </div>
                 </ScrollAnimation>
-
+                
                 <ScrollAnimation threshold={0.1} delay={0.3}>
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform md:translate-y-[-24px] hover:translate-y-[-29px] transition-transform">
                     <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
-                        <CountUp end={13} suffix="" duration={2.5} />
+                        <CountUp end={50} suffix="+" duration={2.5} />
                       </div>
                     </div>
-                    <div className="text-lg text-white/80">Jeunes bénévoles à la rédaction</div>
+                    <div className="text-lg text-white/80">Événements couverts en direct</div>
                   </div>
                 </ScrollAnimation>
-
+                
                 <ScrollAnimation threshold={0.1} delay={0.4}>
                   <div className="p-8 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 transform hover:translate-y-[-5px] transition-transform">
                     <div className="mb-3">
                       <div className="text-3xl md:text-5xl font-bold">
-                        <CountUp end={2} suffix="+" duration={2.5} />
+                        <CountUp end={15} suffix="+" duration={2.5} />
                       </div>
                     </div>
-                    <div className="text-lg text-white/80">Années d'existence sur le WEB</div>
+                    <div className="text-lg text-white/80">Dossiers pédagogiques</div>
                   </div>
                 </ScrollAnimation>
               </div>
             </div>
-
+            
             {/* Texte à gauche */}
             <div className="md:w-2/5 mb-12 md:mb-0 order-1 md:order-1 md:pr-16">
               <ScrollAnimation threshold={0.1}>
                 <h2 className="text-2xl md:text-3xl font-bold mb-4">Notre impact en chiffres</h2>
                 <div className="w-24 h-1 bg-white mb-6"></div>
                 <p className="text-white/90 text-lg mb-6">
-                  Depuis le début, notre objectif est clair : rendre l’information politique accessible à tous, sans barrières.
+                  Depuis notre création, nous nous efforçons de rendre l'information politique accessible au plus grand nombre.
                 </p>
                 <p className="text-white/80">
-                  Ces chiffres reflètent notre engagement à produire du contenu de qualité pour t’aider à comprendre les enjeux politiques actuels.
+                  Ces chiffres témoignent de notre engagement à produire un contenu de qualité qui aide à comprendre les enjeux politiques contemporains.
                 </p>
                 <div className="mt-8">
                   <a 
@@ -291,7 +291,7 @@ const AboutPage: React.FC = () => {
                     className="inline-flex items-center px-6 py-3 bg-white text-blue-800 rounded-full font-medium hover:bg-blue-50 transition-all"
                   >
                     <Instagram className="mr-2 h-5 w-5" />
-                    Alors abonne-toi !
+                    Nous suivre
                   </a>
                 </div>
               </ScrollAnimation>
@@ -299,7 +299,7 @@ const AboutPage: React.FC = () => {
           </div>
         </div>
       </section>
-
+      
       {/* Bande bleue pour transition */}
       <section className="py-2 bg-blue-800"></section>
 
@@ -309,10 +309,10 @@ const AboutPage: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center">
             {/* Cards à gauche */}
             <div className="md:w-3/5 lg:w-3/5 order-2 md:order-1">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative" style={{ overflow: 'visible' }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 relative">
                 {/* Élément décoratif */}
                 <div className="hidden md:block absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full opacity-50 z-0"></div>
-
+                
                 {values.slice(0, 3).map((value, index) => (
                   <ScrollAnimation key={index} threshold={0.1} delay={index * 0.15}>
                     <div className={`bg-white rounded-lg p-6 shadow-lg h-full border-l-4 border-blue-600 hover:shadow-xl transition-shadow relative z-10 transform ${index % 2 === 1 ? 'md:translate-y-8' : ''}`}>
@@ -332,7 +332,7 @@ const AboutPage: React.FC = () => {
                 ))}
               </div>
             </div>
-
+            
             {/* Texte à droite avec mascotte */}
             <div className="md:w-2/5 lg:w-2/5 mb-12 md:mb-0 order-1 md:order-2 md:pl-16">
               <ScrollAnimation threshold={0.1}>
@@ -350,14 +350,14 @@ const AboutPage: React.FC = () => {
                       Je suis Pipo, votre guide !
                     </div>
                   </div>
-
+                  
                   <h2 className="text-2xl md:text-3xl font-bold text-dark mb-4 md:pt-0 lg:pt-40">Nos valeurs</h2>
                   <div className="w-24 h-1 bg-blue-600 mb-6 lg:ml-auto"></div>
                   <p className="text-dark/80 mb-4 max-w-md lg:ml-auto">
-                    Ces principes fondamentaux orientent notre ligne éditoriale et notre façon de traiter l’info au quotidien.
+                    Ces principes fondamentaux guident notre ligne éditoriale et notre approche de l'information quotidienne.
                   </p>
                   <p className="text-dark/70 mb-6 max-w-md lg:ml-auto">
-                    Notre mission est de rendre l’information politique facile à comprendre, impartiale et accessible à tous, quel que soit ton bagage préalable.
+                    Notre objectif est de rendre l'information politique compréhensible, objective et accessible, quelle que soit votre connaissance préalable du sujet.
                   </p>
                 </div>
               </ScrollAnimation>

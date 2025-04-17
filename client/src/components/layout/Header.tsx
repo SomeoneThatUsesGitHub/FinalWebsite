@@ -113,9 +113,6 @@ const Header: React.FC = () => {
               {/* Séparateur */}
               <div className="border-t border-gray-200 my-2.5"></div>
               
-              {/* Espace supplémentaire au-dessus du bouton Contact */}
-              <div className="py-2"></div>
-              
               {/* Bouton Contact spécial */}
               <div className="mt-2 px-1">
                 <Link href="/contact">
@@ -128,8 +125,6 @@ const Header: React.FC = () => {
                   </div>
                 </Link>
               </div>
-              {/* Espace supplémentaire en bas du menu */}
-              <div className="py-3"></div>
             </nav>
           </motion.div>
         )}

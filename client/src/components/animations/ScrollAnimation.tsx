@@ -18,9 +18,9 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({
   const ref = useRef<HTMLDivElement>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
   
-  // Sur mobile, réduire encore plus les effets pour de meilleures performances
-  const mobileDelay = isMobile ? 0 : delay; // Pas de délai sur mobile
-  const mobileThreshold = isMobile ? 0.05 : threshold; // Seuil plus bas = animation plus tôt
+  // Sur mobile, on réduit les effets pour éviter les problèmes de défilement
+  const mobileDelay = isMobile ? Math.min(delay, 0.1) : delay;
+  const mobileThreshold = isMobile ? Math.min(threshold, 0.1) : threshold;
 
   useEffect(() => {
     // Désactive les animations pour les petits écrans si nécessaire
@@ -60,10 +60,10 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({
   return (
     <div
       ref={ref}
-      className={`transition-all ${isMobile ? 'duration-300' : 'duration-500'} ${
+      className={`transition-all ${isMobile ? 'duration-500' : 'duration-700'} ${
         isVisible
           ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-2'
+          : 'opacity-0 translate-y-4'
       } ${className}`}
       style={{ transitionDelay: `${mobileDelay}s` }}
     >
