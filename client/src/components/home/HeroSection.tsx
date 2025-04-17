@@ -52,16 +52,15 @@ const HeroSection: React.FC = () => {
         {/* Image pour mobile - affichée en tant qu'élément img avec import direct et léger effet sombre */}
         <div className="absolute inset-0 w-full h-full block md:hidden z-0 bg-gray-800">
           <div className="absolute inset-0 bg-black/20 z-1"></div> {/* Effet sombre léger sur l'image */}
-          <div className="fixed top-0 left-0 w-full h-[100vh]"> {/* Fixed position pour éviter le zoom au scroll */}
-            <img 
-              src={parlamentMobile} 
-              alt="Parlement européen avec drapeau UE" 
-              className="w-full h-full object-cover"
-              style={{
-                objectPosition: "center",
-              }}
-            />
-          </div>
+          <img 
+            src={parlamentMobile} 
+            alt="Parlement européen avec drapeau UE" 
+            className="w-full h-full object-cover"
+            style={{
+              objectPosition: "center",
+              height: "100vh", /* Force hauteur fixe */
+            }}
+          />
         </div>
         
         {/* Image pour desktop - cachée sur mobile */}
